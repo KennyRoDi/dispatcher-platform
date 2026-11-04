@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** tests a65d972
+**Verificación IA:** plan 21957cd
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
@@ -58,3 +58,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Auditoria | 2026-11-03 | prueba de auditoria (a65d972) |
 | tests | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
 | devuelta de implementacion | Auditoria | 2026-11-03 | x |
+| verificación IA de plan | Auditoria | 2026-11-03 | prueba de auditoria (21957cd) |
