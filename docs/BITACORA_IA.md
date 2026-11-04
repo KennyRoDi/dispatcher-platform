@@ -117,3 +117,29 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado. Comandos probados contra GitHub real con features desechables |
 | Cómo se validó | Clon limpio, ciclo real con PR apilada y 11 checks, retirada de datos de prueba, pytest |
 | Error de la IA | CONTRIBUTING.md afirmaba que GitHub cambia la base de una PR apilada al borrar la de abajo; la prueba real mostró que la cierra. También pedía Python 3.10 y AD-22 proponía 3.12, cuando el código requiere 3.13 |
+
+## 2026-11-03 · Kenni Rodriguez · Base del equipo (`main`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Base del equipo |
+| Propósito | Dejar la base para que el equipo trabaje en paralelo |
+| Consulta resumida | Preparar la base para empezar a contribuir, con la distribución aceptada |
+| Resultado obtenido | Coordinador dividido, contratos compartidos y matriz de responsabilidades |
+| Validado / corregido / descartado | Aceptado. Los contratos son una primera versión que los responsables pueden ajustar |
+| Cómo se validó | OpenAPI idéntico antes y después, 11 checks en cada PR y pytest |
+| Error de la IA | Al dividir el coordinador quedaron nombres sin definir (_REDIS_HOST); pyflakes y 3 pruebas lo detectaron antes de publicar |
+
+## 2026-11-03 · Kenni Rodriguez · Auditoría de inicio (`chore/backlog-sin-bloqueos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Auditoría de inicio |
+| Propósito | Comprobar que el equipo pueda empezar sin esperar a nadie |
+| Consulta resumida | Auditar comandos, workflows y la base de trabajo de cada integrante |
+| Resultado obtenido | Dependencias relajadas, comandos endurecidos y PR apilada probada con fusionar |
+| Validado / corregido / descartado | Aceptado. Las dependencias relajadas exigen integrar después con los escenarios F-33 a F-37 |
+| Cómo se validó | Clon limpio, PR malas rechazadas por los checks, claude -p y agy -p, grafo del backlog y enlaces |
+| Error de la IA | Las dependencias del backlog se fijaron antes de existir los contratos y dejaban a Melany sin tareas; además el número de parte se podía reutilizar tras fusionar y borrar ramas, lo que permitía reusar una entrada de bitácora |
