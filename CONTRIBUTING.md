@@ -72,12 +72,25 @@ main
 
 Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/BACKLOG.md`.
 
-## Conformidad en GitHub
+## Checks en GitHub
 
-El workflow `conformidad` corre en cada PR y en cada push a `main`. No compila el sistema: comprueba que todos sigan el mismo patrón y que estén las piezas. Se reproduce en local con `python -m scripts.conformidad repo`.
+Cada PR muestra estos checks por separado. `main` está protegida: todos deben estar en verde para fusionar, también para administradores, y no se admite push directo.
 
-- **Repositorio:** piezas comunes, entregables de las features `hecha`, `STATUS.md` frente al backlog, dependencias, formato de la bitácora, fichas con sus cinco secciones y capas.
-- **PR:** rama, título, commits, tamaño, llaves privadas y alcance. En una feature, además: SPEC terminado con las seis verificaciones de IA y las seis aprobaciones humanas, base coherente y entrada en la bitácora.
+| Workflow | Check | Comprueba |
+|---|---|---|
+| `pr` | `titulo` | Conventional Commits y ámbito de la feature |
+| `pr` | `rama` | Patrón de nombre de rama |
+| `pr` | `commits` | Conventional Commits en cada commit |
+| `pr` | `tamano` | Hasta 400 líneas sin pruebas ni documentos, en features |
+| `pr` | `alcance` | Bitácora fuera de las features; código de producto solo por feature o `fix/` y `refactor/` |
+| `pr` | `secretos` | Sin llaves privadas agregadas |
+| `pr` | `estado-feature` | SPEC terminado, seis verificaciones de IA, seis aprobaciones y base coherente |
+| `pr` | `bitacora` | Entrada de la rama en la bitácora |
+| `ci` | `piezas y formato` | Piezas y entregables, `STATUS.md`, backlog, bitácora y fichas |
+| `ci` | `capas (clean architecture)` | Regla de dependencias |
+| `ci` | `pruebas (pytest)` | Pruebas sin `integration` ni `acceptance` |
+
+En local: `python -m scripts.conformidad repo`.
 
 ## Configuración del repositorio
 
@@ -87,4 +100,4 @@ Una vez, quien administre el repositorio:
 gh repo edit --enable-squash-merge=false --enable-rebase-merge=false --delete-branch-on-merge
 ```
 
-`main` debe aceptar los commits `chore(status): regenerar` del script. Si se protege, hay que permitirlos o `docs/STATUS.md` dejará de actualizarse.
+La rama `estado` guarda `docs/STATUS.md` y la bitácora que publica el script. No se protege ni se borra, y no se fusiona en `main`.

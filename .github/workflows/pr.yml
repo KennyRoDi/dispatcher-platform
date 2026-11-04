@@ -1,29 +1,28 @@
-name: conformidad
+name: pr
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
-  push:
-    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
-  repositorio:
+  pr:
+    name: ${{ matrix.check }}
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: python -m scripts.conformidad repo
-      - run: pip install pytest
-      - run: python -m pytest -q tests/unit/test_arquitectura.py tests/unit/test_flujo.py tests/unit/test_conformidad.py
-
-  pull-request:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        check:
+          - titulo
+          - rama
+          - commits
+          - tamano
+          - alcance
+          - secretos
+          - estado-feature
+          - bitacora
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,8 +30,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: python -m scripts.conformidad pr
+          python-version: "3.13"
+      - run: python -m scripts.conformidad pr ${{ matrix.check }}
         env:
           PR_TITULO: ${{ github.event.pull_request.title }}
           PR_RAMA: ${{ github.event.pull_request.head.ref }}

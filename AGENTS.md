@@ -8,7 +8,7 @@ No leas documentos enteros si no hace falta.
 
 | Necesitas | Archivo |
 |---|---|
-| Estado de cada feature | [docs/STATUS.md](docs/STATUS.md) |
+| Estado de cada feature | `git fetch origin estado && git show origin/estado:docs/STATUS.md` |
 | Historia, responsable y dependencias | [docs/BACKLOG.md](docs/BACKLOG.md): busca `(F-XX)` |
 | Diseño aprobado de una feature | `docs/specs/F-XX/SPEC.md` |
 | Prueba roja y comandos de medición | [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) §4 y §5: busca `F-XX` |
@@ -55,11 +55,11 @@ Un plan se aprueba una vez por feature. Cada parte de su pila repite las fases 2
 
 ### Bitácora de IA
 
-**Cada parte actualiza `docs/BITACORA_IA.md` antes de terminar.** `aprobar` en `documentacion` y `cierre` se niegan si falta la entrada de la rama. La escribe `python scripts/flujo.py bitacora`, que garantiza el formato del Anexo 3 y la publica en `main`, de modo que no genera conflictos. Si no se usó IA, se declara con `--sin-ia`. El error real de la IA detectado se registra con `--error-ia`.
+**Cada parte actualiza `docs/BITACORA_IA.md` antes de terminar.** `aprobar` en `documentacion` y `cierre` se niegan si falta la entrada de la rama. La escribe `python scripts/flujo.py bitacora`, que garantiza el formato del Anexo 3 y la publica en la rama `estado`, de modo que no genera conflictos. Antes de la entrega se copia a `main` por PR: `git checkout origin/estado -- docs/BITACORA_IA.md`. Si no se usó IA, se declara con `--sin-ia`. El error real de la IA detectado se registra con `--error-ia`.
 
 ### Estado
 
-**`docs/STATUS.md` se genera; nunca se edita.** El script lo deriva de la fase de cada `SPEC.md` y lo publica en `main` en cada comando. Estados: `pendiente`, las seis fases, `en-pr` y `hecha`. Una feature pasa a `hecha` al fusionarse su última PR.
+**`docs/STATUS.md` se genera; nunca se edita.** El script lo deriva de la fase de cada `SPEC.md` y lo publica en la rama `estado` en cada comando, porque `main` está protegida. Estados: `pendiente`, las seis fases, `en-pr` y `hecha`. Una feature pasa a `hecha` al fusionarse su última PR.
 
 ## Roles
 

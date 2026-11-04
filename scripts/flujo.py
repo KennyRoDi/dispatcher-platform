@@ -11,7 +11,7 @@
     python scripts/flujo.py cierre --tipo feat --resumen "texto" [--final]
     python scripts/flujo.py status
 
-docs/STATUS.md se deriva de la fase declarada en cada SPEC.md; nadie lo edita.
+docs/STATUS.md se deriva de la fase declarada en cada SPEC.md. Él y la bitácora se publican en la rama `estado`.
 Solo usa la biblioteca estándar, git y, para abrir PR, gh.
 """
 import argparse
@@ -37,6 +37,7 @@ TIPOS = ("feat", "fix", "docs", "test", "refactor", "perf", "build", "ci", "chor
 LIMITE_LINEAS = 400
 STATUS = "docs/STATUS.md"
 BACKLOG = "docs/BACKLOG.md"
+RAMA_ESTADO = "estado"
 BITACORA = "docs/BITACORA_IA.md"
 PLANTILLA_SPEC = "docs/specs/PLANTILLA.md"
 PLANTILLA_PR = ".github/pull_request_template.md"
@@ -379,22 +380,23 @@ def _estados_actuales(features):
     return estados, ramas
 
 
-def _publicar_en_main(ruta, generar, mensaje, intentos=3):
+def _publicar_en_estado(ruta, generar, mensaje, intentos=3):
     error = ""
     for _ in range(intentos):
-        git("fetch", "-q", "origin", "main")
-        actual = _leer_referencia("origin/main", ruta)
+        git("fetch", "-q", "origin", RAMA_ESTADO)
+        actual = _leer_referencia(f"origin/{RAMA_ESTADO}", ruta)
         nuevo = generar(actual)
         if nuevo == actual:
             return ""
         with tempfile.TemporaryDirectory() as tmp:
             arbol = pathlib.Path(tmp) / "publicacion"
-            git("worktree", "add", "-q", "--detach", str(arbol), "origin/main")
+            git("worktree", "add", "-q", "--detach", str(arbol), f"origin/{RAMA_ESTADO}")
             try:
+                (arbol / ruta).parent.mkdir(parents=True, exist_ok=True)
                 (arbol / ruta).write_text(nuevo, encoding="utf-8", newline="\n")
                 git("add", ruta, cwd=arbol)
                 git("commit", "-q", "-m", mensaje, cwd=arbol)
-                git("push", "-q", "origin", "HEAD:main", cwd=arbol)
+                git("push", "-q", "origin", f"HEAD:{RAMA_ESTADO}", cwd=arbol)
                 return ""
             except subprocess.CalledProcessError as fallo:
                 error = fallo.stderr
@@ -408,14 +410,14 @@ def publicar_status():
         estados, _ramas = _estados_actuales(parsear_backlog(_leer_main(BACKLOG)))
         return generar_status(estados)
 
-    error = _publicar_en_main(STATUS, generar, "chore(status): regenerar")
+    error = _publicar_en_estado(STATUS, generar, "chore(status): regenerar")
     if error:
         print(f"aviso: no se pudo publicar {STATUS}: {error}")
 
 
 def _rama_en_bitacora(rama):
-    git("fetch", "-q", "origin", "main")
-    return bitacora_registra(_leer_main(BITACORA), rama)
+    git("fetch", "-q", "origin", RAMA_ESTADO)
+    return bitacora_registra(_leer_referencia(f"origin/{RAMA_ESTADO}", BITACORA) or "", rama)
 
 
 def _archivos_cambiados(base):
@@ -501,7 +503,7 @@ def cmd_empezables(args):
 def cmd_status(_args):
     git("fetch", "-q", "--prune", "origin")
     publicar_status()
-    print(f"{STATUS} al día en origin/main")
+    print(f"{STATUS} al día en origin/{RAMA_ESTADO}")
 
 
 def cmd_trabajar(args):
@@ -667,11 +669,11 @@ def cmd_bitacora(args):
             _fallar("faltan campos: " + ", ".join(f"--{c}" for c in faltantes) + "; o usa --sin-ia")
         campos = {c: getattr(args, c) for c in CAMPOS_BITACORA}
         entrada = entrada_bitacora(fecha, integrante, componente, rama, error_ia=args.error_ia or "", **campos)
-    error = _publicar_en_main(BITACORA, lambda actual: agregar_entrada(actual, entrada),
+    error = _publicar_en_estado(BITACORA, lambda actual: agregar_entrada(actual, entrada),
                               f"docs(bitacora): registrar {componente}")
     if error:
         _fallar(f"no se pudo publicar {BITACORA}: {error}")
-    print(f"{BITACORA}: entrada de {componente} publicada en main")
+    print(f"{BITACORA}: entrada de {componente} publicada en la rama {RAMA_ESTADO}")
 
 
 def cmd_cierre(args):

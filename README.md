@@ -18,7 +18,7 @@ Solo se usan datos sintéticos o públicos con licencia. Está prohibido incorpo
 
 ## Estado
 
-**En desarrollo.** El repositorio contiene el código del I Proyecto Programado, que sirve de base, y los documentos de diseño. Las funcionalidades del II Proyecto y sus mediciones aún no están implementadas. El avance está en [docs/STATUS.md](docs/STATUS.md).
+**En desarrollo.** El repositorio contiene el código del I Proyecto Programado, que sirve de base, y los documentos de diseño. Las funcionalidades del II Proyecto y sus mediciones aún no están implementadas. El avance está en `docs/STATUS.md` de la rama `estado`.
 
 ## Cómo trabajar
 
@@ -34,7 +34,7 @@ python scripts/flujo.py empezables
 |---|---|
 | [AGENTS.md](AGENTS.md) | Reglas y ciclo de trabajo para agentes y personas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Commits, títulos de PR y pilas |
-| [docs/STATUS.md](docs/STATUS.md) | Estado de cada funcionalidad |
+| `docs/STATUS.md` de la rama `estado` | Estado de cada funcionalidad |
 | [docs/BACKLOG.md](docs/BACKLOG.md) | Historias, responsables, dependencias y criterios de aceptación |
 | [docs/specs/](docs/specs/) | `SPEC.md` aprobado de cada funcionalidad |
 | [docs/BITACORA_IA.md](docs/BITACORA_IA.md) | Bitácora de uso de IA |

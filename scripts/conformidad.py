@@ -2,7 +2,7 @@
 """Comprueba patrón y piezas del proyecto, sin compilar ni ejecutar el sistema.
 
     python -m scripts.conformidad repo
-    PR_TITULO=... PR_RAMA=... PR_BASE=... PR_BASE_SHA=... python -m scripts.conformidad pr
+    PR_TITULO=... PR_RAMA=... PR_BASE=... PR_BASE_SHA=... python -m scripts.conformidad pr [check ...]
 """
 import os
 import pathlib
@@ -22,6 +22,7 @@ from scripts.flujo import (
     PLANTILLA_SPEC,
     PR_ABIERTA,
     RAIZ,
+    RAMA_ESTADO,
     STATUS,
     _RAMA,
     base_de_spec,
@@ -34,7 +35,7 @@ from scripts.flujo import (
 ROLES = ("orquestador", "arquitecto", "developer", "qa-tester", "medidor", "documentador", "revisor")
 COMANDOS = ("empezables", "trabajar", "cierre")
 PIEZAS_COMUNES = (
-    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", BACKLOG, STATUS, BITACORA,
+    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", BACKLOG, BITACORA,
     PLANTILLA_SPEC, PLANTILLA_PR, "docs/ENUNCIADO.md", "docs/REQUERIMIENTOS.md", "docs/ARQUITECTURA.md",
     "docs/IMPLEMENTACION.md",
     *(f".agents/roles/{r}.md" for r in ROLES),
@@ -106,8 +107,6 @@ def revisar_spec(spec, base_pr):
 
 def revisar_alcance(rama, archivos):
     motivos = []
-    if STATUS in archivos:
-        motivos.append(f"{STATUS} se genera; no se edita en una PR")
     if _feature_de(rama) and BITACORA in archivos:
         motivos.append(f"{BITACORA} se publica con `flujo.py bitacora`, no en la PR")
     if not _feature_de(rama) and not rama.startswith(RAMAS_CON_CODIGO):
@@ -173,39 +172,86 @@ def _leer(ruta):
 
 def conformidad_repo():
     backlog = parsear_backlog(_leer(BACKLOG))
-    status = _leer(STATUS)
+    status = _git("show", f"origin/{RAMA_ESTADO}:{STATUS}")
+    bitacora = _git("show", f"origin/{RAMA_ESTADO}:{BITACORA}")
     existentes = {p.relative_to(RAIZ).as_posix() for p in RAIZ.rglob("*") if p.is_file() and ".git" not in p.parts}
     fichas = pathlib.Path(RAIZ / "docs").glob("modulo-M*.md")
     motivos = revisar_piezas(existentes, dict(_FILA_STATUS.findall(status)))
-    motivos += revisar_status(status, backlog) + revisar_backlog(backlog) + revisar_bitacora(_leer(BITACORA))
+    motivos += revisar_status(status, backlog) + revisar_backlog(backlog) + revisar_bitacora(bitacora)
     motivos += revisar_comandos({c: _leer(f".claude/skills/{c}/SKILL.md") for c in COMANDOS
                                  if f".claude/skills/{c}/SKILL.md" in existentes})
+    if STATUS in existentes:
+        motivos.append(f"{STATUS} vive en la rama {RAMA_ESTADO}, no aquí")
     for ficha in fichas:
         motivos += [f"{ficha.name}: {m}" for m in revisar_ficha(ficha.read_text(encoding="utf-8"))]
     return motivos
 
 
-def conformidad_pr():
-    rama, base, base_sha = os.environ["PR_RAMA"], os.environ["PR_BASE"], os.environ["PR_BASE_SHA"]
-    rango = f"{base_sha}...HEAD"
-    archivos = _git("diff", "--name-only", rango).splitlines()
-    agregadas = [l for l in _git("diff", rango).splitlines() if l.startswith("+")]
-    motivos = revisar_rama(rama) + revisar_titulo(os.environ["PR_TITULO"], rama)
-    motivos += revisar_commits(_git("log", "--no-merges", "--format=%s", f"{base_sha}..HEAD").splitlines())
-    motivos += revisar_tamano(_git("diff", "--numstat", rango, "--", ".", *EXCLUIDOS_DEL_TAMANO), rama)
-    motivos += revisar_alcance(rama, archivos) + revisar_secretos(agregadas)
-    feature = _feature_de(rama)
-    if feature:
-        ruta = f"docs/specs/{feature}/SPEC.md"
-        motivos += revisar_spec(_leer(ruta), base) if (RAIZ / ruta).exists() else [f"falta {ruta}"]
-        if not bitacora_registra(_git("show", f"origin/main:{BITACORA}"), rama):
-            motivos.append(f"falta la entrada de {rama} en {BITACORA}")
-    return motivos
+def _rango():
+    return f"{os.environ['PR_BASE_SHA']}...HEAD"
+
+
+def _rama():
+    return os.environ["PR_RAMA"]
+
+
+def _check_titulo():
+    return revisar_titulo(os.environ["PR_TITULO"], _rama())
+
+
+def _check_rama():
+    return revisar_rama(_rama())
+
+
+def _check_commits():
+    return revisar_commits(_git("log", "--no-merges", "--format=%s", f"{os.environ['PR_BASE_SHA']}..HEAD").splitlines())
+
+
+def _check_tamano():
+    return revisar_tamano(_git("diff", "--numstat", _rango(), "--", ".", *EXCLUIDOS_DEL_TAMANO), _rama())
+
+
+def _check_alcance():
+    return revisar_alcance(_rama(), _git("diff", "--name-only", _rango()).splitlines())
+
+
+def _check_secretos():
+    return revisar_secretos([l for l in _git("diff", _rango()).splitlines() if l.startswith("+")])
+
+
+def _check_estado_feature():
+    feature = _feature_de(_rama())
+    if not feature:
+        return []
+    ruta = f"docs/specs/{feature}/SPEC.md"
+    return revisar_spec(_leer(ruta), os.environ["PR_BASE"]) if (RAIZ / ruta).exists() else [f"falta {ruta}"]
+
+
+def _check_bitacora():
+    if not _feature_de(_rama()) or bitacora_registra(_git("show", f"origin/{RAMA_ESTADO}:{BITACORA}"), _rama()):
+        return []
+    return [f"falta la entrada de {_rama()} en {BITACORA}"]
+
+
+CHECKS_PR = {
+    "titulo": _check_titulo,
+    "rama": _check_rama,
+    "commits": _check_commits,
+    "tamano": _check_tamano,
+    "alcance": _check_alcance,
+    "secretos": _check_secretos,
+    "estado-feature": _check_estado_feature,
+    "bitacora": _check_bitacora,
+}
+
+
+def conformidad_pr(nombres):
+    return [motivo for nombre in nombres or CHECKS_PR for motivo in CHECKS_PR[nombre]()]
 
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    motivos = conformidad_pr() if sys.argv[1:] == ["pr"] else conformidad_repo()
+    motivos = conformidad_pr(sys.argv[2:]) if sys.argv[1:2] == ["pr"] else conformidad_repo()
     for motivo in motivos:
         print(f"::error::{motivo}")
     print(f"Conformidad: {len(motivos)} problema(s)")
