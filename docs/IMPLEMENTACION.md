@@ -221,7 +221,7 @@ F-27 (TLS) y F-30 (sin privilegios) son configuración de despliegue, sin lógic
 
 ## 6. Clean Commits y PR
 
-Las reglas de commits, títulos de PR y pilas están en [CONTRIBUTING.md](../CONTRIBUTING.md). El estado está en [STATUS.md](STATUS.md) y las dependencias de cada funcionalidad, en [backlog/](backlog/README.md). Los resultados de medición se versionan en `docs/evidencia/` con el script y el commit que los produjo.
+Las reglas de commits, títulos de PR y pilas están en [CONTRIBUTING.md](../CONTRIBUTING.md). El estado está en `docs/STATUS.md` de la rama `estado` y las dependencias de cada funcionalidad, en [backlog/](backlog/README.md). Los resultados de medición se versionan en `docs/evidencia/` con el script y el commit que los produjo.
 
 ## 7. Riesgo de orden
 

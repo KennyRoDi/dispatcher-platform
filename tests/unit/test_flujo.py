@@ -1,6 +1,7 @@
 import pytest
 
 from scripts.flujo import (
+    partes_cerradas,
     hijas_de,
     corresponde_a,
     desbloqueadoras,
@@ -390,3 +391,9 @@ def test_hijas_son_las_pr_abiertas_cuya_base_es_la_rama():
         {"number": 4, "baseRefName": "feat/F-01-1-a"},
     ]
     assert hijas_de(prs, "feat/F-01-1-a") == [2, 4]
+
+
+def test_nueva_parte_no_reutiliza_numero_tras_fusionar_y_borrar_ramas():
+    spec = SPEC + "| revision | Ana | d |  |\n| devuelta de revision | Ana | d | x |\n| revision | Ana | d |  |\n"
+    assert partes_cerradas(spec) == 2
+    assert nombre_rama("F-20", "otra", {}, partes_cerradas(spec)) == "feat/F-20-3-otra"

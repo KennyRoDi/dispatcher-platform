@@ -129,8 +129,21 @@ def revisar_status(texto, features):
     return motivos
 
 
+def _tiene_ciclo(features, inicio):
+    pendientes, vistas = list(features[inicio].deps), set()
+    while pendientes:
+        actual = pendientes.pop()
+        if actual == inicio:
+            return True
+        if actual in features and actual not in vistas:
+            vistas.add(actual)
+            pendientes.extend(features[actual].deps)
+    return False
+
+
 def revisar_backlog(features):
-    return [f"{f.id} depende de {d}, que no existe" for f in features.values() for d in f.deps if d not in features]
+    motivos = [f"{f.id} depende de {d}, que no existe" for f in features.values() for d in f.deps if d not in features]
+    return motivos + [f"{f} forma un ciclo de dependencias" for f in features if _tiene_ciclo(features, f)]
 
 
 def revisar_responsables(features, letras):
