@@ -9,7 +9,7 @@ No leas documentos enteros si no hace falta.
 | Necesitas | Archivo |
 |---|---|
 | Estado de cada feature | `git fetch origin estado && git show origin/estado:docs/STATUS.md` |
-| Historia, responsable y dependencias | [docs/BACKLOG.md](docs/BACKLOG.md): busca `(F-XX)` |
+| Historia, responsable y dependencias | [docs/backlog/](docs/backlog/README.md): `git grep -n "(F-XX)" docs/backlog` |
 | Diseño aprobado de una feature | `docs/specs/F-XX/SPEC.md` |
 | Prueba roja y comandos de medición | [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) §4 y §5: busca `F-XX` |
 | Decisiones y capas | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §4 y §8 |
@@ -29,6 +29,10 @@ Este ciclo es igual para todos. `scripts/flujo.py` lo automatiza para que el for
 | Abrir la PR | `/cierre` | `$cierre` | `python scripts/flujo.py cierre --tipo feat --resumen "texto"` |
 
 Si tu herramienta no reconoce el comando, abre su archivo en `.agents/skills/` y síguelo.
+
+### Identidad
+
+Cada persona trabaja su módulo. Antes de empezar, el agente pregunta a la persona su usuario de GitHub y ejecuta una vez `python scripts/flujo.py soy <usuario>`; queda en ese clon. Así `empezables` muestra solo lo suyo y lo ajeno que la desbloquea; `--todas` muestra el resto. Tomar una feature ajena se permite como apoyo, con aviso. Es una declaración, no una autenticación. Equipo en [docs/EQUIPO.md](docs/EQUIPO.md).
 
 ### Seis fases, una por vez
 

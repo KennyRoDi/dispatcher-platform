@@ -14,6 +14,7 @@ from scripts.flujo import (
     BACKLOG,
     BITACORA,
     CERRADA,
+    EQUIPO,
     EN_PR,
     EXCLUIDOS_DEL_TAMANO,
     FASES,
@@ -28,14 +29,16 @@ from scripts.flujo import (
     base_de_spec,
     bitacora_registra,
     es_conventional,
+    RESPONSABLES_COMPARTIDOS,
     fase_de,
+    letras_de_equipo,
     parsear_backlog,
 )
 
 ROLES = ("orquestador", "arquitecto", "developer", "qa-tester", "medidor", "documentador", "revisor")
 COMANDOS = ("empezables", "trabajar", "cierre")
 PIEZAS_COMUNES = (
-    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", BACKLOG, BITACORA,
+    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", f"{BACKLOG}/README.md", EQUIPO, BITACORA,
     PLANTILLA_SPEC, PLANTILLA_PR, "docs/ENUNCIADO.md", "docs/REQUERIMIENTOS.md", "docs/ARQUITECTURA.md",
     "docs/IMPLEMENTACION.md",
     *(f".agents/roles/{r}.md" for r in ROLES),
@@ -130,6 +133,11 @@ def revisar_backlog(features):
     return [f"{f.id} depende de {d}, que no existe" for f in features.values() for d in f.deps if d not in features]
 
 
+def revisar_responsables(features, letras):
+    return [f"{f.id}: responsable {f.responsable} no está en {EQUIPO}" for f in features.values()
+            if f.responsable not in letras and f.responsable not in RESPONSABLES_COMPARTIDOS]
+
+
 def revisar_bitacora(texto):
     motivos = []
     for entrada in re.split(r"^## ", texto, flags=re.M)[1:]:
@@ -171,12 +179,14 @@ def _leer(ruta):
 
 
 def conformidad_repo():
-    backlog = parsear_backlog(_leer(BACKLOG))
+    rutas = sorted(p for p in (RAIZ / BACKLOG).glob("*.md") if p.name != "README.md")
+    backlog = parsear_backlog("\n".join(p.read_text(encoding="utf-8") for p in rutas))
     status = _git("show", f"origin/{RAMA_ESTADO}:{STATUS}")
     bitacora = _git("show", f"origin/{RAMA_ESTADO}:{BITACORA}")
     existentes = {p.relative_to(RAIZ).as_posix() for p in RAIZ.rglob("*") if p.is_file() and ".git" not in p.parts}
     fichas = pathlib.Path(RAIZ / "docs").glob("modulo-M*.md")
     motivos = revisar_piezas(existentes, dict(_FILA_STATUS.findall(status)))
+    motivos += revisar_responsables(backlog, letras_de_equipo(_leer(EQUIPO)))
     motivos += revisar_status(status, backlog) + revisar_backlog(backlog) + revisar_bitacora(bitacora)
     motivos += revisar_comandos({c: _leer(f".claude/skills/{c}/SKILL.md") for c in COMANDOS
                                  if f".claude/skills/{c}/SKILL.md" in existentes})

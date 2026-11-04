@@ -17,7 +17,7 @@
 
 ## Criterios de aceptación
 
-… Copiados de `docs/BACKLOG.md`, en Dado/Cuando/Entonces.
+… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
 
 ## Diseño
 

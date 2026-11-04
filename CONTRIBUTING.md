@@ -70,7 +70,7 @@ main
 
 `flujo.py aprobar` exige la verificación de IA vigente y comprueba cada fase (ver [AGENTS.md](AGENTS.md)). `flujo.py cierre` exige todas las fases aprobadas, sin cambios pendientes, y comprueba commits, título, tamaño y `pytest -q -m "not integration and not acceptance"`.
 
-Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/BACKLOG.md`.
+Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/backlog/`.
 
 ## Checks en GitHub
 
