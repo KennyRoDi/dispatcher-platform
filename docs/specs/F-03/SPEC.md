@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion bcdab75
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
@@ -65,3 +65,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Auditoria | 2026-11-03 | prueba de auditoria (4240a89) |
 | implementacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
 | verificación IA de verificacion | Auditoria | 2026-11-03 | prueba de auditoria (bcdab75) |
+| verificacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
