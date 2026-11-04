@@ -30,7 +30,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - run: python -m scripts.conformidad pr ${{ matrix.check }}
         env:
           PR_TITULO: ${{ github.event.pull_request.title }}
