@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion bcdab75
+**Verificación IA:** documentacion c2e2db5
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
@@ -66,3 +66,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
 | verificación IA de verificacion | Auditoria | 2026-11-03 | prueba de auditoria (bcdab75) |
 | verificacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
+| verificación IA de documentacion | Auditoria | 2026-11-03 | prueba de auditoria (c2e2db5) |
