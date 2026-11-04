@@ -2,6 +2,7 @@
 
 **Fase:** plan
 **Base:** {base}
+**Verificación IA:** pendiente
 **Historia:** {historia} · **Requisitos:** … · **Responsable:** {responsable}
 
 ## Objetivo

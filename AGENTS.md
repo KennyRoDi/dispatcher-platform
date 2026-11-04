@@ -32,7 +32,10 @@ Si tu herramienta no reconoce el comando, abre su archivo en `.agents/skills/` y
 
 ### Seis fases, una por vez
 
-**El agente genera todo lo de una fase, se detiene y pide aprobación.** No encadena fases sin un sí explícito, para que la persona lea y entienda lo entregado [Parte I §3, §6].
+**Cada fase pasa dos controles antes de avanzar:**
+
+1. **Verificación de IA.** El orquestador lanza al subagente, comprueba su trabajo sin fiarse de su informe y lo registra con `flujo.py verificar`.
+2. **Verificación humana.** La persona lee el informe y aprueba. Sin un sí explícito no se avanza ni se encadenan fases, para que entienda lo entregado [Parte I §3, §6].
 
 | # | Fase | Rol | Genera | Para aprobar, el script exige |
 |---|---|---|---|---|
@@ -45,9 +48,10 @@ Si tu herramienta no reconoce el comando, abre su archivo en `.agents/skills/` y
 
 Un plan se aprueba una vez por feature. Cada parte de su pila repite las fases 2 a 6 y termina en una PR.
 
+- `python scripts/flujo.py verificar` registra la verificación sobre el commit exacto. Cualquier commit posterior la invalida y `aprobar` se niega hasta repetirla.
 - `python scripts/flujo.py aprobar` registra quién aprobó y avanza. Solo se ejecuta tras un sí explícito de la persona.
 - `python scripts/flujo.py devolver <fase> "motivo"` regresa a una fase anterior.
-- `aprobar --excepcion "motivo"` omite las comprobaciones cuando no aplican, por ejemplo en una feature sin código. Requiere autorización de la persona y queda registrada.
+- `aprobar --excepcion "motivo"` omite las comprobaciones de la tabla, no la verificación, cuando no aplican, por ejemplo en una feature sin código. Requiere autorización de la persona y queda registrada.
 
 ### Bitácora de IA
 
@@ -59,10 +63,11 @@ Un plan se aprueba una vez por feature. Cada parte de su pila repite las fases 2
 
 ## Roles
 
-Cada rol está definido en `.agents/roles/`. Con subagentes, usa uno por rol y pásale su archivo y la feature. Sin subagentes, ejecútalo en la misma sesión.
+Cada rol está definido en `.agents/roles/`. El agente principal es el orquestador y lanza un subagente por rol. Sin subagentes, ejecuta el rol en la misma sesión y declara que su verificación no es independiente.
 
 | Rol | Hace |
 |---|---|
+| Orquestador | Lanza a los subagentes, verifica su trabajo y pide la aprobación humana |
 | Arquitecto | Escribe el SPEC y divide en PR |
 | Developer | Escribe las pruebas y luego implementa |
 | QA tester | Verifica criterios e intenta romperlo |

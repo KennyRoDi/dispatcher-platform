@@ -21,7 +21,9 @@ from scripts.flujo import (
     nombre_rama,
     parsear_backlog,
     ramas_por_feature,
+    registrar_verificacion,
     titulo_pr,
+    verificacion_vigente,
 )
 
 BACKLOG = """# Backlog
@@ -41,6 +43,7 @@ SPEC = """# SPEC F-01: Crear caso
 
 **Fase:** plan
 **Base:** main
+**Verificación IA:** pendiente
 
 ## Aprobaciones
 
@@ -297,3 +300,41 @@ def test_bitacora_registra_solo_la_rama_exacta():
     texto = entrada_bitacora("2026-11-03", "Ana", "F-01", "feat/F-01-10-a", **CAMPOS_BITACORA)
     assert bitacora_registra(texto, "feat/F-01-10-a")
     assert not bitacora_registra(texto, "feat/F-01-1-a")
+
+
+def verificada(fase="plan", sha="abc1234"):
+    return registrar_verificacion(SPEC, fase, sha, "Claude Code", "2026-11-03", "reejecuté | pruebas")
+
+
+ASUNTO = "docs(F-01): registrar verificacion plan"
+
+
+def test_verificacion_registra_fase_commit_y_resumen():
+    texto = verificada()
+    assert "**Verificación IA:** plan abc1234" in texto
+    assert "| verificación IA de plan | Claude Code | 2026-11-03 | reejecuté / pruebas (abc1234) |" in texto
+
+
+def test_sin_verificacion_no_esta_vigente():
+    assert not verificacion_vigente(SPEC, "plan", [])
+
+
+def test_verificacion_vigente_si_solo_sigue_su_propio_commit():
+    assert verificacion_vigente(verificada(), "plan", [ASUNTO])
+
+
+def test_verificacion_de_otra_fase_no_sirve():
+    assert not verificacion_vigente(verificada("plan"), "tests", ["docs(F-01): registrar verificacion tests"])
+
+
+def test_cualquier_commit_posterior_invalida_la_verificacion():
+    assert not verificacion_vigente(verificada(), "plan", ["fix(F-01): cambio pedido", ASUNTO])
+
+
+def test_verificacion_sin_su_commit_no_esta_vigente():
+    assert not verificacion_vigente(verificada(), "plan", [])
+
+
+def test_aprobar_conserva_la_exigencia_para_la_fase_siguiente():
+    texto = avanzar_spec(verificada(), "Ana", "2026-11-03")
+    assert not verificacion_vigente(texto, "tests", ["docs(F-01): registrar verificacion tests"])
