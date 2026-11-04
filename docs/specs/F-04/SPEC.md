@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-03-1-prueba-auditoria
 **Verificación IA:** documentacion a3c202a
 **Historia:** US-04 · **Requisitos:** prueba de auditoria · **Responsable:** K
@@ -62,3 +62,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Auditoria | 2026-11-03 | prueba de auditoria (9c9e1b9) |
 | verificacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
 | verificación IA de documentacion | Auditoria | 2026-11-03 | prueba de auditoria (a3c202a) |
+| documentacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
