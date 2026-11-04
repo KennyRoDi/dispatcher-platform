@@ -46,7 +46,7 @@ Como supervisor, quiero recibir alertas sin esperar a consultar para reaccionar 
 - **Demuestra:** prueba A. **Evidencia:** marcas de tiempo de alerta y de cierre.
 
 ### US-15 · Dashboard (F-15) · P5 · H3
-- **Responsable:** V · **Depende de:** F-16
+- **Responsable:** V · **Depende de:** —
 Como operador, quiero ver el estado y los recursos por nodo para detectar problemas durante la operación.
 - **Dado** tres nodos activos y una ráfaga
 - **Cuando** abro el dashboard

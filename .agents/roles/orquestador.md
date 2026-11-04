@@ -19,7 +19,7 @@ El agente principal de `/trabajar`. Dirige una fase, vigila a sus subagentes y p
 
 | Fase | Comprueba |
 |---|---|
-| Todas | El diff no sale del SPEC; sin llaves ni datos de terceros; commits en el formato de `CONTRIBUTING.md`; comentarios solo en casos borde |
+| Todas | El diff no sale del SPEC; solo toca archivos de su módulo o cambios mínimos en compartidos; un contrato cambiado incluye su conformidad; sin llaves ni datos de terceros; commits en el formato de `CONTRIBUTING.md`; comentarios solo en casos borde |
 | `plan` | Cada criterio de `docs/backlog/` está en el SPEC; sin alcance que el enunciado no pida; requisitos citados; PR de hasta 400 líneas |
 | `tests` | Cada criterio tiene prueba; fallan por falta de la funcionalidad, no por errores de la prueba; prueban comportamiento; no hay código de implementación |
 | `implementacion` | Tú ejecutas las pruebas; **las pruebas no se debilitaron** (`git diff` de `tests/` desde la fase anterior); la lógica está en la capa correcta |

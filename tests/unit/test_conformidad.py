@@ -8,6 +8,7 @@ from scripts.conformidad import (
     revisar_comandos,
     revisar_commits,
     revisar_ficha,
+    revisar_independencia,
     revisar_piezas,
     revisar_rama,
     revisar_responsables,
@@ -139,3 +140,13 @@ def test_responsable_sin_integrante_falla():
 def test_backlog_con_ciclo_falla():
     features = {"F-01": Feature("F-01", "K", ("F-02",), ""), "F-02": Feature("F-02", "K", ("F-01",), "")}
     assert any("ciclo" in m for m in revisar_backlog(features))
+
+
+def test_una_feature_de_modulo_no_puede_depender_de_otro_responsable():
+    features = {"F-01": Feature("F-01", "N", (), ""), "F-02": Feature("F-02", "V", ("F-01",), "")}
+    assert any("F-02" in m for m in revisar_independencia(features))
+
+
+def test_las_features_de_integracion_si_pueden_depender_de_otros():
+    features = {"F-01": Feature("F-01", "N", (), ""), "F-33": Feature("F-33", "K", ("F-01",), "")}
+    assert not revisar_independencia(features)

@@ -19,7 +19,7 @@ Como operador, quiero no guardar el mismo contenido dos veces para ahorrar espac
 - **Demuestra:** prueba I. **Evidencia:** ficha M3: tasa de deduplicación.
 
 ### US-24 · Backpressure (F-24) · P2 · H2
-- **Responsable:** V · **Depende de:** F-20
+- **Responsable:** V · **Depende de:** —
 Como operador, quiero frenar a los productores cuando las colas se llenan para proteger el sistema.
 - **Dado** una cola en su límite
 - **Cuando** llega más carga

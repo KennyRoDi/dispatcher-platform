@@ -136,8 +136,7 @@ python scripts/flujo.py empezables</code></pre></li>
     <tr><td>José Andrés Loría Herrera</td><td><code>joselhcr</code></td><td>J</td><td>M1, M5</td><td>Workers, cancelación, modelos</td></tr>
     <tr><td>Melany Vindas</td><td>Por confirmar</td><td>V</td><td>M3</td><td>E/S, almacenamiento, dashboard</td></tr>
   </table></div>
-  <p>Todos tienen trabajo libre desde el primer día: la lógica se programa contra los contratos, con fakes, sin esperar a otro módulo. Si quedas bloqueado, toma lo que aparece en <code>AJENAS QUE TE DESBLOQUEAN</code>. La haces como apoyo: la responsabilidad sigue siendo de su dueño.</p>
-  <p>Conecta tu adaptador real si la otra parte ya está en <code>main</code>. Si no, anótalo en tu SPEC como integración pendiente. Los escenarios F-33 a F-37 comprueban la integración sobre los tres nodos.</p>
+  <p>Cada quien tiene trabajo libre desde el primer día y hasta el final de su módulo, sin esperar a otros. La integración, F-33 a F-37, se hace al final sobre los tres nodos.</p>
 </section>
 
 <section id="mapa">
@@ -159,8 +158,15 @@ python scripts/flujo.py empezables</code></pre></li>
     <tr><td>Rama <code>estado</code></td><td><code>docs/STATUS.md</code> y la bitácora vigente</td><td>La publica el script; no la edites</td></tr>
   </table></div>
   <p>Los documentos antiguos de <code>docs/</code>, como <code>WORKER_CONTRACT.md</code> o <code>DECISIONES_DISENO.md</code>, describen la plataforma heredada. Son útiles para entender el código actual, pero no definen el alcance del II Proyecto.</p>
-  <h3>Contratos entre módulos</h3>
-  <p>Para no esperar a otros módulos, programa contra los contratos y usa fakes en las pruebas: <code>Priority</code> en <code>src/domain/priority.py</code>, <code>Finding</code> en <code>src/domain/finding.py</code> y los puertos <code>Clock</code>, <code>Analyzer</code>, <code>ObjectStore</code>, <code>WorkQueue</code> y <code>AlertPublisher</code> en <code>src/application/ports.py</code>. Si necesitas cambiar uno, hazlo en una PR y avisa a los módulos afectados.</p>
+  <h3>Módulos independientes</h3>
+  <p>Cada módulo se desarrolla de principio a fin sin esperar a otro. Los módulos solo se tocan por los contratos de <a href="CONTRATOS.md"><code>docs/CONTRATOS.md</code></a>, que indica quién implementa cada uno y qué archivos son de quién.</p>
+  <ul>
+    <li><strong>Programa contra el puerto:</strong> <code>src/application/ports.py</code>, nunca contra el adaptador de otro módulo.</li>
+    <li><strong>Prueba con dobles:</strong> <code>tests/dobles.py</code> tiene uno por puerto, y <code>tests/datos/chat_whatsapp.txt</code> es una exportación de ejemplo.</li>
+    <li><strong>Valida tu adaptador:</strong> <code>tests/contratos.py</code> es la misma prueba que pasa el doble, y por eso lo probado con él sigue valiendo.</li>
+    <li><strong>Cambiar un contrato</strong> es lo único que obliga a coordinarse: una PR solo con ese cambio y aviso a los afectados.</li>
+  </ul>
+  <p>Los contratos reducen el ajuste de integración, pero no lo eliminan: rendimiento, memoria real y red solo se ven en F-33 a F-37, sobre los tres nodos. Conviene integrar temprano lo que ya esté en <code>main</code>.</p>
   <h3>Regla de capas</h3>
   <pre><code>infrastructure → adapters → application → domain</code></pre>
   <p>Las dependencias apuntan hacia el dominio. <code>src/domain</code> es lógica pura: no importa <code>redis</code>, <code>fastapi</code>, <code>minio</code> ni otras capas. Una prueba lo hace cumplir. El código debe entenderse por sí solo: comenta solo casos borde que el código no pueda expresar.</p>

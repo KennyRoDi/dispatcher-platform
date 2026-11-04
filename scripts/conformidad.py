@@ -38,7 +38,7 @@ from scripts.flujo import (
 ROLES = ("orquestador", "arquitecto", "developer", "qa-tester", "medidor", "documentador", "revisor")
 COMANDOS = ("empezables", "trabajar", "cierre")
 PIEZAS_COMUNES = (
-    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", f"{BACKLOG}/README.md", EQUIPO, BITACORA,
+    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", f"{BACKLOG}/README.md", EQUIPO, BITACORA, "docs/CONTRATOS.md", "tests/contratos.py", "tests/dobles.py",
     PLANTILLA_SPEC, PLANTILLA_PR, "docs/ENUNCIADO.md", "docs/REQUERIMIENTOS.md", "docs/ARQUITECTURA.md",
     "docs/IMPLEMENTACION.md",
     *(f".agents/roles/{r}.md" for r in ROLES),
@@ -52,6 +52,7 @@ PIEZAS_POR_FEATURE = {
     "F-41": ("docs/modulo-M1-memoria.md", "docs/modulo-M2-planificacion.md", "docs/modulo-M3-es-almacenamiento.md",
              "docs/modulo-M4-seguridad.md", "docs/modulo-M5-computo.md"),
 }
+FEATURES_DE_INTEGRACION = ("F-33", "F-34", "F-35", "F-36", "F-37", "F-41", "F-42")
 ESTADOS = ("pendiente", *FASES, EN_PR, "hecha")
 CAMPOS_ANEXO_3 = ("Herramienta", "Componente", "Propósito", "Consulta resumida", "Resultado obtenido",
                   "Validado / corregido / descartado", "Cómo se validó")
@@ -151,6 +152,12 @@ def revisar_responsables(features, letras):
             if f.responsable not in letras and f.responsable not in RESPONSABLES_COMPARTIDOS]
 
 
+def revisar_independencia(features):
+    return [f"{f.id} [{f.responsable}] depende de {d} [{features[d].responsable}]: usa un contrato de docs/CONTRATOS.md"
+            for f in features.values() if f.id not in FEATURES_DE_INTEGRACION
+            for d in f.deps if d in features and features[d].responsable != f.responsable]
+
+
 def revisar_bitacora(texto):
     motivos = []
     for entrada in re.split(r"^## ", texto, flags=re.M)[1:]:
@@ -200,6 +207,7 @@ def conformidad_repo():
     fichas = pathlib.Path(RAIZ / "docs").glob("modulo-M*.md")
     motivos = revisar_piezas(existentes, dict(_FILA_STATUS.findall(status)))
     motivos += revisar_responsables(backlog, letras_de_equipo(_leer(EQUIPO)))
+    motivos += revisar_independencia(backlog)
     motivos += revisar_status(status, backlog) + revisar_backlog(backlog) + revisar_bitacora(bitacora)
     motivos += revisar_comandos({c: _leer(f".claude/skills/{c}/SKILL.md") for c in COMANDOS
                                  if f".claude/skills/{c}/SKILL.md" in existentes})
