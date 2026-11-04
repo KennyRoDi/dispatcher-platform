@@ -3,37 +3,37 @@
 **Fase:** plan
 **Base:** main
 **Verificación IA:** pendiente
-**Historia:** US-03 · **Requisitos:** … · **Responsable:** K
+**Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
 
-… Qué cambia para quién y por qué, citando el enunciado.
+prueba de auditoria Qué cambia para quién y por qué, citando el enunciado.
 
 ## Alcance
 
-**Incluye:** …
+**Incluye:** prueba de auditoria
 
-**No incluye:** …
+**No incluye:** prueba de auditoria
 
 ## Criterios de aceptación
 
-… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
+prueba de auditoria Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
 
 ## Diseño
 
-… Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+prueba de auditoria Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | … | … |
-| Integración | … | … |
-| Aceptación | … | … |
+| Unitaria | prueba de auditoria | prueba de auditoria |
+| Integración | prueba de auditoria | prueba de auditoria |
+| Aceptación | prueba de auditoria | prueba de auditoria |
 
 ## Mediciones
 
-… Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
+prueba de auditoria Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
 
 ## Plan de pila
 
@@ -41,11 +41,11 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-03): …` | … |
+| 1 | `feat(F-03): prueba de auditoria` | prueba de auditoria |
 
 ## Riesgos y preguntas abiertas
 
-… Lo que la persona que aprueba debe decidir.
+prueba de auditoria Lo que la persona que aprueba debe decidir.
 
 ## Aprobaciones
 
