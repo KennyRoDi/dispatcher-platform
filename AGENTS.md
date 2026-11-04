@@ -40,7 +40,7 @@ Si tu herramienta no reconoce el comando, abre su archivo en `.agents/skills/` y
 | 2 | `tests` | Developer | Pruebas en rojo | Pruebas nuevas, sin código, y que fallen |
 | 3 | `implementacion` | Developer | Código en verde | Código, pruebas en verde, hasta 400 líneas |
 | 4 | `verificacion` | QA tester, medidor | Hallazgos y mediciones | Pruebas en verde, hasta 400 líneas |
-| 5 | `documentacion` | Documentador | Fichas, documentos, bitácora | Documentos actualizados |
+| 5 | `documentacion` | Documentador | Fichas, documentos, bitácora | Entrada de la rama en la bitácora |
 | 6 | `revision` | Revisor | Revisión contra el SPEC | Aprobación humana |
 
 Un plan se aprueba una vez por feature. Cada parte de su pila repite las fases 2 a 6 y termina en una PR.
@@ -48,6 +48,10 @@ Un plan se aprueba una vez por feature. Cada parte de su pila repite las fases 2
 - `python scripts/flujo.py aprobar` registra quién aprobó y avanza. Solo se ejecuta tras un sí explícito de la persona.
 - `python scripts/flujo.py devolver <fase> "motivo"` regresa a una fase anterior.
 - `aprobar --excepcion "motivo"` omite las comprobaciones cuando no aplican, por ejemplo en una feature sin código. Requiere autorización de la persona y queda registrada.
+
+### Bitácora de IA
+
+**Cada parte actualiza `docs/BITACORA_IA.md` antes de terminar.** `aprobar` en `documentacion` y `cierre` se niegan si falta la entrada de la rama. La escribe `python scripts/flujo.py bitacora`, que garantiza el formato del Anexo 3 y la publica en `main`, de modo que no genera conflictos. Si no se usó IA, se declara con `--sin-ia`. El error real de la IA detectado se registra con `--error-ia`.
 
 ### Estado
 
@@ -77,7 +81,7 @@ El **responsable principal** es siempre una persona: aprueba cada fase y debe po
 - **Workers:** nunca como root [B.5 M4].
 - **Llaves:** nunca en el código ni en el historial. El repositorio es público [B.5 M4].
 - **Terceros:** cita la fuente en el código y en la documentación [Parte I §9].
-- **IA:** se declara en `docs/bitacora_ia.md`, con errores reales detectados [Parte I §4, Anexo 3].
+- **IA:** se declara en `docs/BITACORA_IA.md`, con errores reales detectados [Parte I §4, Anexo 3].
 - **Historial:** fechas reales; prohibido simular avance [Parte I §3].
 
 ## Métodos

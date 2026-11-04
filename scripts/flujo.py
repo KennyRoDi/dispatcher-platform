@@ -6,6 +6,7 @@
     python scripts/flujo.py fase
     python scripts/flujo.py aprobar [--excepcion "motivo"]
     python scripts/flujo.py devolver <fase> "motivo"
+    python scripts/flujo.py bitacora --herramienta "x" --proposito "x" ... | --sin-ia
     python scripts/flujo.py cierre --tipo feat --resumen "texto" [--final]
     python scripts/flujo.py status
 
@@ -35,6 +36,7 @@ TIPOS = ("feat", "fix", "docs", "test", "refactor", "perf", "build", "ci", "chor
 LIMITE_LINEAS = 400
 STATUS = "docs/STATUS.md"
 BACKLOG = "docs/BACKLOG.md"
+BITACORA = "docs/BITACORA_IA.md"
 PLANTILLA_SPEC = "docs/specs/PLANTILLA.md"
 PLANTILLA_PR = ".github/pull_request_template.md"
 EXCLUIDOS_DEL_TAMANO = (":!tests", ":!docs", ":!*.md")
@@ -46,9 +48,11 @@ _TRABAJO_POR_FASE = {
     "tests": ("developer", "Escribe todas las pruebas de esta parte y déjalas en rojo. Sin código de implementación."),
     "implementacion": ("developer", "Implementa lo mínimo para ponerlas en verde y refactoriza."),
     "verificacion": ("qa-tester, medidor si el SPEC tiene mediciones", "Comprueba cada criterio, intenta romperlo y ejecuta las mediciones."),
-    "documentacion": ("documentador", "Actualiza fichas, arquitectura, reutilización, README y bitácora de IA."),
+    "documentacion": ("documentador", "Actualiza fichas, arquitectura, reutilización y README. Registra el uso de IA con `flujo.py bitacora`."),
     "revision": ("revisor", "Compara el diff con el SPEC e informa APROBADO o DEVUELTO."),
 }
+
+CAMPOS_BITACORA = ("herramienta", "proposito", "consulta", "resultado", "validado", "como")
 
 _CONVENTIONAL = re.compile(rf"^({'|'.join(TIPOS)})(\([\w./-]+\))?!?: \S")
 _ENCABEZADO_US = re.compile(r"^### (US-\d+) · .*\((F-\d+)\)", re.M)
@@ -135,6 +139,37 @@ def devolver_spec(spec, destino, nombre, fecha, motivo):
     return fijar_fase(_registrar(spec, f"devuelta de {fase}", nombre, fecha, motivo), destino)
 
 
+def _celda(texto):
+    return " ".join(texto.replace("|", "/").split())
+
+
+def _encabezado_entrada(fecha, integrante, componente, rama):
+    return f"## {fecha} · {integrante} · {componente} (`{rama}`)\n\n| Campo | Contenido |\n|---|---|\n"
+
+
+def entrada_bitacora(fecha, integrante, componente, rama, herramienta, proposito, consulta,
+                     resultado, validado, como, error_ia=""):
+    campos = [("Herramienta", herramienta), ("Componente", componente), ("Propósito", proposito),
+              ("Consulta resumida", consulta), ("Resultado obtenido", resultado),
+              ("Validado / corregido / descartado", validado), ("Cómo se validó", como)]
+    if error_ia:
+        campos.append(("Error de la IA", error_ia))
+    filas = "".join(f"| {campo} | {_celda(valor)} |\n" for campo, valor in campos)
+    return _encabezado_entrada(fecha, integrante, componente, rama) + filas
+
+
+def entrada_sin_ia(fecha, integrante, componente, rama):
+    return _encabezado_entrada(fecha, integrante, componente, rama) + f"| Uso de IA | No se usó IA en {_celda(componente)}. |\n"
+
+
+def agregar_entrada(bitacora, entrada):
+    return f"{bitacora.rstrip()}\n\n{entrada}"
+
+
+def bitacora_registra(bitacora, rama):
+    return f"(`{rama}`)" in bitacora
+
+
 def generar_spec(plantilla, feature, base):
     campos = {"feature": feature.id, "titulo": feature.titulo, "base": base,
               "historia": feature.historia_id, "responsable": feature.responsable}
@@ -145,16 +180,12 @@ def _es_prueba(archivo):
     return archivo.startswith("tests/")
 
 
-def _es_documento(archivo):
-    return (archivo.startswith("docs/") or archivo.endswith(".md")) and not archivo.startswith("docs/specs/")
-
-
 def _es_codigo(archivo):
     return not (_es_prueba(archivo) or archivo.startswith(("docs/", ".agents/", ".claude/", ".github/"))
                 or archivo.endswith(".md"))
 
 
-def motivos_bloqueo(fase, archivos, spec=""):
+def motivos_bloqueo(fase, archivos, spec="", bitacora_registrada=True):
     if fase == "plan" and "…" in spec:
         return ["el SPEC aún tiene campos … sin completar"]
     if fase == "tests":
@@ -167,8 +198,8 @@ def motivos_bloqueo(fase, archivos, spec=""):
         return motivos
     if fase == "implementacion" and not any(_es_codigo(a) for a in archivos):
         return ["no hay código de implementación"]
-    if fase == "documentacion" and not any(_es_documento(a) for a in archivos):
-        return ["no hay documentación actualizada"]
+    if fase == "documentacion" and not bitacora_registrada:
+        return [f"falta la entrada de esta rama en {BITACORA}; usa `flujo.py bitacora`"]
     return []
 
 
@@ -327,28 +358,43 @@ def _estados_actuales(features):
     return estados, ramas
 
 
-def publicar_status(intentos=3):
+def _publicar_en_main(ruta, generar, mensaje, intentos=3):
     error = ""
     for _ in range(intentos):
-        estados, _ramas = _estados_actuales(parsear_backlog(_leer_main(BACKLOG)))
-        texto = generar_status(estados)
-        if _leer_referencia("origin/main", STATUS) == texto:
-            return estados
+        git("fetch", "-q", "origin", "main")
+        actual = _leer_referencia("origin/main", ruta)
+        nuevo = generar(actual)
+        if nuevo == actual:
+            return ""
         with tempfile.TemporaryDirectory() as tmp:
-            arbol = pathlib.Path(tmp) / "status"
+            arbol = pathlib.Path(tmp) / "publicacion"
             git("worktree", "add", "-q", "--detach", str(arbol), "origin/main")
             try:
-                (arbol / STATUS).write_text(texto, encoding="utf-8", newline="\n")
-                git("add", STATUS, cwd=arbol)
-                git("commit", "-q", "-m", "chore(status): regenerar", cwd=arbol)
+                (arbol / ruta).write_text(nuevo, encoding="utf-8", newline="\n")
+                git("add", ruta, cwd=arbol)
+                git("commit", "-q", "-m", mensaje, cwd=arbol)
                 git("push", "-q", "origin", "HEAD:main", cwd=arbol)
-                return estados
+                return ""
             except subprocess.CalledProcessError as fallo:
                 error = fallo.stderr
             finally:
                 git("worktree", "remove", "--force", str(arbol))
-    print(f"aviso: no se pudo publicar {STATUS}: {error}")
-    return estados
+    return error or "reintentos agotados"
+
+
+def publicar_status():
+    def generar(_actual):
+        estados, _ramas = _estados_actuales(parsear_backlog(_leer_main(BACKLOG)))
+        return generar_status(estados)
+
+    error = _publicar_en_main(STATUS, generar, "chore(status): regenerar")
+    if error:
+        print(f"aviso: no se pudo publicar {STATUS}: {error}")
+
+
+def _rama_en_bitacora(rama):
+    git("fetch", "-q", "origin", "main")
+    return bitacora_registra(_leer_main(BITACORA), rama)
 
 
 def _archivos_cambiados(base):
@@ -514,7 +560,7 @@ def cmd_aprobar(args):
     git("fetch", "-q", "origin", base)
     _validar_commits(base)
     if not args.excepcion:
-        _comprobar_fase(fase, _archivos_cambiados(base), spec, base)
+        _comprobar_fase(fase, _archivos_cambiados(base), spec, base, _rama_actual())
     nombre = git("config", "user.name")
     hoy = datetime.date.today().isoformat()
     nuevo = avanzar_spec(spec, nombre, hoy, args.excepcion or "")
@@ -524,8 +570,9 @@ def cmd_aprobar(args):
     _imprimir_fase(feature_id, fase_de(nuevo))
 
 
-def _comprobar_fase(fase, archivos, spec, base):
-    motivos = motivos_bloqueo(fase, archivos, spec)
+def _comprobar_fase(fase, archivos, spec, base, rama):
+    registrada = fase != "documentacion" or _rama_en_bitacora(rama)
+    motivos = motivos_bloqueo(fase, archivos, spec, registrada)
     if motivos:
         _fallar(f"la fase {fase} no se puede aprobar: " + "; ".join(motivos))
     if fase == "tests":
@@ -550,6 +597,29 @@ def cmd_devolver(args):
     _imprimir_fase(feature_id, args.fase)
 
 
+def cmd_bitacora(args):
+    rama = _rama_actual()
+    coincidencia = _RAMA.match(rama)
+    componente = args.componente or (coincidencia and coincidencia.group(1))
+    if not componente:
+        _fallar("fuera de una rama de feature, indica --componente")
+    fecha = datetime.date.today().isoformat()
+    integrante = git("config", "user.name")
+    if args.sin_ia:
+        entrada = entrada_sin_ia(fecha, integrante, componente, rama)
+    else:
+        faltantes = [c for c in CAMPOS_BITACORA if not getattr(args, c)]
+        if faltantes:
+            _fallar("faltan campos: " + ", ".join(f"--{c}" for c in faltantes) + "; o usa --sin-ia")
+        campos = {c: getattr(args, c) for c in CAMPOS_BITACORA}
+        entrada = entrada_bitacora(fecha, integrante, componente, rama, error_ia=args.error_ia or "", **campos)
+    error = _publicar_en_main(BITACORA, lambda actual: agregar_entrada(actual, entrada),
+                              f"docs(bitacora): registrar {componente}")
+    if error:
+        _fallar(f"no se pudo publicar {BITACORA}: {error}")
+    print(f"{BITACORA}: entrada de {componente} publicada en main")
+
+
 def cmd_cierre(args):
     rama = _rama_actual()
     feature_id = _feature_actual()
@@ -565,6 +635,8 @@ def cmd_cierre(args):
     git("fetch", "-q", "origin", base)
     _validar_tamano(base)
     _exigir_pruebas_en_verde()
+    if not _rama_en_bitacora(rama):
+        _fallar(f"falta la entrada de esta rama en {BITACORA}; usa `flujo.py bitacora`")
     if args.final and fase_de(spec) != CERRADA:
         _guardar_y_confirmar(feature_id, fijar_fase(spec, CERRADA), f"docs({feature_id}): cerrar feature")
     asuntos = _validar_commits(base)
@@ -592,7 +664,7 @@ def _analizador():
     analizador = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     comandos = analizador.add_subparsers(dest="comando", required=True)
     lista = comandos.add_parser("empezables", help="lista lo que se puede tomar")
-    lista.add_argument("--responsable", help="K, N o J")
+    lista.add_argument("--responsable", help="K, N, J o V")
     lista.set_defaults(accion=cmd_empezables)
     comandos.add_parser("status", help="regenera docs/STATUS.md").set_defaults(accion=cmd_status)
     toma = comandos.add_parser("trabajar", help="inicia o retoma una feature, o abre su siguiente parte")
@@ -607,6 +679,13 @@ def _analizador():
     devolver.add_argument("fase", choices=FASES)
     devolver.add_argument("motivo")
     devolver.set_defaults(accion=cmd_devolver)
+    registro = comandos.add_parser("bitacora", help="publica una entrada en la bitácora de IA")
+    registro.add_argument("--componente", help="por defecto, la feature de la rama actual")
+    registro.add_argument("--sin-ia", action="store_true", help="declara que no se usó IA")
+    registro.add_argument("--error-ia", help="error o imprecisión de la IA detectado y cómo se resolvió")
+    for campo in CAMPOS_BITACORA:
+        registro.add_argument(f"--{campo}")
+    registro.set_defaults(accion=cmd_bitacora)
     cerrar = comandos.add_parser("cierre", help="valida, publica y abre la PR")
     cerrar.add_argument("--tipo", required=True, choices=TIPOS)
     cerrar.add_argument("--resumen", required=True)

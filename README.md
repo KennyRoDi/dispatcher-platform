@@ -37,6 +37,7 @@ python scripts/flujo.py empezables
 | [docs/STATUS.md](docs/STATUS.md) | Estado de cada funcionalidad |
 | [docs/BACKLOG.md](docs/BACKLOG.md) | Historias, responsables, dependencias y criterios de aceptación |
 | [docs/specs/](docs/specs/) | `SPEC.md` aprobado de cada funcionalidad |
+| [docs/BITACORA_IA.md](docs/BITACORA_IA.md) | Bitácora de uso de IA |
 | [docs/ENUNCIADO.md](docs/ENUNCIADO.md) | Enunciado del proyecto: fuente de verdad |
 | [docs/REQUERIMIENTOS.md](docs/REQUERIMIENTOS.md) | Requisitos con cita al enunciado, supuestos y trazabilidad |
 | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Escenarios de calidad, capas, diagramas y decisiones |
