@@ -8,24 +8,24 @@ Requisitos en `REQUERIMIENTOS.md`, decisiones en `ARQUITECTURA.md`, historias en
 
 ### 1.1 Hitos del documento [Parte I §2]
 
-| Hito | Contenido exigido para la Alternativa B | Fecha nominal | Estado el 03/nov/26 |
+| Hito | Contenido exigido para la Alternativa B | Fecha nominal | Fecha real |
 |---|---|---|---|
-| H1 | Reutilización, arquitectura, dataset sintético, pipeline base con texto, imagen y audio, matriz | Fin de semana 1 | Vencido |
-| H2 | M1, M2 y M3 con mediciones preliminares; estados, reintentos y cancelación | Fin de semana 2 | Vencido o vence el 04/nov, según SUP-02 |
-| H3 | M4, M5, pruebas de carga, informe, demo y defensa | Entrega final, 04/nov/26 | Vence mañana |
+| H1 | Reutilización, arquitectura, dataset sintético, pipeline base con texto, imagen y audio, matriz | Fin de semana 1 | Por confirmar |
+| H2 | M1, M2 y M3 con mediciones preliminares; estados, reintentos y cancelación | Fin de semana 2 | Por confirmar |
+| H3 | M4, M5, pruebas de carga, informe, demo y defensa | Entrega final | Por confirmar |
 
-### 1.2 Calendario comprimido real
+### 1.2 Orden de trabajo
 
-Hay menos de 30 horas (SUP-03). Se conserva el orden de dependencias de los hitos, no sus fechas.
+El equipo indica que el plazo real supera la fecha del enunciado; la fecha exacta está por confirmar (SUP-03). Se conserva el orden de dependencias de los hitos:
 
-| Bloque | Ventana | Hito | Salida verificable |
-|---|---|---|---|
-| B1 | 03/nov, hasta 23:59 | H1 | Pipeline de los tres tipos sobre 3 nodos; dataset; matriz; reutilización |
-| B2 | 04/nov, hasta 10:00 | H2 | M1, M2, M3 con primera medición; estados, reintentos, cancelación |
-| B3 | 04/nov, hasta 16:00 | H3 | M4, M5, escenarios B.6 |
-| B4 | 04/nov, hasta la entrega | H3 | Fichas, informe, README, ensayo de la demo y de la defensa |
+| Bloque | Hito | Salida verificable |
+|---|---|---|
+| B1 | H1 | Pipeline de los tres tipos sobre 3 nodos; dataset; matriz; reutilización |
+| B2 | H2 | M1, M2, M3 con primera medición; estados, reintentos, cancelación |
+| B3 | H3 | M4, M5, escenarios B.6 |
+| B4 | H3 | Fichas, informe, README, ensayo de la demo y de la defensa |
 
-**Regla de integridad del historial.** Los commits llevan su fecha real. No se usa `GIT_COMMITTER_DATE`, `--date` ni rebase para simular avance. Un historial concentrado en dos días afecta el rubro de documentación [Parte I §3], pero alterarlo es falta de integridad académica [Parte I §9]. Si existe trabajo real en otras copias, debe integrarse conservando sus fechas.
+**Regla de integridad del historial.** Los commits llevan su fecha real. No se usa `GIT_COMMITTER_DATE`, `--date` ni rebase para simular avance [Parte I §3, §9]. Si existe trabajo real en otras copias, debe integrarse conservando sus fechas.
 
 ### 1.3 Recorte si falta tiempo
 
@@ -218,29 +218,10 @@ F-27 (TLS) y F-30 (sin privilegios) son configuración de despliegue, sin lógic
 | GPU (F-31) | `nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv -l 1` durante la corrida | Memoria y uso de GPU |
 | Sin GPU local | Mismo script en Colab o Kaggle; si nadie tiene GPU, solo hilos y `int8` [B.5 M5] | Se declara la diferencia de entorno |
 
-## 6. Clean Commits
+## 6. Clean Commits y PR
 
-- Un commit por paso coherente de una funcionalidad, con su prueba. Formato: `tipo(F-XX): descripción`.
-- Cada integrante hace sus propios commits con su identidad. **El autor debe coincidir con la matriz** [Parte I §3].
-- Ramas `feat/F-XX-nombre`; fusión sin aplastar, para conservar el historial.
-- Los resultados de medición se versionan en `docs/evidencia/` con el script y el commit que los produjo.
+Las reglas de commits, títulos de PR y pilas están en [CONTRIBUTING.md](../CONTRIBUTING.md). El estado está en [STATUS.md](STATUS.md) y las dependencias de cada funcionalidad, en [BACKLOG.md](BACKLOG.md). Los resultados de medición se versionan en `docs/evidencia/` con el script y el commit que los produjo.
 
-## 7. Dependencias críticas
-
-```mermaid
-flowchart LR
-    F38["F-38 Tres nodos"] --> F07["F-07 a F-09 Workers"]
-    F03["F-03 Dataset"] --> F07
-    F05["F-05 Enrutar"] --> F07
-    F07 --> F16["F-16 a F-19 M1"]
-    F07 --> F31["F-31 Benchmark M5"]
-    F31 --> F32["F-32 Routing"]
-    F06["F-06 Cola confiable"] --> F20["F-20 Scheduler M2"]
-    F10["F-10 Estados"] --> F13["F-13 Reporte"]
-    F12["F-12 Cancelación"] --> F36["F-36 Escenario"]
-    F17["F-17 Admisión"] --> F37["F-37 Saturación"]
-    F20 --> F33["F-33 Ráfaga"]
-    F24["F-24 Backpressure"] --> F33
-```
+## 7. Riesgo de orden
 
 **F-27 (TLS) y F-26 (auth) tocan todas las conexiones.** Si van tarde, pueden romper mediciones ya hechas. Las mediciones de M1 a M3 se repiten si TLS altera sus resultados, al menos el throughput de M3, y esa diferencia se reporta.

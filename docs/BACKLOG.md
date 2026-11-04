@@ -18,9 +18,12 @@ Las historias de entrega (US-38 a US-42) toman P1 o P2 según lo que bloquean: l
 
 Pruebas: **U** unitaria, **I** integración, **A** aceptación.
 
+El estado de cada funcionalidad está en [STATUS.md](STATUS.md). Responsables propuestos: K Kenni Rodriguez, N Nahúm Murillo, J José Andrés Loría Herrera (SUP-01).
+
 ## Área: recepción y dataset
 
 ### US-01 · Crear caso multifuente (F-01) · P1 · H1
+- **Responsable:** N · **Depende de:** —
 Como analista, quiero crear un caso con varias fuentes para analizarlas en conjunto.
 - **Dado** un analista autenticado y fuentes de texto, imagen, audio y video
 - **Cuando** crea el caso
@@ -29,6 +32,7 @@ Como analista, quiero crear un caso con varias fuentes para analizarlas en conju
 - **Demuestra:** prueba A. **Evidencia:** respuesta de `GET /cases/{id}`.
 
 ### US-02 · Validar y normalizar (F-02) · P1 · H1
+- **Responsable:** N · **Depende de:** F-01
 Como analista, quiero que se rechacen formatos no válidos y se normalicen las exportaciones para analizar datos uniformes.
 - **Dado** una exportación de WhatsApp o Telegram y un archivo no admitido
 - **Cuando** se reciben
@@ -37,6 +41,7 @@ Como analista, quiero que se rechacen formatos no válidos y se normalicen las e
 - **Demuestra:** prueba A. **Evidencia:** conteo de mensajes válidos frente a rechazados.
 
 ### US-03 · Dataset sintético (F-03) · P1 · H1
+- **Responsable:** K · **Depende de:** —
 Como equipo, queremos un dataset reproducible para probar con volumen sin usar datos de terceros.
 - **Dado** el generador con una semilla
 - **Cuando** se ejecuta
@@ -45,6 +50,7 @@ Como equipo, queremos un dataset reproducible para probar con volumen sin usar d
 - **Demuestra:** validador. **Evidencia:** salida del validador en `docs/dataset.md`.
 
 ### US-04 · Verdad de referencia y procedencia (F-04) · P1 · H1
+- **Responsable:** K · **Depende de:** F-03
 Como evaluador, quiero conocer el origen de cada fuente y los aciertos del análisis para confiar en el dataset.
 - **Dado** el manifiesto con etiquetas, procedencia y licencia
 - **Cuando** se comparan las salidas con las etiquetas
@@ -55,6 +61,7 @@ Como evaluador, quiero conocer el origen de cada fuente y los aciertos del anál
 ## Área: cola y workers
 
 ### US-05 · Descomponer y enrutar (F-05) · P1 · H1
+- **Responsable:** N · **Depende de:** F-01
 Como coordinador, quiero separar un caso en sub-tareas por tipo para enviarlas a workers especializados.
 - **Dado** un caso con texto, imagen, audio y video
 - **Cuando** se descompone
@@ -63,6 +70,7 @@ Como coordinador, quiero separar un caso en sub-tareas por tipo para enviarlas a
 - **Demuestra:** prueba A. **Evidencia:** log de routing.
 
 ### US-06 · Cola confiable (F-06) · P1 · H1
+- **Responsable:** N · **Depende de:** —
 Como coordinador, quiero que ninguna sub-tarea se pierda si un worker muere al tomarla.
 - **Dado** un worker que toma una sub-tarea
 - **Cuando** muere justo después de sacarla
@@ -71,6 +79,7 @@ Como coordinador, quiero que ninguna sub-tarea se pierda si un worker muere al t
 - **Demuestra:** prueba I. **Evidencia:** entrada en `docs/reutilizacion.md` con la limitación corregida.
 
 ### US-07 · Worker de texto (F-07) · P1 · H1
+- **Responsable:** J · **Depende de:** F-05
 Como analista, quiero palabras clave, tema, sentimiento y lenguaje ofensivo o amenazas para encontrar conversaciones relevantes.
 - **Dado** una conversación etiquetada
 - **Cuando** se procesa
@@ -79,6 +88,7 @@ Como analista, quiero palabras clave, tema, sentimiento y lenguaje ofensivo o am
 - **Demuestra:** prueba A. **Evidencia:** tabla de aciertos.
 
 ### US-08 · Worker de imagen (F-08) · P1 · H1
+- **Responsable:** J · **Depende de:** F-05
 Como analista, quiero detectar contenido sensible en imágenes para incluirlo como hallazgo.
 - **Dado** una imagen con contenido positivo conocido
 - **Cuando** se procesa
@@ -87,6 +97,7 @@ Como analista, quiero detectar contenido sensible en imágenes para incluirlo co
 - **Demuestra:** prueba A. **Evidencia:** tabla de aciertos.
 
 ### US-09 · Worker de audio (F-09) · P1 · H1
+- **Responsable:** J · **Depende de:** F-07
 Como analista, quiero transcribir y analizar notas de voz para tratarlas como texto con timestamps.
 - **Dado** una nota de voz con transcripción conocida
 - **Cuando** se procesa
@@ -97,6 +108,7 @@ Como analista, quiero transcribir y analizar notas de voz para tratarlas como te
 ## Área: estados, reporte, alertas y dashboard
 
 ### US-10 · Estados y cierre (F-10) · P3 · H2
+- **Responsable:** N · **Depende de:** F-05
 Como analista, quiero un estado de caso confiable para saber cuándo terminó realmente.
 - **Dado** un caso con sub-tareas exitosas y fallidas
 - **Cuando** todas terminan, incluso con reportes duplicados
@@ -105,6 +117,7 @@ Como analista, quiero un estado de caso confiable para saber cuándo terminó re
 - **Demuestra:** prueba I. **Evidencia:** historial de estados por caso.
 
 ### US-11 · Reintentos (F-11) · P3 · H2
+- **Responsable:** N · **Depende de:** F-10
 Como operador, quiero reintentos con backoff para superar fallos transitorios sin saturar.
 - **Dado** una sub-tarea que falla, con máximo configurado N
 - **Cuando** se reintenta
@@ -113,6 +126,7 @@ Como operador, quiero reintentos con backoff para superar fallos transitorios si
 - **Demuestra:** prueba I. **Evidencia:** log con tiempos entre intentos.
 
 ### US-12 · Cancelación real (F-12) · P3 · H2
+- **Responsable:** J · **Depende de:** F-06
 Como supervisor, quiero cancelar un caso y liberar recursos para que no siga consumiendo.
 - **Dado** un caso con una sub-tarea en ejecución
 - **Cuando** se cancela
@@ -121,6 +135,7 @@ Como supervisor, quiero cancelar un caso y liberar recursos para que no siga con
 - **Demuestra:** prueba I. **Evidencia:** salida de `ps` y `ls` antes y después.
 
 ### US-13 · Reporte consolidado (F-13) · P3 · H2
+- **Responsable:** K · **Depende de:** F-07, F-10
 Como analista, quiero un reporte con evidencias enlazadas para sustentar cada hallazgo.
 - **Dado** un caso finalizado
 - **Cuando** se consulta el reporte
@@ -129,6 +144,7 @@ Como analista, quiero un reporte con evidencias enlazadas para sustentar cada ha
 - **Demuestra:** prueba A. **Evidencia:** JSON de ejemplo en el informe.
 
 ### US-14 · Alertas (F-14) · P5 · H3
+- **Responsable:** K · **Depende de:** F-10
 Como supervisor, quiero recibir alertas sin esperar a consultar para reaccionar a incidencias.
 - **Dado** un caso con una incidencia alta
 - **Cuando** se detecta y cuando el caso finaliza
@@ -137,6 +153,7 @@ Como supervisor, quiero recibir alertas sin esperar a consultar para reaccionar 
 - **Demuestra:** prueba A. **Evidencia:** marcas de tiempo de alerta y de cierre.
 
 ### US-15 · Dashboard (F-15) · P5 · H3
+- **Responsable:** K · **Depende de:** F-16
 Como operador, quiero ver el estado y los recursos por nodo para detectar problemas durante la operación.
 - **Dado** tres nodos activos y una ráfaga
 - **Cuando** abro el dashboard
@@ -147,6 +164,7 @@ Como operador, quiero ver el estado y los recursos por nodo para detectar proble
 ## Área: M1 · Memoria
 
 ### US-16 · Límites por worker (F-16) · P2 · H2
+- **Responsable:** J · **Depende de:** —
 Como operador, quiero un límite por worker para que ninguno afecte al nodo.
 - **Dado** el Compose de un nodo
 - **Cuando** arranca
@@ -155,6 +173,7 @@ Como operador, quiero un límite por worker para que ninguno afecte al nodo.
 - **Demuestra:** prueba I. **Evidencia:** ficha M1: valores por worker.
 
 ### US-17 · Control de admisión (F-17) · P2 · H2
+- **Responsable:** J · **Depende de:** F-16
 Como operador, quiero admitir solo lo que cabe en memoria para evitar terminaciones por OOM.
 - **Dado** un worker sin memoria para otra sub-tarea según la huella medida
 - **Cuando** hay trabajo en cola
@@ -163,6 +182,7 @@ Como operador, quiero admitir solo lo que cabe en memoria para evitar terminacio
 - **Demuestra:** prueba I. **Evidencia:** ficha M1: tabla de huella y gráfico de memoria por worker.
 
 ### US-18 · Detección de OOM (F-18) · P2 · H2
+- **Responsable:** J · **Depende de:** F-12, F-16
 Como operador, quiero distinguir un OOM de otros fallos para aplicar la política correcta.
 - **Dado** una sub-tarea que excede el límite
 - **Cuando** el kernel termina el subproceso
@@ -171,6 +191,7 @@ Como operador, quiero distinguir un OOM de otros fallos para aplicar la polític
 - **Demuestra:** prueba I. **Evidencia:** ficha M1: `memory.events` y recuperación.
 
 ### US-19 · Estrategias de carga (F-19) · P2 · H2
+- **Responsable:** J · **Depende de:** F-09
 Como responsable de M1, quiero ejecutar ambas estrategias para justificar la elegida con datos.
 - **Dado** el parámetro de estrategia
 - **Cuando** se inicia con N procesos en cada variante
@@ -181,6 +202,7 @@ Como responsable de M1, quiero ejecutar ambas estrategias para justificar la ele
 ## Área: M2 · Planificación
 
 ### US-20 · Prioridades con aging (F-20) · P2 · H2
+- **Responsable:** N · **Depende de:** F-06
 Como analista, quiero que los casos críticos pasen primero sin bloquear los de baja prioridad.
 - **Dado** un flujo continuo de casos altos y un caso bajo en espera
 - **Cuando** corre el scheduler
@@ -189,6 +211,7 @@ Como analista, quiero que los casos críticos pasen primero sin bloquear los de 
 - **Demuestra:** prueba U de inanición y medición. **Evidencia:** ficha M2: espera máxima por nivel.
 
 ### US-21 · Comparación de políticas (F-21) · P2 · H2
+- **Responsable:** N · **Depende de:** F-20
 Como responsable de M2, quiero cambiar de política por configuración para compararlas bajo la misma carga.
 - **Dado** la misma carga con semilla fija
 - **Cuando** se ejecuta con FIFO y con aging
@@ -199,6 +222,7 @@ Como responsable de M2, quiero cambiar de política por configuración para comp
 ## Área: M3 · E/S y almacenamiento
 
 ### US-22 · Chunks verificados (F-22) · P2 · H2
+- **Responsable:** N · **Depende de:** F-01
 Como cliente, quiero enviar archivos grandes por partes para no cargarlos completos en memoria y detectar corrupción.
 - **Dado** un archivo ≥ 200 MB dividido en chunks
 - **Cuando** se envía y reensambla
@@ -207,6 +231,7 @@ Como cliente, quiero enviar archivos grandes por partes para no cargarlos comple
 - **Demuestra:** prueba I. **Evidencia:** ficha M3: MB/s para ≥ 3 tamaños.
 
 ### US-23 · Almacenamiento por contenido (F-23) · P2 · H2
+- **Responsable:** N · **Depende de:** F-22
 Como operador, quiero no guardar el mismo contenido dos veces para ahorrar espacio.
 - **Dado** dos fuentes con el mismo contenido
 - **Cuando** se almacenan
@@ -215,6 +240,7 @@ Como operador, quiero no guardar el mismo contenido dos veces para ahorrar espac
 - **Demuestra:** prueba I. **Evidencia:** ficha M3: tasa de deduplicación.
 
 ### US-24 · Backpressure (F-24) · P2 · H2
+- **Responsable:** N · **Depende de:** F-20
 Como operador, quiero frenar a los productores cuando las colas se llenan para proteger el sistema.
 - **Dado** una cola en su límite
 - **Cuando** llega más carga
@@ -223,6 +249,7 @@ Como operador, quiero frenar a los productores cuando las colas se llenan para p
 - **Demuestra:** experimento con y sin límite. **Evidencia:** ficha M3: gráfico de profundidad y respuesta.
 
 ### US-25 · Recepción no bloqueante (F-25) · P2 · H2
+- **Responsable:** N · **Depende de:** F-22
 Como usuario, quiero que la API responda durante subidas grandes.
 - **Dado** una subida lenta en curso
 - **Cuando** llega otra petición
@@ -233,6 +260,7 @@ Como usuario, quiero que la API responda durante subidas grandes.
 ## Área: M4 · Seguridad
 
 ### US-26 · Autenticación y roles (F-26) · P2 · H3
+- **Responsable:** K · **Depende de:** F-01
 Como administrador, quiero que cada rol solo haga lo permitido para proteger la información.
 - **Dado** usuarios analista, supervisor y administrador
 - **Cuando** cada uno intenta cada acción, o no presenta token
@@ -241,6 +269,7 @@ Como administrador, quiero que cada rol solo haga lo permitido para proteger la 
 - **Demuestra:** prueba I. **Evidencia:** ficha M4: `curl` y códigos por rol.
 
 ### US-27 · TLS entre nodos (F-27) · P2 · H3
+- **Responsable:** K · **Depende de:** F-38
 Como responsable de seguridad, quiero cifrar la comunicación entre nodos para que no pueda leerse en la red.
 - **Dado** el sistema procesando un mensaje con un marcador sintético
 - **Cuando** se captura el tráfico entre nodos
@@ -249,6 +278,7 @@ Como responsable de seguridad, quiero cifrar la comunicación entre nodos para q
 - **Demuestra:** captura. **Evidencia:** ficha M4: `tcpdump`, `tshark`, `strings`.
 
 ### US-28 · Cifrado en reposo (F-28) · P2 · H3
+- **Responsable:** K · **Depende de:** F-23
 Como responsable de seguridad, quiero las evidencias cifradas y las llaves fuera del código para proteger el almacenamiento.
 - **Dado** una evidencia almacenada con un marcador sintético
 - **Cuando** se lee directo de MinIO, o se busca en el historial de Git
@@ -257,6 +287,7 @@ Como responsable de seguridad, quiero las evidencias cifradas y las llaves fuera
 - **Demuestra:** prueba I y búsqueda en historial. **Evidencia:** ficha M4: comandos y justificación de AD-16.
 
 ### US-29 · Cadena de custodia (F-29) · P2 · H3
+- **Responsable:** K · **Depende de:** F-23
 Como supervisor, quiero una cadena verificable para demostrar que las evidencias no se alteraron.
 - **Dado** evidencias procesadas, con entrada de ingreso y de cada transformación
 - **Cuando** se altera una evidencia, una entrada, o se trunca el log
@@ -265,6 +296,7 @@ Como supervisor, quiero una cadena verificable para demostrar que las evidencias
 - **Demuestra:** prueba A. **Evidencia:** ficha M4: salida del verificador antes y después.
 
 ### US-30 · Workers sin privilegios (F-30) · P2 · H3
+- **Responsable:** K · **Depende de:** F-38
 Como responsable de seguridad, quiero workers sin root para limitar el daño de un compromiso.
 - **Dado** los workers desplegados en los tres nodos
 - **Cuando** se inspeccionan
@@ -275,6 +307,7 @@ Como responsable de seguridad, quiero workers sin root para limitar el daño de 
 ## Área: M5 · Cómputo heterogéneo
 
 ### US-31 · Benchmark de inferencia (F-31) · P2 · H3
+- **Responsable:** J · **Depende de:** F-09
 Como responsable de M5, quiero medir la inferencia en varias configuraciones para decidir con datos.
 - **Dado** el mismo conjunto de audio
 - **Cuando** corre en al menos dos configuraciones
@@ -283,6 +316,7 @@ Como responsable de M5, quiero medir la inferencia en varias configuraciones par
 - **Demuestra:** benchmark. **Evidencia:** ficha M5: tabla por configuración y conexión con Unidad 1.
 
 ### US-32 · Routing por tipo de nodo (F-32) · P2 · H3
+- **Responsable:** J · **Depende de:** F-05, F-31
 Como coordinador, quiero asignar según la tabla medida para aprovechar cada nodo.
 - **Dado** la tabla de routing y clases de nodo activas
 - **Cuando** llega una sub-tarea, o el nodo preferido no está activo
@@ -295,6 +329,7 @@ Como coordinador, quiero asignar según la tabla medida para aprovechar cada nod
 Todas se ejecutan en los tres nodos reales. Prueba: **A** escenario con script `scripts/scenarios/`, por crear. La evidencia se integra en el informe con métricas, gráficos e interpretación [B.6].
 
 ### US-33 · Ráfaga (F-33) · P4 · H3
+- **Responsable:** K · **Depende de:** F-08, F-09, F-20, F-24, F-38
 ```gherkin
 Dado que hay tres nodos worker activos
 Cuando se envían al menos 20 casos de forma concurrente
@@ -305,6 +340,7 @@ Y se registran throughput, latencia por caso y recursos por nodo durante la ráf
 - **Demuestra:** conteo de casos finales. **Evidencia:** CSV y gráficos en el informe.
 
 ### US-34 · Caída de un worker (F-34) · P4 · H3
+- **Responsable:** N · **Depende de:** F-06, F-38
 ```gherkin
 Dado un caso en proceso con una sub-tarea en un worker
 Y otro worker del mismo tipo en otro nodo
@@ -317,6 +353,7 @@ Y el caso termina en el estado correcto, sin sub-tareas perdidas ni contadas dos
 - **Demuestra:** comparación de sub-tareas creadas y terminadas. **Evidencia:** tiempos de detección y reasignación.
 
 ### US-35 · Reinicio del coordinador (F-35) · P4 · H3
+- **Responsable:** N · **Depende de:** F-06, F-10
 ```gherkin
 Dado que hay casos en curso
 Cuando el coordinador se reinicia
@@ -328,6 +365,7 @@ Y los casos alcanzan su estado final
 - **Demuestra:** conteo por `subtask_id`. **Evidencia:** tiempo de retoma y conteos antes y después.
 
 ### US-36 · Cancelación en curso (F-36) · P4 · H3
+- **Responsable:** J · **Depende de:** F-12, F-38
 ```gherkin
 Dado un caso pesado, con un archivo de al menos 200 MB, en procesamiento
 Cuando se cancela a mitad de procesamiento
@@ -340,6 +378,7 @@ Y el caso queda cancelled
 - **Demuestra:** comparación de recursos. **Evidencia:** `ps`, `ls /scratch`, `memory.current` antes y después, y tiempo de liberación.
 
 ### US-37 · Saturación de memoria (F-37) · P4 · H3
+- **Responsable:** J · **Depende de:** F-17, F-38
 ```gherkin
 Dado un nodo con su control de admisión activo
 Cuando llega una carga superior a su memoria disponible
@@ -354,6 +393,7 @@ Y todos los casos terminan cuando se libera capacidad
 ## Área: entrega y proceso
 
 ### US-38 · Despliegue en tres nodos (F-38) · P1 · H1
+- **Responsable:** K · **Depende de:** —
 Como equipo, queremos desplegar en tres máquinas para cumplir la distribución real.
 - **Dado** tres máquinas en red con Docker
 - **Cuando** se siguen las instrucciones y se levanta el Compose de cada nodo
@@ -362,6 +402,7 @@ Como equipo, queremos desplegar en tres máquinas para cumplir la distribución 
 - **Demuestra:** tabla de sub-tareas por `hostname`. **Evidencia:** log de `GET /workers` e IP por nodo.
 
 ### US-39 · Reutilización y correcciones (F-39) · P1 · H1
+- **Responsable:** N · **Depende de:** —
 Como evaluador, quiero saber qué es reutilizado y qué es nuevo para evaluar lo nuevo.
 - **Dado** el repositorio del I Proyecto
 - **Cuando** se revisa `docs/reutilizacion.md`
@@ -370,6 +411,7 @@ Como evaluador, quiero saber qué es reutilizado y qué es nuevo para evaluar lo
 - **Demuestra:** el documento. **Evidencia:** `docs/reutilizacion.md`.
 
 ### US-40 · Matriz, historial y bitácora (F-40) · P1 · H1
+- **Responsable:** K · **Depende de:** —
 Como evaluador, quiero ver responsabilidades, proceso y uso de IA para valorar la contribución individual.
 - **Dado** el repositorio
 - **Cuando** se revisan la matriz, el historial y la bitácora
@@ -378,6 +420,7 @@ Como evaluador, quiero ver responsabilidades, proceso y uso de IA para valorar l
 - **Demuestra:** comandos y documentos. **Evidencia:** `docs/responsabilidades.md`, `docs/bitacora_ia.md`.
 
 ### US-41 · Fichas de evidencia (F-41) · P2 · H3
+- **Responsable:** Cada responsable · **Depende de:** F-19, F-21, F-25, F-29, F-30, F-32
 Como evaluador, quiero fichas con datos medidos para calificar cada módulo.
 - **Dado** los cinco módulos
 - **Cuando** se revisa cada ficha
@@ -386,6 +429,7 @@ Como evaluador, quiero fichas con datos medidos para calificar cada módulo.
 - **Demuestra:** comprobación. **Evidencia:** `docs/modulo-M1-memoria.md`, `docs/modulo-M2-planificacion.md`, `docs/modulo-M3-es-almacenamiento.md`, `docs/modulo-M4-seguridad.md`, `docs/modulo-M5-computo.md`.
 
 ### US-42 · Informe, README, demo y defensa (F-42) · P1 · H3
+- **Responsable:** Todos, coordina K · **Depende de:** F-33, F-34, F-35, F-36, F-37, F-41
 Como evaluador, quiero el informe y una demo real para verificar el sistema y la comprensión de cada integrante.
 - **Dado** el sistema en los tres nodos
 - **Cuando** se presenta
