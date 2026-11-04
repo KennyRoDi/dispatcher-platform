@@ -53,3 +53,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Rol de orquestador y comando `verificar`; `aprobar` exige una verificación vigente |
 | Validado / corregido / descartado | Aceptado. Limitación declarada: sin subagentes, la verificación no es independiente |
 | Cómo se validó | `pytest` y ciclo completo en un clon desechable con remoto local y `gh` falso |
+
+## 2026-11-03 · Kenni Rodriguez · Conformidad en GitHub (`chore/conformidad`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | `scripts/conformidad.py` y workflow de GitHub Actions |
+| Propósito | Verificar en GitHub que todos sigan el mismo patrón y estén las piezas |
+| Consulta resumida | Agregar workflows y checks de patrón y completitud, sin compilar el código |
+| Resultado obtenido | Workflow `conformidad` con comprobaciones de repositorio y de PR |
+| Validado / corregido / descartado | Aceptado. El registro de aprobaciones demuestra que se ejecutó el comando, no quién respondió |
+| Cómo se validó | `pytest` y ejecución local de ambos modos sobre el repositorio |

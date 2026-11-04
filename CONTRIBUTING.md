@@ -72,6 +72,13 @@ main
 
 Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/BACKLOG.md`.
 
+## Conformidad en GitHub
+
+El workflow `conformidad` corre en cada PR y en cada push a `main`. No compila el sistema: comprueba que todos sigan el mismo patrón y que estén las piezas. Se reproduce en local con `python -m scripts.conformidad repo`.
+
+- **Repositorio:** piezas comunes, entregables de las features `hecha`, `STATUS.md` frente al backlog, dependencias, formato de la bitácora, fichas con sus cinco secciones y capas.
+- **PR:** rama, título, commits, tamaño, llaves privadas y alcance. En una feature, además: SPEC terminado con las seis verificaciones de IA y las seis aprobaciones humanas, base coherente y entrada en la bitácora.
+
 ## Configuración del repositorio
 
 Una vez, quien administre el repositorio:
