@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-03-1-prueba-auditoria
 **Verificación IA:** revision d9b1a18
 **Historia:** US-04 · **Requisitos:** prueba de auditoria · **Responsable:** K
