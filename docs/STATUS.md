@@ -6,7 +6,7 @@
 | F-01 | pendiente |
 | F-02 | pendiente |
 | F-03 | revision |
-| F-04 | plan |
+| F-04 | tests |
 | F-05 | pendiente |
 | F-06 | pendiente |
 | F-07 | pendiente |
