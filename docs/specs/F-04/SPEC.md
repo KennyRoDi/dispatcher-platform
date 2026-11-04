@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** plan
+**Fase:** tests
 **Base:** feat/F-03-1-prueba-auditoria
 **Verificación IA:** plan 0a06571
 **Historia:** US-04 · **Requisitos:** prueba de auditoria · **Responsable:** K
@@ -54,3 +54,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Auditoria | 2026-11-03 | prueba de auditoria (0a06571) |
+| plan | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
