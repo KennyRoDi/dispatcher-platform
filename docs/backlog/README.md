@@ -13,6 +13,12 @@
 - [carga-fallos](carga-fallos.md)
 - [entrega](entrega.md)
 
+## Dependencias
+
+Una dependencia significa un bloqueo real: sin ella no se puede probar la feature. La lógica que se apoya en `src/application/ports.py` se desarrolla con fakes, sin esperar a otro módulo.
+
+Trabajar con fakes no termina la integración. Quien entrega una feature conecta su adaptador real si la otra parte ya está en `main`. Si no, lo indica en su SPEC como integración pendiente. Los escenarios F-33 a F-37 dependen de todo lo que integran y lo comprueban sobre los tres nodos.
+
 ## Prioridad
 
 Todos los requisitos son obligatorios [B.10], por lo que MoSCoW los dejaría a todos en «Must» y no ayudaría a decidir. Se usa una prioridad numérica, justificada por hito y dependencias.

@@ -1,7 +1,7 @@
 # Área: estados, reporte, alertas y dashboard
 
 ### US-10 · Estados y cierre (F-10) · P3 · H2
-- **Responsable:** N · **Depende de:** F-05
+- **Responsable:** N · **Depende de:** —
 Como analista, quiero un estado de caso confiable para saber cuándo terminó realmente.
 - **Dado** un caso con sub-tareas exitosas y fallidas
 - **Cuando** todas terminan, incluso con reportes duplicados
@@ -19,7 +19,7 @@ Como operador, quiero reintentos con backoff para superar fallos transitorios si
 - **Demuestra:** prueba I. **Evidencia:** log con tiempos entre intentos.
 
 ### US-12 · Cancelación real (F-12) · P3 · H2
-- **Responsable:** J · **Depende de:** F-06
+- **Responsable:** J · **Depende de:** —
 Como supervisor, quiero cancelar un caso y liberar recursos para que no siga consumiendo.
 - **Dado** un caso con una sub-tarea en ejecución
 - **Cuando** se cancela
@@ -28,7 +28,7 @@ Como supervisor, quiero cancelar un caso y liberar recursos para que no siga con
 - **Demuestra:** prueba I. **Evidencia:** salida de `ps` y `ls` antes y después.
 
 ### US-13 · Reporte consolidado (F-13) · P3 · H2
-- **Responsable:** K · **Depende de:** F-07, F-10
+- **Responsable:** K · **Depende de:** —
 Como analista, quiero un reporte con evidencias enlazadas para sustentar cada hallazgo.
 - **Dado** un caso finalizado
 - **Cuando** se consulta el reporte
@@ -37,7 +37,7 @@ Como analista, quiero un reporte con evidencias enlazadas para sustentar cada ha
 - **Demuestra:** prueba A. **Evidencia:** JSON de ejemplo en el informe.
 
 ### US-14 · Alertas (F-14) · P5 · H3
-- **Responsable:** K · **Depende de:** F-10
+- **Responsable:** K · **Depende de:** —
 Como supervisor, quiero recibir alertas sin esperar a consultar para reaccionar a incidencias.
 - **Dado** un caso con una incidencia alta
 - **Cuando** se detecta y cuando el caso finaliza

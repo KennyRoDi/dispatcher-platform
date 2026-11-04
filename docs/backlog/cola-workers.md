@@ -1,7 +1,7 @@
 # Área: cola y workers
 
 ### US-05 · Descomponer y enrutar (F-05) · P1 · H1
-- **Responsable:** N · **Depende de:** F-01
+- **Responsable:** N · **Depende de:** —
 Como coordinador, quiero separar un caso en sub-tareas por tipo para enviarlas a workers especializados.
 - **Dado** un caso con texto, imagen, audio y video
 - **Cuando** se descompone
@@ -19,7 +19,7 @@ Como coordinador, quiero que ninguna sub-tarea se pierda si un worker muere al t
 - **Demuestra:** prueba I. **Evidencia:** entrada en `docs/reutilizacion.md` con la limitación corregida.
 
 ### US-07 · Worker de texto (F-07) · P1 · H1
-- **Responsable:** J · **Depende de:** F-05
+- **Responsable:** J · **Depende de:** —
 Como analista, quiero palabras clave, tema, sentimiento y lenguaje ofensivo o amenazas para encontrar conversaciones relevantes.
 - **Dado** una conversación etiquetada
 - **Cuando** se procesa
@@ -28,7 +28,7 @@ Como analista, quiero palabras clave, tema, sentimiento y lenguaje ofensivo o am
 - **Demuestra:** prueba A. **Evidencia:** tabla de aciertos.
 
 ### US-08 · Worker de imagen (F-08) · P1 · H1
-- **Responsable:** J · **Depende de:** F-05
+- **Responsable:** J · **Depende de:** —
 Como analista, quiero detectar contenido sensible en imágenes para incluirlo como hallazgo.
 - **Dado** una imagen con contenido positivo conocido
 - **Cuando** se procesa
@@ -37,7 +37,7 @@ Como analista, quiero detectar contenido sensible en imágenes para incluirlo co
 - **Demuestra:** prueba A. **Evidencia:** tabla de aciertos.
 
 ### US-09 · Worker de audio (F-09) · P1 · H1
-- **Responsable:** J · **Depende de:** F-07
+- **Responsable:** J · **Depende de:** —
 Como analista, quiero transcribir y analizar notas de voz para tratarlas como texto con timestamps.
 - **Dado** una nota de voz con transcripción conocida
 - **Cuando** se procesa

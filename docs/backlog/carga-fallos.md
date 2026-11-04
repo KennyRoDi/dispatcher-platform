@@ -3,7 +3,7 @@
 Todas se ejecutan en los tres nodos reales. Prueba: **A** escenario con script `scripts/scenarios/`, por crear. La evidencia se integra en el informe con métricas, gráficos e interpretación [B.6].
 
 ### US-33 · Ráfaga (F-33) · P4 · H3
-- **Responsable:** K · **Depende de:** F-08, F-09, F-20, F-24, F-38
+- **Responsable:** K · **Depende de:** F-01, F-05, F-07, F-08, F-09, F-10, F-20, F-24, F-38
 ```gherkin
 Dado que hay tres nodos worker activos
 Cuando se envían al menos 20 casos de forma concurrente
@@ -14,7 +14,7 @@ Y se registran throughput, latencia por caso y recursos por nodo durante la ráf
 - **Demuestra:** conteo de casos finales. **Evidencia:** CSV y gráficos en el informe.
 
 ### US-34 · Caída de un worker (F-34) · P4 · H3
-- **Responsable:** N · **Depende de:** F-06, F-38
+- **Responsable:** N · **Depende de:** F-05, F-06, F-07, F-10, F-38
 ```gherkin
 Dado un caso en proceso con una sub-tarea en un worker
 Y otro worker del mismo tipo en otro nodo
@@ -27,7 +27,7 @@ Y el caso termina en el estado correcto, sin sub-tareas perdidas ni contadas dos
 - **Demuestra:** comparación de sub-tareas creadas y terminadas. **Evidencia:** tiempos de detección y reasignación.
 
 ### US-35 · Reinicio del coordinador (F-35) · P4 · H3
-- **Responsable:** N · **Depende de:** F-06, F-10
+- **Responsable:** N · **Depende de:** F-05, F-06, F-07, F-10, F-38
 ```gherkin
 Dado que hay casos en curso
 Cuando el coordinador se reinicia

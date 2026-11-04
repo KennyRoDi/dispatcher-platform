@@ -1,6 +1,6 @@
 # Contrato del Worker y del Coordinador — Referencia Técnica (API v4)
 
-Documentación para coordinadores, propietarios de dashboard y desarrolladores de la plataforma distribuida de procesamiento multimedia. El código es la fuente de verdad: `src/coordinator/main.py`, `src/coordinator/router.py`, `src/workers/*.py` y `scripts/reaper.py`. Las decisiones de diseño y su justificación están en `docs/DECISIONES_DISENO.md`.
+Documentación para coordinadores, propietarios de dashboard y desarrolladores de la plataforma distribuida de procesamiento multimedia. El código es la fuente de verdad: `src/coordinator/`, `src/coordinator/router.py`, `src/workers/*.py` y `scripts/reaper.py`. Las decisiones de diseño y su justificación están en `docs/DECISIONES_DISENO.md`.
 
 ## Resumen del flujo
 
