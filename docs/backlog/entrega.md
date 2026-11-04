@@ -41,6 +41,6 @@ Como evaluador, quiero fichas con datos medidos para calificar cada módulo.
 Como evaluador, quiero el informe y una demo real para verificar el sistema y la comprensión de cada integrante.
 - **Dado** el sistema en los tres nodos
 - **Cuando** se presenta
-- **Entonces** el PDF tiene ≤ 20 páginas sin anexos e integra B.6; la demo es en vivo; cada responsable explica y modifica su componente
+- **Entonces** `docs/BITACORA_IA.md` de `main` está al día con la rama `estado` (`git checkout origin/estado -- docs/BITACORA_IA.md` por PR); el PDF tiene ≤ 20 páginas sin anexos e integra B.6; la demo es en vivo; cada responsable explica y modifica su componente
 - **Pruebas:** A ensayo completo de la demo y simulacro cruzado de preguntas.
 - **Demuestra:** ensayo. **Evidencia:** informe PDF y README con mapa del repositorio.

@@ -10,6 +10,7 @@
     python scripts/flujo.py devolver <fase> "motivo"
     python scripts/flujo.py bitacora --herramienta "x" --proposito "x" ... | --sin-ia
     python scripts/flujo.py cierre --tipo feat --resumen "texto" [--final]
+    python scripts/flujo.py fusionar <numero-de-pr>
     python scripts/flujo.py status
 
 docs/STATUS.md se deriva de la fase declarada en cada SPEC.md. Él y la bitácora se publican en la rama `estado`.
@@ -308,6 +309,10 @@ def desbloqueadoras(features, clases, letra):
     return sorted(encontradas)
 
 
+def hijas_de(prs, rama):
+    return [pr["number"] for pr in prs if pr["baseRefName"] == rama]
+
+
 def nombre_rama(feature, descripcion, ramas):
     sin_acentos = unicodedata.normalize("NFKD", descripcion).encode("ascii", "ignore").decode()
     slug = re.sub(r"[^a-z0-9]+", "-", sin_acentos.lower()).strip("-")
@@ -416,8 +421,9 @@ def _guardar_y_confirmar(feature, spec, mensaje):
     git("commit", "-q", "-m", mensaje)
 
 
-def _exigir_sin_cambios():
-    if git("status", "--porcelain", "--untracked-files=no"):
+def _exigir_sin_cambios(incluir_nuevos=True):
+    opciones = () if incluir_nuevos else ("--untracked-files=no",)
+    if git("status", "--porcelain", *opciones):
         _fallar("hay cambios sin commit")
 
 
@@ -581,7 +587,7 @@ def cmd_status(_args):
 
 def cmd_trabajar(args):
     feature_id = args.feature
-    _exigir_sin_cambios()
+    _exigir_sin_cambios(incluir_nuevos=False)
     git("fetch", "-q", "--prune", "origin")
     features = _leer_backlog_main()
     if feature_id not in features:
@@ -777,6 +783,26 @@ def cmd_cierre(args):
     publicar_status()
 
 
+def cmd_fusionar(args):
+    pr = json.loads(_ejecutar("gh", "pr", "view", args.numero, "--json", "number,headRefName,baseRefName,state"))
+    if pr["state"] != "OPEN":
+        _fallar(f"la PR #{pr['number']} no está abierta")
+    if pr["baseRefName"] != "main":
+        _fallar(f"la PR #{pr['number']} va sobre {pr['baseRefName']}; fusiona primero la de abajo")
+    rama = pr["headRefName"]
+    _ejecutar("gh", "pr", "merge", args.numero, "--merge")
+    abiertas = json.loads(_ejecutar("gh", "pr", "list", "--state", "open", "--limit", "200", "--json", "number,baseRefName"))
+    repo = _ejecutar("gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner")
+    # Borrar la rama antes de cambiar la base hace que GitHub cierre las PR apiladas encima.
+    # `gh pr edit --base` falla con Projects classic; la API REST no.
+    for hija in hijas_de(abiertas, rama):
+        _ejecutar("gh", "api", "-X", "PATCH", f"repos/{repo}/pulls/{hija}", "-f", "base=main", "--silent")
+        print(f"PR #{hija}: base cambiada a main")
+    git("push", "-q", "origin", "--delete", rama)
+    publicar_status()
+    print(f"PR #{pr['number']} fusionada y rama {rama} borrada")
+
+
 def _abrir_pr(rama, base, titulo, feature_id, asuntos, final):
     existente = json.loads(_ejecutar("gh", "pr", "list", "--head", rama, "--state", "open", "--json", "url"))
     if existente:
@@ -830,6 +856,9 @@ def _analizador():
     cerrar.add_argument("--resumen", required=True)
     cerrar.add_argument("--final", action="store_true", help="última parte: la PR cierra la feature")
     cerrar.set_defaults(accion=cmd_cierre)
+    fusion = comandos.add_parser("fusionar", help="fusiona una PR sobre main y reubica las apiladas encima")
+    fusion.add_argument("numero")
+    fusion.set_defaults(accion=cmd_fusionar)
     return analizador
 
 

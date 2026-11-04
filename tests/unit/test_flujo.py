@@ -1,6 +1,7 @@
 import pytest
 
 from scripts.flujo import (
+    hijas_de,
     corresponde_a,
     desbloqueadoras,
     letras_de_equipo,
@@ -380,3 +381,12 @@ def test_desbloqueadoras_son_lo_empezable_ajeno_que_frena_lo_propio():
     }
     clases = clasificar(features, {}, {})
     assert desbloqueadoras(features, clases, "V") == ["F-01"]
+
+
+def test_hijas_son_las_pr_abiertas_cuya_base_es_la_rama():
+    prs = [
+        {"number": 2, "baseRefName": "feat/F-01-1-a"},
+        {"number": 3, "baseRefName": "main"},
+        {"number": 4, "baseRefName": "feat/F-01-1-a"},
+    ]
+    assert hijas_de(prs, "feat/F-01-1-a") == [2, 4]
