@@ -95,7 +95,7 @@ Convención de citas: `[B.5 M1]`, `[B.4 Estados del caso]`, `[Parte I §3]`, `[A
 | RNF-16 | Cubrir la rúbrica: pipeline 15 %, M1–M5 40 % (8 % cada uno), pruebas 10 %, documentación 10 %, defensa 15 %, bitácora 10 %. | [B.9] | Cada rubro tiene al menos una funcionalidad asignada en `IMPLEMENTACION.md`. | M1–M5 y pipeline |
 | RNF-17 | Matriz de responsabilidades en `docs/responsabilidades.md`; al menos un módulo por integrante como responsable principal. | [Parte I §3] [B.5] [B.10] [Anexo 1] | Cada módulo tiene responsable, apoyo, ruta y ficha; cada integrante tiene al menos un módulo. | M1–M5 y pipeline |
 | RNF-18 | Historial de Git que refleje la matriz, con contribuciones distribuidas y sin commits masivos al final. | [Parte I §3] [Parte I §8] | `git shortlog -sn` y `git log --stat` muestran contribuciones por integrante en sus componentes. | M1–M5 y pipeline |
-| RNF-19 | `docs/bitacora_ia.md` en formato del Anexo 3, con entrada por módulo donde se usó IA y al menos dos errores de la IA detectados. | [Parte I §4] [Anexo 3] [B.9] | Cada módulo tiene entrada o declaración de no uso; hay ≥ 2 casos de error con su validación. | M1–M5 y pipeline |
+| RNF-19 | `docs/BITACORA_IA.md` (SUP-20) en formato del Anexo 3, con entrada por módulo donde se usó IA y al menos dos errores de la IA detectados. | [Parte I §4] [Anexo 3] [B.9] | Cada módulo tiene entrada o declaración de no uso; hay ≥ 2 casos de error con su validación. | M1–M5 y pipeline |
 | RNF-20 | Hitos H1, H2 y H3 verificables en el historial. | [Parte I §2] [Parte I §8] | Cada entregable de hito tiene commits identificables; fechas reales, sin reescritura. | M1–M5 y pipeline |
 | RNF-21 | Entregables comunes: repositorio con historial completo, README, `docs/`, informe PDF de máximo 20 páginas sin anexos. | [Parte I §7] | Lista de comprobación completa; el PDF tiene ≤ 20 páginas sin anexos y sigue la convención de nombres del curso. | M1–M5 y pipeline |
 | RNF-22 | Entregables específicos: código, despliegue por nodo con instrucciones, arquitectura actualizada con diagramas de componentes, despliegue y flujo. | [B.8] | Una persona externa al equipo puede seguir las instrucciones de despliegue; existen los tres diagramas. | Pipeline |
@@ -109,9 +109,9 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 
 | ID | Supuesto | Justificación técnica |
 |---|---|---|
-| SUP-01 ⚠ | Equipo de 3: Kenni Rodriguez, Nahúm Murillo y José Andrés Loría Herrera. | Son los autores del repositorio del I Proyecto y [Parte I, Modalidad] mantiene los equipos. `Tareas del Proyecto.pdf` menciona una Persona 4 sin commits. |
-| SUP-02 ⚠ | Fechas de hitos sin resolver: el documento dice «3 semanas, del 21/oct/26 al 04/nov/26», pero ese rango dura 14 días. Se toma 04/nov/26 como entrega de H3. | Es la única fecha explícita de cierre. |
-| SUP-03 ⚠ | La fecha real de entrega es posterior a 04/nov/26 y está por confirmar. | El equipo indica que el plazo real es más extenso que el del enunciado; falta la fecha exacta. |
+| SUP-01 ⚠ | Equipo de 4: Kenni Rodriguez, Nahúm Murillo, José Andrés Loría Herrera y Melany Vindas. Falta confirmar la asignación de módulos. | Indicado por Kenni Rodriguez; [Parte I, Modalidad] mantiene los equipos. Melany Vindas no aparece como autora en el historial del I Proyecto. |
+| SUP-02 | H1 el 28/oct/26 y H2 el 04/nov/26, contando semanas desde el 21/oct/26. | El documento dice «fin de semana 1» y «fin de semana 2» sin fecha. Es una inferencia, compatible con tres semanas hasta el 10/nov/26. |
+| SUP-03 | La entrega final es el 10/nov/26, no el 04/nov/26 del enunciado. | Indicado por Kenni Rodriguez. Falta la hora de entrega. |
 | SUP-04 | Coordinador, Redis, MinIO y custodia comparten el Nodo A, que también corre workers. | [B.2] exige tres nodos worker, no un nodo adicional para el coordinador. |
 | SUP-05 | `completed`: todas bien. `partially_completed`: al menos una bien y una fallida definitiva. `failed`: ninguna bien. `retrying`: alguna espera reintento. `cancelled`: terminal y prevalece. | [B.4] enumera estados, no su semántica. Coincide con `_final_case_status` del I Proyecto. |
 | SUP-06 | Máximo de 3 intentos y backoff exponencial con jitter, base configurable. | 3 viene de `MAX_ATTEMPTS` del I Proyecto. [B.4] solo exige que sea configurable. |
@@ -127,6 +127,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-16 | Bibliografía de las fichas: Silberschatz, Galvin y Gagne, *Operating System Concepts*, 10.ª ed. | [Anexo 2] exige autor y capítulo sin fijar libro. Confirmar con el programa del curso. |
 | SUP-17 | Los parámetros sin valor en el documento (aging, márgenes, chunk) se calibran midiendo. | Ningún umbral numérico de rendimiento aparece en B.5 o B.6. |
 | SUP-18 | Reporte y alertas se asignan a H2 y H3 respectivamente, y el dashboard a H3. | La sección 2 de Parte I no los asigna a un hito. |
+| SUP-20 ⚠ | La bitácora de IA se llama `docs/BITACORA_IA.md`. | Decisión del equipo. [Parte I §4] y [Anexo 3] la nombran `docs/bitacora_ia.md`; confirmar con el profesor que el cambio de nombre es aceptable. |
 | SUP-19 ⚠ | Las deficiencias de RNF-03 se toman de `docs/DECISIONES_DISENO.md` del I Proyecto. | No se encontró la retroalimentación de la evaluación; solo limitaciones autodeclaradas. |
 
 ## 4. Discrepancias detectadas al contrastar con el documento
@@ -136,7 +137,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | Nodos | «tres nodos» | «tres nodos **worker**» [B.2] | Se aplica lo más estricto: los tres ejecutan workers. |
 | Umbrales | «umbrales de evidencia» | Solo mínimos de cantidad, sin objetivos de rendimiento | Se usan esos mínimos; no se inventan objetivos numéricos. |
 | SIGTERM y normalización | Prácticas de código limpio | No son requisitos del documento | Son reglas de diseño (`ARQUITECTURA.md` §9), no RF. |
-| Duración | Entrega 04/nov/26 | «3 semanas» y 14 días | Ver SUP-02. |
+| Duración | Entrega 04/nov/26 | «3 semanas» y 14 días | Entrega real 10/nov/26. Ver SUP-02 y SUP-03. |
 
 ## 5. Trazabilidad
 

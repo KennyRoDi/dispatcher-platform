@@ -3,10 +3,14 @@ import pytest
 from scripts.flujo import (
     Feature,
     avanzar_spec,
+    agregar_entrada,
     base_de_spec,
+    bitacora_registra,
     clasificar,
     cuerpo_pr,
     devolver_spec,
+    entrada_bitacora,
+    entrada_sin_ia,
     es_conventional,
     estado_feature,
     fase_de,
@@ -151,10 +155,9 @@ def test_implementacion_exige_codigo():
     assert not motivos_bloqueo("implementacion", ["tests/unit/test_a.py", "src/domain/a.py"])
 
 
-def test_documentacion_exige_algo_mas_que_el_spec():
-    assert motivos_bloqueo("documentacion", ["src/a.py", "docs/specs/F-01/SPEC.md"])
-    assert not motivos_bloqueo("documentacion", ["docs/modulo-M1-memoria.md"])
-    assert not motivos_bloqueo("documentacion", ["README.md"])
+def test_documentacion_exige_entrada_en_la_bitacora():
+    assert motivos_bloqueo("documentacion", ["docs/modulo-M1-memoria.md"], bitacora_registrada=False)
+    assert not motivos_bloqueo("documentacion", [], bitacora_registrada=True)
 
 
 def test_backlog_da_responsable_dependencias_e_historia():
@@ -258,3 +261,39 @@ def test_titulo_de_pr_rechaza_tipo_invalido():
 def test_cuerpo_de_pr_rellena_la_plantilla():
     plantilla = "F: {feature}\nBase: {base}\n{commits}\n"
     assert cuerpo_pr(plantilla, feature="F-01", base="main", commits="- a") == "F: F-01\nBase: main\n- a\n"
+
+
+CAMPOS_BITACORA = dict(
+    herramienta="Claude Code", proposito="implementar", consulta="pedir F-01",
+    resultado="codigo", validado="aceptado", como="pytest",
+)
+
+
+def test_entrada_tiene_los_campos_del_anexo_3():
+    entrada = entrada_bitacora("2026-11-03", "Ana", "F-01", "feat/F-01-1-a", **CAMPOS_BITACORA)
+    assert entrada.startswith("## 2026-11-03 · Ana · F-01 (`feat/F-01-1-a`)\n")
+    for campo in ("Herramienta", "Componente", "Propósito", "Consulta resumida", "Resultado obtenido",
+                  "Validado / corregido / descartado", "Cómo se validó"):
+        assert f"| {campo} |" in entrada
+    assert "Error de la IA" not in entrada
+
+
+def test_entrada_registra_el_error_de_la_ia_y_protege_la_tabla():
+    entrada = entrada_bitacora("2026-11-03", "Ana", "F-01", "r", error_ia="a | b\nc", **CAMPOS_BITACORA)
+    assert "| Error de la IA | a / b c |" in entrada
+
+
+def test_entrada_sin_ia_lo_declara_explicitamente():
+    entrada = entrada_sin_ia("2026-11-03", "Ana", "F-01", "feat/F-01-1-a")
+    assert "No se usó IA" in entrada
+    assert bitacora_registra(entrada, "feat/F-01-1-a")
+
+
+def test_agregar_entrada_va_al_final_y_conserva_lo_anterior():
+    assert agregar_entrada("# Bitacora\n\n## vieja\n", "## nueva\n") == "# Bitacora\n\n## vieja\n\n## nueva\n"
+
+
+def test_bitacora_registra_solo_la_rama_exacta():
+    texto = entrada_bitacora("2026-11-03", "Ana", "F-01", "feat/F-01-10-a", **CAMPOS_BITACORA)
+    assert bitacora_registra(texto, "feat/F-01-10-a")
+    assert not bitacora_registra(texto, "feat/F-01-1-a")
