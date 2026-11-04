@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** implementacion
+**Fase:** plan
 **Base:** main
 **Verificación IA:** tests a65d972
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
@@ -57,3 +57,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
 | verificación IA de tests | Auditoria | 2026-11-03 | prueba de auditoria (a65d972) |
 | tests | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
+| devuelta de implementacion | Auditoria | 2026-11-03 | x |
