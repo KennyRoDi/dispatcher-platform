@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-03-1-prueba-auditoria
-**Verificación IA:** plan 0a06571
+**Verificación IA:** tests 73ff090
 **Historia:** US-04 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
@@ -55,3 +55,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Auditoria | 2026-11-03 | prueba de auditoria (0a06571) |
 | plan | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
+| verificación IA de tests | Auditoria | 2026-11-03 | prueba de auditoria (73ff090) |
