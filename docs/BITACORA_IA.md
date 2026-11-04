@@ -104,3 +104,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado. La identidad es una declaración, no una autenticación |
 | Cómo se validó | pytest, conformidad y clon desechable con remoto local |
 | Error de la IA | Un script de migración abortó y aun así se creó un commit parcial local; se descartó y se repitió deteniendo ante fallos. El check de piezas detectó que F-42 quedaba oculta por su responsable y se corrigió |
+
+## 2026-11-03 · Auditoria · F-03 (`feat/F-03-1-prueba-auditoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | A |
+| Componente | F-03 |
+| Propósito | prueba de auditoria |
+| Consulta resumida | c |
+| Resultado obtenido | r |
+| Validado / corregido / descartado | v |
+| Cómo se validó | c |
