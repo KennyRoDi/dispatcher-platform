@@ -134,3 +134,8 @@ def test_responsable_sin_integrante_falla():
     features = {"F-01": Feature("F-01", "Z", (), ""), "F-02": Feature("F-02", "Todos", (), "")}
     motivos = revisar_responsables(features, {"K"})
     assert len(motivos) == 1 and "F-01" in motivos[0]
+
+
+def test_backlog_con_ciclo_falla():
+    features = {"F-01": Feature("F-01", "K", ("F-02",), ""), "F-02": Feature("F-02", "K", ("F-01",), "")}
+    assert any("ciclo" in m for m in revisar_backlog(features))

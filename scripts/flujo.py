@@ -313,11 +313,15 @@ def hijas_de(prs, rama):
     return [pr["number"] for pr in prs if pr["baseRefName"] == rama]
 
 
-def nombre_rama(feature, descripcion, ramas):
+def partes_cerradas(spec):
+    return spec.count("\n| revision |")
+
+
+def nombre_rama(feature, descripcion, ramas, cerradas=0):
     sin_acentos = unicodedata.normalize("NFKD", descripcion).encode("ascii", "ignore").decode()
     slug = re.sub(r"[^a-z0-9]+", "-", sin_acentos.lower()).strip("-")
     partes = [int(_RAMA.match(r).group(2)) for r in ramas.get(feature, [])]
-    return f"feat/{feature}-{max(partes, default=0) + 1}-{slug}"
+    return f"feat/{feature}-{max([*partes, cerradas]) + 1}-{slug}"
 
 
 def es_conventional(mensaje):
@@ -612,6 +616,7 @@ def cmd_trabajar(args):
 
 def _continuar_en_rama(feature_id, descripcion, ramas):
     if not _rama_actual().startswith(f"feat/{feature_id}-"):
+        print(f"aviso: {feature_id} ya está activa; retomas su rama {ramas[feature_id][-1]}\n")
         git("switch", "-q", ramas[feature_id][-1])
     elif ramas.get(feature_id) and _rama_actual() != ramas[feature_id][-1]:
         git("switch", "-q", ramas[feature_id][-1])
@@ -642,7 +647,8 @@ def _iniciar_sin_rama(feature, descripcion, features, estados, ramas):
 
 
 def _crear_parte(feature_id, descripcion, base, referencia, ramas):
-    rama = nombre_rama(feature_id, descripcion, ramas)
+    spec_base = _leer_referencia(referencia, _ruta_spec(feature_id)) or ""
+    rama = nombre_rama(feature_id, descripcion, ramas, partes_cerradas(spec_base))
     git("switch", "-q", "--no-track", "-c", rama, referencia)
     spec = fijar_fase(_leer_spec_local(feature_id), "tests", base)
     _guardar_y_confirmar(feature_id, spec, f"docs({feature_id}): iniciar nueva parte")
@@ -868,7 +874,9 @@ def main():
     try:
         args.accion(args)
     except subprocess.CalledProcessError as error:
-        _fallar(f"{' '.join(map(str, error.cmd))}\n{error.stderr}")
+        _fallar(f"{' '.join(map(str, error.cmd))}\n{error.stderr.strip()}")
+    except FileNotFoundError as error:
+        _fallar(f"falta {error.filename}; instala git y gh")
     except ValueError as error:
         _fallar(str(error))
 
