@@ -74,7 +74,7 @@ Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa
 
 ## Checks en GitHub
 
-Cada PR muestra estos checks por separado. Ninguno es obligatorio para fusionar: `main` no tiene protección, así que quien fusiona debe verlos en verde.
+Cada PR muestra estos checks por separado. `main` está protegida: todos deben estar en verde para fusionar, también para administradores, y no se admite push directo.
 
 | Workflow | Check | Comprueba |
 |---|---|---|
@@ -82,7 +82,7 @@ Cada PR muestra estos checks por separado. Ninguno es obligatorio para fusionar:
 | `pr` | `rama` | Patrón de nombre de rama |
 | `pr` | `commits` | Conventional Commits en cada commit |
 | `pr` | `tamano` | Hasta 400 líneas sin pruebas ni documentos, en features |
-| `pr` | `alcance` | `STATUS.md` sin editar; código de producto solo por feature o `fix/` y `refactor/` |
+| `pr` | `alcance` | Bitácora fuera de las features; código de producto solo por feature o `fix/` y `refactor/` |
 | `pr` | `secretos` | Sin llaves privadas agregadas |
 | `pr` | `estado-feature` | SPEC terminado, seis verificaciones de IA, seis aprobaciones y base coherente |
 | `pr` | `bitacora` | Entrada de la rama en la bitácora |
@@ -100,4 +100,4 @@ Una vez, quien administre el repositorio:
 gh repo edit --enable-squash-merge=false --enable-rebase-merge=false --delete-branch-on-merge
 ```
 
-`main` debe aceptar los commits `chore(status): regenerar` del script. Si se protege, hay que permitirlos o `docs/STATUS.md` dejará de actualizarse.
+La rama `estado` guarda `docs/STATUS.md` y la bitácora que publica el script. No se protege ni se borra, y no se fusiona en `main`.

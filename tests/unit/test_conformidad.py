@@ -77,8 +77,7 @@ def test_ramas_sin_feature_no_tocan_codigo_de_producto():
     assert not revisar_alcance("chore/x", ["scripts/flujo.py"])
 
 
-def test_nadie_edita_el_status_ni_una_feature_la_bitacora():
-    assert revisar_alcance("chore/x", ["docs/STATUS.md"])
+def test_una_feature_no_edita_la_bitacora():
     assert revisar_alcance(RAMA, ["docs/BITACORA_IA.md"])
 
 

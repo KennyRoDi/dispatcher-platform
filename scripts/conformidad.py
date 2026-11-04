@@ -22,6 +22,7 @@ from scripts.flujo import (
     PLANTILLA_SPEC,
     PR_ABIERTA,
     RAIZ,
+    RAMA_ESTADO,
     STATUS,
     _RAMA,
     base_de_spec,
@@ -34,7 +35,7 @@ from scripts.flujo import (
 ROLES = ("orquestador", "arquitecto", "developer", "qa-tester", "medidor", "documentador", "revisor")
 COMANDOS = ("empezables", "trabajar", "cierre")
 PIEZAS_COMUNES = (
-    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", BACKLOG, STATUS, BITACORA,
+    "AGENTS.md", "CONTRIBUTING.md", "README.md", ".claude/CLAUDE.md", "scripts/flujo.py", BACKLOG, BITACORA,
     PLANTILLA_SPEC, PLANTILLA_PR, "docs/ENUNCIADO.md", "docs/REQUERIMIENTOS.md", "docs/ARQUITECTURA.md",
     "docs/IMPLEMENTACION.md",
     *(f".agents/roles/{r}.md" for r in ROLES),
@@ -106,8 +107,6 @@ def revisar_spec(spec, base_pr):
 
 def revisar_alcance(rama, archivos):
     motivos = []
-    if STATUS in archivos:
-        motivos.append(f"{STATUS} se genera; no se edita en una PR")
     if _feature_de(rama) and BITACORA in archivos:
         motivos.append(f"{BITACORA} se publica con `flujo.py bitacora`, no en la PR")
     if not _feature_de(rama) and not rama.startswith(RAMAS_CON_CODIGO):
@@ -173,13 +172,16 @@ def _leer(ruta):
 
 def conformidad_repo():
     backlog = parsear_backlog(_leer(BACKLOG))
-    status = _leer(STATUS)
+    status = _git("show", f"origin/{RAMA_ESTADO}:{STATUS}")
+    bitacora = _git("show", f"origin/{RAMA_ESTADO}:{BITACORA}")
     existentes = {p.relative_to(RAIZ).as_posix() for p in RAIZ.rglob("*") if p.is_file() and ".git" not in p.parts}
     fichas = pathlib.Path(RAIZ / "docs").glob("modulo-M*.md")
     motivos = revisar_piezas(existentes, dict(_FILA_STATUS.findall(status)))
-    motivos += revisar_status(status, backlog) + revisar_backlog(backlog) + revisar_bitacora(_leer(BITACORA))
+    motivos += revisar_status(status, backlog) + revisar_backlog(backlog) + revisar_bitacora(bitacora)
     motivos += revisar_comandos({c: _leer(f".claude/skills/{c}/SKILL.md") for c in COMANDOS
                                  if f".claude/skills/{c}/SKILL.md" in existentes})
+    if STATUS in existentes:
+        motivos.append(f"{STATUS} vive en la rama {RAMA_ESTADO}, no aquí")
     for ficha in fichas:
         motivos += [f"{ficha.name}: {m}" for m in revisar_ficha(ficha.read_text(encoding="utf-8"))]
     return motivos
@@ -226,7 +228,7 @@ def _check_estado_feature():
 
 
 def _check_bitacora():
-    if not _feature_de(_rama()) or bitacora_registra(_git("show", f"origin/main:{BITACORA}"), _rama()):
+    if not _feature_de(_rama()) or bitacora_registra(_git("show", f"origin/{RAMA_ESTADO}:{BITACORA}"), _rama()):
         return []
     return [f"falta la entrada de {_rama()} en {BITACORA}"]
 
