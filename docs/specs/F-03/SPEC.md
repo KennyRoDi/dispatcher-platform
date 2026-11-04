@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 4eb3441
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
@@ -54,3 +54,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Auditoria | 2026-11-03 | prueba de auditoria (4eb3441) |
+| plan | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
