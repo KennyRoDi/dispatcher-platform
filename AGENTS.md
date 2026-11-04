@@ -13,6 +13,7 @@ No leas documentos enteros si no hace falta.
 | Diseño aprobado de una feature | `docs/specs/F-XX/SPEC.md` |
 | Prueba roja y comandos de medición | [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) §4 y §5: busca `F-XX` |
 | Decisiones y capas | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §4 y §8 |
+| Contratos entre módulos | `src/domain/priority.py`, `src/domain/finding.py`, `src/application/ports.py` |
 | Requisito y supuestos | [docs/REQUERIMIENTOS.md](docs/REQUERIMIENTOS.md) |
 | Commits y PR | [CONTRIBUTING.md](CONTRIBUTING.md) |
 

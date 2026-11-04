@@ -128,7 +128,7 @@ python scripts/flujo.py empezables</code></pre></li>
   </ol>
   <p>Después, en tu agente, ejecuta <code>/empezables</code> y <code>/trabajar F-XX</code>. También puedes hacerlo todo sin agente con los comandos de <code>flujo.py</code>.</p>
   <h3>Quién hace qué</h3>
-  <p>Cada persona se enfoca en su módulo. La asignación es una propuesta hasta que el equipo la confirme; se edita en <a href="EQUIPO.md"><code>docs/EQUIPO.md</code></a>.</p>
+  <p>Cada persona se enfoca en su módulo. El equipo aceptó esta distribución; la matriz está en <a href="responsabilidades.md"><code>docs/responsabilidades.md</code></a> y los usuarios, en <a href="EQUIPO.md"><code>docs/EQUIPO.md</code></a>.</p>
   <div class="tabla"><table>
     <tr><th>Persona</th><th>Usuario</th><th>Letra</th><th>Módulos</th><th>Otras áreas</th></tr>
     <tr><td>Kenni Rodriguez</td><td><code>KennyRoDi</code></td><td>K</td><td>M4</td><td>Dataset, reporte, alertas, despliegue, informe</td></tr>
@@ -150,14 +150,16 @@ python scripts/flujo.py empezables</code></pre></li>
     <tr><td><code>docs/ARQUITECTURA.md</code></td><td>Capas, diagramas y decisiones <code>AD-XX</code></td><td>Al diseñar</td></tr>
     <tr><td><code>docs/IMPLEMENTACION.md</code></td><td>Prueba roja y comandos de medición por feature</td><td>En las fases de tests y verificación</td></tr>
     <tr><td><code>docs/REQUERIMIENTOS.md</code></td><td>Requisitos con cita al enunciado y supuestos <code>SUP-XX</code></td><td>Al dudar del alcance</td></tr>
-    <tr><td><code>src/domain</code>, <code>application</code>, <code>adapters</code>, <code>infrastructure</code></td><td>Capas nuevas, por ahora vacías</td><td>Aquí va el código nuevo</td></tr>
-    <tr><td><code>src/coordinator</code>, <code>src/workers</code>, <code>dashboard</code>, <code>deploy</code>, <code>scripts</code></td><td>Código heredado del I Proyecto</td><td>Se mueve a <code>adapters</code> solo cuando se toca</td></tr>
+    <tr><td><code>src/domain</code>, <code>application</code>, <code>adapters</code>, <code>infrastructure</code></td><td>Capas nuevas, con los contratos compartidos entre módulos</td><td>Aquí va el código nuevo</td></tr>
+    <tr><td><code>src/coordinator</code>, <code>src/workers</code>, <code>dashboard</code>, <code>deploy</code>, <code>scripts</code></td><td>Código heredado del I Proyecto. <code>src/coordinator</code> ya está dividido por responsabilidad</td><td>Se mueve a <code>adapters</code> solo cuando se toca</td></tr>
     <tr><td><code>tests/unit</code>, <code>integration</code>, <code>acceptance</code></td><td>Pruebas nuevas; las heredadas están en <code>tests/</code></td><td>En la fase de tests</td></tr>
     <tr><td><code>scripts/flujo.py</code>, <code>conformidad.py</code></td><td>Ciclo de trabajo y checks</td><td>Los usas, no los editas en una feature</td></tr>
     <tr><td><code>.agents/</code>, <code>.claude/</code></td><td>Comandos y roles comunes a los agentes</td><td>Tu agente los usa</td></tr>
     <tr><td>Rama <code>estado</code></td><td><code>docs/STATUS.md</code> y la bitácora vigente</td><td>La publica el script; no la edites</td></tr>
   </table></div>
   <p>Los documentos antiguos de <code>docs/</code>, como <code>WORKER_CONTRACT.md</code> o <code>DECISIONES_DISENO.md</code>, describen la plataforma heredada. Son útiles para entender el código actual, pero no definen el alcance del II Proyecto.</p>
+  <h3>Contratos entre módulos</h3>
+  <p>Para no esperar a otros módulos, programa contra los contratos y usa fakes en las pruebas: <code>Priority</code> en <code>src/domain/priority.py</code>, <code>Finding</code> en <code>src/domain/finding.py</code> y los puertos <code>Clock</code>, <code>Analyzer</code>, <code>ObjectStore</code>, <code>WorkQueue</code> y <code>AlertPublisher</code> en <code>src/application/ports.py</code>. Si necesitas cambiar uno, hazlo en una PR y avisa a los módulos afectados.</p>
   <h3>Regla de capas</h3>
   <pre><code>infrastructure → adapters → application → domain</code></pre>
   <p>Las dependencias apuntan hacia el dominio. <code>src/domain</code> es lógica pura: no importa <code>redis</code>, <code>fastapi</code>, <code>minio</code> ni otras capas. Una prueba lo hace cumplir. El código debe entenderse por sí solo: comenta solo casos borde que el código no pueda expresar.</p>

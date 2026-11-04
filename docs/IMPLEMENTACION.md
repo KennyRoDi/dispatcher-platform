@@ -42,7 +42,7 @@ Todo es obligatorio [B.10], así que recortar afecta la nota. Este orden minimiz
 
 ## 2. Funcionalidades
 
-**Responsables (propuesta, SUP-01; requiere confirmación).** Se basa en lo que cada integrante hizo en el I Proyecto.
+**Responsables, aceptados por el equipo.** Matriz en [responsabilidades.md](responsabilidades.md).
 
 | Integrante | Módulos como responsable principal | Áreas |
 |---|---|---|
