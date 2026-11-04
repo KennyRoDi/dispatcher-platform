@@ -1,7 +1,7 @@
 # Área: M3 · E/S y almacenamiento
 
 ### US-22 · Chunks verificados (F-22) · P2 · H2
-- **Responsable:** V · **Depende de:** F-01
+- **Responsable:** V · **Depende de:** —
 Como cliente, quiero enviar archivos grandes por partes para no cargarlos completos en memoria y detectar corrupción.
 - **Dado** un archivo ≥ 200 MB dividido en chunks
 - **Cuando** se envía y reensambla
@@ -10,7 +10,7 @@ Como cliente, quiero enviar archivos grandes por partes para no cargarlos comple
 - **Demuestra:** prueba I. **Evidencia:** ficha M3: MB/s para ≥ 3 tamaños.
 
 ### US-23 · Almacenamiento por contenido (F-23) · P2 · H2
-- **Responsable:** V · **Depende de:** F-22
+- **Responsable:** V · **Depende de:** —
 Como operador, quiero no guardar el mismo contenido dos veces para ahorrar espacio.
 - **Dado** dos fuentes con el mismo contenido
 - **Cuando** se almacenan

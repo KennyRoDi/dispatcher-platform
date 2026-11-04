@@ -1,7 +1,7 @@
 # Área: M2 · Planificación
 
 ### US-20 · Prioridades con aging (F-20) · P2 · H2
-- **Responsable:** N · **Depende de:** F-06
+- **Responsable:** N · **Depende de:** —
 Como analista, quiero que los casos críticos pasen primero sin bloquear los de baja prioridad.
 - **Dado** un flujo continuo de casos altos y un caso bajo en espera
 - **Cuando** corre el scheduler

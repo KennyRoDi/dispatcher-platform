@@ -1,7 +1,7 @@
 # Área: M4 · Seguridad
 
 ### US-26 · Autenticación y roles (F-26) · P2 · H3
-- **Responsable:** K · **Depende de:** F-01
+- **Responsable:** K · **Depende de:** —
 Como administrador, quiero que cada rol solo haga lo permitido para proteger la información.
 - **Dado** usuarios analista, supervisor y administrador
 - **Cuando** cada uno intenta cada acción, o no presenta token
@@ -19,7 +19,7 @@ Como responsable de seguridad, quiero cifrar la comunicación entre nodos para q
 - **Demuestra:** captura. **Evidencia:** ficha M4: `tcpdump`, `tshark`, `strings`.
 
 ### US-28 · Cifrado en reposo (F-28) · P2 · H3
-- **Responsable:** K · **Depende de:** F-23
+- **Responsable:** K · **Depende de:** —
 Como responsable de seguridad, quiero las evidencias cifradas y las llaves fuera del código para proteger el almacenamiento.
 - **Dado** una evidencia almacenada con un marcador sintético
 - **Cuando** se lee directo de MinIO, o se busca en el historial de Git
@@ -28,7 +28,7 @@ Como responsable de seguridad, quiero las evidencias cifradas y las llaves fuera
 - **Demuestra:** prueba I y búsqueda en historial. **Evidencia:** ficha M4: comandos y justificación de AD-16.
 
 ### US-29 · Cadena de custodia (F-29) · P2 · H3
-- **Responsable:** K · **Depende de:** F-23
+- **Responsable:** K · **Depende de:** —
 Como supervisor, quiero una cadena verificable para demostrar que las evidencias no se alteraron.
 - **Dado** evidencias procesadas, con entrada de ingreso y de cada transformación
 - **Cuando** se altera una evidencia, una entrada, o se trunca el log

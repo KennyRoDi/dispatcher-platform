@@ -10,7 +10,7 @@ Como analista, quiero crear un caso con varias fuentes para analizarlas en conju
 - **Demuestra:** prueba A. **Evidencia:** respuesta de `GET /cases/{id}`.
 
 ### US-02 · Validar y normalizar (F-02) · P1 · H1
-- **Responsable:** N · **Depende de:** F-01
+- **Responsable:** N · **Depende de:** —
 Como analista, quiero que se rechacen formatos no válidos y se normalicen las exportaciones para analizar datos uniformes.
 - **Dado** una exportación de WhatsApp o Telegram y un archivo no admitido
 - **Cuando** se reciben
