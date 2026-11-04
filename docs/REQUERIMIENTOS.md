@@ -109,7 +109,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 
 | ID | Supuesto | Justificación técnica |
 |---|---|---|
-| SUP-01 ⚠ | Equipo de 4: Kenni Rodriguez, Nahúm Murillo, José Andrés Loría Herrera y Melany Vindas. Falta confirmar la asignación de módulos y el usuario de GitHub de Melany Vindas. | Indicado por Kenni Rodriguez; [Parte I, Modalidad] mantiene los equipos. Melany Vindas no aparece como autora en el historial del I Proyecto. |
+| SUP-01 ⚠ | Equipo de 4: Kenni Rodriguez, Nahúm Murillo, José Andrés Loría Herrera y Melany Vindas, con la distribución de módulos aceptada. Falta confirmar el usuario de GitHub de Melany Vindas y que Nahúm Murillo acepte la invitación. | Indicado por Kenni Rodriguez; [Parte I, Modalidad] mantiene los equipos. |
 | SUP-02 | H1 el 28/oct/26 y H2 el 04/nov/26, contando semanas desde el 21/oct/26. | El documento dice «fin de semana 1» y «fin de semana 2» sin fecha. Es una inferencia, compatible con tres semanas hasta el 10/nov/26. |
 | SUP-03 | La entrega final es el 10/nov/26, no el 04/nov/26 del enunciado. | Indicado por Kenni Rodriguez. Falta la hora de entrega. |
 | SUP-04 | Coordinador, Redis, MinIO y custodia comparten el Nodo A, que también corre workers. | [B.2] exige tres nodos worker, no un nodo adicional para el coordinador. |
