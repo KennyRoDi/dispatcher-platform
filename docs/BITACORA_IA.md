@@ -104,3 +104,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado. La identidad es una declaración, no una autenticación |
 | Cómo se validó | pytest, conformidad y clon desechable con remoto local |
 | Error de la IA | Un script de migración abortó y aun así se creó un commit parcial local; se descartó y se repitió deteniendo ante fallos. El check de piezas detectó que F-42 quedaba oculta por su responsable y se corrigió |
+
+## 2026-11-03 · Kenni Rodriguez · Auditoría y guía (`chore/auditoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Auditoría y guía |
+| Propósito | Auditar el flujo antes de abrirlo al equipo y escribir la guía |
+| Consulta resumida | Auditar flujo, integridad y comandos; generar una guía para contribuir |
+| Resultado obtenido | Hallazgos corregidos, comando fusionar y docs/GUIA.html |
+| Validado / corregido / descartado | Aceptado. Comandos probados contra GitHub real con features desechables |
+| Cómo se validó | Clon limpio, ciclo real con PR apilada y 11 checks, retirada de datos de prueba, pytest |
+| Error de la IA | CONTRIBUTING.md afirmaba que GitHub cambia la base de una PR apilada al borrar la de abajo; la prueba real mostró que la cierra. También pedía Python 3.10 y AD-22 proponía 3.12, cuando el código requiere 3.13 |
