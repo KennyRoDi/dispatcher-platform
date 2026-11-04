@@ -2,7 +2,7 @@
 
 # Plan de implementación
 
-Requisitos en `REQUERIMIENTOS.md`, decisiones en `ARQUITECTURA.md`, historias en `BACKLOG.md`. Cada `F-XX` corresponde a la historia `US-XX`.
+Requisitos en `REQUERIMIENTOS.md`, decisiones en `ARQUITECTURA.md`, historias en `docs/backlog/`. Cada `F-XX` corresponde a la historia `US-XX`.
 
 ## 1. Calendario
 
@@ -113,7 +113,7 @@ Tipo: **Reu**tilizar, **Mod**ificar, **Nue**vo. Este campo alimenta `docs/reutil
 
 **Clean Tests (F.I.R.S.T.):** las pruebas unitarias no usan red, `sleep` ni reloj real. Se inyecta `Clock` y se usa `fakeredis`, ya presente en el I Proyecto. Cada una prepara sus datos. Los marcadores `integration` y `acceptance` separan lo que necesita servicios. `pytest -q -m "not integration and not acceptance"` debe ejecutarse en segundos.
 
-Las F-33 a F-37 y F-38 a F-42 no siguen TDD: son escenarios y entregables, y su verificación está en `BACKLOG.md`.
+Las F-33 a F-37 y F-38 a F-42 no siguen TDD: son escenarios y entregables, y su verificación está en `docs/backlog/`.
 
 | ID | Prueba roja | Implementación mínima | Refactor |
 |---|---|---|---|
@@ -196,7 +196,7 @@ La tasa de deduplicación depende de los duplicados que tenga el dataset. Su ori
 | Cifrado (F-28) | `test_ida_y_vuelta_aes_gcm`, `test_chunk_alterado_falla_autenticacion`, `test_nonce_no_se_repite`, `test_falla_si_falta_kek` | `EnvelopeCipher` | Puerto de llaves |
 | Cadena (F-29) | `test_cada_entrada_enlaza_a_la_anterior`, `test_alterar_entrada_detecta_posicion`, `test_truncar_log_se_detecta`, `test_alterar_evidencia_se_detecta` | `CustodyChain` y `verify` | CLI `verify_custody` |
 
-F-27 (TLS) y F-30 (sin privilegios) son configuración de despliegue, sin lógica propia que justifique TDD. Se verifican con las mediciones siguientes y con la prueba de integración de `BACKLOG.md`.
+F-27 (TLS) y F-30 (sin privilegios) son configuración de despliegue, sin lógica propia que justifique TDD. Se verifican con las mediciones siguientes y con la prueba de integración de `docs/backlog/`.
 
 | Medición de SO | Comando reproducible | Producto |
 |---|---|---|
@@ -221,7 +221,7 @@ F-27 (TLS) y F-30 (sin privilegios) son configuración de despliegue, sin lógic
 
 ## 6. Clean Commits y PR
 
-Las reglas de commits, títulos de PR y pilas están en [CONTRIBUTING.md](../CONTRIBUTING.md). El estado está en [STATUS.md](STATUS.md) y las dependencias de cada funcionalidad, en [BACKLOG.md](BACKLOG.md). Los resultados de medición se versionan en `docs/evidencia/` con el script y el commit que los produjo.
+Las reglas de commits, títulos de PR y pilas están en [CONTRIBUTING.md](../CONTRIBUTING.md). El estado está en [STATUS.md](STATUS.md) y las dependencias de cada funcionalidad, en [backlog/](backlog/README.md). Los resultados de medición se versionan en `docs/evidencia/` con el script y el commit que los produjo.
 
 ## 7. Riesgo de orden
 

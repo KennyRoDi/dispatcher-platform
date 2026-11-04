@@ -35,7 +35,7 @@ python scripts/flujo.py empezables
 | [AGENTS.md](AGENTS.md) | Reglas y ciclo de trabajo para agentes y personas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Commits, títulos de PR y pilas |
 | `docs/STATUS.md` de la rama `estado` | Estado de cada funcionalidad |
-| [docs/BACKLOG.md](docs/BACKLOG.md) | Historias, responsables, dependencias y criterios de aceptación |
+| [docs/backlog/](docs/backlog/README.md) | Historias, responsables, dependencias y criterios de aceptación |
 | [docs/specs/](docs/specs/) | `SPEC.md` aprobado de cada funcionalidad |
 | [docs/BITACORA_IA.md](docs/BITACORA_IA.md) | Bitácora de uso de IA |
 | [docs/ENUNCIADO.md](docs/ENUNCIADO.md) | Enunciado del proyecto: fuente de verdad |

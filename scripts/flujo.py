@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Ciclo de trabajo común a todos los agentes y personas. Ver AGENTS.md y CONTRIBUTING.md.
 
-    python scripts/flujo.py empezables [--responsable K]
+    python scripts/flujo.py soy <usuario-github>
+    python scripts/flujo.py empezables [--todas]
     python scripts/flujo.py trabajar F-XX ["descripcion"]
     python scripts/flujo.py fase
     python scripts/flujo.py verificar --herramienta "x" --resumen "qué se comprobó"
@@ -36,7 +37,10 @@ APILABLES = tuple(e for e in ACTIVOS if e != "plan")
 TIPOS = ("feat", "fix", "docs", "test", "refactor", "perf", "build", "ci", "chore", "style", "revert")
 LIMITE_LINEAS = 400
 STATUS = "docs/STATUS.md"
-BACKLOG = "docs/BACKLOG.md"
+BACKLOG = "docs/backlog"
+EQUIPO = "docs/EQUIPO.md"
+RESPONSABLES_COMPARTIDOS = ("Todos", "Cada responsable")
+USUARIO_SIN_CONFIRMAR = "por-confirmar"
 RAMA_ESTADO = "estado"
 BITACORA = "docs/BITACORA_IA.md"
 PLANTILLA_SPEC = "docs/specs/PLANTILLA.md"
@@ -59,6 +63,7 @@ CAMPOS_BITACORA = ("herramienta", "proposito", "consulta", "resultado", "validad
 _CONVENTIONAL = re.compile(rf"^({'|'.join(TIPOS)})(\([\w./-]+\))?!?: \S")
 _ENCABEZADO_US = re.compile(r"^### (US-\d+) · .*\((F-\d+)\)", re.M)
 _METADATOS = re.compile(r"\*\*Responsable:\*\* (.+?) · \*\*Depende de:\*\* (.+)")
+_FILA_EQUIPO = re.compile(r"^\| ([\w-]+) \| ([A-Z]) \| ([^|]+?) \|", re.M)
 _RAMA = re.compile(r"^feat/(F-\d+)-(\d+)-")
 _CAMPO_FASE = re.compile(r"^\*\*Fase:\*\* ([\w-]+)$", re.M)
 _CAMPO_BASE = re.compile(r"^\*\*Base:\*\* (\S+)$", re.M)
@@ -80,6 +85,13 @@ class Feature:
     @property
     def historia_id(self):
         return self.historia.split(" · ", 1)[0].removeprefix("### ")
+
+
+@dataclasses.dataclass(frozen=True)
+class Integrante:
+    usuario: str
+    letra: str
+    nombre: str
 
 
 @dataclasses.dataclass(frozen=True)
@@ -269,6 +281,33 @@ def _clasificar_una(feature, estados, ramas):
     return Clasificacion("bloqueada", motivo="falta " + ", ".join(faltantes))
 
 
+def parsear_equipo(texto):
+    filas = _FILA_EQUIPO.findall(texto)
+    return {u.lower(): Integrante(u, l, n) for u, l, n in filas if u != USUARIO_SIN_CONFIRMAR}
+
+
+def letras_de_equipo(texto):
+    return {letra for _usuario, letra, _nombre in _FILA_EQUIPO.findall(texto)}
+
+
+def corresponde_a(feature, letra):
+    return feature.responsable == letra or feature.responsable in RESPONSABLES_COMPARTIDOS
+
+
+def desbloqueadoras(features, clases, letra):
+    encontradas, pendientes, vistas = set(), [f.id for f in features.values() if corresponde_a(f, letra)], set()
+    while pendientes:
+        actual = pendientes.pop()
+        for dep in features[actual].deps:
+            if dep in vistas:
+                continue
+            vistas.add(dep)
+            pendientes.append(dep)
+            if clases[dep].tipo in ("empezable", "apilable") and not corresponde_a(features[dep], letra):
+                encontradas.add(dep)
+    return sorted(encontradas)
+
+
 def nombre_rama(feature, descripcion, ramas):
     sin_acentos = unicodedata.normalize("NFKD", descripcion).encode("ascii", "ignore").decode()
     slug = re.sub(r"[^a-z0-9]+", "-", sin_acentos.lower()).strip("-")
@@ -320,6 +359,25 @@ def _leer_main(ruta):
     if texto is None:
         _fallar(f"{ruta} no existe en origin/main; fusiona primero la pila del flujo")
     return texto
+
+
+def _leer_backlog_main():
+    salida = git("ls-tree", "--name-only", "origin/main", f"{BACKLOG}/")
+    rutas = [r for r in salida.splitlines() if r.endswith(".md") and not r.endswith("README.md")]
+    if not rutas:
+        _fallar(f"{BACKLOG} no existe en origin/main")
+    return parsear_backlog("\n".join(_leer_main(r) for r in rutas))
+
+
+def _integrante_actual():
+    equipo = parsear_equipo(_leer_main(EQUIPO))
+    try:
+        usuario = git("config", "flujo.usuario")
+    except subprocess.CalledProcessError:
+        _fallar("¿quién eres? Indica tu usuario de GitHub: python scripts/flujo.py soy <usuario>")
+    if usuario.lower() not in equipo:
+        _fallar(f"{usuario} no está en {EQUIPO}; agrégalo o corrige con `flujo.py soy <usuario>`")
+    return equipo[usuario.lower()]
 
 
 def _ruta_spec(feature):
@@ -407,7 +465,7 @@ def _publicar_en_estado(ruta, generar, mensaje, intentos=3):
 
 def publicar_status():
     def generar(_actual):
-        estados, _ramas = _estados_actuales(parsear_backlog(_leer_main(BACKLOG)))
+        estados, _ramas = _estados_actuales(_leer_backlog_main())
         return generar_status(estados)
 
     error = _publicar_en_estado(STATUS, generar, "chore(status): regenerar")
@@ -478,26 +536,41 @@ def _imprimir_fase(feature, fase):
     print("Luego DETENTE a pedir aprobación. Solo con un sí explícito de la persona: python scripts/flujo.py aprobar")
 
 
+def cmd_soy(args):
+    git("fetch", "-q", "origin", "main")
+    integrante = parsear_equipo(_leer_main(EQUIPO)).get(args.usuario.lower())
+    if not integrante:
+        _fallar(f"{args.usuario} no está en {EQUIPO}")
+    git("config", "flujo.usuario", integrante.usuario)
+    print(f"Hola, {integrante.nombre} ({integrante.usuario}). Responsable: {integrante.letra}")
+
+
+def _imprimir_grupo(titulo, filas, clases):
+    print(titulo)
+    for feature in filas:
+        clase = clases[feature.id]
+        detalle = clase.motivo if clase.tipo in ("activa", "bloqueada") else f"base {clase.base}"
+        print(f"  {feature.id} [{feature.responsable}] {feature.titulo}: {detalle}")
+    if not filas:
+        print("  (ninguna)")
+
+
 def cmd_empezables(args):
     git("fetch", "-q", "--prune", "origin")
+    integrante = None if args.todas else _integrante_actual()
     publicar_status()
-    features = parsear_backlog(_leer_main(BACKLOG))
+    features = _leer_backlog_main()
     estados, ramas = _estados_actuales(features)
     clases = clasificar(features, estados, ramas)
-
-    def corresponde(feature):
-        return (not args.responsable or feature.responsable == args.responsable
-                or feature.responsable in ("Todos", "Cada responsable"))
-
-    for tipo, titulo in (("empezable", "EMPEZABLES"), ("apilable", "APILABLES"), ("activa", "ACTIVAS")):
-        print(titulo)
-        filas = [f for f in features.values() if clases[f.id].tipo == tipo and corresponde(f)]
-        for feature in filas:
-            clase = clases[feature.id]
-            detalle = clase.motivo if tipo == "activa" else f"base {clase.base}"
-            print(f"  {feature.id} [{feature.responsable}] {feature.titulo}: {detalle}")
-        if not filas:
-            print("  (ninguna)")
+    visibles = list(features.values())
+    if integrante:
+        print(f"{integrante.nombre} ({integrante.usuario})\n")
+        visibles = [f for f in visibles if corresponde_a(f, integrante.letra)]
+    for tipo, titulo in (("empezable", "EMPEZABLES"), ("apilable", "APILABLES"), ("activa", "ACTIVAS"), ("bloqueada", "BLOQUEADAS")):
+        _imprimir_grupo(titulo, [f for f in visibles if clases[f.id].tipo == tipo], clases)
+    if integrante:
+        ajenas = desbloqueadoras(features, clases, integrante.letra)
+        _imprimir_grupo("AJENAS QUE TE DESBLOQUEAN", [features[f] for f in ajenas], clases)
 
 
 def cmd_status(_args):
@@ -510,10 +583,13 @@ def cmd_trabajar(args):
     feature_id = args.feature
     _exigir_sin_cambios()
     git("fetch", "-q", "--prune", "origin")
-    features = parsear_backlog(_leer_main(BACKLOG))
+    features = _leer_backlog_main()
     if feature_id not in features:
         _fallar(f"{feature_id} no está en {BACKLOG}")
     feature = features[feature_id]
+    integrante = _integrante_actual()
+    if not corresponde_a(feature, integrante.letra):
+        print(f"aviso: {feature_id} es de {feature.responsable}; la tomas como apoyo\n")
     estados, ramas = _estados_actuales(features)
     if estados[feature_id] == "hecha":
         _fallar(f"{feature_id} ya está hecha")
@@ -719,8 +795,11 @@ def _abrir_pr(rama, base, titulo, feature_id, asuntos, final):
 def _analizador():
     analizador = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     comandos = analizador.add_subparsers(dest="comando", required=True)
+    identidad = comandos.add_parser("soy", help="registra tu usuario de GitHub en este clon")
+    identidad.add_argument("usuario")
+    identidad.set_defaults(accion=cmd_soy)
     lista = comandos.add_parser("empezables", help="lista lo que se puede tomar")
-    lista.add_argument("--responsable", help="K, N, J o V")
+    lista.add_argument("--todas", action="store_true", help="muestra las de todo el equipo")
     lista.set_defaults(accion=cmd_empezables)
     comandos.add_parser("status", help="regenera docs/STATUS.md").set_defaults(accion=cmd_status)
     toma = comandos.add_parser("trabajar", help="inicia o retoma una feature, o abre su siguiente parte")

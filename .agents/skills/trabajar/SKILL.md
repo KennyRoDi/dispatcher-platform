@@ -11,6 +11,8 @@ Actúas como **orquestador**: lee `.agents/roles/orquestador.md`. Cada fase pasa
 
 1. Ejecuta `python scripts/flujo.py trabajar F-XX`. Inicia la feature, la retoma donde quedó o abre su siguiente parte, y muestra la historia, la fase y el subagente.
    - Si la persona ya aprobó y sigues en la misma conversación, usa `python scripts/flujo.py fase`.
+   - Si pregunta quién eres, pide a la persona su usuario de GitHub y ejecuta `python scripts/flujo.py soy <usuario>`.
+   - Si avisa que la feature es ajena, confirma con la persona antes de continuar.
    - Si falla por dependencias, detente e informa.
 2. Lanza al subagente que indica el comando. Debe hacer commit según `CONTRIBUTING.md` y `git push`.
 3. Verifica su trabajo y registra con `python scripts/flujo.py verificar`. Si falla, devuélveselo.

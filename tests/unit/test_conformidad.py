@@ -10,6 +10,7 @@ from scripts.conformidad import (
     revisar_ficha,
     revisar_piezas,
     revisar_rama,
+    revisar_responsables,
     revisar_secretos,
     revisar_spec,
     revisar_status,
@@ -127,3 +128,9 @@ def test_cada_check_de_pr_tiene_su_entrada_en_el_workflow():
     workflow = (RAIZ / ".github/workflows/pr.yml").read_text(encoding="utf-8")
     for nombre in CHECKS_PR:
         assert f"- {nombre}\n" in workflow
+
+
+def test_responsable_sin_integrante_falla():
+    features = {"F-01": Feature("F-01", "Z", (), ""), "F-02": Feature("F-02", "Todos", (), "")}
+    motivos = revisar_responsables(features, {"K"})
+    assert len(motivos) == 1 and "F-01" in motivos[0]
