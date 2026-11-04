@@ -4,6 +4,7 @@ import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 
+from src.coordinator import conexion
 import src.coordinator.main as main
 
 OPS = (
@@ -18,7 +19,7 @@ OPS = (
 @pytest.fixture
 def fake(monkeypatch):
     r = fakeredis.FakeRedis(decode_responses=True)
-    monkeypatch.setattr(main, "redis_client", r)
+    monkeypatch.setattr(conexion, "redis_client", r)
     return r
 
 
