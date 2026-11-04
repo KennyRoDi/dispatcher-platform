@@ -10,13 +10,13 @@ Requisitos en `REQUERIMIENTOS.md`, decisiones en `ARQUITECTURA.md`, historias en
 
 | Hito | Contenido exigido para la Alternativa B | Fecha nominal | Fecha real |
 |---|---|---|---|
-| H1 | Reutilización, arquitectura, dataset sintético, pipeline base con texto, imagen y audio, matriz | Fin de semana 1 | Por confirmar |
-| H2 | M1, M2 y M3 con mediciones preliminares; estados, reintentos y cancelación | Fin de semana 2 | Por confirmar |
-| H3 | M4, M5, pruebas de carga, informe, demo y defensa | Entrega final | Por confirmar |
+| H1 | Reutilización, arquitectura, dataset sintético, pipeline base con texto, imagen y audio, matriz | Fin de semana 1 | 28/oct/26 (SUP-02) |
+| H2 | M1, M2 y M3 con mediciones preliminares; estados, reintentos y cancelación | Fin de semana 2 | 04/nov/26 (SUP-02) |
+| H3 | M4, M5, pruebas de carga, informe, demo y defensa | Entrega final | 10/nov/26 (SUP-03) |
 
 ### 1.2 Orden de trabajo
 
-El equipo indica que el plazo real supera la fecha del enunciado; la fecha exacta está por confirmar (SUP-03). Se conserva el orden de dependencias de los hitos:
+La entrega real es el 10/nov/26 (SUP-03). Se conserva el orden de dependencias de los hitos:
 
 | Bloque | Hito | Salida verificable |
 |---|---|---|
@@ -42,13 +42,14 @@ Todo es obligatorio [B.10], así que recortar afecta la nota. Este orden minimiz
 
 ## 2. Funcionalidades
 
-**Responsables (propuesta, SUP-01; requiere confirmación).** Se basa en lo que cada integrante hizo en el I Proyecto. Si hay un cuarto integrante, recibe M3 o M5.
+**Responsables (propuesta, SUP-01; requiere confirmación).** Se basa en lo que cada integrante hizo en el I Proyecto.
 
 | Integrante | Módulos como responsable principal | Áreas |
 |---|---|---|
-| Nahúm Murillo (N) | M2, M3 | Coordinador, cola, estados, reutilización |
+| Nahúm Murillo (N) | M2 | Coordinador, cola, estados, reutilización |
 | José Andrés Loría Herrera (J) | M1, M5 | Workers, cancelación, modelos |
-| Kenni Rodriguez (K) | M4 | Dataset, reporte, alertas, dashboard, seguridad, informe |
+| Kenni Rodriguez (K) | M4 | Dataset, reporte, alertas, seguridad, informe |
+| Melany Vindas (V) | M3 | E/S, almacenamiento, dashboard |
 
 Tipo: **Reu**tilizar, **Mod**ificar, **Nue**vo. Este campo alimenta `docs/reutilizacion.md`.
 
@@ -68,17 +69,17 @@ Tipo: **Reu**tilizar, **Mod**ificar, **Nue**vo. Este campo alimenta `docs/reutil
 | F-12 | Estados | Cancelación real y Clean Shutdown | RF-12 | J | H2 | B2 | Nue |
 | F-13 | Reportes | Reporte consolidado con evidencias | RF-13, RF-14 | K | H2 | B2 | Mod |
 | F-14 | Alertas | Alertas asíncronas | RF-15, RF-16 | K | H3 | B3 | Nue |
-| F-15 | Dashboard | Monitoreo y recursos por nodo | RF-17 | K | H3 | B3 | Mod |
+| F-15 | Dashboard | Monitoreo y recursos por nodo | RF-17 | V | H3 | B3 | Mod |
 | F-16 | M1 | Límites cgroups v2 por worker | RF-24 | J | H2 | B2 | Nue |
 | F-17 | M1 | Control de admisión | RF-25 | J | H2 | B2 | Nue |
 | F-18 | M1 | Detección de OOM y reencolado | RF-26 | J | H2 | B2 | Nue |
 | F-19 | M1 | Dos estrategias de carga de modelos | RF-27 | J | H2 | B2 | Nue |
 | F-20 | M2 | Scheduler con cuatro prioridades y aging | RF-28, RF-29 | N | H2 | B2 | Nue |
 | F-21 | M2 | Política FIFO seleccionable | RF-30 | N | H2 | B2 | Nue |
-| F-22 | M3 | Transferencia por chunks con hash | RF-31 | N | H2 | B2 | Nue |
-| F-23 | M3 | Almacenamiento por contenido con dedup | RF-32 | N | H2 | B2 | Mod |
-| F-24 | M3 | Backpressure | RF-33 | N | H2 | B2 | Nue |
-| F-25 | M3 | Recepción no bloqueante | RF-34 | N | H2 | B2 | Nue |
+| F-22 | M3 | Transferencia por chunks con hash | RF-31 | V | H2 | B2 | Nue |
+| F-23 | M3 | Almacenamiento por contenido con dedup | RF-32 | V | H2 | B2 | Mod |
+| F-24 | M3 | Backpressure | RF-33 | V | H2 | B2 | Nue |
+| F-25 | M3 | Recepción no bloqueante | RF-34 | V | H2 | B2 | Nue |
 | F-26 | M4 | Autenticación y roles | RF-35 | K | H3 | B3 | Nue |
 | F-27 | M4 | TLS entre nodos | RF-36 | K | H3 | B3 | Nue |
 | F-28 | M4 | Cifrado en reposo y llaves | RF-37, RNF-08 | K | H3 | B3 | Nue |
@@ -170,7 +171,7 @@ TDD prueba que la lógica decide bien. **No demuestra el comportamiento del sist
 | Comparación de políticas | `SCHED_POLICY=fifo python scripts/measure/m2_sched.py --high-rate R --low N --seed 42 --out m2_fifo.csv`, luego `SCHED_POLICY=aging`, 3 repeticiones, 3 nodos | Espera, turnaround y throughput por nivel |
 | Ausencia de inanición | Con los mismos CSV: `python scripts/measure/m2_plot.py m2_*.csv` | Espera máxima de la prioridad baja por política |
 
-### M3 · E/S y almacenamiento (`docs/modulo-M3-es-almacenamiento.md`, responsable N)
+### M3 · E/S y almacenamiento (`docs/modulo-M3-es-almacenamiento.md`, responsable V)
 
 | Lógica con TDD | Prueba roja | Implementación mínima | Refactor |
 |---|---|---|---|

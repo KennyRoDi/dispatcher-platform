@@ -18,7 +18,7 @@ Las historias de entrega (US-38 a US-42) toman P1 o P2 según lo que bloquean: l
 
 Pruebas: **U** unitaria, **I** integración, **A** aceptación.
 
-El estado de cada funcionalidad está en [STATUS.md](STATUS.md). Responsables propuestos: K Kenni Rodriguez, N Nahúm Murillo, J José Andrés Loría Herrera (SUP-01).
+El estado de cada funcionalidad está en [STATUS.md](STATUS.md). Responsables propuestos: K Kenni Rodriguez, N Nahúm Murillo, J José Andrés Loría Herrera, V Melany Vindas (SUP-01).
 
 ## Área: recepción y dataset
 
@@ -153,7 +153,7 @@ Como supervisor, quiero recibir alertas sin esperar a consultar para reaccionar 
 - **Demuestra:** prueba A. **Evidencia:** marcas de tiempo de alerta y de cierre.
 
 ### US-15 · Dashboard (F-15) · P5 · H3
-- **Responsable:** K · **Depende de:** F-16
+- **Responsable:** V · **Depende de:** F-16
 Como operador, quiero ver el estado y los recursos por nodo para detectar problemas durante la operación.
 - **Dado** tres nodos activos y una ráfaga
 - **Cuando** abro el dashboard
@@ -222,7 +222,7 @@ Como responsable de M2, quiero cambiar de política por configuración para comp
 ## Área: M3 · E/S y almacenamiento
 
 ### US-22 · Chunks verificados (F-22) · P2 · H2
-- **Responsable:** N · **Depende de:** F-01
+- **Responsable:** V · **Depende de:** F-01
 Como cliente, quiero enviar archivos grandes por partes para no cargarlos completos en memoria y detectar corrupción.
 - **Dado** un archivo ≥ 200 MB dividido en chunks
 - **Cuando** se envía y reensambla
@@ -231,7 +231,7 @@ Como cliente, quiero enviar archivos grandes por partes para no cargarlos comple
 - **Demuestra:** prueba I. **Evidencia:** ficha M3: MB/s para ≥ 3 tamaños.
 
 ### US-23 · Almacenamiento por contenido (F-23) · P2 · H2
-- **Responsable:** N · **Depende de:** F-22
+- **Responsable:** V · **Depende de:** F-22
 Como operador, quiero no guardar el mismo contenido dos veces para ahorrar espacio.
 - **Dado** dos fuentes con el mismo contenido
 - **Cuando** se almacenan
@@ -240,7 +240,7 @@ Como operador, quiero no guardar el mismo contenido dos veces para ahorrar espac
 - **Demuestra:** prueba I. **Evidencia:** ficha M3: tasa de deduplicación.
 
 ### US-24 · Backpressure (F-24) · P2 · H2
-- **Responsable:** N · **Depende de:** F-20
+- **Responsable:** V · **Depende de:** F-20
 Como operador, quiero frenar a los productores cuando las colas se llenan para proteger el sistema.
 - **Dado** una cola en su límite
 - **Cuando** llega más carga
@@ -249,7 +249,7 @@ Como operador, quiero frenar a los productores cuando las colas se llenan para p
 - **Demuestra:** experimento con y sin límite. **Evidencia:** ficha M3: gráfico de profundidad y respuesta.
 
 ### US-25 · Recepción no bloqueante (F-25) · P2 · H2
-- **Responsable:** N · **Depende de:** F-22
+- **Responsable:** V · **Depende de:** F-22
 Como usuario, quiero que la API responda durante subidas grandes.
 - **Dado** una subida lenta en curso
 - **Cuando** llega otra petición
@@ -417,7 +417,7 @@ Como evaluador, quiero ver responsabilidades, proceso y uso de IA para valorar l
 - **Cuando** se revisan la matriz, el historial y la bitácora
 - **Entonces** cada módulo tiene responsable, cada integrante tiene al menos un módulo y commits propios, hay entradas por módulo y ≥ 2 errores reales de la IA documentados
 - **Pruebas:** A `git shortlog -sn --all`; revisión contra Anexos 1 y 3.
-- **Demuestra:** comandos y documentos. **Evidencia:** `docs/responsabilidades.md`, `docs/bitacora_ia.md`.
+- **Demuestra:** comandos y documentos. **Evidencia:** `docs/responsabilidades.md`, `docs/BITACORA_IA.md`.
 
 ### US-41 · Fichas de evidencia (F-41) · P2 · H3
 - **Responsable:** Cada responsable · **Depende de:** F-19, F-21, F-25, F-29, F-30, F-32

@@ -197,7 +197,7 @@ stateDiagram-v2
 
 | ID | Decisión | Alternativas | Criterio de elección | Fuente |
 |---|---|---|---|---|
-| AD-01 | Extender el I Proyecto | Reescribir | [B.2] motiva reutilizar y evalúa lo nuevo; tiempo disponible | Medición del repo: 18 archivos con unas 387 pruebas |
+| AD-01 | Extender el I Proyecto | Reescribir | [B.2] motiva reutilizar y evalúa lo nuevo; tiempo disponible | Medición del repo: 18 archivos, 387 funciones de prueba, 474 casos pasan y 3 se omiten |
 | AD-02 | Tres nodos físicos, servicios en el Nodo A | Cuarta máquina; VMs en un solo equipo | [B.2] rechaza una sola máquina | [B.2]; SUP-04 |
 | AD-03 | Redis con `BLMOVE` a lista `inflight:{worker}` | Redis Streams; RabbitMQ | Cierra la ventana de pérdida con el menor cambio; conserva `recovery.py` y reaper | R1; limitación declarada del I Proyecto. Entrega al menos una vez, compensada por AD-21 |
 | AD-04 | ZSET por tipo con `puntaje = t_entrada − bono(prioridad)`, el menor sale primero | Prioridad estricta; WFQ; MLFQ | Aging implícito sin temporizadores: un caso de prioridad baja solo puede ser adelantado por casos que entren hasta `bono(crítica) − bono(baja)` después de él; con llegadas finitas, su espera queda acotada. Selección O(log n) | R2 cap. 5; R3. **Medición pendiente:** ficha M2, comparada con FIFO |
