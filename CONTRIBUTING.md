@@ -72,12 +72,25 @@ main
 
 Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/BACKLOG.md`.
 
-## Conformidad en GitHub
+## Checks en GitHub
 
-El workflow `conformidad` corre en cada PR y en cada push a `main`. No compila el sistema: comprueba que todos sigan el mismo patrón y que estén las piezas. Se reproduce en local con `python -m scripts.conformidad repo`.
+Cada PR muestra estos checks por separado. Ninguno es obligatorio para fusionar: `main` no tiene protección, así que quien fusiona debe verlos en verde.
 
-- **Repositorio:** piezas comunes, entregables de las features `hecha`, `STATUS.md` frente al backlog, dependencias, formato de la bitácora, fichas con sus cinco secciones y capas.
-- **PR:** rama, título, commits, tamaño, llaves privadas y alcance. En una feature, además: SPEC terminado con las seis verificaciones de IA y las seis aprobaciones humanas, base coherente y entrada en la bitácora.
+| Workflow | Check | Comprueba |
+|---|---|---|
+| `pr` | `titulo` | Conventional Commits y ámbito de la feature |
+| `pr` | `rama` | Patrón de nombre de rama |
+| `pr` | `commits` | Conventional Commits en cada commit |
+| `pr` | `tamano` | Hasta 400 líneas sin pruebas ni documentos, en features |
+| `pr` | `alcance` | `STATUS.md` sin editar; código de producto solo por feature o `fix/` y `refactor/` |
+| `pr` | `secretos` | Sin llaves privadas agregadas |
+| `pr` | `estado-feature` | SPEC terminado, seis verificaciones de IA, seis aprobaciones y base coherente |
+| `pr` | `bitacora` | Entrada de la rama en la bitácora |
+| `ci` | `piezas y formato` | Piezas y entregables, `STATUS.md`, backlog, bitácora y fichas |
+| `ci` | `capas (clean architecture)` | Regla de dependencias |
+| `ci` | `pruebas (pytest)` | Pruebas sin `integration` ni `acceptance` |
+
+En local: `python -m scripts.conformidad repo`.
 
 ## Configuración del repositorio
 

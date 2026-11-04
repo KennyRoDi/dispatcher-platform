@@ -1,6 +1,7 @@
 import pytest
 
 from scripts.conformidad import (
+    CHECKS_PR,
     revisar_alcance,
     revisar_backlog,
     revisar_bitacora,
@@ -15,7 +16,7 @@ from scripts.conformidad import (
     revisar_tamano,
     revisar_titulo,
 )
-from scripts.flujo import FASES, Feature, generar_status
+from scripts.flujo import FASES, RAIZ, Feature, generar_status
 
 RAMA = "feat/F-01-1-crear-caso"
 
@@ -121,3 +122,9 @@ def test_comando_de_claude_debe_apuntar_al_comun():
 def test_detecta_llave_privada_agregada():
     assert revisar_secretos(["+-----BEGIN RSA " + "PRIVATE KEY-----"])
     assert not revisar_secretos(["+texto normal"])
+
+
+def test_cada_check_de_pr_tiene_su_entrada_en_el_workflow():
+    workflow = (RAIZ / ".github/workflows/pr.yml").read_text(encoding="utf-8")
+    for nombre in CHECKS_PR:
+        assert f"- {nombre}\n" in workflow

@@ -65,3 +65,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Workflow `conformidad` con comprobaciones de repositorio y de PR |
 | Validado / corregido / descartado | Aceptado. El registro de aprobaciones demuestra que se ejecutó el comando, no quién respondió |
 | Cómo se validó | `pytest` y ejecución local de ambos modos sobre el repositorio |
+
+## 2026-11-03 · Kenni Rodriguez · Checks por PR (`ci/checks-por-pr`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Workflows `pr` y `ci`, `scripts/conformidad.py` |
+| Propósito | Mostrar en cada PR un check separado por regla |
+| Consulta resumida | Dividir la conformidad en checks con nombre, sin revisión humana |
+| Resultado obtenido | Ocho checks de PR y tres de repositorio |
+| Validado / corregido / descartado | Aceptado. Se descartó marcarlos como requeridos porque `main` no tiene protección |
+| Cómo se validó | `pytest`, ejecución local y corrida real en la PR |
+| Error de la IA | Interpretó «checks» como git hooks locales; el usuario aclaró con una captura que se refería a checks de PR en GitHub |
