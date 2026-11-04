@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 4eb3441
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
@@ -53,3 +53,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Auditoria | 2026-11-03 | prueba de auditoria (4eb3441) |
