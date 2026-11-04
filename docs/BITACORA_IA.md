@@ -116,3 +116,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | r |
 | Validado / corregido / descartado | v |
 | Cómo se validó | c |
+
+## 2026-11-03 · Auditoria · F-04 (`feat/F-04-1-prueba-auditoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | A |
+| Componente | F-04 |
+| Propósito | prueba de auditoria |
+| Consulta resumida | c |
+| Resultado obtenido | r |
+| Validado / corregido / descartado | v |
+| Cómo se validó | c |
