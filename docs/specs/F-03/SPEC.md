@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 21957cd
+**Verificación IA:** tests a892100
 **Historia:** US-03 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
@@ -60,3 +60,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de implementacion | Auditoria | 2026-11-03 | x |
 | verificación IA de plan | Auditoria | 2026-11-03 | prueba de auditoria (21957cd) |
 | plan | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
+| verificación IA de tests | Auditoria | 2026-11-03 | prueba de auditoria (a892100) |
