@@ -22,7 +22,7 @@ Solo se usan datos sintéticos o públicos con licencia. Está prohibido incorpo
 
 ## Cómo trabajar
 
-Personas y agentes (Claude Code, Codex y Antigravity) siguen el mismo ciclo: elegir una tarea y avanzar por seis fases, plan, tests, implementación, verificación, documentación y revisión, con aprobación humana en cada una, hasta abrir PR pequeñas y apiladas. Empieza por [AGENTS.md](AGENTS.md) y [CONTRIBUTING.md](CONTRIBUTING.md).
+Personas y agentes (Claude Code, Codex y Antigravity) siguen el mismo ciclo: elegir una tarea y avanzar por seis fases, plan, tests, implementación, verificación, documentación y revisión, con aprobación humana en cada una, hasta abrir PR pequeñas y apiladas. **Si eres nuevo, abre [docs/GUIA.html](docs/GUIA.html) en tu navegador.** Las reglas están en [AGENTS.md](AGENTS.md) y [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```bash
 python scripts/flujo.py empezables
@@ -32,6 +32,7 @@ python scripts/flujo.py empezables
 
 | Ruta | Contenido |
 |---|---|
+| [docs/GUIA.html](docs/GUIA.html) | Guía para entender el repositorio y contribuir |
 | [AGENTS.md](AGENTS.md) | Reglas y ciclo de trabajo para agentes y personas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Commits, títulos de PR y pilas |
 | `docs/STATUS.md` de la rama `estado` | Estado de cada funcionalidad |

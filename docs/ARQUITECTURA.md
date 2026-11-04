@@ -218,7 +218,7 @@ stateDiagram-v2
 | AD-19 | faster-whisper, YOLO (variante nano), spaCy y un modelo preentrenado de HuggingFace para sentimiento y ofensas | Modelos mayores; Vosk | Pesos pequeños para el límite de memoria; variantes `int8` para M5; [B.7] los sugiere. Ultralytics usa AGPL-3.0: se cita. Modelos definitivos sujetos a medición | [B.7 Texto/Imagen/Audio]. **Medición pendiente:** ficha M1 |
 | AD-20 | Extender el dashboard Streamlit; datos de cgroups en el heartbeat | Prometheus y Grafana | Reutiliza código; evita servicios y TLS adicionales. Los gráficos de las fichas salen de CSV producidos por scripts | [B.2]; R4 |
 | AD-21 | Coordinador sin estado, Redis AOF como checkpoint; `SADD` idempotente; reconciliación al arrancar | PostgreSQL; snapshots propios | Ya funciona. Con `appendfsync everysec` un fallo de **Redis** puede perder hasta 1 s; [B.6] exige reinicio del **coordinador**, no de Redis | R1. I Proyecto declaró 45 s detenido sin pérdida, sin logs: **Medición pendiente**, F-35 |
-| AD-22 | Imágenes de workers ML con `python:3.12-slim`, no la `3.14` actual | Mantener 3.14 | Las dependencias nativas de inferencia suelen tardar en publicar *wheels*. Verificar al construir | Supuesto a validar al construir la imagen |
+| AD-22 | Imágenes de workers ML con Python 3.13, igual que CI; la imagen heredada usa `3.14` | 3.12; mantener 3.14 | El código heredado usa `os.process_cpu_count`, disponible desde 3.13, así que 3.12 no sirve. Las dependencias nativas de inferencia pueden no publicar *wheels* para 3.14 | `src/workers/config.py:176`; CI. Verificar *wheels* al construir la imagen |
 
 ## 9. Reglas de diseño obligatorias
 

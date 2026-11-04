@@ -123,4 +123,4 @@ pip install -r requirements-dev.txt
 pytest -q -m "not integration and not acceptance"
 ```
 
-Requisitos del ciclo: Python 3.10 o superior, `git` y `gh` con sesión iniciada. Para agentes en paralelo, usa un worktree por agente: `git worktree add ../wt-F-XX origin/main`.
+Requisitos del ciclo: Python 3.13 o superior, `git` y `gh` con sesión iniciada. Para agentes en paralelo, usa un worktree por agente: `git worktree add ../wt-F-XX origin/main`.

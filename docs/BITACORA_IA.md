@@ -91,3 +91,29 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado |
 | Cómo se validó | `pytest`, corrida real de los checks y lectura de la protección por API |
 | Error de la IA | Configuró Python 3.12 en CI, pero el código heredado usa `os.process_cpu_count`, de 3.13. El check `pruebas (pytest)` lo detectó. AD-22 propone 3.12 para workers ML y debe revisarse |
+
+## 2026-11-03 · Kenni Rodriguez · Backlog e identidad (`chore/backlog-por-area`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Backlog e identidad |
+| Propósito | Dividir el backlog y mostrar a cada persona sus features |
+| Consulta resumida | Dividir el backlog y pedir el usuario de GitHub para filtrar por módulo |
+| Resultado obtenido | docs/backlog por área, docs/EQUIPO.md y comando soy |
+| Validado / corregido / descartado | Aceptado. La identidad es una declaración, no una autenticación |
+| Cómo se validó | pytest, conformidad y clon desechable con remoto local |
+| Error de la IA | Un script de migración abortó y aun así se creó un commit parcial local; se descartó y se repitió deteniendo ante fallos. El check de piezas detectó que F-42 quedaba oculta por su responsable y se corrigió |
+
+## 2026-11-03 · Kenni Rodriguez · Auditoría y guía (`chore/auditoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Auditoría y guía |
+| Propósito | Auditar el flujo antes de abrirlo al equipo y escribir la guía |
+| Consulta resumida | Auditar flujo, integridad y comandos; generar una guía para contribuir |
+| Resultado obtenido | Hallazgos corregidos, comando fusionar y docs/GUIA.html |
+| Validado / corregido / descartado | Aceptado. Comandos probados contra GitHub real con features desechables |
+| Cómo se validó | Clon limpio, ciclo real con PR apilada y 11 checks, retirada de datos de prueba, pytest |
+| Error de la IA | CONTRIBUTING.md afirmaba que GitHub cambia la base de una PR apilada al borrar la de abajo; la prueba real mostró que la cierra. También pedía Python 3.10 y AD-22 proponía 3.12, cuando el código requiere 3.13 |
