@@ -13,7 +13,7 @@ No leas documentos enteros si no hace falta.
 | Diseño aprobado de una feature | `docs/specs/F-XX/SPEC.md` |
 | Prueba roja y comandos de medición | [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) §4 y §5: busca `F-XX` |
 | Decisiones y capas | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §4 y §8 |
-| Contratos entre módulos | `src/domain/priority.py`, `src/domain/finding.py`, `src/application/ports.py` |
+| Contratos entre módulos, dueños de archivos | [docs/CONTRATOS.md](docs/CONTRATOS.md) |
 | Requisito y supuestos | [docs/REQUERIMIENTOS.md](docs/REQUERIMIENTOS.md) |
 | Commits y PR | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
@@ -103,6 +103,8 @@ El **responsable principal** es siempre una persona: aprueba cada fase y debe po
 **TDD.** Prueba roja, implementación mínima, refactor; las fases 2 y 3 lo hacen cumplir. Las unitarias no usan red, `sleep` ni reloj real.
 
 **Las mediciones de SO no llevan TDD.** TDD prueba que la lógica decide bien, no cómo se comporta el sistema operativo. Lo medido va en `docs/modulo-MX-nombre.md`, con comandos exactos [Anexo 2].
+
+**Módulos independientes.** Cada módulo avanza de principio a fin sin esperar a otro: programa contra los puertos, prueba con `tests/dobles.py` y pasa los adaptadores por `tests/contratos.py`. Una feature de módulo no puede depender de otro responsable.
 
 **Capas.** Las dependencias apuntan hacia el dominio y `tests/unit/test_arquitectura.py` lo hace cumplir. El código heredado se mueve a `src/adapters` solo cuando se toca.
 

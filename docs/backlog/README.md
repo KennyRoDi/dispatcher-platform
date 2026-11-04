@@ -15,9 +15,9 @@
 
 ## Dependencias
 
-Una dependencia significa un bloqueo real: sin ella no se puede probar la feature. La lógica que se apoya en `src/application/ports.py` se desarrolla con fakes, sin esperar a otro módulo.
+Cada módulo se desarrolla de principio a fin sin esperar a otro. **Una feature de módulo solo puede depender de otra del mismo responsable;** el check `piezas y formato` lo exige. El contacto entre módulos ocurre por los contratos de [CONTRATOS.md](../CONTRATOS.md), con dobles y pruebas de conformidad.
 
-Trabajar con fakes no termina la integración. Quien entrega una feature conecta su adaptador real si la otra parte ya está en `main`. Si no, lo indica en su SPEC como integración pendiente. Los escenarios F-33 a F-37 dependen de todo lo que integran y lo comprueban sobre los tres nodos.
+Solo F-33 a F-37, F-41 y F-42 dependen de varios módulos: son la integración final sobre los tres nodos.
 
 ## Prioridad
 

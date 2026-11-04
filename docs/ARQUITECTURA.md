@@ -74,7 +74,7 @@ flowchart TB
 | Adaptadores | `src/adapters/` | `api/`, `redis_queue`, `redis_case_repository`, `minio_object_store`, `whatsapp_parser`, `telegram_parser`, `text_analyzer`, `image_analyzer`, `audio_analyzer`, `ffmpeg_media` |
 | Infraestructura | `src/infrastructure/`, `deploy/` | Composición, configuración, lectura de cgroups, TLS, Compose por nodo |
 
-**Contratos compartidos.** `src/domain/priority.py`, `src/domain/finding.py` y `src/application/ports.py` son el acuerdo entre módulos: permiten avanzar con fakes sin esperar a los demás. Son la primera versión. Quien necesite cambiarlos lo hace en una PR y avisa a los módulos afectados.
+**Contratos compartidos.** Ver [CONTRATOS.md](CONTRATOS.md): definen cada punto de contacto entre módulos, con dobles en `tests/dobles.py` y pruebas de conformidad en `tests/contratos.py`.
 
 **Coordinador.** `src/coordinator/` se divide en `rutas_casos`, `rutas_subtareas`, `rutas_monitoreo`, `modelos`, `conexion` y `apoyo`; `main.py` solo compone la aplicación.
 
