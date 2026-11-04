@@ -143,3 +143,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado. Las dependencias relajadas exigen integrar después con los escenarios F-33 a F-37 |
 | Cómo se validó | Clon limpio, PR malas rechazadas por los checks, claude -p y agy -p, grafo del backlog y enlaces |
 | Error de la IA | Las dependencias del backlog se fijaron antes de existir los contratos y dejaban a Melany sin tareas; además el número de parte se podía reutilizar tras fusionar y borrar ramas, lo que permitía reusar una entrada de bitácora |
+
+## 2026-11-03 · Kenni Rodriguez · Independencia de módulos (`chore/modulos-independientes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | Independencia de módulos |
+| Propósito | Permitir que cada módulo se desarrolle de principio a fin sin esperar a otro |
+| Consulta resumida | Verificar que el backlog no bloquee entre módulos e integrar con ajustes mínimos |
+| Resultado obtenido | Contratos ampliados, dobles, pruebas de conformidad, dueños de archivos y un check de independencia |
+| Validado / corregido / descartado | Aceptado. Los contratos no eliminan el ajuste de integración: rendimiento, memoria real y red solo se ven en F-33 a F-37 |
+| Cómo se validó | Simulación del backlog por persona: todas sus features completables solas; pytest; 11 checks |
+| Error de la IA | La auditoría previa declaró resuelto el bloqueo con dejar tareas libres, pero seguían dos dependencias entre módulos, F-15 y F-24, y faltaban contratos para los demás puntos de contacto |
