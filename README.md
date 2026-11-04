@@ -18,18 +18,35 @@ Solo se usan datos sintéticos o públicos con licencia. Está prohibido incorpo
 
 ## Estado
 
-**Fase de planificación.** Este repositorio contiene los documentos de diseño; todavía no hay código ni mediciones. La implementación extenderá la plataforma del I Proyecto Programado.
+**En desarrollo.** El repositorio contiene el código del I Proyecto Programado, que sirve de base, y los documentos de diseño. Las funcionalidades del II Proyecto y sus mediciones aún no están implementadas. El avance está en [docs/STATUS.md](docs/STATUS.md).
+
+## Cómo trabajar
+
+Personas y agentes (Claude Code, Codex y Antigravity) siguen el mismo ciclo: elegir una tarea y avanzar por seis fases, plan, tests, implementación, verificación, documentación y revisión, con aprobación humana en cada una, hasta abrir PR pequeñas y apiladas. Empieza por [AGENTS.md](AGENTS.md) y [CONTRIBUTING.md](CONTRIBUTING.md).
+
+```bash
+python scripts/flujo.py empezables
+```
 
 ## Mapa del repositorio
 
 | Ruta | Contenido |
 |---|---|
+| [AGENTS.md](AGENTS.md) | Reglas y ciclo de trabajo para agentes y personas |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Commits, títulos de PR y pilas |
+| [docs/STATUS.md](docs/STATUS.md) | Estado de cada funcionalidad |
+| [docs/BACKLOG.md](docs/BACKLOG.md) | Historias, responsables, dependencias y criterios de aceptación |
+| [docs/specs/](docs/specs/) | `SPEC.md` aprobado de cada funcionalidad |
+| [docs/ENUNCIADO.md](docs/ENUNCIADO.md) | Enunciado del proyecto: fuente de verdad |
 | [docs/REQUERIMIENTOS.md](docs/REQUERIMIENTOS.md) | Requisitos con cita al enunciado, supuestos y trazabilidad |
 | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Escenarios de calidad, capas, diagramas y decisiones |
-| [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) | Funcionalidades, calendario, responsables y comandos de medición |
-| [docs/BACKLOG.md](docs/BACKLOG.md) | Historias de usuario con criterios de aceptación y pruebas |
-
-Conviene leerlos en ese orden, porque cada uno depende del anterior.
+| [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) | Funcionalidades, responsables, TDD y comandos de medición |
+| [docs/README_I_PROYECTO.md](docs/README_I_PROYECTO.md) | Manual de la plataforma heredada |
+| `src/domain`, `src/application`, `src/adapters`, `src/infrastructure` | Capas nuevas |
+| `src/coordinator`, `src/workers`, `dashboard`, `scripts`, `deploy` | Código heredado del I Proyecto |
+| `tests/` | Pruebas heredadas y `unit`, `integration`, `acceptance` |
+| `scripts/flujo.py` | Comandos del ciclo de trabajo |
+| `.agents/` | Comandos y roles comunes a todos los agentes |
 
 ## Manual
 

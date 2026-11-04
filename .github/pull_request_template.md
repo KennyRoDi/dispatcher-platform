@@ -12,12 +12,10 @@ Base: `{base}`. Fusiona primero la PR de esa rama, si la hay.
 
 ## Verificación
 
-- [ ] Criterios Dado/Cuando/Entonces cumplidos
-- [ ] Revisado por QA tester y revisor
-- [ ] Sin llaves ni datos reales de terceros
-- [ ] Bitácora de IA actualizada, si se usó IA
-- [ ] El responsable puede explicarlo sin ayuda
+Las seis fases están aprobadas en el SPEC. Quien revisa comprueba además:
 
-{excepcion}
+- [ ] Criterios Dado/Cuando/Entonces cumplidos
+- [ ] Sin llaves ni datos reales de terceros
+- [ ] El responsable puede explicarlo sin ayuda
 
 {cierre}

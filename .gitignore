@@ -1,6 +1,8 @@
 # Bitácora local de trabajo con IA: no se versiona
 CLAUDE.md
-docs/II_ProyectoProgramado_IC6600_IIS2026.docx.md
+# Punto de entrada compartido de Claude Code: solo importa AGENTS.md
+!.claude/CLAUDE.md
+.claude/settings.local.json
 
 # Heredado del I Proyecto
 .env

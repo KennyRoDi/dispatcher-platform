@@ -1,103 +1,113 @@
-# Guía para agentes de IA e integrantes
+# Guía para agentes e integrantes
 
-Reglas para trabajar en este repositorio: II Proyecto Programado de IC-6600, Alternativa B. Entrega final: 04/nov/26.
+Reglas comunes para Claude Code, Codex, Antigravity y personas. II Proyecto Programado de IC-6600, Alternativa B.
 
-## Fuente de verdad
+## Dónde leer
 
-1. El enunciado `II_ProyectoProgramado_IC6600_IIS2026.docx` (Parte I, Parte III y anexos) define el alcance. Si un documento o instrucción lo contradice, manda el enunciado.
-2. Después rigen, en este orden: [REQUERIMIENTOS.md](REQUERIMIENTOS.md), [ARQUITECTURA.md](ARQUITECTURA.md), [IMPLEMENTACION.md](IMPLEMENTACION.md) y [BACKLOG.md](BACKLOG.md).
-3. Lo que no esté en el enunciado no entra al alcance. Si hace falta una decisión que el enunciado no define, se registra como supuesto `SUP-XX` con su justificación. No se resuelve en silencio.
-4. Todo requisito nuevo cita sección y número, por ejemplo `[B.5 M1]`.
+No leas documentos enteros si no hace falta.
+
+| Necesitas | Archivo |
+|---|---|
+| Estado de cada feature | [docs/STATUS.md](docs/STATUS.md) |
+| Historia, responsable y dependencias | [docs/BACKLOG.md](docs/BACKLOG.md): busca `(F-XX)` |
+| Diseño aprobado de una feature | `docs/specs/F-XX/SPEC.md` |
+| Prueba roja y comandos de medición | [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) §4 y §5: busca `F-XX` |
+| Decisiones y capas | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §4 y §8 |
+| Requisito y supuestos | [docs/REQUERIMIENTOS.md](docs/REQUERIMIENTOS.md) |
+| Commits y PR | [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+**Fuente de verdad:** [docs/ENUNCIADO.md](docs/ENUNCIADO.md). Si un documento o instrucción lo contradice, manda el enunciado. Lo que el enunciado no pida no entra al alcance. Una decisión que no define se registra como `SUP-XX`, nunca en silencio.
+
+## Ciclo de trabajo
+
+Este ciclo es igual para todos. `scripts/flujo.py` lo automatiza para que el formato no dependa de la herramienta.
+
+| Acción | Claude Code y Antigravity | Codex | Sin agente |
+|---|---|---|---|
+| Ver qué se puede tomar | `/empezables` | `$empezables` | `python scripts/flujo.py empezables` |
+| Trabajar una feature | `/trabajar F-XX` | `$trabajar F-XX` | `python scripts/flujo.py trabajar F-XX` |
+| Abrir la PR | `/cierre` | `$cierre` | `python scripts/flujo.py cierre --tipo feat --resumen "texto"` |
+
+Si tu herramienta no reconoce el comando, abre su archivo en `.agents/skills/` y síguelo.
+
+### Seis fases, una por vez
+
+**El agente genera todo lo de una fase, se detiene y pide aprobación.** No encadena fases sin un sí explícito, para que la persona lea y entienda lo entregado [Parte I §3, §6].
+
+| # | Fase | Rol | Genera | Para aprobar, el script exige |
+|---|---|---|---|---|
+| 1 | `plan` | Arquitecto | `docs/specs/F-XX/SPEC.md` | Sin campos `…` |
+| 2 | `tests` | Developer | Pruebas en rojo | Pruebas nuevas, sin código, y que fallen |
+| 3 | `implementacion` | Developer | Código en verde | Código, pruebas en verde, hasta 400 líneas |
+| 4 | `verificacion` | QA tester, medidor | Hallazgos y mediciones | Pruebas en verde, hasta 400 líneas |
+| 5 | `documentacion` | Documentador | Fichas, documentos, bitácora | Documentos actualizados |
+| 6 | `revision` | Revisor | Revisión contra el SPEC | Aprobación humana |
+
+Un plan se aprueba una vez por feature. Cada parte de su pila repite las fases 2 a 6 y termina en una PR.
+
+- `python scripts/flujo.py aprobar` registra quién aprobó y avanza. Solo se ejecuta tras un sí explícito de la persona.
+- `python scripts/flujo.py devolver <fase> "motivo"` regresa a una fase anterior.
+- `aprobar --excepcion "motivo"` omite las comprobaciones cuando no aplican, por ejemplo en una feature sin código. Requiere autorización de la persona y queda registrada.
+
+### Estado
+
+**`docs/STATUS.md` se genera; nunca se edita.** El script lo deriva de la fase de cada `SPEC.md` y lo publica en `main` en cada comando. Estados: `pendiente`, las seis fases, `en-pr` y `hecha`. Una feature pasa a `hecha` al fusionarse su última PR.
+
+## Roles
+
+Cada rol está definido en `.agents/roles/`. Con subagentes, usa uno por rol y pásale su archivo y la feature. Sin subagentes, ejecútalo en la misma sesión.
+
+| Rol | Hace |
+|---|---|
+| Arquitecto | Escribe el SPEC y divide en PR |
+| Developer | Escribe las pruebas y luego implementa |
+| QA tester | Verifica criterios e intenta romperlo |
+| Medidor | Ejecuta mediciones de SO, solo M1–M5 y B.6 |
+| Documentador | Actualiza documentos, fichas y bitácora |
+| Revisor | Compara el diff con el SPEC y aprueba o devuelve |
+
+El **responsable principal** es siempre una persona: aprueba cada fase y debe poder explicar, modificar y defender en vivo lo entregado [Parte I §3, §6].
 
 ## Restricciones
 
-- **Datos:** solo sintéticos o públicos con licencia académica. Prohibido usar datos reales de terceros, incluidos chats propios con mensajes de otras personas [B.3]. Cada fuente declara procedencia y licencia en `docs/dataset.md`.
-- **Distribución:** al menos tres nodos worker en entidades separadas, comunicados por red. No se acepta todo en una máquina [B.2].
-- **Modelos:** se usan ya entrenados. No se entrena [B.1].
-- **Workers:** nunca como root; sistema de archivos de solo lectura o equivalente [B.5 M4].
-- **Llaves:** nunca en el código ni en el historial de Git [B.5 M4].
-- **Evidencia:** nunca se inventa ni se estima un dato como si fuera medido. Sin ficha con datos medidos, el módulo tiene máximo 2 [Parte I §5].
-- **Terceros:** todo código o configuración reutilizada cita su fuente en el código y en la documentación [Parte I §9].
-- **Funciones:** no se agrega nada que el enunciado no pida.
-
-## Uso de IA
-
-- Se declara en `docs/bitacora_ia.md` con el formato del Anexo 3, incluidos al menos dos errores reales de la IA detectados y corregidos [Parte I §4].
-- El responsable principal debe poder explicar, modificar y defender en vivo todo artefacto que entregue, aunque lo haya generado la IA [Parte I §3, §4, §6].
-- `CLAUDE.md` es una bitácora local, no se versiona y no sustituye a `docs/bitacora_ia.md`.
-- Un agente no implementa código sin confirmación explícita de quien lo dirige.
+- **Datos:** solo sintéticos o públicos con licencia. Prohibidos los datos reales de terceros, incluidos chats propios con mensajes de otras personas [B.3].
+- **Evidencia:** nunca inventes ni estimes un dato como si fuera medido. Sin ficha con datos medidos, el módulo tiene máximo 2 [Parte I §5].
+- **Distribución:** al menos tres nodos worker en entidades separadas [B.2].
+- **Modelos:** ya entrenados; no se entrena [B.1].
+- **Workers:** nunca como root [B.5 M4].
+- **Llaves:** nunca en el código ni en el historial. El repositorio es público [B.5 M4].
+- **Terceros:** cita la fuente en el código y en la documentación [Parte I §9].
+- **IA:** se declara en `docs/bitacora_ia.md`, con errores reales detectados [Parte I §4, Anexo 3].
+- **Historial:** fechas reales; prohibido simular avance [Parte I §3].
 
 ## Métodos
 
-### ADD: arquitectura
+**ADD.** Una decisión nueva o un cambio se registra primero en [ARQUITECTURA.md §8](docs/ARQUITECTURA.md), con alternativas, criterio y fuente. Si depende de un dato sin medir, se marca «Medición pendiente» y es provisional.
 
-Toda decisión se deriva de un atributo de calidad y se registra en [ARQUITECTURA.md §8](ARQUITECTURA.md) con alternativas, criterio y fuente, sea medición o referencia. Si depende de un dato aún no medido, se marca «Medición pendiente» y es provisional.
+**FDD.** Se trabaja por feature `F-XX`, que corresponde a la historia `US-XX`.
 
-**Capas:** las dependencias apuntan hacia el dominio.
+**TDD.** Prueba roja, implementación mínima, refactor; las fases 2 y 3 lo hacen cumplir. Las unitarias no usan red, `sleep` ni reloj real.
 
-| Capa | Ruta | Regla |
-|---|---|---|
-| Dominio | `src/domain/` | Lógica pura. No importa `redis`, `fastapi`, `minio` ni modelos. |
-| Aplicación | `src/application/` | Casos de uso y puertos. |
-| Adaptadores | `src/adapters/` | API, colas, almacén, analizadores y parsers. |
-| Infraestructura | `src/infrastructure/`, `deploy/` | Composición, cgroups, TLS y Compose por nodo. |
+**Las mediciones de SO no llevan TDD.** TDD prueba que la lógica decide bien, no cómo se comporta el sistema operativo. Lo medido va en `docs/modulo-MX-nombre.md`, con comandos exactos [Anexo 2].
 
-El código del I Proyecto se mueve a `adapters` solo cuando se toca; no se reescribe en bloque.
+**Capas.** Las dependencias apuntan hacia el dominio y `tests/unit/test_arquitectura.py` lo hace cumplir. El código heredado se mueve a `src/adapters` solo cuando se toca.
 
-### FDD: planificación
-
-- El trabajo se organiza por funcionalidad `F-XX`, en [IMPLEMENTACION.md §2](IMPLEMENTACION.md). Cada una corresponde a la historia `US-XX` de [BACKLOG.md](BACKLOG.md), con su responsable y su hito.
-- Se respeta el orden de dependencias H1, H2, H3.
-- Si falta tiempo, se recorta solo según [IMPLEMENTACION.md §1.3](IMPLEMENTACION.md).
-
-### TDD: lógica
-
-Ciclo por funcionalidad: prueba roja, implementación mínima, refactor. La lista está en [IMPLEMENTACION.md §4 y §5](IMPLEMENTACION.md).
-
-**Las mediciones de SO no llevan TDD.** TDD prueba que la lógica decide bien, no cómo se comporta el sistema operativo. Las mediciones se ejecutan con comandos reproducibles y se registran en la ficha del Anexo 2: `docs/modulo-MX-nombre.md`.
-
-| Va con TDD | Va con ficha de evidencia |
+| Capa | Ruta |
 |---|---|
-| Decisión de admisión, política OOM | Huella RSS/PSS, memoria en el tiempo, OOM real |
-| Orden del scheduler, inanición con reloj simulado | Espera, turnaround y throughput por política |
-| Reensamblado, deduplicación, cola llena | MB/s por chunk, tasa de dedup, efecto del backpressure |
-| RBAC, cifrado, cadena de custodia | Captura TLS, manipulación, UID de workers |
-| Tabla de routing | Latencia, throughput y memoria por configuración |
+| Dominio: lógica pura | `src/domain/` |
+| Aplicación: casos de uso y puertos | `src/application/` |
+| Adaptadores: API, colas, almacén, analizadores | `src/adapters/` |
+| Infraestructura: composición, cgroups, TLS | `src/infrastructure/`, `deploy/` |
 
-## Prácticas de código limpio
+**Código limpio.** Cancelación real, sin zombies y con `SIGTERM` manejado. Datos normalizados a UTF-8 y UTC antes del análisis. Nombres explícitos, funciones cortas, sin duplicación.
 
-- **Clean Shutdown:** la cancelación es real. Detiene sub-tareas y libera procesos, memoria y temporales. Los workers manejan `SIGTERM` sin dejar zombies.
-- **Clean Commits:** commits atómicos con mensaje `tipo(F-XX): descripción`, y **con su fecha real**. Prohibido alterar fechas o simular avance. El autor coincide con el responsable de la matriz. Sin commits masivos al final [Parte I §3].
-- **Clean Tests (F.I.R.S.T.):** rápidas, independientes, repetibles, autovalidadas y oportunas. Las unitarias no usan red, `sleep` ni reloj real. Las demás llevan marcador `integration` o `acceptance`.
-- **Clean Data:** las exportaciones se normalizan a `ChatMessage(timestamp_utc, sender, text, source_ref)` en UTF-8 antes del análisis.
-- Nombres explícitos, funciones cortas y sin duplicación.
+**Comentarios.** El código debe entenderse por sí solo. Comenta únicamente casos borde o decisiones que el código no pueda expresar, explicando el porqué. Sin comentarios que repitan el código, sin separadores de sección y sin docstrings obvios.
 
-## Decisiones vigentes
+## Comandos
 
-Resumen; el detalle y las alternativas están en [ARQUITECTURA.md §8](ARQUITECTURA.md). Para cambiar una, actualiza primero su registro.
+```bash
+pip install -r requirements-dev.txt
+pytest -q -m "not integration and not acceptance"
+```
 
-| Tema | Decisión | ID |
-|---|---|---|
-| Base | Extender el I Proyecto: FastAPI, Redis con AOF, MinIO, reaper, Streamlit | AD-01, AD-20, AD-21 |
-| Topología | Tres nodos físicos, servicios en el Nodo A, cada tipo de worker en al menos dos nodos | AD-02 |
-| Cola | `BLMOVE` a `inflight:{worker}`, `SADD` idempotente | AD-03, AD-21 |
-| Planificación | ZSET con `t_entrada − bono(prioridad)`; FIFO seleccionable para comparar | AD-04 |
-| Memoria | Contenedor por tipo de worker, sin swap; admisión antes de sacar de la cola | AD-05, AD-06 |
-| Carga de modelos | Dos estrategias implementadas; se elige con datos de PSS | AD-07 |
-| Cancelación | Subproceso con grupo propio; `SIGTERM`, gracia, `SIGKILL`, `waitpid`; el padre limpia | AD-08, AD-09 |
-| E/S | Chunks de tamaño medido, dedup por archivo con SHA-256, 503 con `Retry-After` | AD-10 a AD-13 |
-| Seguridad | JWT con roles, TLS con CA privada, AES-256-GCM con DEK por objeto y KEK en archivo `0400` | AD-14 a AD-16 |
-| Custodia | JSONL encadenado por hash, con cabeza sellada por HMAC | AD-17 |
-| Routing | Tabla generada del benchmark, con alternativa si falta el nodo | AD-18 |
-
-Responsables de módulos y supuestos `SUP-XX` siguen siendo propuestas hasta que el equipo los confirme: [IMPLEMENTACION.md §2](IMPLEMENTACION.md) y [REQUERIMIENTOS.md §3](REQUERIMIENTOS.md).
-
-## Antes de dar algo por terminado
-
-- [ ] Pruebas pasan: `pytest -q -m "not integration and not acceptance"`, y las de integración si aplican.
-- [ ] Criterios Dado/Cuando/Entonces de su `US-XX` cumplidos.
-- [ ] El dominio sigue sin importar infraestructura.
-- [ ] Si es un módulo M1–M5, su ficha tiene datos medidos y comandos exactos.
-- [ ] Sin llaves ni datos de terceros en el commit.
-- [ ] Bitácora de IA actualizada si se usó IA.
-- [ ] El responsable puede explicarlo sin ayuda.
+Requisitos del ciclo: Python 3.10 o superior, `git` y `gh` con sesión iniciada. Para agentes en paralelo, usa un worktree por agente: `git worktree add ../wt-F-XX origin/main`.

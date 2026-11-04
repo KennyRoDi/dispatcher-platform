@@ -1,19 +1,22 @@
-"""Lógica pura del ciclo de trabajo común (scripts/flujo.py)."""
 import pytest
 
 from scripts.flujo import (
     Feature,
-    aprobar_spec,
-    cambiar_status,
+    avanzar_spec,
+    base_de_spec,
     clasificar,
     cuerpo_pr,
+    devolver_spec,
     es_conventional,
-    features_cerradas,
+    estado_feature,
+    fase_de,
+    fijar_fase,
+    generar_spec,
+    generar_status,
+    motivos_bloqueo,
     nombre_rama,
     parsear_backlog,
-    parsear_status,
     ramas_por_feature,
-    spec_aprobada,
     titulo_pr,
 )
 
@@ -30,26 +33,128 @@ Como analista, quiero crear un caso.
 Como analista, quiero validar.
 """
 
+SPEC = """# SPEC F-01: Crear caso
+
+**Fase:** plan
+**Base:** main
+
+## Aprobaciones
+
+| Fase | Aprobó | Fecha | Excepción |
+|---|---|---|---|
+"""
+
 
 def features(**deps):
     return {f: Feature(f, "K", tuple(d), "") for f, d in deps.items()}
 
 
-def test_parsea_status_e_ignora_encabezados():
-    texto = "# Estado\n\n| Feature | Estado |\n|---|---|\n| F-01 | pendiente |\n| F-02 | en-pr |\n"
-    assert parsear_status(texto) == {"F-01": "pendiente", "F-02": "en-pr"}
+def test_sin_spec_ni_rama_esta_pendiente():
+    assert estado_feature(None, None) == "pendiente"
 
 
-def test_cambia_solo_la_fila_indicada():
-    texto = "| F-01 | pendiente |\n| F-02 | pendiente |\n"
-    assert cambiar_status(texto, "F-02", "spec") == "| F-01 | pendiente |\n| F-02 | spec |\n"
+def test_la_fase_de_la_rama_es_el_estado():
+    assert estado_feature(None, SPEC.replace("plan", "tests", 1)) == "tests"
 
 
-def test_rechaza_estado_desconocido_o_feature_inexistente():
+def test_la_rama_activa_manda_sobre_lo_fusionado():
+    en_main = SPEC.replace("**Fase:** plan", "**Fase:** pr")
+    en_rama = SPEC.replace("**Fase:** plan", "**Fase:** implementacion")
+    assert estado_feature(en_main, en_rama) == "implementacion"
+
+
+def test_parte_abierta_o_cierre_sin_fusionar_es_en_pr():
+    assert estado_feature(None, SPEC.replace("**Fase:** plan", "**Fase:** pr")) == "en-pr"
+    assert estado_feature(None, SPEC.replace("**Fase:** plan", "**Fase:** cerrada")) == "en-pr"
+
+
+def test_solo_el_cierre_fusionado_en_main_es_hecha():
+    cerrada = SPEC.replace("**Fase:** plan", "**Fase:** cerrada")
+    assert estado_feature(cerrada, None) == "hecha"
+    assert estado_feature(cerrada, cerrada) == "hecha"
+
+
+def test_status_generado_solo_tiene_feature_y_estado_en_orden():
+    texto = generar_status({"F-02": "tests", "F-01": "pendiente"})
+    filas = [l for l in texto.splitlines() if l.startswith("| F-")]
+    assert filas == ["| F-01 | pendiente |", "| F-02 | tests |"]
+    assert "No editar" in texto
+
+
+def test_aprobar_avanza_una_fase_y_registra_quien_y_cuando():
+    texto = avanzar_spec(SPEC, "Ana", "2026-11-03")
+    assert fase_de(texto) == "tests"
+    assert "| plan | Ana | 2026-11-03 |  |" in texto
+
+
+@pytest.mark.parametrize("actual, siguiente", [
+    ("plan", "tests"),
+    ("tests", "implementacion"),
+    ("implementacion", "verificacion"),
+    ("verificacion", "documentacion"),
+    ("documentacion", "revision"),
+    ("revision", "pr"),
+])
+def test_las_seis_fases_van_en_orden_sin_saltos(actual, siguiente):
+    texto = SPEC.replace("**Fase:** plan", f"**Fase:** {actual}")
+    assert fase_de(avanzar_spec(texto, "Ana", "2026-11-03")) == siguiente
+
+
+def test_no_se_aprueba_lo_que_ya_paso_las_seis_fases():
     with pytest.raises(ValueError):
-        cambiar_status("| F-01 | pendiente |\n", "F-01", "casi-lista")
+        avanzar_spec(SPEC.replace("**Fase:** plan", "**Fase:** pr"), "Ana", "2026-11-03")
+
+
+def test_la_excepcion_queda_registrada_y_sin_romper_la_tabla():
+    texto = avanzar_spec(SPEC, "Ana", "2026-11-03", excepcion="sin | logica")
+    assert "| plan | Ana | 2026-11-03 | sin / logica |" in texto
+
+
+def test_devolver_regresa_a_una_fase_anterior_y_registra_motivo():
+    texto = devolver_spec(SPEC.replace("**Fase:** plan", "**Fase:** revision"),
+                          "implementacion", "Ana", "2026-11-03", "falla en borde")
+    assert fase_de(texto) == "implementacion"
+    assert "| devuelta de revision | Ana | 2026-11-03 | falla en borde |" in texto
+
+
+def test_no_se_devuelve_hacia_adelante():
     with pytest.raises(ValueError):
-        cambiar_status("| F-01 | pendiente |\n", "F-99", "spec")
+        devolver_spec(SPEC, "revision", "Ana", "2026-11-03", "x")
+
+
+def test_nueva_parte_vuelve_a_tests_con_su_base():
+    texto = fijar_fase(SPEC.replace("**Fase:** plan", "**Fase:** pr"), "tests", "feat/F-01-1-a")
+    assert fase_de(texto) == "tests"
+    assert base_de_spec(texto) == "feat/F-01-1-a"
+
+
+def test_generar_spec_rellena_datos_de_la_historia():
+    plantilla = "# SPEC {feature}: {titulo}\n**Base:** {base}\n{historia} {responsable}\n"
+    feature = parsear_backlog(BACKLOG)["F-02"]
+    texto = generar_spec(plantilla, feature, "main")
+    assert texto == "# SPEC F-02: Validar\n**Base:** main\nUS-02 K\n"
+
+
+def test_plan_incompleto_se_bloquea():
+    assert motivos_bloqueo("plan", [], spec="Objetivo: …")
+    assert not motivos_bloqueo("plan", [], spec="Objetivo: listo")
+
+
+def test_fase_de_tests_exige_pruebas_y_prohibe_codigo():
+    assert motivos_bloqueo("tests", ["docs/specs/F-01/SPEC.md"])
+    assert motivos_bloqueo("tests", ["tests/unit/test_a.py", "src/domain/a.py"])
+    assert not motivos_bloqueo("tests", ["tests/unit/test_a.py", "docs/specs/F-01/SPEC.md"])
+
+
+def test_implementacion_exige_codigo():
+    assert motivos_bloqueo("implementacion", ["tests/unit/test_a.py"])
+    assert not motivos_bloqueo("implementacion", ["tests/unit/test_a.py", "src/domain/a.py"])
+
+
+def test_documentacion_exige_algo_mas_que_el_spec():
+    assert motivos_bloqueo("documentacion", ["src/a.py", "docs/specs/F-01/SPEC.md"])
+    assert not motivos_bloqueo("documentacion", ["docs/modulo-M1-memoria.md"])
+    assert not motivos_bloqueo("documentacion", ["README.md"])
 
 
 def test_backlog_da_responsable_dependencias_e_historia():
@@ -57,6 +162,8 @@ def test_backlog_da_responsable_dependencias_e_historia():
     assert resultado["F-01"].deps == ()
     assert resultado["F-02"].deps == ("F-01", "F-03")
     assert resultado["F-02"].responsable == "K"
+    assert resultado["F-02"].titulo == "Validar"
+    assert resultado["F-02"].historia_id == "US-02"
     assert "quiero validar" in resultado["F-02"].historia
     assert "quiero crear" not in resultado["F-02"].historia
     assert "Área" not in resultado["F-01"].historia
@@ -78,22 +185,23 @@ def test_dependencia_hecha_libera_la_feature():
     assert r["F-02"].tipo == "empezable"
 
 
-def test_dependencia_activa_con_rama_se_apila_sobre_su_ultima_parte():
+@pytest.mark.parametrize("estado", ["tests", "implementacion", "verificacion", "documentacion", "revision", "en-pr"])
+def test_dependencia_con_plan_aprobado_se_apila_sobre_su_ultima_parte(estado):
     r = clasificar(features(**{"F-01": [], "F-02": ["F-01"]}),
-                   {"F-01": "en-pr", "F-02": "pendiente"},
+                   {"F-01": estado, "F-02": "pendiente"},
                    {"F-01": ["feat/F-01-1-a", "feat/F-01-2-b"]})
     assert (r["F-02"].tipo, r["F-02"].base) == ("apilable", "feat/F-01-2-b")
 
 
-def test_dependencia_en_spec_bloquea_porque_su_diseno_puede_cambiar():
+def test_dependencia_en_plan_bloquea_porque_su_diseno_puede_cambiar():
     r = clasificar(features(**{"F-01": [], "F-02": ["F-01"]}),
-                   {"F-01": "spec", "F-02": "pendiente"}, {"F-01": ["feat/F-01-1-a"]})
+                   {"F-01": "plan", "F-02": "pendiente"}, {"F-01": ["feat/F-01-1-a"]})
     assert r["F-02"].tipo == "bloqueada"
 
 
 def test_dos_dependencias_sin_terminar_bloquean_porque_una_pila_tiene_una_base():
     r = clasificar(features(**{"F-01": [], "F-03": [], "F-02": ["F-01", "F-03"]}),
-                   {"F-01": "en-curso", "F-03": "en-curso", "F-02": "pendiente"},
+                   {"F-01": "tests", "F-03": "tests", "F-02": "pendiente"},
                    {"F-01": ["feat/F-01-1-a"], "F-03": ["feat/F-03-1-a"]})
     assert r["F-02"].tipo == "bloqueada"
     assert "F-01" in r["F-02"].motivo and "F-03" in r["F-02"].motivo
@@ -106,8 +214,7 @@ def test_dependencia_pendiente_bloquea():
 
 
 def test_feature_activa_u_hecha_no_se_ofrece():
-    r = clasificar(features(**{"F-01": [], "F-02": []}),
-                   {"F-01": "en-curso", "F-02": "hecha"}, {})
+    r = clasificar(features(**{"F-01": [], "F-02": []}), {"F-01": "tests", "F-02": "hecha"}, {})
     assert r["F-01"].tipo == "activa"
     assert r["F-02"].tipo == "hecha"
 
@@ -118,32 +225,11 @@ def test_nombre_de_rama_usa_la_siguiente_parte_y_normaliza():
     assert nombre_rama("F-21", "fifo", ramas) == "feat/F-21-1-fifo"
 
 
-def test_spec_en_borrador_no_esta_aprobada():
-    assert not spec_aprobada("# SPEC\n**Estado:** borrador\n")
-    assert not spec_aprobada("# SPEC sin campo\n")
-
-
-def test_aprobar_registra_quien_y_cuando():
-    texto = aprobar_spec("**Estado:** borrador\n", "Ana", "2026-11-03")
-    assert texto == "**Estado:** aprobado por Ana el 2026-11-03\n"
-    assert spec_aprobada(texto)
-
-
-def test_aprobar_falla_si_no_hay_borrador():
-    with pytest.raises(ValueError):
-        aprobar_spec("sin campo\n", "Ana", "2026-11-03")
-
-
-def test_cuerpo_de_pr_rellena_la_plantilla():
-    plantilla = "F: {feature}\nBase: {base}\n{commits}\n"
-    assert cuerpo_pr(plantilla, feature="F-01", base="main", commits="- a") == "F: F-01\nBase: main\n- a\n"
-
-
 @pytest.mark.parametrize("mensaje", [
     "feat(F-20): agregar politica de aging",
     "fix(F-06)!: cerrar ventana de perdida",
     "docs: actualizar readme",
-    "chore(status): F-20 en-curso",
+    "chore(status): regenerar",
 ])
 def test_acepta_conventional_commits(mensaje):
     assert es_conventional(mensaje)
@@ -169,6 +255,6 @@ def test_titulo_de_pr_rechaza_tipo_invalido():
         titulo_pr("wip", "F-20", "algo")
 
 
-def test_detecta_features_cerradas_por_el_footer_de_la_pr():
-    cuerpos = ["texto\nCierra-Feature: F-20\n", "parte intermedia", "Cierra-Feature: F-03"]
-    assert features_cerradas(cuerpos) == {"F-20", "F-03"}
+def test_cuerpo_de_pr_rellena_la_plantilla():
+    plantilla = "F: {feature}\nBase: {base}\n{commits}\n"
+    assert cuerpo_pr(plantilla, feature="F-01", base="main", commits="- a") == "F: F-01\nBase: main\n- a\n"

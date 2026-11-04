@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""Ciclo de trabajo común a todos los agentes y personas. Ver CONTRIBUTING.md.
+"""Ciclo de trabajo común a todos los agentes y personas. Ver AGENTS.md y CONTRIBUTING.md.
 
     python scripts/flujo.py empezables [--responsable K]
-    python scripts/flujo.py trabajar F-XX "descripcion corta"
-    python scripts/flujo.py aprobar
+    python scripts/flujo.py trabajar F-XX ["descripcion"]
+    python scripts/flujo.py fase
+    python scripts/flujo.py aprobar [--excepcion "motivo"]
+    python scripts/flujo.py devolver <fase> "motivo"
     python scripts/flujo.py cierre --tipo feat --resumen "texto" [--final]
+    python scripts/flujo.py status
 
-Solo usa la biblioteca estándar, git y gh.
+docs/STATUS.md se deriva de la fase declarada en cada SPEC.md; nadie lo edita.
+Solo usa la biblioteca estándar, git y, para abrir PR, gh.
 """
 import argparse
 import dataclasses
 import datetime
+import importlib.util
 import json
 import pathlib
 import re
@@ -19,25 +24,38 @@ import sys
 import tempfile
 import unicodedata
 
-ESTADOS = ("pendiente", "spec", "en-curso", "en-pr", "hecha")
-ACTIVOS = ("spec", "en-curso", "en-pr")
-APILABLES = ("en-curso", "en-pr")
+FASES = ("plan", "tests", "implementacion", "verificacion", "documentacion", "revision")
+PR_ABIERTA = "pr"
+CERRADA = "cerrada"
+ORDEN_FASES = (*FASES, PR_ABIERTA)
+EN_PR = "en-pr"
+ACTIVOS = (*FASES, EN_PR)
+APILABLES = tuple(e for e in ACTIVOS if e != "plan")
 TIPOS = ("feat", "fix", "docs", "test", "refactor", "perf", "build", "ci", "chore", "style", "revert")
 LIMITE_LINEAS = 400
 STATUS = "docs/STATUS.md"
 BACKLOG = "docs/BACKLOG.md"
+PLANTILLA_SPEC = "docs/specs/PLANTILLA.md"
 PLANTILLA_PR = ".github/pull_request_template.md"
-EXCLUIDOS_DEL_TAMANO = (":!tests", ":!docs")
-PRUEBAS = ("-m", "pytest", "-q", "-m", "not integration and not acceptance")
+EXCLUIDOS_DEL_TAMANO = (":!tests", ":!docs", ":!*.md")
+PRUEBAS_RAPIDAS = ("-m", "not integration and not acceptance")
 RAIZ = pathlib.Path(__file__).resolve().parents[1]
 
+_TRABAJO_POR_FASE = {
+    "plan": ("arquitecto", "Completa docs/specs/{feature}/SPEC.md: reemplaza cada … y define el plan de pila."),
+    "tests": ("developer", "Escribe todas las pruebas de esta parte y déjalas en rojo. Sin código de implementación."),
+    "implementacion": ("developer", "Implementa lo mínimo para ponerlas en verde y refactoriza."),
+    "verificacion": ("qa-tester, medidor si el SPEC tiene mediciones", "Comprueba cada criterio, intenta romperlo y ejecuta las mediciones."),
+    "documentacion": ("documentador", "Actualiza fichas, arquitectura, reutilización, README y bitácora de IA."),
+    "revision": ("revisor", "Compara el diff con el SPEC e informa APROBADO o DEVUELTO."),
+}
+
 _CONVENTIONAL = re.compile(rf"^({'|'.join(TIPOS)})(\([\w./-]+\))?!?: \S")
-_FILA_STATUS = re.compile(r"^\| (F-\d+) \| ([\w-]+) \|$", re.M)
-_ENCABEZADO_US = re.compile(r"^### US-\d+ · .*\((F-\d+)\)", re.M)
+_ENCABEZADO_US = re.compile(r"^### (US-\d+) · .*\((F-\d+)\)", re.M)
 _METADATOS = re.compile(r"\*\*Responsable:\*\* (.+?) · \*\*Depende de:\*\* (.+)")
 _RAMA = re.compile(r"^feat/(F-\d+)-(\d+)-")
-_BORRADOR = "**Estado:** borrador"
-_APROBADO = "**Estado:** aprobado"
+_CAMPO_FASE = re.compile(r"^\*\*Fase:\*\* ([\w-]+)$", re.M)
+_CAMPO_BASE = re.compile(r"^\*\*Base:\*\* (\S+)$", re.M)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -52,6 +70,10 @@ class Feature:
         primera = self.historia.split("\n", 1)[0]
         return primera.split(" · ", 1)[-1].split(" (F-")[0]
 
+    @property
+    def historia_id(self):
+        return self.historia.split(" · ", 1)[0].removeprefix("### ")
+
 
 @dataclasses.dataclass(frozen=True)
 class Clasificacion:
@@ -60,19 +82,94 @@ class Clasificacion:
     motivo: str = ""
 
 
-# --- Lógica pura ---
+def fase_de(spec):
+    coincidencia = _CAMPO_FASE.search(spec)
+    if not coincidencia:
+        raise ValueError("el SPEC no declara **Fase:**")
+    return coincidencia.group(1)
 
-def parsear_status(texto):
-    return dict(_FILA_STATUS.findall(texto))
+
+def base_de_spec(spec):
+    coincidencia = _CAMPO_BASE.search(spec)
+    return coincidencia.group(1) if coincidencia else "main"
 
 
-def cambiar_status(texto, feature, estado):
-    if estado not in ESTADOS:
-        raise ValueError(f"estado desconocido: {estado}")
-    nuevo, cambios = re.subn(rf"^\| {feature} \| [\w-]+ \|$", f"| {feature} | {estado} |", texto, flags=re.M)
-    if not cambios:
-        raise ValueError(f"{feature} no está en {STATUS}")
-    return nuevo
+def estado_feature(spec_main, spec_rama):
+    if spec_main and fase_de(spec_main) == CERRADA:
+        return "hecha"
+    spec = spec_rama or spec_main
+    if not spec:
+        return "pendiente"
+    fase = fase_de(spec)
+    return EN_PR if fase in (PR_ABIERTA, CERRADA) else fase
+
+
+def generar_status(estados):
+    filas = "".join(f"| {f} | {estados[f]} |\n" for f in sorted(estados))
+    return ("<!-- Generado por scripts/flujo.py. No editar. -->\n"
+            f"# Estado\n\n| Feature | Estado |\n|---|---|\n{filas}")
+
+
+def _registrar(spec, fase, nombre, fecha, nota=""):
+    nota = nota.replace("|", "/")
+    return f"{spec.rstrip()}\n| {fase} | {nombre} | {fecha} | {nota} |\n"
+
+
+def fijar_fase(spec, fase, base=None):
+    spec = _CAMPO_FASE.sub(f"**Fase:** {fase}", spec, count=1)
+    return _CAMPO_BASE.sub(f"**Base:** {base}", spec, count=1) if base else spec
+
+
+def avanzar_spec(spec, nombre, fecha, excepcion=""):
+    fase = fase_de(spec)
+    if fase not in FASES:
+        raise ValueError(f"la fase {fase} no requiere aprobación")
+    siguiente = ORDEN_FASES[ORDEN_FASES.index(fase) + 1]
+    return fijar_fase(_registrar(spec, fase, nombre, fecha, excepcion), siguiente)
+
+
+def devolver_spec(spec, destino, nombre, fecha, motivo):
+    fase = fase_de(spec)
+    if fase not in FASES or destino not in FASES or FASES.index(destino) >= FASES.index(fase):
+        raise ValueError(f"no se puede devolver de {fase} a {destino}")
+    return fijar_fase(_registrar(spec, f"devuelta de {fase}", nombre, fecha, motivo), destino)
+
+
+def generar_spec(plantilla, feature, base):
+    campos = {"feature": feature.id, "titulo": feature.titulo, "base": base,
+              "historia": feature.historia_id, "responsable": feature.responsable}
+    return cuerpo_pr(plantilla, **campos)
+
+
+def _es_prueba(archivo):
+    return archivo.startswith("tests/")
+
+
+def _es_documento(archivo):
+    return (archivo.startswith("docs/") or archivo.endswith(".md")) and not archivo.startswith("docs/specs/")
+
+
+def _es_codigo(archivo):
+    return not (_es_prueba(archivo) or archivo.startswith(("docs/", ".agents/", ".claude/", ".github/"))
+                or archivo.endswith(".md"))
+
+
+def motivos_bloqueo(fase, archivos, spec=""):
+    if fase == "plan" and "…" in spec:
+        return ["el SPEC aún tiene campos … sin completar"]
+    if fase == "tests":
+        motivos = []
+        if not any(_es_prueba(a) for a in archivos):
+            motivos.append("no hay pruebas nuevas")
+        codigo = [a for a in archivos if _es_codigo(a)]
+        if codigo:
+            motivos.append(f"la fase de tests no admite código: {', '.join(codigo)}")
+        return motivos
+    if fase == "implementacion" and not any(_es_codigo(a) for a in archivos):
+        return ["no hay código de implementación"]
+    if fase == "documentacion" and not any(_es_documento(a) for a in archivos):
+        return ["no hay documentación actualizada"]
+    return []
 
 
 def parsear_backlog(texto):
@@ -82,10 +179,11 @@ def parsear_backlog(texto):
         fin = encabezados[i + 1].start() if i + 1 < len(encabezados) else len(texto)
         historia = re.split(r"^## ", texto[encabezado.start():fin], flags=re.M)[0].strip()
         metadatos = _METADATOS.search(historia)
+        feature_id = encabezado.group(2)
         if not metadatos:
-            raise ValueError(f"{encabezado.group(1)} no declara responsable y dependencias")
+            raise ValueError(f"{feature_id} no declara responsable y dependencias")
         deps = tuple(re.findall(r"F-\d+", metadatos.group(2)))
-        features[encabezado.group(1)] = Feature(encabezado.group(1), metadatos.group(1), deps, historia)
+        features[feature_id] = Feature(feature_id, metadatos.group(1), deps, historia)
     return features
 
 
@@ -100,25 +198,22 @@ def ramas_por_feature(ramas):
     return agrupadas
 
 
-def clasificar(features, status, ramas):
-    return {f.id: _clasificar_una(f, status, ramas) for f in features.values()}
+def clasificar(features, estados, ramas):
+    return {f.id: _clasificar_una(f, estados, ramas) for f in features.values()}
 
 
-def _clasificar_una(feature, status, ramas):
-    estado = status.get(feature.id, "pendiente")
+def _clasificar_una(feature, estados, ramas):
+    estado = estados.get(feature.id, "pendiente")
     if estado == "hecha":
         return Clasificacion("hecha")
     if estado in ACTIVOS:
         return Clasificacion("activa", motivo=estado)
-    faltantes = [d for d in feature.deps if status.get(d, "pendiente") != "hecha"]
+    faltantes = [d for d in feature.deps if estados.get(d, "pendiente") != "hecha"]
     if not faltantes:
         return Clasificacion("empezable", base="main")
-    motivo = "falta " + ", ".join(faltantes)
-    if len(faltantes) == 1:
-        dep = faltantes[0]
-        if status.get(dep) in APILABLES and ramas.get(dep):
-            return Clasificacion("apilable", base=ramas[dep][-1], motivo=f"sobre {dep}")
-    return Clasificacion("bloqueada", motivo=motivo)
+    if len(faltantes) == 1 and estados.get(faltantes[0]) in APILABLES and ramas.get(faltantes[0]):
+        return Clasificacion("apilable", base=ramas[faltantes[0]][-1], motivo=f"sobre {faltantes[0]}")
+    return Clasificacion("bloqueada", motivo="falta " + ", ".join(faltantes))
 
 
 def nombre_rama(feature, descripcion, ramas):
@@ -128,16 +223,6 @@ def nombre_rama(feature, descripcion, ramas):
     return f"feat/{feature}-{max(partes, default=0) + 1}-{slug}"
 
 
-def spec_aprobada(texto):
-    return _APROBADO in texto
-
-
-def aprobar_spec(texto, nombre, fecha):
-    if _BORRADOR not in texto:
-        raise ValueError("el SPEC no está en borrador")
-    return texto.replace(_BORRADOR, f"{_APROBADO} por {nombre} el {fecha}")
-
-
 def es_conventional(mensaje):
     return bool(_CONVENTIONAL.match(mensaje))
 
@@ -145,12 +230,8 @@ def es_conventional(mensaje):
 def titulo_pr(tipo, feature, resumen):
     titulo = f"{tipo}({feature}): {resumen}"
     if not es_conventional(titulo):
-        raise ValueError(f"título no cumple Conventional Commits: {titulo}")
+        raise ValueError(f"título fuera de Conventional Commits: {titulo}")
     return titulo
-
-
-def features_cerradas(cuerpos):
-    return {f for cuerpo in cuerpos for f in re.findall(r"^Cierra-Feature: (F-\d+)", cuerpo, re.M)}
 
 
 def cuerpo_pr(plantilla, **campos):
@@ -158,8 +239,6 @@ def cuerpo_pr(plantilla, **campos):
         plantilla = plantilla.replace("{" + clave + "}", valor)
     return plantilla
 
-
-# --- Git y GitHub ---
 
 def _ejecutar(*comando, cwd=RAIZ, entrada=None):
     resultado = subprocess.run(comando, cwd=cwd, input=entrada, capture_output=True, text=True, encoding="utf-8")
@@ -176,11 +255,22 @@ def _fallar(mensaje):
     raise SystemExit(f"flujo: {mensaje}")
 
 
-def _leer_main(ruta):
+def _leer_referencia(referencia, ruta):
     try:
-        return git("show", f"origin/main:{ruta}") + "\n"
+        return git("show", f"{referencia}:{ruta}") + "\n"
     except subprocess.CalledProcessError:
+        return None
+
+
+def _leer_main(ruta):
+    texto = _leer_referencia("origin/main", ruta)
+    if texto is None:
         _fallar(f"{ruta} no existe en origin/main; fusiona primero la pila del flujo")
+    return texto
+
+
+def _ruta_spec(feature):
+    return f"docs/specs/{feature}/SPEC.md"
 
 
 def _ramas_remotas():
@@ -192,15 +282,27 @@ def _rama_actual():
     return git("branch", "--show-current")
 
 
-def _feature_de(rama):
+def _feature_actual():
+    rama = _rama_actual()
     coincidencia = _RAMA.match(rama)
     if not coincidencia:
         _fallar(f"la rama {rama!r} no es de una feature; usa `trabajar F-XX`")
     return coincidencia.group(1)
 
 
-def _ruta_spec(feature):
-    return RAIZ / "docs" / "specs" / feature / "SPEC.md"
+def _leer_spec_local(feature):
+    ruta = RAIZ / _ruta_spec(feature)
+    if not ruta.exists():
+        _fallar(f"falta {_ruta_spec(feature)}")
+    return ruta.read_text(encoding="utf-8")
+
+
+def _guardar_y_confirmar(feature, spec, mensaje):
+    ruta = RAIZ / _ruta_spec(feature)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text(spec, encoding="utf-8", newline="\n")
+    git("add", _ruta_spec(feature))
+    git("commit", "-q", "-m", mensaje)
 
 
 def _exigir_sin_cambios():
@@ -208,197 +310,282 @@ def _exigir_sin_cambios():
         _fallar("hay cambios sin commit")
 
 
-def publicar_estado(feature, estado, intentos=3):
-    """Publica el estado en main al instante: es el tablero que leen todos."""
+def _base_vigente(spec):
+    base = base_de_spec(spec)
+    return base if git("ls-remote", "--heads", "origin", base) else "main"
+
+
+def _estados_actuales(features):
+    git("fetch", "-q", "--prune", "origin")
+    ramas = ramas_por_feature(_ramas_remotas())
+    estados = {}
+    for feature_id in features:
+        spec_main = _leer_referencia("origin/main", _ruta_spec(feature_id))
+        ultima = ramas.get(feature_id, [None])[-1]
+        spec_rama = _leer_referencia(f"origin/{ultima}", _ruta_spec(feature_id)) if ultima else None
+        estados[feature_id] = estado_feature(spec_main, spec_rama)
+    return estados, ramas
+
+
+def publicar_status(intentos=3):
+    error = ""
     for _ in range(intentos):
-        git("fetch", "-q", "origin", "main")
+        estados, _ramas = _estados_actuales(parsear_backlog(_leer_main(BACKLOG)))
+        texto = generar_status(estados)
+        if _leer_referencia("origin/main", STATUS) == texto:
+            return estados
         with tempfile.TemporaryDirectory() as tmp:
             arbol = pathlib.Path(tmp) / "status"
             git("worktree", "add", "-q", "--detach", str(arbol), "origin/main")
             try:
-                ruta = arbol / STATUS
-                actual = ruta.read_text(encoding="utf-8")
-                nuevo = cambiar_status(actual, feature, estado)
-                if nuevo == actual:
-                    return
-                ruta.write_text(nuevo, encoding="utf-8", newline="\n")
-                git("commit", "-q", "-m", f"chore(status): {feature} {estado}", "--", STATUS, cwd=arbol)
+                (arbol / STATUS).write_text(texto, encoding="utf-8", newline="\n")
+                git("add", STATUS, cwd=arbol)
+                git("commit", "-q", "-m", "chore(status): regenerar", cwd=arbol)
                 git("push", "-q", "origin", "HEAD:main", cwd=arbol)
-                return
-            except subprocess.CalledProcessError as error:
-                ultimo_error = error.stderr
+                return estados
+            except subprocess.CalledProcessError as fallo:
+                error = fallo.stderr
             finally:
                 git("worktree", "remove", "--force", str(arbol))
-    _fallar(f"no se pudo publicar el estado de {feature}: {ultimo_error}")
+    print(f"aviso: no se pudo publicar {STATUS}: {error}")
+    return estados
 
 
-def _sincronizar_cerradas(status):
-    """Marca `hecha` lo que tiene su PR final fusionada. Sin gh, solo avisa."""
-    try:
-        salida = _ejecutar("gh", "pr", "list", "--state", "merged", "--search", "Cierra-Feature in:body",
-                           "--limit", "200", "--json", "body")
-    except (OSError, subprocess.CalledProcessError):
-        print("aviso: sin gh no se detectan PR finales fusionadas\n")
-        return status
-    for feature in sorted(features_cerradas(pr["body"] for pr in json.loads(salida))):
-        if status.get(feature) == "en-pr":
-            publicar_estado(feature, "hecha")
-            status = {**status, feature: "hecha"}
-    return status
+def _archivos_cambiados(base):
+    salida = git("diff", "--name-only", f"origin/{base}...HEAD")
+    return salida.splitlines()
 
 
-# --- Comandos ---
+def _validar_commits(base):
+    asuntos = git("log", "--no-merges", "--format=%s", f"origin/{base}..HEAD").splitlines()
+    invalidos = [a for a in asuntos if not es_conventional(a)]
+    if invalidos:
+        _fallar("commits fuera de Conventional Commits; corrígelos:\n  " + "\n  ".join(invalidos))
+    return asuntos
 
-def empezables(args):
-    git("fetch", "-q", "origin", "main")
-    status = _sincronizar_cerradas(parsear_status(_leer_main(STATUS)))
+
+def _validar_tamano(base):
+    numstat = git("diff", "--numstat", f"origin/{base}...HEAD", "--", ".", *EXCLUIDOS_DEL_TAMANO)
+    lineas = sum(int(a) + int(b) for a, b, *_ in (f.split("\t") for f in numstat.splitlines()) if a != "-")
+    if lineas > LIMITE_LINEAS:
+        _fallar(f"{lineas} líneas sin contar pruebas ni documentos (límite {LIMITE_LINEAS}); "
+                "divide con otra parte de la pila")
+
+
+def _correr_pytest(*argumentos):
+    if not importlib.util.find_spec("pytest"):
+        _fallar("pytest no está instalado: pip install -r requirements-dev.txt")
+    resultado = subprocess.run([sys.executable, "-m", "pytest", "-q", *argumentos], cwd=RAIZ,
+                               capture_output=True, text=True, encoding="utf-8")
+    return resultado.returncode, "\n".join(resultado.stdout.splitlines()[-15:])
+
+
+def _exigir_pruebas_en_verde():
+    codigo, salida = _correr_pytest(*PRUEBAS_RAPIDAS)
+    if codigo:
+        _fallar(f"las pruebas fallan:\n{salida}")
+
+
+def _exigir_pruebas_en_rojo(archivos):
+    pruebas = [a for a in archivos if re.search(r"^tests/.*test_[^/]*\.py$", a) and (RAIZ / a).exists()]
+    if not pruebas:
+        _fallar("no hay archivos test_*.py nuevos o modificados")
+    codigo, salida = _correr_pytest(*pruebas)
+    if codigo == 0:
+        _fallar(f"las pruebas nuevas ya pasan; deben estar en rojo:\n{salida}")
+    if codigo == 5:
+        _fallar("los archivos de prueba no contienen pruebas")
+
+
+def _imprimir_fase(feature, fase):
+    if fase in (PR_ABIERTA, CERRADA):
+        print(f"{feature}: fases aprobadas. Siguiente: `cierre`, o `trabajar {feature}` para la siguiente parte.")
+        return
+    rol, trabajo = _TRABAJO_POR_FASE[fase]
+    print(f"{feature} · fase {FASES.index(fase) + 1}/{len(FASES)}: {fase}")
+    print(f"Rol: {rol} (.agents/roles/)")
+    print(f"Haz: {trabajo.format(feature=feature)}")
+    print("Genera todo lo de esta fase, haz commit, muéstralo y DETENTE a pedir aprobación.")
+    print("Solo con un sí explícito de la persona: python scripts/flujo.py aprobar")
+
+
+def cmd_empezables(args):
+    git("fetch", "-q", "--prune", "origin")
+    publicar_status()
     features = parsear_backlog(_leer_main(BACKLOG))
-    ramas = ramas_por_feature(_ramas_remotas())
-    clases = clasificar(features, status, ramas)
+    estados, ramas = _estados_actuales(features)
+    clases = clasificar(features, estados, ramas)
 
     def corresponde(feature):
-        if not args.responsable:
-            return True
-        return feature.responsable == args.responsable or feature.responsable in ("Todos", "Cada responsable")
+        return (not args.responsable or feature.responsable == args.responsable
+                or feature.responsable in ("Todos", "Cada responsable"))
 
     for tipo, titulo in (("empezable", "EMPEZABLES"), ("apilable", "APILABLES"), ("activa", "ACTIVAS")):
         print(titulo)
         filas = [f for f in features.values() if clases[f.id].tipo == tipo and corresponde(f)]
         for feature in filas:
-            detalle = clases[feature.id].base if tipo != "activa" else clases[feature.id].motivo
-            print(f"  {feature.id} [{feature.responsable}] {feature.titulo} -> {detalle}")
+            clase = clases[feature.id]
+            detalle = clase.motivo if tipo == "activa" else f"base {clase.base}"
+            print(f"  {feature.id} [{feature.responsable}] {feature.titulo}: {detalle}")
         if not filas:
             print("  (ninguna)")
 
 
-def trabajar(args):
+def cmd_status(_args):
+    git("fetch", "-q", "--prune", "origin")
+    publicar_status()
+    print(f"{STATUS} al día en origin/main")
+
+
+def cmd_trabajar(args):
     feature_id = args.feature
     _exigir_sin_cambios()
-    git("fetch", "-q", "origin")
-    status = parsear_status(_leer_main(STATUS))
+    git("fetch", "-q", "--prune", "origin")
     features = parsear_backlog(_leer_main(BACKLOG))
     if feature_id not in features:
         _fallar(f"{feature_id} no está en {BACKLOG}")
-    ramas = ramas_por_feature(_ramas_remotas())
-    base = _elegir_base(feature_id, features, status, ramas)
-    rama = nombre_rama(feature_id, args.descripcion, ramas)
-    referencia = base if base == _rama_actual() else f"origin/{base}"
-    git("switch", "-q", "--no-track", "-c", rama, referencia)
-    git("config", f"branch.{rama}.flujo-base", base)
-    git("push", "-q", "-u", "origin", rama)
-    if status.get(feature_id, "pendiente") == "pendiente":
-        publicar_estado(feature_id, "spec")
-    print(f"Rama: {rama}\nBase de la PR: {base}\nSPEC: docs/specs/{feature_id}/SPEC.md\n")
-    print(features[feature_id].historia)
-
-
-def _elegir_base(feature_id, features, status, ramas):
-    actual = _rama_actual()
-    estado = status.get(feature_id, "pendiente")
-    if estado == "hecha":
+    feature = features[feature_id]
+    estados, ramas = _estados_actuales(features)
+    if estados[feature_id] == "hecha":
         _fallar(f"{feature_id} ya está hecha")
-    if actual.startswith(f"feat/{feature_id}-"):
-        if not _spec_aprobada_en_disco(feature_id):
-            _fallar("el SPEC aún no está aprobado; no se abren más partes")
-        return actual
-    if estado in ACTIVOS:
-        if ramas.get(feature_id):
-            _fallar(f"{feature_id} ya está activa en {ramas[feature_id][-1]}; si es tuya, cámbiate a esa rama")
-        return "main"
-    clase = clasificar(features, status, ramas)[feature_id]
+    descripcion = args.descripcion or feature.titulo
+
+    if ramas.get(feature_id) or _rama_actual().startswith(f"feat/{feature_id}-"):
+        _continuar_en_rama(feature_id, descripcion, ramas)
+    else:
+        _iniciar_sin_rama(feature, descripcion, features, estados, ramas)
+    publicar_status()
+    print(feature.historia, "\n")
+    _imprimir_fase(feature_id, fase_de(_leer_spec_local(feature_id)))
+
+
+def _continuar_en_rama(feature_id, descripcion, ramas):
+    if not _rama_actual().startswith(f"feat/{feature_id}-"):
+        git("switch", "-q", ramas[feature_id][-1])
+    elif ramas.get(feature_id) and _rama_actual() != ramas[feature_id][-1]:
+        git("switch", "-q", ramas[feature_id][-1])
+    actual = _rama_actual()
+    git("pull", "-q", "--ff-only", "origin", actual)
+    fase = fase_de(_leer_spec_local(feature_id))
+    if fase == PR_ABIERTA:
+        _crear_parte(feature_id, descripcion, actual, f"origin/{actual}", ramas)
+    elif fase == CERRADA:
+        _fallar(f"{feature_id} está cerrada; falta revisar y fusionar su PR")
+
+
+def _iniciar_sin_rama(feature, descripcion, features, estados, ramas):
+    spec_main = _leer_referencia("origin/main", _ruta_spec(feature.id))
+    if spec_main:
+        if fase_de(spec_main) != PR_ABIERTA:
+            _fallar(f"{feature.id} no tiene rama y su SPEC en main está en fase {fase_de(spec_main)}")
+        _crear_parte(feature.id, descripcion, "main", "origin/main", ramas)
+        return
+    clase = clasificar(features, estados, ramas)[feature.id]
     if clase.tipo == "bloqueada":
-        _fallar(f"{feature_id} está bloqueada: {clase.motivo}")
-    return clase.base
-
-
-def _spec_aprobada_en_disco(feature_id):
-    ruta = _ruta_spec(feature_id)
-    return ruta.exists() and spec_aprobada(ruta.read_text(encoding="utf-8"))
-
-
-def aprobar(_args):
-    rama = _rama_actual()
-    feature_id = _feature_de(rama)
-    ruta = _ruta_spec(feature_id)
-    if not ruta.exists():
-        _fallar(f"falta {ruta.relative_to(RAIZ)}")
-    _exigir_sin_cambios()
-    hoy = datetime.date.today().isoformat()
-    ruta.write_text(aprobar_spec(ruta.read_text(encoding="utf-8"), git("config", "user.name"), hoy), encoding="utf-8", newline="\n")
-    git("commit", "-q", "-m", f"docs({feature_id}): aprobar spec", "--", str(ruta))
-    git("push", "-q", "origin", rama)
-    publicar_estado(feature_id, "en-curso")
-    print(f"{feature_id}: SPEC aprobado; estado en-curso")
-
-
-def cierre(args):
-    rama = _rama_actual()
-    feature_id = _feature_de(rama)
-    _exigir_sin_cambios()
-    if not _spec_aprobada_en_disco(feature_id):
-        _fallar("el SPEC no está aprobado")
-    titulo = _validar_titulo(args.tipo, feature_id, args.resumen)
-    base = _base_de(rama)
-    comparacion = f"origin/{base}...HEAD"
-    git("fetch", "-q", "origin", base)
-    commits = _validar_commits(f"origin/{base}..HEAD")
-    _validar_tamano(comparacion, args.motivo_grande)
-    print("Ejecutando pruebas...")
-    if subprocess.run([sys.executable, *PRUEBAS], cwd=RAIZ).returncode:
-        _fallar("las pruebas fallan; no se abre la PR")
+        _fallar(f"{feature.id} está bloqueada: {clase.motivo}")
+    rama = nombre_rama(feature.id, descripcion, ramas)
+    git("switch", "-q", "--no-track", "-c", rama, f"origin/{clase.base}")
+    plantilla = (RAIZ / PLANTILLA_SPEC).read_text(encoding="utf-8")
+    _guardar_y_confirmar(feature.id, generar_spec(plantilla, feature, clase.base), f"docs({feature.id}): iniciar spec")
     git("push", "-q", "-u", "origin", rama)
-    print(_abrir_pr(rama, base, titulo, feature_id, commits, args))
-    if args.final:
-        publicar_estado(feature_id, "en-pr")
 
 
-def _validar_titulo(tipo, feature_id, resumen):
+def _crear_parte(feature_id, descripcion, base, referencia, ramas):
+    rama = nombre_rama(feature_id, descripcion, ramas)
+    git("switch", "-q", "--no-track", "-c", rama, referencia)
+    spec = fijar_fase(_leer_spec_local(feature_id), "tests", base)
+    _guardar_y_confirmar(feature_id, spec, f"docs({feature_id}): iniciar nueva parte")
+    git("push", "-q", "-u", "origin", rama)
+
+
+def cmd_fase(_args):
+    feature_id = _feature_actual()
+    _imprimir_fase(feature_id, fase_de(_leer_spec_local(feature_id)))
+
+
+def cmd_aprobar(args):
+    feature_id = _feature_actual()
+    _exigir_sin_cambios()
+    spec = _leer_spec_local(feature_id)
+    fase = fase_de(spec)
+    if fase not in FASES:
+        _fallar(f"la fase {fase} no requiere aprobación")
+    base = _base_vigente(spec)
+    git("fetch", "-q", "origin", base)
+    _validar_commits(base)
+    if not args.excepcion:
+        _comprobar_fase(fase, _archivos_cambiados(base), spec, base)
+    nombre = git("config", "user.name")
+    hoy = datetime.date.today().isoformat()
+    nuevo = avanzar_spec(spec, nombre, hoy, args.excepcion or "")
+    _guardar_y_confirmar(feature_id, nuevo, f"docs({feature_id}): aprobar fase {fase}")
+    git("push", "-q", "origin", _rama_actual())
+    publicar_status()
+    _imprimir_fase(feature_id, fase_de(nuevo))
+
+
+def _comprobar_fase(fase, archivos, spec, base):
+    motivos = motivos_bloqueo(fase, archivos, spec)
+    if motivos:
+        _fallar(f"la fase {fase} no se puede aprobar: " + "; ".join(motivos))
+    if fase == "tests":
+        _exigir_pruebas_en_rojo(archivos)
+    if fase in ("implementacion", "verificacion"):
+        _exigir_pruebas_en_verde()
+        _validar_tamano(base)
+
+
+def cmd_devolver(args):
+    feature_id = _feature_actual()
+    _exigir_sin_cambios()
+    spec = _leer_spec_local(feature_id)
+    hoy = datetime.date.today().isoformat()
     try:
-        return titulo_pr(tipo, feature_id, resumen)
+        nuevo = devolver_spec(spec, args.fase, git("config", "user.name"), hoy, args.motivo)
     except ValueError as error:
         _fallar(str(error))
+    _guardar_y_confirmar(feature_id, nuevo, f"docs({feature_id}): devolver a {args.fase}")
+    git("push", "-q", "origin", _rama_actual())
+    publicar_status()
+    _imprimir_fase(feature_id, args.fase)
 
 
-def _base_de(rama):
+def cmd_cierre(args):
+    rama = _rama_actual()
+    feature_id = _feature_actual()
+    _exigir_sin_cambios()
+    spec = _leer_spec_local(feature_id)
+    if fase_de(spec) not in (PR_ABIERTA, CERRADA):
+        _fallar(f"faltan aprobaciones; la feature está en fase {fase_de(spec)}")
     try:
-        base = git("config", f"branch.{rama}.flujo-base")
-    except subprocess.CalledProcessError:
-        base = "main"
-    return base if git("ls-remote", "--heads", "origin", base) else "main"
+        titulo = titulo_pr(args.tipo, feature_id, args.resumen)
+    except ValueError as error:
+        _fallar(str(error))
+    base = _base_vigente(spec)
+    git("fetch", "-q", "origin", base)
+    _validar_tamano(base)
+    _exigir_pruebas_en_verde()
+    if args.final and fase_de(spec) != CERRADA:
+        _guardar_y_confirmar(feature_id, fijar_fase(spec, CERRADA), f"docs({feature_id}): cerrar feature")
+    asuntos = _validar_commits(base)
+    git("push", "-q", "-u", "origin", rama)
+    print(_abrir_pr(rama, base, titulo, feature_id, asuntos, args.final))
+    publicar_status()
 
 
-def _validar_commits(rango):
-    asuntos = git("log", "--no-merges", "--format=%s", rango).splitlines()
-    if not asuntos:
-        _fallar("no hay commits nuevos respecto a la base")
-    invalidos = [a for a in asuntos if not es_conventional(a)]
-    if invalidos:
-        _fallar("commits fuera de Conventional Commits:\n  " + "\n  ".join(invalidos))
-    return asuntos
-
-
-def _validar_tamano(comparacion, motivo):
-    numstat = git("diff", "--numstat", comparacion, "--", ".", *EXCLUIDOS_DEL_TAMANO)
-    lineas = sum(int(a) + int(b) for a, b, *_ in (f.split("\t") for f in numstat.splitlines()) if a != "-")
-    if lineas > LIMITE_LINEAS and not motivo:
-        _fallar(f"{lineas} líneas sin contar tests ni docs (límite {LIMITE_LINEAS}); divide con otra parte de la pila")
-    print(f"Tamaño: {lineas} líneas sin contar tests ni docs")
-
-
-def _abrir_pr(rama, base, titulo, feature_id, commits, args):
+def _abrir_pr(rama, base, titulo, feature_id, asuntos, final):
     existente = json.loads(_ejecutar("gh", "pr", "list", "--head", rama, "--state", "open", "--json", "url"))
     if existente:
         return f"PR existente actualizada: {existente[0]['url']}"
-    plantilla = (RAIZ / PLANTILLA_PR).read_text(encoding="utf-8")
     cuerpo = cuerpo_pr(
-        plantilla,
+        (RAIZ / PLANTILLA_PR).read_text(encoding="utf-8"),
         feature=feature_id,
         base=base,
-        commits="\n".join(f"- {c}" for c in commits),
-        excepcion=f"Excepción de tamaño: {args.motivo_grande}" if args.motivo_grande else "",
-        cierre=f"Cierra-Feature: {feature_id}" if args.final else "Parte de la pila; no cierra la feature.",
+        commits="\n".join(f"- {a}" for a in asuntos),
+        cierre="Esta PR cierra la feature." if final else "Parte de la pila; la feature sigue abierta.",
     )
-    return _ejecutar("gh", "pr", "create", "--base", base, "--head", rama, "--title", titulo, "--body-file", "-", entrada=cuerpo)
+    return _ejecutar("gh", "pr", "create", "--base", base, "--head", rama, "--title", titulo,
+                     "--body-file", "-", entrada=cuerpo)
 
 
 def _analizador():
@@ -406,18 +593,25 @@ def _analizador():
     comandos = analizador.add_subparsers(dest="comando", required=True)
     lista = comandos.add_parser("empezables", help="lista lo que se puede tomar")
     lista.add_argument("--responsable", help="K, N o J")
-    lista.set_defaults(accion=empezables)
-    toma = comandos.add_parser("trabajar", help="crea la rama de la feature o de su siguiente parte")
+    lista.set_defaults(accion=cmd_empezables)
+    comandos.add_parser("status", help="regenera docs/STATUS.md").set_defaults(accion=cmd_status)
+    toma = comandos.add_parser("trabajar", help="inicia o retoma una feature, o abre su siguiente parte")
     toma.add_argument("feature", type=str.upper)
-    toma.add_argument("descripcion")
-    toma.set_defaults(accion=trabajar)
-    comandos.add_parser("aprobar", help="registra la aprobación humana del SPEC").set_defaults(accion=aprobar)
+    toma.add_argument("descripcion", nargs="?")
+    toma.set_defaults(accion=cmd_trabajar)
+    comandos.add_parser("fase", help="muestra la fase actual y qué hacer").set_defaults(accion=cmd_fase)
+    aprobar = comandos.add_parser("aprobar", help="registra la aprobación humana y avanza una fase")
+    aprobar.add_argument("--excepcion", help="motivo para omitir las comprobaciones; autorizado por una persona")
+    aprobar.set_defaults(accion=cmd_aprobar)
+    devolver = comandos.add_parser("devolver", help="regresa a una fase anterior")
+    devolver.add_argument("fase", choices=FASES)
+    devolver.add_argument("motivo")
+    devolver.set_defaults(accion=cmd_devolver)
     cerrar = comandos.add_parser("cierre", help="valida, publica y abre la PR")
     cerrar.add_argument("--tipo", required=True, choices=TIPOS)
     cerrar.add_argument("--resumen", required=True)
     cerrar.add_argument("--final", action="store_true", help="última parte: la PR cierra la feature")
-    cerrar.add_argument("--motivo-grande", help="justifica superar el límite de tamaño")
-    cerrar.set_defaults(accion=cierre)
+    cerrar.set_defaults(accion=cmd_cierre)
     return analizador
 
 
@@ -427,7 +621,9 @@ def main():
     try:
         args.accion(args)
     except subprocess.CalledProcessError as error:
-        _fallar(f"{' '.join(error.cmd)}\n{error.stderr}")
+        _fallar(f"{' '.join(map(str, error.cmd))}\n{error.stderr}")
+    except ValueError as error:
+        _fallar(str(error))
 
 
 if __name__ == "__main__":

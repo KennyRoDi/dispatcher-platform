@@ -1,4 +1,3 @@
-"""Hace cumplir la regla de dependencias de docs/ARQUITECTURA.md §4."""
 import ast
 from pathlib import Path
 

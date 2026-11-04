@@ -1,3 +1,4 @@
+<!-- Generado por scripts/flujo.py. No editar. -->
 # Estado
 
 | Feature | Estado |
