@@ -7,6 +7,7 @@ import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 
+from src.coordinator import conexion
 import src.coordinator.main as main
 from fakes import FakeStorage, make_fake_processor
 
@@ -76,7 +77,7 @@ class Env:
 @pytest.fixture
 def env(tmp_path, monkeypatch):
     fake = fakeredis.FakeRedis(decode_responses=True)
-    monkeypatch.setattr(main, "redis_client", fake)
+    monkeypatch.setattr(conexion, "redis_client", fake)
     return Env(tmp_path, fake, TestClient(main.app), FakeStorage())
 
 
