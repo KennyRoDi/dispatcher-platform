@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-03-1-prueba-auditoria
-**Verificación IA:** verificacion 9c9e1b9
+**Verificación IA:** documentacion a3c202a
 **Historia:** US-04 · **Requisitos:** prueba de auditoria · **Responsable:** K
 
 ## Objetivo
@@ -61,3 +61,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
 | verificación IA de verificacion | Auditoria | 2026-11-03 | prueba de auditoria (9c9e1b9) |
 | verificacion | Auditoria | 2026-11-03 | prueba de auditoria, no fusionar |
+| verificación IA de documentacion | Auditoria | 2026-11-03 | prueba de auditoria (a3c202a) |
