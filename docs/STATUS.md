@@ -5,8 +5,8 @@
 |---|---|
 | F-01 | pendiente |
 | F-02 | pendiente |
-| F-03 | revision |
-| F-04 | en-pr |
+| F-03 | pendiente |
+| F-04 | pendiente |
 | F-05 | pendiente |
 | F-06 | pendiente |
 | F-07 | pendiente |
