@@ -41,3 +41,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Corregido: se abrió la PR #6 para llevar el contenido a `main` |
 | Cómo se validó | `git rev-list --count origin/main..chore/flujo-agentes` dio 0, sin diferencias de archivos, y `flujo.py empezables` funcionó contra GitHub |
 | Error de la IA | `gh pr edit --base main` falló y su salida estaba descartada, por lo que las PR #3, #4 y #5 se fusionaron en sus ramas apiladas y no en `main`. Se detectó al comparar `main` con la pila |
+
+## 2026-11-03 · Kenni Rodriguez · Orquestador (`chore/orquestador`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5 |
+| Componente | `scripts/flujo.py`, rol de orquestador y comando `trabajar` |
+| Propósito | Sumar una verificación de IA a la aprobación humana en cada fase |
+| Consulta resumida | Agregar un orquestador que vigile a los subagentes antes de pedir aprobación |
+| Resultado obtenido | Rol de orquestador y comando `verificar`; `aprobar` exige una verificación vigente |
+| Validado / corregido / descartado | Aceptado. Limitación declarada: sin subagentes, la verificación no es independiente |
+| Cómo se validó | `pytest` y ciclo completo en un clon desechable con remoto local y `gh` falso |

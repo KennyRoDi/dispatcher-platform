@@ -40,7 +40,7 @@ docs(F-20): agregar spec
 - **Commits atómicos:** un paso coherente por commit, con su prueba.
 - **Autoría:** cada persona usa su propia identidad de Git. El autor debe coincidir con la matriz de responsabilidades [Parte I §3].
 - **Fechas:** siempre reales. Prohibido usar `GIT_COMMITTER_DATE` o `--date` para simular avance.
-- `chore(status): regenerar` y `docs(F-XX): aprobar fase …` los genera solo `scripts/flujo.py`.
+- `chore(status): regenerar`, `docs(F-XX): registrar verificacion …` y `docs(F-XX): aprobar fase …` los genera solo `scripts/flujo.py`.
 - `docs/STATUS.md` nunca se edita a mano.
 
 ## Ramas
@@ -68,7 +68,7 @@ main
 
 ## Comprobaciones automáticas
 
-`flujo.py aprobar` comprueba cada fase (ver [AGENTS.md](AGENTS.md)). `flujo.py cierre` exige todas las fases aprobadas, sin cambios pendientes, y comprueba commits, título, tamaño y `pytest -q -m "not integration and not acceptance"`.
+`flujo.py aprobar` exige la verificación de IA vigente y comprueba cada fase (ver [AGENTS.md](AGENTS.md)). `flujo.py cierre` exige todas las fases aprobadas, sin cambios pendientes, y comprueba commits, título, tamaño y `pytest -q -m "not integration and not acceptance"`.
 
 Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/BACKLOG.md`.
 

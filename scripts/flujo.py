@@ -4,6 +4,7 @@
     python scripts/flujo.py empezables [--responsable K]
     python scripts/flujo.py trabajar F-XX ["descripcion"]
     python scripts/flujo.py fase
+    python scripts/flujo.py verificar --herramienta "x" --resumen "qué se comprobó"
     python scripts/flujo.py aprobar [--excepcion "motivo"]
     python scripts/flujo.py devolver <fase> "motivo"
     python scripts/flujo.py bitacora --herramienta "x" --proposito "x" ... | --sin-ia
@@ -60,6 +61,7 @@ _METADATOS = re.compile(r"\*\*Responsable:\*\* (.+?) · \*\*Depende de:\*\* (.+)
 _RAMA = re.compile(r"^feat/(F-\d+)-(\d+)-")
 _CAMPO_FASE = re.compile(r"^\*\*Fase:\*\* ([\w-]+)$", re.M)
 _CAMPO_BASE = re.compile(r"^\*\*Base:\*\* (\S+)$", re.M)
+_CAMPO_VERIFICACION = re.compile(r"^\*\*Verificación IA:\*\* .*$", re.M)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -137,6 +139,25 @@ def devolver_spec(spec, destino, nombre, fecha, motivo):
     if fase not in FASES or destino not in FASES or FASES.index(destino) >= FASES.index(fase):
         raise ValueError(f"no se puede devolver de {fase} a {destino}")
     return fijar_fase(_registrar(spec, f"devuelta de {fase}", nombre, fecha, motivo), destino)
+
+
+def _asunto_verificacion(feature, fase):
+    return f"docs({feature}): registrar verificacion {fase}"
+
+
+def registrar_verificacion(spec, fase, sha, herramienta, fecha, resumen):
+    if not _CAMPO_VERIFICACION.search(spec):
+        raise ValueError("el SPEC no declara **Verificación IA:**")
+    con_campo = _CAMPO_VERIFICACION.sub(f"**Verificación IA:** {fase} {sha}", spec, count=1)
+    return _registrar(con_campo, f"verificación IA de {fase}", herramienta, fecha, f"{resumen} ({sha})")
+
+
+def verificacion_vigente(spec, fase, asuntos_posteriores):
+    campo = _CAMPO_VERIFICACION.search(spec)
+    partes = campo.group(0).split()[2:] if campo else []
+    if len(partes) != 2 or partes[0] != fase or len(asuntos_posteriores) != 1:
+        return False
+    return asuntos_posteriores[0].endswith(f"): registrar verificacion {fase}")
 
 
 def _celda(texto):
@@ -449,10 +470,10 @@ def _imprimir_fase(feature, fase):
         return
     rol, trabajo = _TRABAJO_POR_FASE[fase]
     print(f"{feature} · fase {FASES.index(fase) + 1}/{len(FASES)}: {fase}")
-    print(f"Rol: {rol} (.agents/roles/)")
-    print(f"Haz: {trabajo.format(feature=feature)}")
-    print("Genera todo lo de esta fase, haz commit, muéstralo y DETENTE a pedir aprobación.")
-    print("Solo con un sí explícito de la persona: python scripts/flujo.py aprobar")
+    print(f"Subagente: {rol} (.agents/roles/)")
+    print(f"Debe hacer: {trabajo.format(feature=feature)}")
+    print("Orquestador: verifica su trabajo según .agents/roles/orquestador.md y registra con `flujo.py verificar`.")
+    print("Luego DETENTE a pedir aprobación. Solo con un sí explícito de la persona: python scripts/flujo.py aprobar")
 
 
 def cmd_empezables(args):
@@ -549,6 +570,38 @@ def cmd_fase(_args):
     _imprimir_fase(feature_id, fase_de(_leer_spec_local(feature_id)))
 
 
+def cmd_verificar(args):
+    feature_id = _feature_actual()
+    _exigir_sin_cambios()
+    spec = _leer_spec_local(feature_id)
+    fase = fase_de(spec)
+    if fase not in FASES:
+        _fallar(f"la fase {fase} no requiere verificación")
+    sha = git("rev-parse", "--short", "HEAD")
+    hoy = datetime.date.today().isoformat()
+    nuevo = registrar_verificacion(spec, fase, sha, args.herramienta, hoy, args.resumen)
+    _guardar_y_confirmar(feature_id, nuevo, _asunto_verificacion(feature_id, fase))
+    git("push", "-q", "origin", _rama_actual())
+    print(f"{feature_id}: verificación de {fase} registrada sobre {sha}. Pide la aprobación de la persona.")
+
+
+def _sha_verificado(spec):
+    return _CAMPO_VERIFICACION.search(spec).group(0).split()[-1]
+
+
+def _exigir_verificacion(spec, fase):
+    campo = _CAMPO_VERIFICACION.search(spec)
+    if not campo or len(campo.group(0).split()) != 4:
+        _fallar(f"falta la verificación de IA de la fase {fase}; usa `flujo.py verificar`")
+    try:
+        asuntos = git("log", "--format=%s", f"{_sha_verificado(spec)}..HEAD").splitlines()
+    except subprocess.CalledProcessError:
+        asuntos = []
+    if not verificacion_vigente(spec, fase, asuntos):
+        _fallar(f"la verificación de IA de la fase {fase} no está vigente: "
+                "hubo cambios después o es de otra fase; verifica de nuevo")
+
+
 def cmd_aprobar(args):
     feature_id = _feature_actual()
     _exigir_sin_cambios()
@@ -556,6 +609,7 @@ def cmd_aprobar(args):
     fase = fase_de(spec)
     if fase not in FASES:
         _fallar(f"la fase {fase} no requiere aprobación")
+    _exigir_verificacion(spec, fase)
     base = _base_vigente(spec)
     git("fetch", "-q", "origin", base)
     _validar_commits(base)
@@ -672,6 +726,10 @@ def _analizador():
     toma.add_argument("descripcion", nargs="?")
     toma.set_defaults(accion=cmd_trabajar)
     comandos.add_parser("fase", help="muestra la fase actual y qué hacer").set_defaults(accion=cmd_fase)
+    verificar = comandos.add_parser("verificar", help="registra la verificación de IA del orquestador")
+    verificar.add_argument("--herramienta", required=True)
+    verificar.add_argument("--resumen", required=True, help="qué se comprobó y con qué comandos")
+    verificar.set_defaults(accion=cmd_verificar)
     aprobar = comandos.add_parser("aprobar", help="registra la aprobación humana y avanza una fase")
     aprobar.add_argument("--excepcion", help="motivo para omitir las comprobaciones; autorizado por una persona")
     aprobar.set_defaults(accion=cmd_aprobar)
