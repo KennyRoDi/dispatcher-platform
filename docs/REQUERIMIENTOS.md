@@ -2,7 +2,7 @@
 
 # Requerimientos: Plataforma distribuida de análisis de datos de mensajería
 
-Fuente única: `II_ProyectoProgramado_IC6600_IIS2026.docx`, Parte III (B.1 a B.10), Anexos 1 a 3 y Parte I como marco común.
+Fuente única: [ENUNCIADO.md](ENUNCIADO.md), conversión de `II_ProyectoProgramado_IC6600_IIS2026.docx`, Parte III (B.1 a B.10), Anexos 1 a 3 y Parte I como marco común.
 Convención de citas: `[B.5 M1]`, `[B.4 Estados del caso]`, `[Parte I §3]`, `[Anexo 2]`.
 
 ## 1. Requisitos funcionales
@@ -111,7 +111,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 |---|---|---|
 | SUP-01 ⚠ | Equipo de 3: Kenni Rodriguez, Nahúm Murillo y José Andrés Loría Herrera. | Son los autores del repositorio del I Proyecto y [Parte I, Modalidad] mantiene los equipos. `Tareas del Proyecto.pdf` menciona una Persona 4 sin commits. |
 | SUP-02 ⚠ | Fechas de hitos sin resolver: el documento dice «3 semanas, del 21/oct/26 al 04/nov/26», pero ese rango dura 14 días. Se toma 04/nov/26 como entrega de H3. | Es la única fecha explícita de cierre. |
-| SUP-03 ⚠ | La hora de entrega es 04/nov/26 23:59. | El documento no indica hora. |
+| SUP-03 ⚠ | La fecha real de entrega es posterior a 04/nov/26 y está por confirmar. | El equipo indica que el plazo real es más extenso que el del enunciado; falta la fecha exacta. |
 | SUP-04 | Coordinador, Redis, MinIO y custodia comparten el Nodo A, que también corre workers. | [B.2] exige tres nodos worker, no un nodo adicional para el coordinador. |
 | SUP-05 | `completed`: todas bien. `partially_completed`: al menos una bien y una fallida definitiva. `failed`: ninguna bien. `retrying`: alguna espera reintento. `cancelled`: terminal y prevalece. | [B.4] enumera estados, no su semántica. Coincide con `_final_case_status` del I Proyecto. |
 | SUP-06 | Máximo de 3 intentos y backoff exponencial con jitter, base configurable. | 3 viene de `MAX_ATTEMPTS` del I Proyecto. [B.4] solo exige que sea configurable. |
