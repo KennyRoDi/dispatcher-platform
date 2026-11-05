@@ -169,3 +169,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado tras las correcciones de la fila de errores. Kenni corrigió la topología, confirmó los añadidos del arquitecto y aprobó cada fase. US-38 y RNF-01 no se dan por cumplidos: nada se ejecutó sobre nodos reales |
 | Cómo se validó | pytest -q -m 'not integration and not acceptance': 682 passed, 3 skipped, 1 deselected. python -m scripts.conformidad repo: 0 problemas. Lectura de diffs contra el SPEC y contraste con el código. Mutantes de QA y dos del orquestador en copia temporal. Aceptación reproducida con datos sintéticos. Sin comprobar: Docker, Compose, imagen, Tailscale desde WSL2, CLIENT LIST y run_load real |
 | Error de la IA | (1) La lógica de aceptación contaba como procesa a un nodo con todas sus sub-tareas fallidas, por usar metrics.subtasks_per_host; lo detectó el orquestador y se corrigió a contar solo completed y a fallar con timed_out. (2) 19 de 50 mutantes sobrevivían a las pruebas de la fase tests, incluidos worker sin env_file e imagen sin COPY scripts; lo detectó QA y añadió 73 líneas de pruebas. (3) El primer SPEC presentaba el proyecto como continuación del I Proyecto y retiraba la cuarta máquina; lo corrigió Kenni. (4) El encargo al arquitecto decía que AD-22 proponía Python 3.12; el arquitecto comprobó que ya decía 3.13. (5) El arquitecto añadió por su cuenta puertos solo en Tailscale y el rango 100.64.0.0/10; el orquestador no los dio por aprobados y Kenni los confirmó |
+
+## 2026-11-05 · Kenni Rodriguez · F-38, despliegue en tres nodos, Parte 1: revisión (`feat/F-38-1-despliegue-en-tres-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5: orquestador y subagentes revisor y documentador |
+| Componente | F-38, despliegue en tres nodos, Parte 1: revisión |
+| Propósito | Comparar el diff contra el SPEC y corregir los desajustes de documentos antes de abrir la PR |
+| Consulta resumida | Revisar el diff de la Parte 1 contra el SPEC, con contexto nuevo, y aplicar los hallazgos en la documentación |
+| Resultado obtenido | Primera ronda DEVUELTO con 6 hallazgos de documentos; corregidos en 97219bd; segunda ronda APROBADO. La guía queda en 444 líneas, no en las 421 de la entrada anterior |
+| Validado / corregido / descartado | Kenni aprobó la fase. Sin cambios en código ni configuración ejecutable |
+| Cómo se validó | Confirmé los hallazgos con sed y grep y leí el delta. pytest -q -m 'not integration and not acceptance': 682 passed, 3 skipped, 1 deselected. conformidad repo: 0 problemas. Sin comprobar: Docker, Compose, imagen, PowerShell, Tailscale y run_load real |
+| Error de la IA | El revisor detectó 6 desajustes en la documentación generada por IA: el SPEC decía que el archivo GPU no cambiaba y sus comentarios sí cambiaron; DECISIONES_DISENO seguía con coordinador nativo y Tailscale como plan B; faltaba la lista de comprobación que pedía el SPEC; notepad no bloquea PowerShell y la normalización del .env podía correr antes de editar; el filtro NODE_* daba falsa alarma; faltaban apt-get update y la nota de Python 3.13. Los corrigió el documentador |
