@@ -1,6 +1,6 @@
 # Override para el nodo GPU: transcodificacion con NVENC dentro del contenedor.
 # Se usa JUNTO con el compose del worker (no solo):
-#   docker compose -f deploy/docker-compose.worker.yml -f deploy/docker-compose.worker-gpu.yml up -d --build
+#   docker compose --env-file .env -f deploy/docker-compose.worker.yml -f deploy/docker-compose.worker-gpu.yml up -d --build
 #
 # Requisitos:
 #   - Driver NVIDIA instalado en el host.
@@ -12,7 +12,7 @@
 #   - Revisar en Redis los campos gpu / nvenc_ok / hwaccel del heartbeat:
 #       redis-cli HMGET worker:<worker_id> gpu nvenc_ok hwaccel
 #   - O desde el contenedor:
-#       docker compose -f deploy/docker-compose.worker.yml -f deploy/docker-compose.worker-gpu.yml run --rm worker \
+#       docker compose --env-file .env -f deploy/docker-compose.worker.yml -f deploy/docker-compose.worker-gpu.yml run --rm worker \
 #         python -c "from src.workers import multimedia_processor as m; print(m.detect_hw_encoders())"
 #
 # Alternativa nativa (sin Docker): poner HWACCEL=nvenc en .env y ejecutar

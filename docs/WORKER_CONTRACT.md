@@ -207,10 +207,10 @@ Estado de vitalidad del worker. El heartbeat escribe cada `HEARTBEAT_INTERVAL` (
 
 | Campo | Tipo | Ejemplo | Notas |
 |-------|------|---------|-------|
-| `worker_id` | str | `"worker-gpu-node-01"` | Único; si no se define `WORKER_ID` se genera como `"worker-" + socket.gethostname()` |
-| `host` | str | `"gpu-node-01"` | `NODE_NAME` (nombre de la máquina física). En Docker el hostname es el ID del contenedor, por eso se usa `NODE_NAME` |
-| `hostname` | str | `"a1b2c3d4e5f6"` | `socket.gethostname()` |
-| `ip` | str | `"192.168.1.42"` | IP local usada para llegar a Redis (`local_ip(REDIS_HOST)`) |
+| `worker_id` | str | `"worker-gpu-node-01"` | Único; si no se define `WORKER_ID` se genera como `"worker-" + socket.gethostname()`. Con `deploy/docker-compose.worker.yml` queda `worker-<NODE_NAME>`, estable entre reinicios |
+| `host` | str | `"gpu-node-01"` | `NODE_NAME`, que llega por `env_file`. Es el valor que se anota en cada sub-tarea. Sin definir, cae a `socket.gethostname()` |
+| `hostname` | str | `"gpu-node-01"` | `socket.gethostname()`. `deploy/docker-compose.worker.yml` lo fija desde `NODE_NAME`, así que identifica la máquina y coincide con `host` (AD-23). Un contenedor sin ese `hostname`, como los de `deploy/docker-compose.local.yml`, muestra su ID |
+| `ip` | str | `"<IP_TAILSCALE_DEL_NODO>"` | `NODE_IP` si está definida; si no, `local_ip(REDIS_HOST)`, que en red bridge es la IP interna del contenedor. `deploy/docker-compose.worker.yml` exige `NODE_IP` (AD-23) |
 | `queues` | str | `"transcode_video,extract_audio"` | `WORKER_QUEUES` |
 | `concurrency` | int | `2` | `WORKER_CONCURRENCY` |
 | `threads_per_job` | int | `4` | `cpu_count // concurrency` (mínimo 1) |
@@ -414,8 +414,9 @@ Todas se leen en `Settings.from_env()` (`src/workers/config.py`); ver `.env.exam
 | `COORDINATOR_URL` | `http://localhost:8000` | Destino de los reportes |
 | `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_SECURE` | `localhost:9000`, `minioadmin`, `minioadmin`, `false` | Conexión a MinIO |
 | `DATASET_BUCKET`, `RESULTS_BUCKET` | `dataset`, `results` | Buckets de entrada y salida |
-| `WORKER_ID` | `worker-<hostname>` | Identidad (dejar vacío al escalar con `--scale`) |
-| `NODE_NAME` | hostname | Nombre de la máquina física; aparece como `host` |
+| `WORKER_ID` | `worker-<hostname>` | Identidad. Dejar vacío: un valor común haría que los nodos se pisen en una sola entrada. `--scale` no se ofrece, porque las réplicas con `hostname` fijo compartirían `worker_id` (AD-23) |
+| `NODE_NAME` | hostname | Nombre de la máquina, salida de `hostname`; aparece como `host`. El Compose de worker lo exige y lo usa también como `hostname` |
+| `NODE_IP` | vacío | IP publicada como `ip`, salida de `tailscale ip -4`. Vacío: `local_ip(REDIS_HOST)`. El Compose de worker lo exige |
 | `WORKER_QUEUES` | las 5 operaciones | Operaciones que consume este nodo |
 | `WORKER_CONCURRENCY` | 1 | Hilos consumidores (sub-tareas simultáneas) |
 | `WORK_DIR` | `<tmp>/mm-worker` | Carpeta temporal por sub-tarea |
@@ -431,7 +432,7 @@ Persona 4 puede usar la API HTTP (recomendado, sin acceso directo a Redis) o Red
 ```python
 import requests
 
-base = "http://192.168.1.X:8000"
+base = "http://<IP_TAILSCALE_NODO_A>:8000"
 
 # Vista rápida: colas, casos por estado, workers vivos
 stats = requests.get(f"{base}/stats", timeout=10).json()
@@ -452,17 +453,17 @@ retrying = requests.get(f"{base}/cases", params={"status": "retrying"}, timeout=
 ### Vía Redis
 
 ```bash
-redis-cli -h 192.168.1.X -p 6379 -a tu_password SMEMBERS workers:registry
-redis-cli -h 192.168.1.X -p 6379 -a tu_password HGETALL worker:worker-gpu-node-01
-redis-cli -h 192.168.1.X -p 6379 -a tu_password HGETALL subtask:a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
-redis-cli -h 192.168.1.X -p 6379 -a tu_password LLEN queue:transcode_video:high
-redis-cli -h 192.168.1.X -p 6379 -a tu_password LLEN reports:pending
+redis-cli -h <IP_TAILSCALE_NODO_A> -p 6379 -a tu_password SMEMBERS workers:registry
+redis-cli -h <IP_TAILSCALE_NODO_A> -p 6379 -a tu_password HGETALL worker:worker-gpu-node-01
+redis-cli -h <IP_TAILSCALE_NODO_A> -p 6379 -a tu_password HGETALL subtask:a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+redis-cli -h <IP_TAILSCALE_NODO_A> -p 6379 -a tu_password LLEN queue:transcode_video:high
+redis-cli -h <IP_TAILSCALE_NODO_A> -p 6379 -a tu_password LLEN reports:pending
 ```
 
 ```python
 import redis
 
-r = redis.Redis(host='192.168.1.X', port=6379, password='tu_password', decode_responses=True)
+r = redis.Redis(host='<IP_TAILSCALE_NODO_A>', port=6379, password='tu_password', decode_responses=True)
 
 for wid in r.smembers('workers:registry'):
     hb = r.hgetall(f'worker:{wid}')

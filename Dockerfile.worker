@@ -1,5 +1,5 @@
-# Imagen unica reutilizada por worker, reaper y coordinador (local compose).
-FROM python:3.14-slim
+# Imagen unica para worker, reaper y coordinador (Compose del Nodo A y compose local).
+FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
