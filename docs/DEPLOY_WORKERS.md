@@ -38,12 +38,15 @@ Necesitas Docker con el plugin Compose, Tailscale, Git, curl y Python 3.13 o sup
 **Requieren `sudo`: los ejecuta la persona, no un agente.** Los nombres de paquetes son de Debian o Ubuntu.
 
 ```bash
+sudo apt-get update
 sudo apt-get install -y git curl python3-venv
 curl -fsSL https://get.docker.com | sudo sh
 sudo usermod -aG docker "$USER"    # cierra sesión y vuelve a entrar
 curl -fsSL https://tailscale.com/install.sh | sudo sh
 sudo tailscale up
 ```
+
+Se requiere Python 3.13 o superior, porque el código usa `os.process_cpu_count`. Si `python3 --version` da menos, instala 3.13 antes de crear el venv, según la [documentación oficial de Python](https://docs.python.org/3/using/unix.html).
 
 Después, sin `sudo`. El venv hace falta porque `run_load` y `pytest` corren en nativo en este nodo:
 
@@ -113,11 +116,11 @@ cp .env.example .env
 nano .env
 ```
 
-**Nodos B, C y D.** PowerShell y Git pueden dejar CRLF, BOM o UTF-16, así que, después de editar, guarda el archivo en UTF-8 sin BOM y con LF:
+**Nodos B, C y D.** PowerShell y Git pueden dejar CRLF, BOM o UTF-16, así que, después de editar, el archivo se reescribe en UTF-8 sin BOM y con LF. Cierra antes cualquier otra ventana de Notepad: el bloque espera a que cierres la que abre, con el archivo ya guardado.
 
 ```powershell
 Copy-Item .env.example .env
-notepad .env
+Start-Process notepad .env -Wait
 $ruta = Join-Path $PWD ".env"
 $texto = [IO.File]::ReadAllText($ruta) -replace "`r`n", "`n"
 [IO.File]::WriteAllText($ruta, $texto, [Text.UTF8Encoding]::new($false))
@@ -132,11 +135,11 @@ No escribas el `.env` con `>` ni con `Out-File`.
 - **`NODE_NAME` o `NODE_IP` en el shell con otro valor.** Compose interpola `hostname` del shell, que tiene prioridad sobre `--env-file`, mientras que `NODE_NAME` llega al proceso por `env_file`. Si difieren, `host` y `hostname` divergen y la aceptación lo detecta, porque un `host` con sub-tareas no estaría entre los `hostname` activos. Un `NODE_IP` del shell también sustituye al del archivo, y la aceptación solo lo detecta si queda repetido o fuera de `100.64.0.0/10`. Ambos comandos deben salir sin resultados:
 
   ```bash
-  env | grep '^NODE_'
+  env | grep -E '^NODE_(NAME|IP)='
   ```
 
   ```powershell
-  Get-ChildItem Env:NODE_*
+  Get-ChildItem Env:NODE_NAME, Env:NODE_IP -ErrorAction SilentlyContinue
   ```
 
 ## 4. Arranque
@@ -165,7 +168,7 @@ MinIO dejó de publicar imágenes públicas, por eso el Compose usa `cgr.dev/cha
 ```powershell
 hostname            # debe coincidir con NODE_NAME
 tailscale ip -4     # debe coincidir con NODE_IP
-Get-ChildItem Env:NODE_*
+Get-ChildItem Env:NODE_NAME, Env:NODE_IP -ErrorAction SilentlyContinue
 docker compose --env-file .env -f deploy/docker-compose.worker.yml run --rm worker python -m scripts.check_connectivity
 $LASTEXITCODE
 ```
@@ -251,6 +254,12 @@ python3 -c 'import json, sys; print(json.dumps(json.load(open(sys.argv[1]))["met
 
 **Esa cifra incluye las fallidas.** Un host puede aparecer con solo fallos, y puede aparecer `reaper`, que reporta las sub-tareas perdidas. La aceptación, en cambio, solo cuenta `completed`. Decláralo así en la evidencia y no leas la tabla como «procesadas con éxito».
 
+Hosts con sub-tareas `completed` en cada caso:
+
+```bash
+python3 -c 'import json, sys; r = json.load(open(sys.argv[1]))["reports"]; print(*(f"{c} {sorted({s["host"] for ss in ((i or {}).get("subtasks_by_operation") or {}).values() for s in ss if s.get("status") == "completed" and s.get("host")})}" for c, i in r.items()), sep="\n")' docs/evidencia/carga_<AAAAMMDD_HHMMSS>.json
+```
+
 ### 5.5 Qué contiene la evidencia
 
 - Por cada nodo: `hostname`, `tailscale ip -4`, `docker compose ps` y `check_connectivity`.
@@ -261,6 +270,20 @@ python3 -c 'import json, sys; print(json.dumps(json.load(open(sys.argv[1]))["met
 - Dónde se atascó quien siguió la guía (RNF-22, SUP-21).
 
 `NODE_NAME` y `NODE_IP` son declarados, por eso importan las dos observaciones independientes. El tiempo y el reparto se registran tal como salgan, sin interpretarlos como rendimiento: `run_load` usa operaciones multimedia y demuestra distribución, no el sistema completo.
+
+### 5.6 Lista de comprobación
+
+- [ ] Prerrequisitos listos y las cuatro máquinas en la misma red de Tailscale (§2).
+- [ ] Cada `.env` con `NODE_NAME` único, su `NODE_IP`, `WORKER_ID` vacío, credenciales propias y sin versionar (§3).
+- [ ] `NODE_NAME` y `NODE_IP` sin definir en el shell de cada máquina (§3).
+- [ ] Nodo A levantado, sin workers y con los puertos solo en su IP de Tailscale (§1, §4).
+- [ ] `check_connectivity` con salida `0` en los tres nodos worker (§4).
+- [ ] Tres entradas `alive: true` en `GET /workers`, con su `hostname` e `ip` (§4).
+- [ ] `run_load` con salida `0` (§5.2).
+- [ ] Aceptación con `1 passed`; `skipped` no cuenta (§5.3).
+- [ ] Tabla por `hostname`, declarando que incluye fallidas (§5.4).
+- [ ] Sub-tareas de un mismo caso completadas en hosts distintos (§5.4). La aceptación no lo exige, porque las colas no lo garantizan; si ningún caso lo muestra, se declara.
+- [ ] Evidencia completa y `tailscale status` sin nombres de cuenta (§5.5).
 
 ## 6. Pruebas automatizadas
 
@@ -294,7 +317,7 @@ Ninguna fila se ha reproducido sobre nodos reales. «Sin comprobar» marca lo qu
 | `1 skipped` | Faltan `COORDINATOR_URL` o `RUN_LOAD_JSON` | Defínelas como en §5.3. No cuenta como aceptación |
 | Una sola entrada para los tres nodos, `nodos activos distintos: 1` | `WORKER_ID` fijo, o `NODE_NAME` repetido | Vacía `WORKER_ID` o corrige `NODE_NAME`, y recrea el contenedor |
 | `ip ... fuera de 100.64.0.0/10` | `NODE_IP` no es la de Tailscale | Corrige con `tailscale ip -4` |
-| `host ... no es un hostname activo` | `NODE_NAME` del shell distinto al del `.env`, o el worker se cayó tras la corrida | Revisa `Get-ChildItem Env:NODE_*` y `docker compose ps` |
+| `host ... no es un hostname activo` | `NODE_NAME` del shell distinto al del `.env`, o el worker se cayó tras la corrida | Revisa `Get-ChildItem Env:NODE_NAME, Env:NODE_IP -ErrorAction SilentlyContinue` y `docker compose ps` |
 | `hosts con sub-tareas completadas: N` menor que 3 | Un nodo no completó nada, solo tuvo fallos, o la corrida fue corta | Revisa sus logs y `failure_breakdown`; repite con un `--limit` mayor |
 | `run_load termino con timed_out` | Corrida incompleta | Repite con un `--timeout` mayor |
 

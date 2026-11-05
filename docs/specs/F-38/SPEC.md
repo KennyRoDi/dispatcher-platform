@@ -27,7 +27,7 @@ El equipo y quien evalúa necesitan ver distribución real: «al menos tres nodo
 - TLS (F-27), autenticación (F-26) ni endurecimiento sin privilegios (F-30). **Tailscale no sustituye a TLS:** RF-36 exige una captura entre nodos que muestre TLS, así que F-27 sigue obligatoria. Los puertos 8000, 6379 y 9000 siguen sin TLS hasta F-27.
 - Un contenedor por tipo de worker y `mem_limit` (F-16, AD-05); `stop_grace_period` (F-12).
 - Workers de texto, imagen y audio (F-07 a F-09). La corrida usa las operaciones multimedia reutilizadas del I Proyecto.
-- Nodo GPU y routing (F-32). `deploy/docker-compose.worker-gpu.yml` no cambia.
+- Nodo GPU y routing (F-32). La configuración de `deploy/docker-compose.worker-gpu.yml` no cambia; solo se actualizan sus comandos de ejemplo en comentarios.
 - Sección de despliegue del `README.md` (F-42), escenarios de carga y fallos (F-33 a F-37), diagramas de arquitectura salvo el ajuste de topología de §6.
 
 ## Criterios de aceptación
