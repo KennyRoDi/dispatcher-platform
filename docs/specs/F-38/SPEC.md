@@ -1,6 +1,6 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion ab0bccf
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
@@ -210,3 +210,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (Opus 5.5), orquestador; developer en subagente | 2026-11-05 | Verificacion de tests sobre bc1fe65. Diff: solo tests/. Lei las pruebas y ejecute la suite con un venv del scratchpad: 18 failed, 650 passed, 3 skipped, 1 deselected; las 600 preexistentes siguen en verde. Las 18 rojas fallan por falta de funcionalidad: Settings sin node_ip, heartbeat con la IP detectada, sin coordinator, puertos sin NODE_IP, python 3.14, NODE_IP ausente. Devolvi un hallazgo al developer: nodo solo con fallidas contaba como procesa; corregido y reproducido por mi con datos sinteticos. Aceptacion se omite sin variables. conformidad repo: 0 problemas. Sin comprobar: aceptacion contra nodos reales y contra un servidor con la logica nueva; Docker y Compose. (bc1fe65) |
 | tests | Kenni Rodriguez | 2026-11-05 |  |
 | verificación IA de implementacion | Claude Code (Opus 5.5), orquestador; developer en subagente | 2026-11-05 | Verificacion de implementacion sobre ab0bccf. Lei el diff completo contra el SPEC: 6 archivos, 61 inserciones y 25 borrados, sin tocar docs. git diff de tests desde la fase anterior vacio: pruebas no debilitadas. Suite: 668 passed, 3 skipped, 1 deselected. conformidad repo: 0 problemas. grep confirma que el coordinador solo lee REDIS_* y que ningun script ni CI levanta docker-compose.yml. Sin comprobar: docker compose config y up, build de imagen 3.13, interpolacion real, pruebas integration y acceptance, nodos reales. (ab0bccf) |
+| implementacion | Kenni Rodriguez | 2026-11-05 |  |
