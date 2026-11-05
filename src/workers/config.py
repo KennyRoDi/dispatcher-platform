@@ -117,6 +117,7 @@ class Settings:
     reaper_max_age: float = 2100.0
     max_attempts: int = 3
     hwaccel: str | None = None
+    node_ip: str | None = None
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -164,6 +165,7 @@ class Settings:
             reaper_max_age=_float(env, "REAPER_MAX_AGE", cls.reaper_max_age),
             max_attempts=_int(env, "MAX_ATTEMPTS", cls.max_attempts),
             hwaccel=_parse_hwaccel(env.get("HWACCEL")),
+            node_ip=_optional_str(env, "NODE_IP"),
         )
 
     def queue_keys(self) -> list[str]:

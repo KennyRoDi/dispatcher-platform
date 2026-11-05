@@ -146,7 +146,7 @@ class Heartbeat(threading.Thread):
             "worker_id": self.settings.worker_id,
             "host": self.settings.node_name,
             "hostname": socket.gethostname(),
-            "ip": local_ip(self.settings.redis_host),
+            "ip": self.settings.node_ip or local_ip(self.settings.redis_host),
             "queues": ",".join(self.settings.worker_queues),
             "concurrency": self.settings.worker_concurrency,
             "threads_per_job": self.settings.threads_per_job(),
