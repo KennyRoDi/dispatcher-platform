@@ -35,6 +35,16 @@ def test_node_name_defaults_to_hostname_and_reads_env(monkeypatch):
     assert Settings.from_env({"NODE_NAME": "kenni-laptop"}).node_name == "kenni-laptop"
 
 
+@pytest.mark.parametrize("raw", ["100.64.0.7", "100.64.0.7\r"])
+def test_node_ip_reads_env(raw):
+    assert Settings.from_env({"NODE_IP": raw}).node_ip == "100.64.0.7"
+
+
+@pytest.mark.parametrize("env", [{}, {"NODE_IP": ""}, {"NODE_IP": "\r"}])
+def test_node_ip_is_optional(env):
+    assert not Settings.from_env(env).node_ip
+
+
 def test_env_parsing_basic_types():
     env = {
         "REDIS_HOST": "10.0.0.1",

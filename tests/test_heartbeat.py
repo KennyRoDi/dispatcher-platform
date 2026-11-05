@@ -3,6 +3,7 @@ import threading
 from unittest.mock import patch
 
 import fakeredis
+import pytest
 
 from src.workers.config import Settings
 from src.workers.heartbeat import Heartbeat, WorkerStats, detect_ffmpeg, local_ip
@@ -100,6 +101,27 @@ def test_beat_reports_node_name_as_host():
     data = redis_client.hgetall(f"worker:{settings.worker_id}")
     assert data["host"] == "kenni-laptop"
     assert data["hostname"]
+
+
+def _beat_ip(**settings_overrides) -> tuple[str, Settings, object]:
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    settings = make_settings(**settings_overrides)
+    hb = Heartbeat(settings, redis_client, WorkerStats(), threading.Event(), ffmpeg_info=("x", "none"))
+    with patch("src.workers.heartbeat.local_ip", return_value="172.18.0.2") as detected:
+        hb.beat()
+    return redis_client.hget(f"worker:{settings.worker_id}", "ip"), settings, detected
+
+
+def test_beat_publishes_node_ip_over_detected_ip():
+    ip, _, _ = _beat_ip(NODE_IP="100.64.0.7")
+    assert ip == "100.64.0.7"
+
+
+@pytest.mark.parametrize("overrides", [{}, {"NODE_IP": ""}])
+def test_beat_keeps_local_ip_without_node_ip(overrides):
+    ip, settings, detected = _beat_ip(**overrides)
+    assert ip == "172.18.0.2"
+    detected.assert_called_once_with(settings.redis_host)
 
 
 def test_run_survives_beat_exception_and_stops_on_event():
