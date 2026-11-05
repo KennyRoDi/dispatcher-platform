@@ -124,6 +124,16 @@ def test_beat_keeps_local_ip_without_node_ip(overrides):
     detected.assert_called_once_with(settings.redis_host)
 
 
+def test_beat_publishes_container_hostname_not_declared_node_name():
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    settings = make_settings(NODE_NAME="declarado")
+    hb = Heartbeat(settings, redis_client, WorkerStats(), threading.Event(), ffmpeg_info=("x", "none"))
+    with patch("src.workers.heartbeat.socket.gethostname", return_value="del-contenedor"):
+        hb.beat()
+    data = redis_client.hgetall(f"worker:{settings.worker_id}")
+    assert (data["host"], data["hostname"]) == ("declarado", "del-contenedor")
+
+
 def test_run_survives_beat_exception_and_stops_on_event():
     redis_client = fakeredis.FakeRedis(decode_responses=True)
     settings = make_settings(HEARTBEAT_INTERVAL="0.01")

@@ -136,3 +136,66 @@ def test_imagen_no_corre_como_root():
 def test_env_example_define_la_identidad_del_nodo(variable):
     ejemplo = (RAIZ / ".env.example").read_text(encoding="utf-8")
     assert re.search(rf"^{variable}=", ejemplo, re.MULTILINE), f"{variable} sin definir"
+
+
+def _archivos_de_entorno(servicio: dict) -> list:
+    archivos = servicio.get("env_file") or []
+    return [archivos] if isinstance(archivos, str) else archivos
+
+
+def test_worker_lee_el_env_de_la_raiz(worker):
+    assert _archivos_de_entorno(worker) == ["../.env"]
+
+
+def test_worker_no_escala_ni_usa_la_red_del_host(worker):
+    assert "network_mode" not in worker
+    assert "replicas" not in (worker.get("deploy") or {})
+    assert "scale" not in worker
+
+
+def test_worker_no_fija_worker_id(worker):
+    assert "WORKER_ID" not in _entorno(worker)
+
+
+def test_nodo_a_no_usa_la_red_del_host(nodo_a):
+    assert [nombre for nombre, servicio in nodo_a.items() if "network_mode" in servicio] == []
+
+
+def test_coordinador_exige_la_clave_de_redis(nodo_a):
+    clave = _entorno(_servicio(nodo_a, "coordinator")).get("REDIS_PASSWORD")
+    assert _es_obligatoria(clave, "REDIS_PASSWORD"), clave
+
+
+def test_coordinador_arranca_la_app_en_todas_las_interfaces_del_contenedor(nodo_a):
+    comando = _servicio(nodo_a, "coordinator")["command"]
+    assert "src.coordinator.main:app" in comando
+    assert (RAIZ / "src/coordinator/main.py").is_file()
+    assert comando[comando.index("--host") + 1] == "0.0.0.0"
+    assert comando[comando.index("--port") + 1] == "8000"
+
+
+def test_reaper_usa_el_redis_del_compose_con_su_clave(nodo_a):
+    reaper = _servicio(nodo_a, "reaper")
+    assert _entorno(reaper).get("REDIS_HOST") == "redis"
+    assert _archivos_de_entorno(reaper) == [".env"] or "REDIS_PASSWORD" in _entorno(reaper)
+
+
+@pytest.mark.parametrize("carpeta", ["src", "scripts"])
+def test_imagen_copia_el_codigo(carpeta):
+    dockerfile = (RAIZ / "Dockerfile.worker").read_text(encoding="utf-8")
+    assert re.search(rf"^COPY\s+{carpeta}\s", dockerfile, re.MULTILINE), f"la imagen no copia {carpeta}"
+
+
+def test_imagen_arranca_el_worker_por_defecto():
+    dockerfile = (RAIZ / "Dockerfile.worker").read_text(encoding="utf-8")
+    assert re.search(r'^CMD\s+\[.*"src\.workers\.worker_node"\]', dockerfile, re.MULTILINE)
+
+
+@pytest.mark.parametrize("variable, valor", [
+    ("REDIS_HOST", "<IP_TAILSCALE_NODO_A>"),
+    ("COORDINATOR_URL", "http://<IP_TAILSCALE_NODO_A>:8000"),
+    ("MINIO_ENDPOINT", "<IP_TAILSCALE_NODO_A>:9000"),
+])
+def test_env_example_apunta_al_nodo_a_por_tailscale(variable, valor):
+    ejemplo = (RAIZ / ".env.example").read_text(encoding="utf-8")
+    assert re.search(rf"^{variable}={re.escape(valor)}$", ejemplo, re.MULTILINE), f"{variable} no usa el marcador"
