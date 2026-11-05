@@ -40,7 +40,7 @@
 | F-35 | pendiente |
 | F-36 | pendiente |
 | F-37 | pendiente |
-| F-38 | documentacion |
+| F-38 | revision |
 | F-39 | pendiente |
 | F-40 | pendiente |
 | F-41 | pendiente |
