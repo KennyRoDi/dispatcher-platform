@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 5af74f3
+**Verificación IA:** documentacion e3ab57f
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -213,3 +213,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-05 |  |
 | verificación IA de verificacion | Claude Code (Opus 5.5), orquestador; qa-tester en subagente | 2026-11-05 | Verificacion sobre 5af74f3. QA dio APROBADO con 9 hallazgos no bloqueantes y agrego 73 lineas de pruebas, solo en tests/. Lei ese diff y ejecute la suite: 682 passed, 3 skipped, 1 deselected. conformidad repo: 0 problemas. Reproduje: NODE_IP sin validar se conserva tal cual, WORKER_ID comun da nodos activos distintos: 1, ip marcador rechazada, tres nodos validos sin problemas. Dos mutantes propios en copia temporal, worker sin env_file y heartbeat sin node_ip: ambos detectados. Sin comprobar: Docker, Compose, imagen, Tailscale, CLIENT LIST y run_load real; US-38 y RNF-01 quedan para la Parte 2. Sin mediciones en el SPEC. (5af74f3) |
 | verificacion | Kenni Rodriguez | 2026-11-05 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5), orquestador; documentador en subagente | 2026-11-05 | Verificacion de documentacion sobre e3ab57f. Lei DEPLOY_WORKERS lineas 1 a 264 y el diff de Compose, Dockerfile y REQUERIMIENTOS: en deploy y Dockerfile solo cambian comentarios. Suite: 682 passed, 3 skipped, 1 deselected; conformidad: 0 problemas. Contraste con el codigo: load_dotenv en config.py:125, stop_grace_period 31m, build_dataset --files y --seed, 655.7 MB en dataset/README, upload_dataset sin limite, reaper como host en recovery.py:50, --create-buckets. Lineas 265 a 421 de la guia y WORKER_CONTRACT revisadas solo por grep y por el diff resumido. Sin comprobar: ningun comando de la guia se ejecuto; Docker, Compose, winget, script de PowerShell, Tailscale, escritura de appuser en dataset montado. Bitacora en borrador, sin publicar. (e3ab57f) |
