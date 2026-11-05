@@ -98,8 +98,11 @@ Aplica AD-01, AD-02, AD-22 y SUP-04. Kenni aprobó AD-23 y AD-24 en este plan; q
 
 **Otras decisiones tomadas por Kenni:**
 
-- **Máquinas:** cuatro, tres con Windows 11 y una con Linux. La de Linux es el Nodo A, así que [B.2] se cumple sin workers en él.
-- **Red:** Tailscale, como único camino de red documentado.
+- **Máquinas:** cuatro, tres con Windows 11 y una con Linux. La de Linux es el Nodo A y no ejecuta workers, porque no es muy potente; [B.2] se cumple con los otros tres nodos.
+- **Red:** Tailscale, sin alternativa de red local documentada.
+- **Puertos del Nodo A:** se publican solo en su IP de Tailscale.
+- **Aceptación:** la prueba exige `ip` dentro de `100.64.0.0/10`, porque la red es Tailscale.
+- **Mediciones de M1:** todos los workers corren en WSL2, así que la ficha M1 declara que los cgroups medidos son los de la VM de WSL2 (ARQUITECTURA §6). No afecta a F-38; afecta a F-16 a F-19. La ficha no se crea aquí.
 - **Validación de las instrucciones:** Kenni, como líder (SUP-21). [B.8] no pide que sea externa; ese añadido es de RNF-22, y Kenni no es externo.
 - **Cambio en `src/workers/`:** Kenni avisa a José Andrés.
 
@@ -171,15 +174,14 @@ La Parte 2 no escribe pruebas nuevas si la corrida no revela errores, así que l
 
 ## Riesgos y preguntas abiertas
 
-**Pregunta abierta para la persona, sin decidir:**
-
-- **Mediciones de M1 con workers en WSL2.** Los tres nodos worker usan WSL2, y ARQUITECTURA §6 dice que las mediciones de M1 deben hacerse en un nodo Linux o declarar la diferencia. Hay dos opciones: ejecutar un worker en el Nodo A solo para M1, o declarar la diferencia en la ficha. No afecta a F-38; afecta a F-16 a F-19.
+**Preguntas abiertas:** ninguna.
 
 **Sin comprobar. No se conoce el resultado:**
 
 - Que un contenedor de Docker Desktop en WSL2 alcance la red Tailscale del host Windows. Es la base de la topología. Si falla, la Parte 2 se detiene y se devuelve a `plan`.
 - Qué IP de origen muestra `CLIENT LIST` a través del puerto publicado. Si no distingue los nodos, pierde valor como observación independiente y se declara así en la evidencia.
 - Que Docker acepte como `hostname` el nombre de una máquina Windows, y que publique puertos en la IP de Tailscale cuando esa interfaz aún no está activa. Las instrucciones piden activar Tailscale primero.
+- Que la VM de WSL2 exponga cgroups v2, como suponen RF-24 y los comandos de medición de M1. No afecta a F-38; lo debe comprobar F-16.
 - Compose, imagen, `--env-file` y `run_load` en red: nada de esto se ha ejecutado. La prueba estática solo comprueba la forma de la configuración.
 
 **Riesgos:**

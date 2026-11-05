@@ -1,12 +1,12 @@
-**Resumen:** Arquitectura ADD que extiende el I Proyecto (FastAPI, Redis, MinIO, workers *pull*) con límites de memoria, planificación con aging, E/S por chunks, seguridad y routing medido, en tres nodos worker.
+**Resumen:** Arquitectura ADD de un proyecto independiente que reutiliza código del I Proyecto (FastAPI, Redis, MinIO, workers *pull*), con límites de memoria, planificación con aging, E/S por chunks, seguridad y routing medido, en tres nodos worker.
 
 # Arquitectura
 
 Requisitos en `REQUERIMIENTOS.md`. **Ningún dato de rendimiento de este sistema se ha medido todavía.** Donde una decisión depende de una medición, se indica «Medición pendiente» y la ficha que la producirá. Toda decisión de ese tipo es provisional hasta tener el dato.
 
-## 1. Línea base: I Proyecto
+## 1. Código reutilizado del I Proyecto
 
-Repositorio `nahum0804/distributed-processing-platform`, commit `bc6bab6` de `main`. Las limitaciones provienen de su `docs/DECISIONES_DISENO.md`.
+Este proyecto es independiente: se justifica por su enunciado y reutiliza código porque [B.2] lo motiva. La tabla indica qué se toma y qué no. Origen: repositorio `nahum0804/distributed-processing-platform`, commit `bc6bab6` de `main`. Las limitaciones provienen de su `docs/DECISIONES_DISENO.md`.
 
 | Elemento | Estado en el I Proyecto | Acción | Requisito |
 |---|---|---|---|
@@ -78,7 +78,7 @@ flowchart TB
 
 **Coordinador.** `src/coordinator/` se divide en `rutas_casos`, `rutas_subtareas`, `rutas_monitoreo`, `modelos`, `conexion` y `apoyo`; `main.py` solo compone la aplicación.
 
-**Migración gradual.** El código del I Proyecto no se reescribe en bloque, porque hay poco tiempo y sus pruebas son la red de seguridad. La lógica nueva nace en `domain` y `application`; el código existente se mueve a `adapters` solo cuando se toca.
+**Código reutilizado.** No se reescribe en bloque, porque hay poco tiempo y sus pruebas son la red de seguridad. La lógica nueva nace en `domain` y `application`; el código reutilizado se mueve a `adapters` solo cuando se toca.
 
 ## 5. Diagrama de componentes
 
@@ -149,7 +149,7 @@ Restricciones de despliegue:
 - **Cada tipo de worker debe existir en al menos dos nodos.** Sin eso, la caída de un worker no tiene a quién reasignar sus sub-tareas [B.6].
 - El Nodo A concentra servicios. Es un punto único de falla aceptado: [B.6] solo exige reiniciar el coordinador, no alta disponibilidad.
 - Las cuatro máquinas se comunican por Tailscale. **Tailscale no sustituye a TLS:** RF-36 exige una captura entre nodos que muestre TLS. Las flechas y los puertos del diagrama son el estado final, tras F-27.
-- Los tres nodos worker operan con Docker Desktop sobre WSL2. Sus cgroups son los de la VM de WSL2. **Las mediciones de M1 deben hacerse en un nodo Linux** o declarar esa diferencia en la ficha. Pregunta abierta en `docs/specs/F-38/SPEC.md`: ejecutar un worker en el Nodo A solo para M1, o declarar la diferencia.
+- Los tres nodos worker operan con Docker Desktop sobre WSL2. Sus cgroups son los de la VM de WSL2. **Como ningún worker corre en un nodo Linux, la ficha M1 declara que los cgroups medidos son los de la VM de WSL2.** El Nodo A no ejecuta workers, tampoco para M1. Sin comprobar: que esa VM exponga cgroups v2, que es lo que suponen RF-24 y los comandos de medición de M1.
 
 ## 7. Flujo de un caso
 
