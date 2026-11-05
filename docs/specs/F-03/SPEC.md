@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 78301a4
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -91,3 +91,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code (subagente arquitecto, general-purpose) | 2026-11-05 | Leí SPEC completo: 0 '…' (grep), commit 78301a4 pusheado, árbol limpio, solo toca SPEC. Contrasté con ENUNCIADO B.3 (mínimos y ética), REQUERIMIENTOS RF-18..22/RNF-04/05, build_dataset.py (ffmpeg_args:203, AUDIO_*), .gitignore dataset/media/, ARQUITECTURA §8 (último AD-24, AD-25 libre). No ejecuté pruebas (fase sin código). No verificado: parser WhatsApp existente (no hallé uno en src), espacio/ffmpeg en /scratch. (78301a4) |
