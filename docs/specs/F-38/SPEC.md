@@ -13,21 +13,22 @@ El equipo y quien evalúa necesitan ver distribución real: «al menos tres nodo
 
 **Incluye:**
 
-- Identidad de nodo en contenedor: `hostname` e `ip` del heartbeat corresponden a la máquina, no al contenedor (AD-23 propuesta).
-- Compose completo por nodo: coordinador, Redis, MinIO y reaper en el Nodo A (AD-24 propuesta); un worker en cada uno de los tres nodos, incluido el A (SUP-04).
+- Topología de cuatro máquinas (AD-02, SUP-04). Nodo A, Linux: coordinador, Redis, MinIO y reaper, sin workers. Nodos B, C y D, Windows 11 con Docker Desktop sobre WSL2: un worker cada uno.
+- Red Tailscale: `NODE_IP` es la salida de `tailscale ip -4` de cada máquina; `REDIS_HOST`, `COORDINATOR_URL` y `MINIO_ENDPOINT` usan la IP de Tailscale del Nodo A.
+- Identidad de nodo en contenedor: `hostname` e `ip` del heartbeat corresponden a la máquina, no al contenedor (AD-23).
+- Compose completo del Nodo A, con el coordinador (AD-24), y Compose de worker para los tres nodos, con puertos publicados solo en la IP de Tailscale.
 - `Dockerfile.worker` con Python 3.13, como manda AD-22.
-- Instrucciones de `docs/DEPLOY_WORKERS.md` alineadas con la topología A, B y C [B.8], RNF-22.
+- Instrucciones en `docs/DEPLOY_WORKERS.md` para esta topología [B.8], RNF-22: PowerShell en los nodos Windows, bash en Linux, y la instalación de Docker y Tailscale como prerrequisito.
 - Pruebas estáticas de la configuración y prueba de aceptación ejecutable sobre los nodos.
 - Corrida real con reparto por nodo y su evidencia, **a cargo de la persona, en la Parte 2**.
 
 **No incluye:**
 
-- TLS (F-27), autenticación (F-26) ni endurecimiento sin privilegios (F-30). Los puertos 8000, 6379 y 9000 siguen sin TLS hasta F-27.
+- TLS (F-27), autenticación (F-26) ni endurecimiento sin privilegios (F-30). **Tailscale no sustituye a TLS:** RF-36 exige una captura entre nodos que muestre TLS, así que F-27 sigue obligatoria. Los puertos 8000, 6379 y 9000 siguen sin TLS hasta F-27.
 - Un contenedor por tipo de worker y `mem_limit` (F-16, AD-05); `stop_grace_period` (F-12).
-- Workers de texto, imagen y audio (F-07 a F-09). La corrida usa las operaciones heredadas del I Proyecto.
+- Workers de texto, imagen y audio (F-07 a F-09). La corrida usa las operaciones multimedia reutilizadas del I Proyecto.
 - Nodo GPU y routing (F-32). `deploy/docker-compose.worker-gpu.yml` no cambia.
-- Sección de despliegue del `README.md` (F-42), escenarios de carga y fallos (F-33 a F-37), diagramas de arquitectura.
-- Cualquier cuarta máquina: la Máquina D opcional de la guía heredada se retira (AD-02, SUP-04).
+- Sección de despliegue del `README.md` (F-42), escenarios de carga y fallos (F-33 a F-37), diagramas de arquitectura salvo el ajuste de topología de §6.
 
 ## Criterios de aceptación
 
@@ -40,7 +41,7 @@ Copiados de `docs/backlog/entrega.md`, US-38:
 - **Pruebas:** I `scripts/check_connectivity.py` existente. A corrida con reparto por nodo.
 - **Demuestra:** tabla de sub-tareas por `hostname`. **Evidencia:** log de `GET /workers` e IP por nodo.
 
-Criterio adicional de RNF-01: tres `hostname` **e IP** distintos aparecen como workers activos. Criterio de RNF-22: una persona externa al equipo puede seguir las instrucciones de despliegue. Los tres diagramas de RNF-22 no se cubren aquí: se dejan a F-42, que también cubre RNF-22.
+Criterio adicional de RNF-01: tres `hostname` **e IP** distintos aparecen como workers activos. Criterio de RNF-22: una persona externa al equipo puede seguir las instrucciones de despliegue; se aplica con el límite declarado en SUP-21. Los tres diagramas de RNF-22 no se cubren aquí: se dejan a F-42, que también cubre RNF-22.
 
 ## Diseño
 
@@ -50,7 +51,7 @@ Criterio adicional de RNF-01: tres `hostname` **e IP** distintos aparecen como w
 |---|---|
 | `GET /workers` | Existe (`src/coordinator/rutas_monitoreo.py:44`). Devuelve el heartbeat completo más `alive`: incluye `host`, `hostname` e `ip`. No cambia. |
 | `hostname` | `socket.gethostname()` (`src/workers/heartbeat.py:148`). **En contenedor es el ID del contenedor** (`.env.example:20`, `docs/WORKER_CONTRACT.md:211`). |
-| `ip` | `local_ip(REDIS_HOST)` (`src/workers/heartbeat.py:88`). **En red bridge es la IP interna del contenedor**, y dos nodos pueden repetirla. |
+| `ip` | `local_ip(REDIS_HOST)` (`src/workers/heartbeat.py:88`). **En red bridge es la IP interna del contenedor**, y dos nodos pueden repetirla. No es la de Tailscale. |
 | `host` | `NODE_NAME` (`src/workers/config.py:156`). Es lo que se anota en cada sub-tarea (`src/workers/worker_node.py:323`). Vacío en `.env.example`, cae al ID del contenedor. |
 | `worker_id` | `worker-<hostname>` si `WORKER_ID` está vacío (`src/workers/config.py:26`). |
 | Reparto por nodo | `scripts/run_load.py` ya escribe `subtasks_per_host` y una tabla en `docs/evidencia/` (líneas 320 y 353). Se reutiliza. |
@@ -59,22 +60,22 @@ Criterio adicional de RNF-01: tres `hostname` **e IP** distintos aparecen como w
 | Compose de worker | `deploy/docker-compose.worker.yml`. No fija identidad de nodo. |
 | Bloque de coordinador | Ya escrito en `deploy/docker-compose.local.yml`, reutilizable. |
 | Imagen | `Dockerfile.worker` usa `python:3.14-slim`; CI usa 3.13. Ya corre como `appuser`. |
-| Guía | `docs/DEPLOY_WORKERS.md` (679 líneas) describe A, B, C y D opcional, coordinador nativo y `--scale`. |
+| Guía | `docs/DEPLOY_WORKERS.md` (679 líneas) describe A, B, C y D opcional, coordinador nativo, `--scale` y red local. |
 
 ### Cambios
 
 | Archivo | Cambio | Dueño |
 |---|---|---|
-| `deploy/docker-compose.worker.yml` | `hostname: ${NODE_NAME:?...}` y `NODE_IP: ${NODE_IP:?...}`, ambos obligatorios. Se retira el comentario de `--scale`. | Kenni |
-| `docker-compose.yml` | Servicio `coordinator` tomado de `deploy/docker-compose.local.yml`, con `REDIS_HOST: redis`, `MINIO_ENDPOINT: minio:9000` y puerto 8000. El reaper apunta a `http://coordinator:8000`. | Kenni |
+| `deploy/docker-compose.worker.yml` | `hostname: ${NODE_NAME:?...}` y `NODE_IP: ${NODE_IP:?...}`, ambos obligatorios. Se retira el comentario de `--scale` y el comentario de cabecera apunta a Tailscale. | Kenni |
+| `docker-compose.yml` | Servicio `coordinator` tomado de `deploy/docker-compose.local.yml`, con `REDIS_HOST: redis`, `MINIO_ENDPOINT: minio:9000` y puerto 8000. El reaper apunta a `http://coordinator:8000`. Los puertos de coordinador, Redis y MinIO se publican en `${NODE_IP:?...}`, la IP de Tailscale del Nodo A. | Kenni |
 | `Dockerfile.worker` | `FROM python:3.13-slim` (AD-22). | Kenni |
-| `.env.example` | Agrega `NODE_IP`; `NODE_NAME` pasa a ser obligatorio en Docker y debe ser la salida de `hostname` de la máquina. | Kenni |
-| `src/workers/config.py`, `src/workers/heartbeat.py` | Cambio aditivo: `node_ip` opcional en `Settings`; el heartbeat publica `settings.node_ip or local_ip(...)`. Sin `NODE_IP`, el comportamiento actual sigue igual. | **José Andrés**: requiere aviso, ver pregunta 1 |
-| `docs/DEPLOY_WORKERS.md`, `docs/WORKER_CONTRACT.md` | Topología de tres nodos, comandos por nodo, puertos y lista de comprobación; semántica de `hostname` e `ip`. | Documentación |
+| `.env.example` | Agrega `NODE_IP`, salida de `tailscale ip -4`; `NODE_NAME` pasa a ser obligatorio en Docker y debe ser la salida de `hostname` de la máquina. `REDIS_HOST`, `COORDINATOR_URL` y `MINIO_ENDPOINT` usan como ejemplo un marcador de la IP de Tailscale del Nodo A. | Kenni |
+| `src/workers/config.py`, `src/workers/heartbeat.py` | Cambio aditivo: `node_ip` opcional en `Settings`; el heartbeat publica `settings.node_ip or local_ip(...)`. Sin `NODE_IP`, el comportamiento actual sigue igual. | **José Andrés**: Kenni le avisa |
+| `docs/DEPLOY_WORKERS.md`, `docs/WORKER_CONTRACT.md` | Nodo A y tres nodos worker, instalación de Docker y Tailscale, comandos en bash y PowerShell, puertos y lista de comprobación; semántica de `hostname` e `ip`. | Documentación |
 
-Comando de arranque de un worker, con `--env-file` explícito para que `${NODE_NAME}` y `${NODE_IP}` no dependan de dónde busque Compose el `.env`, ya que el archivo está en `deploy/`:
+Comando de arranque de un worker, en PowerShell, con `--env-file` explícito para que `${NODE_NAME}` y `${NODE_IP}` no dependan de dónde busque Compose el `.env`, ya que el archivo está en `deploy/`:
 
-```bash
+```powershell
 docker compose --env-file .env -f deploy/docker-compose.worker.yml up -d --build
 ```
 
@@ -84,42 +85,74 @@ No implementa ni usa ningún puerto de `docs/CONTRATOS.md`: F-38 es de infraestr
 
 ### Decisiones
 
-Aplica AD-01, AD-02, AD-22 y SUP-04. Dos decisiones nuevas, que se registran en `docs/ARQUITECTURA.md` §8 al aprobarse este plan y antes de implementar:
+Aplica AD-01, AD-02, AD-22 y SUP-04. Kenni aprobó AD-23 y AD-24 en este plan; quedan registradas en `docs/ARQUITECTURA.md` §8:
 
-| ID propuesto | Decisión | Alternativas | Criterio |
+| ID | Decisión | Alternativas | Criterio |
 |---|---|---|---|
-| AD-23 | Compose fija `hostname` con `NODE_NAME` y el heartbeat publica `NODE_IP` | `network_mode: host`; usar solo `host` y capturar la IP aparte | `network_mode: host` no da la identidad real en Docker Desktop sobre WSL2, que ARQUITECTURA §6 admite para un nodo, y quita aislamiento de red. Usar solo `host` deja en `GET /workers` una IP interna que puede repetirse e incumple RNF-01 |
-| AD-24 | Coordinador en el Compose del Nodo A | Mantenerlo nativo | El criterio pide levantar el Compose de cada nodo. Evita instalar Python en el Nodo A solo para el coordinador. Revierte la decisión del I Proyecto de `docs/DECISIONES_DISENO.md`, que F-39 debe declarar como modificada |
+| AD-23 | Compose fija `hostname` con `NODE_NAME` y el heartbeat publica `NODE_IP` | `network_mode: host`; usar solo `host` y capturar la IP aparte | Según la documentación general de Docker, `network_mode: host` en Docker Desktop actúa sobre su VM, no sobre Windows, que es la plataforma de los tres nodos worker; no se ha probado aquí. Usar solo `host` deja en `GET /workers` una IP interna que puede repetirse e incumple RNF-01 |
+| AD-24 | Coordinador en el Compose del Nodo A | Proceso nativo | El criterio pide levantar el Compose de cada nodo, y [B.8] menciona Docker Compose por nodo. F-39 declara `docker-compose.yml` como reutilizado y modificado |
 
 **Consecuencia de AD-23.** `hostname` fijo implica que `--scale` hace chocar el `worker_id` entre réplicas: compartirían heartbeat y lista `inflight`. Se deja de ofrecer `--scale`. La concurrencia por nodo se ajusta con `WORKER_CONCURRENCY`. F-16 debe dar un `WORKER_ID` propio a cada servicio al crear un contenedor por tipo, por ejemplo `worker-${NODE_NAME}-texto`.
 
-**Límite de AD-23.** `NODE_NAME` y `NODE_IP` son declarados: alguien podría falsearlos en un solo equipo. Por eso la evidencia añade una observación independiente, `redis-cli CLIENT LIST`, que muestra el origen de cada conexión visto desde Redis.
+**Límite de AD-23.** `NODE_NAME` y `NODE_IP` son declarados: alguien podría falsearlos en un solo equipo. Por eso la evidencia añade dos observaciones independientes: `redis-cli CLIENT LIST`, con el origen de cada conexión visto desde Redis, y `tailscale status`, con las máquinas de la red. La segunda no prueba que un worker corra en cada una; lo prueba `docker compose ps` en cada nodo.
+
+**Otras decisiones tomadas por Kenni:**
+
+- **Máquinas:** cuatro, tres con Windows 11 y una con Linux. La de Linux es el Nodo A, así que [B.2] se cumple sin workers en él.
+- **Red:** Tailscale, como único camino de red documentado.
+- **Validación de las instrucciones:** Kenni, como líder (SUP-21). [B.8] no pide que sea externa; ese añadido es de RNF-22, y Kenni no es externo.
+- **Cambio en `src/workers/`:** Kenni avisa a José Andrés.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | `tests/unit/test_despliegue_compose.py`: con PyYAML, sin Docker ni red, lee los Compose, `Dockerfile.worker` y `.env.example` | Worker con `NODE_NAME` y `NODE_IP` obligatorios; Nodo A con coordinador, Redis, MinIO y reaper; imagen 3.13; `USER` distinto de root |
+| Unitaria | `tests/unit/test_despliegue_compose.py`: con PyYAML, sin Docker ni red, lee los Compose, `Dockerfile.worker` y `.env.example` | Worker con `NODE_NAME` y `NODE_IP` obligatorios; Nodo A con coordinador, Redis, MinIO y reaper, sin worker y con puertos publicados en `NODE_IP`; imagen 3.13; `USER` distinto de root |
 | Unitaria | `tests/test_config.py`, `tests/test_heartbeat.py`: casos nuevos con `NODE_IP` definido y vacío | El heartbeat publica `NODE_IP`, y sin él conserva `local_ip` |
-| Integración | Por nodo: `docker compose --env-file .env -f deploy/docker-compose.worker.yml run --rm worker python -m scripts.check_connectivity`, con salida 0 | Cada nodo alcanza Redis, coordinador y MinIO por red. **Pendiente de la persona: requiere Docker y nodos** |
-| Aceptación | `tests/acceptance/test_tres_nodos.py`, marcador `acceptance`: lee `GET /workers` de `COORDINATOR_URL` y el JSON de `run_load`. Se omite si esas variables no están | Al menos tres workers con `alive`, con `hostname` e `ip` distintos y distintos de `unknown`; al menos tres hosts con sub-tareas procesadas, todos entre los `hostname` activos. **Pendiente de la persona** |
+| Integración | En cada nodo worker: `docker compose --env-file .env -f deploy/docker-compose.worker.yml run --rm worker python -m scripts.check_connectivity`, con salida 0 | Cada nodo worker alcanza Redis, coordinador y MinIO del Nodo A por Tailscale. **Pendiente de la persona: requiere Docker y nodos** |
+| Aceptación | `tests/acceptance/test_tres_nodos.py`, marcador `acceptance`: lee `GET /workers` de `COORDINATOR_URL` y el JSON de `run_load`. Se omite si esas variables no están | Al menos tres workers con `alive`, con `hostname` e `ip` distintos, e `ip` dentro de `100.64.0.0/10`, el rango de Tailscale, lo que descarta una IP bridge; al menos tres hosts con sub-tareas procesadas, todos entre los `hostname` activos. **Pendiente de la persona** |
 
 F-38 no sigue TDD según `docs/IMPLEMENTACION.md` §4, pero en la Parte 1 hay código y configuración, así que las pruebas unitarias sí se escriben en rojo y cumplen las fases 2 y 3.
 
 ### Evidencia, a cargo de la persona
 
-Destino: `docs/evidencia/F-38_tres_nodos_<fecha>.md` y el JSON de `run_load`. Ningún valor se escribe de antemano. Los datos de la carga del I Proyecto en `docs/evidencia/` no sirven como evidencia de F-38.
+Destino: `docs/evidencia/F-38_tres_nodos_<fecha>.md` y el JSON de `run_load`. Ningún valor se escribe de antemano. Los archivos `carga_*` ya presentes en `docs/evidencia/` no sirven como evidencia de F-38.
 
-1. En cada nodo, registrar `hostname` e IP real de la máquina (`ip -4 route get <IP_NODO_A>`; en Windows, `ipconfig`).
-2. En el Nodo A: `docker compose up -d --build`, y después el worker. En B y C: el worker.
-3. Conectividad en los tres nodos, con el comando de la tabla.
-4. Log de `GET /workers`: `curl -s http://<IP_NODO_A>:8000/workers | python -m json.tool`.
-5. En el Nodo A: `docker compose exec redis redis-cli CLIENT LIST`.
-6. Generar los archivos según `dataset/README.md` y correr `python -m scripts.run_load --dataset dataset --upload --limit 20`.
-7. Tabla de sub-tareas por `hostname`, tomada de `subtasks_per_host`.
-8. `COORDINATOR_URL=... pytest -m acceptance tests/acceptance/test_tres_nodos.py`, con la variable del JSON que defina la prueba.
+**Prerrequisitos.** En el Nodo A, instalar `docker` y `tailscale` y comprobarlos con `which`. En B, C y D, Docker Desktop sobre WSL2 y Tailscale. Las cuatro máquinas deben estar en la misma red de Tailscale antes de levantar nada.
 
-Una persona que no haya escrito las instrucciones las sigue y anota dónde se atascó (RNF-22).
+**Nodo A (bash):**
+
+```bash
+hostname
+tailscale ip -4
+docker compose up -d --build
+```
+
+**Cada nodo worker (PowerShell):**
+
+```powershell
+hostname
+tailscale ip -4
+docker compose --env-file .env -f deploy/docker-compose.worker.yml run --rm worker python -m scripts.check_connectivity
+docker compose --env-file .env -f deploy/docker-compose.worker.yml up -d --build
+docker compose --env-file .env -f deploy/docker-compose.worker.yml ps
+```
+
+**Desde el Nodo A, con los workers activos (bash):**
+
+```bash
+curl -s "http://<IP_TAILSCALE_NODO_A>:8000/workers" | python3 -m json.tool
+tailscale status
+docker compose exec redis redis-cli CLIENT LIST
+python3 -m scripts.run_load --dataset dataset --upload --limit 20
+```
+
+1. `run_load` necesita antes los archivos generados según `dataset/README.md`.
+2. La tabla de sub-tareas por `hostname` sale de `subtasks_per_host` del JSON de `run_load`.
+3. Al final corre `tests/acceptance/test_tres_nodos.py` con `pytest -m acceptance`, y las variables de entorno que defina la prueba.
+4. El repositorio es público. Antes de versionar la salida de `tailscale status`, se revisa y se ocultan los nombres de cuenta que muestre.
+
+Kenni sigue las instrucciones de principio a fin y anota dónde se atascó (RNF-22, SUP-21).
 
 ## Mediciones
 
@@ -138,25 +171,29 @@ La Parte 2 no escribe pruebas nuevas si la corrida no revela errores, así que l
 
 ## Riesgos y preguntas abiertas
 
-**Preguntas para quien aprueba:**
+**Pregunta abierta para la persona, sin decidir:**
 
-1. **¿Se aprueba AD-23 con el cambio en `src/workers/`?** `config.py` y `heartbeat.py` son de José Andrés según `docs/CONTRATOS.md`. Recomendación: aprobarlo, con aviso a José Andrés, porque es aditivo y no cambia ningún contrato. Sin el cambio, RNF-01 no se puede demostrar en `GET /workers`. Alternativa: que él haga ese cambio, pero F-38 pasaría a depender de otro responsable, contra la regla de módulos independientes de `AGENTS.md`.
-2. **¿Se aprueba AD-24?** Recomendación: sí, por el texto del criterio.
-3. **¿Qué tres máquinas son los nodos, con qué sistema operativo, en qué red y qué día se corre?** No hay ninguna disponible todavía, y este plan no lo asume. Sin esa respuesta, la Parte 2 no puede empezar. Las mediciones de M1 deben hacerse en un nodo Linux o declarar la diferencia (ARQUITECTURA §6).
-4. **¿Red local o Tailscale?** `deploy/docker-compose.worker.yml` menciona ambas. Una red universitaria puede aislar equipos entre sí. `NODE_IP` admite cualquiera de las dos.
-5. **¿Quién valida las instrucciones?** RNF-22 dice «externa al equipo». Si no se consigue nadie externo, propongo un integrante que no haya desplegado y declararlo como límite; requeriría un `SUP-XX`.
+- **Mediciones de M1 con workers en WSL2.** Los tres nodos worker usan WSL2, y ARQUITECTURA §6 dice que las mediciones de M1 deben hacerse en un nodo Linux o declarar la diferencia. Hay dos opciones: ejecutar un worker en el Nodo A solo para M1, o declarar la diferencia en la ficha. No afecta a F-38; afecta a F-16 a F-19.
+
+**Sin comprobar. No se conoce el resultado:**
+
+- Que un contenedor de Docker Desktop en WSL2 alcance la red Tailscale del host Windows. Es la base de la topología. Si falla, la Parte 2 se detiene y se devuelve a `plan`.
+- Qué IP de origen muestra `CLIENT LIST` a través del puerto publicado. Si no distingue los nodos, pierde valor como observación independiente y se declara así en la evidencia.
+- Que Docker acepte como `hostname` el nombre de una máquina Windows, y que publique puertos en la IP de Tailscale cuando esa interfaz aún no está activa. Las instrucciones piden activar Tailscale primero.
+- Compose, imagen, `--env-file` y `run_load` en red: nada de esto se ha ejecutado. La prueba estática solo comprueba la forma de la configuración.
 
 **Riesgos:**
 
+- **Nodo A sin preparar.** La máquina Linux de Kenni, futuro Nodo A, hoy no tiene `docker` ni `tailscale` instalados (comprobado con `which`). Es prerrequisito de la Parte 2 y queda en la guía.
 - **Fecha.** La entrega es el 10/nov/26 (SUP-03) y el hito H1 de SUP-02 ya pasó. F-27, F-30 y F-33 a F-37 dependen de F-38. La Parte 1 se puede fusionar sin nodos para que se apilen sobre ella, pero sus criterios reales siguen pendientes hasta la Parte 2. Los escenarios de B.6 tampoco se pueden ejecutar sin nodos.
-- **Nada de Docker está probado.** La máquina local no tiene `docker` ni `nvidia-smi`. Compose, imagen, resolución de `--env-file`, `CLIENT LIST` y `run_load` en red quedan sin ejecutar hasta tener nodos, y pueden revelar errores en la Parte 2. La prueba estática solo comprueba la forma de la configuración.
+- **Validación no independiente.** Kenni es responsable de F-38 y conoce el sistema, así que puede pasar por alto pasos implícitos que alguien externo sí notaría (SUP-21).
+- **Punto único de falla.** Sin el Nodo A no hay coordinador, Redis ni MinIO, y el sistema depende de que Tailscale esté activo en las cuatro máquinas. [B.6] no exige alta disponibilidad (ARQUITECTURA §6).
+- **`.env` en Windows.** PowerShell y Git pueden escribir CRLF, BOM o UTF-16. `check_connectivity` solo avisa de CRLF si el `.env` está a su alcance, y la imagen no lo incluye. La guía indica guardarlo en UTF-8 con LF.
 - **Imagen 3.13.** CI instala `requirements.txt` en 3.13 sobre Linux, lo que da confianza pero no prueba la imagen `slim`.
-- **`hostname` repetido.** Dos máquinas pueden llamarse igual, por ejemplo `ubuntu`. Colisionarían en `worker_id` y la aceptación fallaría. Las instrucciones lo avisan: `NODE_NAME` debe ser único.
-- **Conflicto con otras features.** F-16, F-12, F-27 y F-30 previsiblemente editarán `deploy/docker-compose.worker.yml`, y AD-20 agrega datos al heartbeat. El cambio de F-38 se mantiene en pocas líneas para reducir el conflicto.
-- **Exposición en red.** Hasta F-27 y F-26, Redis, MinIO y el coordinador van sin TLS, y los valores `minioadmin` son públicos. Las instrucciones exigen red de confianza, cortafuegos limitado a los nodos y credenciales propias en `.env`, nunca versionadas.
-- **Corrida parcial.** `run_load` usa operaciones heredadas, no el análisis forense. Demuestra distribución; el sistema completo en los tres nodos lo comprueban F-33 a F-37.
-
-**Corrección sobre AD-22.** `docs/ARQUITECTURA.md` ya dice 3.13, no 3.12; la mención a 3.12 solo queda en `docs/BITACORA_IA.md` como error histórico. La discrepancia vigente es `Dockerfile.worker` con 3.14, y este plan la corrige.
+- **`hostname` repetido.** Si dos máquinas se llaman igual, colisionarían en `worker_id` y la aceptación fallaría. Las instrucciones lo avisan: `NODE_NAME` debe ser único.
+- **Conflicto con otras features.** F-16, F-12, F-27 y F-30 previsiblemente editarán `deploy/docker-compose.worker.yml`, y AD-20 agrega datos al heartbeat. `deploy/` es de Kenni (`docs/CONTRATOS.md`), así que F-16 debe coordinarse con él. El cambio de F-38 se mantiene en pocas líneas para reducir el conflicto.
+- **Exposición en red.** Hasta F-27 y F-26, Redis, MinIO y el coordinador van sin TLS, y los valores `minioadmin` son públicos. Publicar los puertos solo en la IP de Tailscale evita ofrecerlos en otras interfaces; un cortafuegos como `ufw` no basta, porque las reglas de Docker para puertos publicados pueden saltárselo. Las credenciales propias van en `.env`, nunca versionadas.
+- **Corrida parcial.** `run_load` usa operaciones multimedia, no el análisis forense. Demuestra distribución; el sistema completo en los tres nodos lo comprueban F-33 a F-37.
 
 ## Aprobaciones
 

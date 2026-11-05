@@ -116,18 +116,20 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph A["Nodo A: máquina física"]
+    subgraph A["Nodo A: Linux, sin workers"]
         A1["Coordinador 8443 + Reaper"]
         A2["Redis 6380 TLS"]
         A3["MinIO 9000 TLS"]
         A4["Log de custodia + Dashboard"]
-        A5["Workers: texto, imagen, audio"]
     end
-    subgraph B["Nodo B: máquina física"]
+    subgraph B["Nodo B: Windows 11, Docker Desktop sobre WSL2"]
         B1["Workers: texto, imagen, audio"]
     end
-    subgraph C["Nodo C: máquina física con GPU si existe"]
+    subgraph C["Nodo C: Windows 11, con GPU si existe"]
         C1["Workers: texto, imagen, audio con GPU"]
+    end
+    subgraph D["Nodo D: Windows 11, Docker Desktop sobre WSL2"]
+        D1["Workers: texto, imagen, audio"]
     end
     B1 -->|"TLS"| A1
     B1 -->|"TLS"| A2
@@ -135,6 +137,9 @@ flowchart TB
     C1 -->|"TLS"| A1
     C1 -->|"TLS"| A2
     C1 -->|"TLS"| A3
+    D1 -->|"TLS"| A1
+    D1 -->|"TLS"| A2
+    D1 -->|"TLS"| A3
 ```
 
 Restricciones de despliegue:
@@ -143,7 +148,8 @@ Restricciones de despliegue:
 - La suma de límites de un nodo no supera su RAM menos una reserva. Un script lo comprueba antes del arranque.
 - **Cada tipo de worker debe existir en al menos dos nodos.** Sin eso, la caída de un worker no tiene a quién reasignar sus sub-tareas [B.6].
 - El Nodo A concentra servicios. Es un punto único de falla aceptado: [B.6] solo exige reiniciar el coordinador, no alta disponibilidad.
-- Un nodo Windows opera con Docker sobre WSL2, como en la rama `evidencia-gpu` del I Proyecto. Sus cgroups son los de la VM de WSL2. **Las mediciones de M1 deben hacerse en un nodo Linux** o declarar esa diferencia en la ficha.
+- Las cuatro máquinas se comunican por Tailscale. **Tailscale no sustituye a TLS:** RF-36 exige una captura entre nodos que muestre TLS. Las flechas y los puertos del diagrama son el estado final, tras F-27.
+- Los tres nodos worker operan con Docker Desktop sobre WSL2. Sus cgroups son los de la VM de WSL2. **Las mediciones de M1 deben hacerse en un nodo Linux** o declarar esa diferencia en la ficha. Pregunta abierta en `docs/specs/F-38/SPEC.md`: ejecutar un worker en el Nodo A solo para M1, o declarar la diferencia.
 
 ## 7. Flujo de un caso
 
@@ -201,8 +207,8 @@ stateDiagram-v2
 
 | ID | Decisión | Alternativas | Criterio de elección | Fuente |
 |---|---|---|---|---|
-| AD-01 | Extender el I Proyecto | Reescribir | [B.2] motiva reutilizar y evalúa lo nuevo; tiempo disponible | Medición del repo: 18 archivos, 387 funciones de prueba, 474 casos pasan y 3 se omiten |
-| AD-02 | Tres nodos físicos, servicios en el Nodo A | Cuarta máquina; VMs en un solo equipo | [B.2] rechaza una sola máquina | [B.2]; SUP-04 |
+| AD-01 | Reutilizar código del I Proyecto donde sirva, en un proyecto independiente | Escribir todo desde cero | [B.2] motiva reutilizar y evalúa lo nuevo; tiempo disponible | Medición del repo: 18 archivos, 387 funciones de prueba, 474 casos pasan y 3 se omiten |
+| AD-02 | Cuatro máquinas físicas en Tailscale: servicios en el Nodo A y tres nodos worker | Tres máquinas con servicios y workers juntos en el Nodo A; VMs en un solo equipo; red local | [B.2] exige tres nodos worker en entidades separadas, de preferencia una computadora por integrante, y rechaza una sola máquina. El equipo tiene cuatro. Tailscale conecta máquinas que no compartan red local | [B.2]; SUP-04 |
 | AD-03 | Redis con `BLMOVE` a lista `inflight:{worker}` | Redis Streams; RabbitMQ | Cierra la ventana de pérdida con el menor cambio; conserva `recovery.py` y reaper | R1; limitación declarada del I Proyecto. Entrega al menos una vez, compensada por AD-21 |
 | AD-04 | ZSET por tipo con `puntaje = t_entrada − bono(prioridad)`, el menor sale primero | Prioridad estricta; WFQ; MLFQ | Aging implícito sin temporizadores: un caso de prioridad baja solo puede ser adelantado por casos que entren hasta `bono(crítica) − bono(baja)` después de él; con llegadas finitas, su espera queda acotada. Selección O(log n) | R2 cap. 5; R3. **Medición pendiente:** ficha M2, comparada con FIFO |
 | AD-05 | Un contenedor por tipo de worker con `mem_limit`, sin swap | `systemd MemoryMax=`; un solo contenedor para todos | Reutiliza Compose; aísla un OOM a un tipo; cgroups v2 lo aplica el kernel | R4, R5; [B.5 M1] |
@@ -223,6 +229,8 @@ stateDiagram-v2
 | AD-20 | Extender el dashboard Streamlit; datos de cgroups en el heartbeat | Prometheus y Grafana | Reutiliza código; evita servicios y TLS adicionales. Los gráficos de las fichas salen de CSV producidos por scripts | [B.2]; R4 |
 | AD-21 | Coordinador sin estado, Redis AOF como checkpoint; `SADD` idempotente; reconciliación al arrancar | PostgreSQL; snapshots propios | Ya funciona. Con `appendfsync everysec` un fallo de **Redis** puede perder hasta 1 s; [B.6] exige reinicio del **coordinador**, no de Redis | R1. I Proyecto declaró 45 s detenido sin pérdida, sin logs: **Medición pendiente**, F-35 |
 | AD-22 | Imágenes de workers ML con Python 3.13, igual que CI; la imagen heredada usa `3.14` | 3.12; mantener 3.14 | El código heredado usa `os.process_cpu_count`, disponible desde 3.13, así que 3.12 no sirve. Las dependencias nativas de inferencia pueden no publicar *wheels* para 3.14 | `src/workers/config.py:176`; CI. Verificar *wheels* al construir la imagen |
+| AD-23 | Compose fija `hostname` con `NODE_NAME` y el heartbeat publica `NODE_IP`, la IP de Tailscale de la máquina | `network_mode: host`; usar solo `host` y capturar la IP aparte | En contenedor, `hostname` es el ID del contenedor y `ip` es la IP bridge: tres réplicas en un equipo darían tres `hostname` y no probarían [B.2], y RNF-01 no se podría demostrar en `GET /workers`. `network_mode: host` en Docker Desktop actúa sobre su VM, no sobre Windows. Consecuencia: `--scale` deja de ofrecerse y cada servicio de un nodo necesita su `WORKER_ID` | RNF-01; `src/workers/heartbeat.py:88` y `:148`. Comportamiento de `network_mode: host` tomado de la documentación general de Docker, sin probar. Aprobada por Kenni. F-38 |
+| AD-24 | Coordinador en el Compose del Nodo A | Proceso nativo | US-38 pide levantar el Compose de cada nodo; [B.8] menciona Docker Compose por nodo | US-38; [B.8]. Aprobada por Kenni. F-38 |
 
 ## 9. Reglas de diseño obligatorias
 

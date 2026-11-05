@@ -112,7 +112,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-01 ⚠ | Equipo de 4: Kenni Rodriguez, Nahúm Murillo, José Andrés Loría Herrera y Melany Vindas, con la distribución de módulos aceptada. Falta confirmar el usuario de GitHub de Melany Vindas y que Nahúm Murillo acepte la invitación. | Indicado por Kenni Rodriguez; [Parte I, Modalidad] mantiene los equipos. |
 | SUP-02 | H1 el 28/oct/26 y H2 el 04/nov/26, contando semanas desde el 21/oct/26. | El documento dice «fin de semana 1» y «fin de semana 2» sin fecha. Es una inferencia, compatible con tres semanas hasta el 10/nov/26. |
 | SUP-03 | La entrega final es el 10/nov/26, no el 04/nov/26 del enunciado. | Indicado por Kenni Rodriguez. Falta la hora de entrega. |
-| SUP-04 | Coordinador, Redis, MinIO y custodia comparten el Nodo A, que también corre workers. | [B.2] exige tres nodos worker, no un nodo adicional para el coordinador. |
+| SUP-04 | Coordinador, Redis, MinIO y custodia comparten el Nodo A, una máquina Linux que no corre workers para cumplir [B.2]. Los tres nodos worker son otras tres máquinas, con Windows 11. | [B.2] exige tres nodos worker en entidades separadas, no prohíbe una máquina adicional para los servicios, y el equipo tiene cuatro. |
 | SUP-05 | `completed`: todas bien. `partially_completed`: al menos una bien y una fallida definitiva. `failed`: ninguna bien. `retrying`: alguna espera reintento. `cancelled`: terminal y prevalece. | [B.4] enumera estados, no su semántica. Coincide con `_final_case_status` del I Proyecto. |
 | SUP-06 | Máximo de 3 intentos y backoff exponencial con jitter, base configurable. | 3 viene de `MAX_ATTEMPTS` del I Proyecto. [B.4] solo exige que sea configurable. |
 | SUP-07 | Severidad alta: amenaza explícita en texto o audio, o detección de arma en imagen. Reglas en un archivo de configuración. | [B.4 Alertas] usa la severidad sin definirla. |
@@ -129,6 +129,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-18 | Reporte y alertas se asignan a H2 y H3 respectivamente, y el dashboard a H3. | La sección 2 de Parte I no los asigna a un hito. |
 | SUP-20 ⚠ | La bitácora de IA se llama `docs/BITACORA_IA.md`. | Decisión del equipo. [Parte I §4] y [Anexo 3] la nombran `docs/bitacora_ia.md`; confirmar con el profesor que el cambio de nombre es aceptable. |
 | SUP-19 ⚠ | Las deficiencias de RNF-03 se toman de `docs/DECISIONES_DISENO.md` del I Proyecto. | No se encontró la retroalimentación de la evaluación; solo limitaciones autodeclaradas. |
+| SUP-21 | Las instrucciones de despliegue las valida Kenni Rodriguez, integrante y líder, en vez de la persona externa que pide el criterio de RNF-22. **Límite: Kenni no es externo y es responsable de F-38**, así que la validación no es independiente y puede pasar por alto pasos implícitos. | [B.8] solo pide «instrucciones de despliegue distribuido» y no menciona a nadie externo: ese requisito es un añadido de RNF-22, no del enunciado. Decisión de Kenni Rodriguez. |
 
 ## 4. Discrepancias detectadas al contrastar con el documento
 
