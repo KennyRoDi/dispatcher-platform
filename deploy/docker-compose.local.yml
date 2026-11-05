@@ -1,10 +1,6 @@
 # Compose para probar todo el sistema en UNA sola maquina (integracion F2):
 # redis + minio + coordinator + reaper + 3 workers, todo con valores por defecto
 # (no requiere .env; usa las mismas variables que .env.example con fallback ${VAR:-default}).
-#
-# NOTA: asume que el coordinador ya lee REDIS_HOST/REDIS_PORT/REDIS_PASSWORD por env
-# (ver comentario en el docker-compose.yml raiz); mientras tanto este archivo sirve de
-# referencia de la topologia final.
 
 services:
   redis:
