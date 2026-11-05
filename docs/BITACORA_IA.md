@@ -156,3 +156,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado. Los contratos no eliminan el ajuste de integración: rendimiento, memoria real y red solo se ven en F-33 a F-37 |
 | Cómo se validó | Simulación del backlog por persona: todas sus features completables solas; pytest; 11 checks |
 | Error de la IA | La auditoría previa declaró resuelto el bloqueo con dejar tareas libres, pero seguían dos dependencias entre módulos, F-15 y F-24, y faltaban contratos para los demás puntos de contacto |
+
+## 2026-11-05 · Kenni Rodriguez · F-38, despliegue en tres nodos, Parte 1: Compose, identidad de nodo, pruebas y guía (`feat/F-38-1-despliegue-en-tres-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Opus 5.5: orquestador y subagentes arquitecto, developer, QA tester y documentador |
+| Componente | F-38, despliegue en tres nodos, Parte 1: Compose, identidad de nodo, pruebas y guía |
+| Propósito | Levantar cada nodo con Compose, hacer que GET /workers identifique la máquina real y dejar instrucciones y una prueba de aceptación para la Parte 2 |
+| Consulta resumida | Diseñar y aplicar el ciclo de seis fases de F-38 para un Nodo A Linux y tres nodos Windows 11 con Docker Desktop sobre WSL2 por Tailscale, y alinear la guía y el contrato del worker |
+| Resultado obtenido | SPEC, AD-23 y AD-24; hostname desde NODE_NAME e ip desde NODE_IP; coordinador en el Compose del Nodo A con puertos solo en la IP de Tailscale; imagen Python 3.13; pruebas de configuración y heartbeat; prueba de aceptación; guía de 679 a 421 líneas y contrato actualizado |
+| Validado / corregido / descartado | Aceptado tras las correcciones de la fila de errores. Kenni corrigió la topología, confirmó los añadidos del arquitecto y aprobó cada fase. US-38 y RNF-01 no se dan por cumplidos: nada se ejecutó sobre nodos reales |
+| Cómo se validó | pytest -q -m 'not integration and not acceptance': 682 passed, 3 skipped, 1 deselected. python -m scripts.conformidad repo: 0 problemas. Lectura de diffs contra el SPEC y contraste con el código. Mutantes de QA y dos del orquestador en copia temporal. Aceptación reproducida con datos sintéticos. Sin comprobar: Docker, Compose, imagen, Tailscale desde WSL2, CLIENT LIST y run_load real |
+| Error de la IA | (1) La lógica de aceptación contaba como procesa a un nodo con todas sus sub-tareas fallidas, por usar metrics.subtasks_per_host; lo detectó el orquestador y se corrigió a contar solo completed y a fallar con timed_out. (2) 19 de 50 mutantes sobrevivían a las pruebas de la fase tests, incluidos worker sin env_file e imagen sin COPY scripts; lo detectó QA y añadió 73 líneas de pruebas. (3) El primer SPEC presentaba el proyecto como continuación del I Proyecto y retiraba la cuarta máquina; lo corrigió Kenni. (4) El encargo al arquitecto decía que AD-22 proponía Python 3.12; el arquitecto comprobó que ya decía 3.13. (5) El arquitecto añadió por su cuenta puertos solo en Tailscale y el rango 100.64.0.0/10; el orquestador no los dio por aprobados y Kenni los confirmó |
