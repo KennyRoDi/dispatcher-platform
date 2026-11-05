@@ -15,8 +15,15 @@ def _tres_workers() -> list[dict]:
     ]
 
 
-def _run_load(reparto: dict) -> dict:
-    return {"metrics": {"subtasks_per_host": reparto}}
+def _subtareas(*hosts, status="completed") -> list[dict]:
+    return [{"host": host, "status": status} for host in hosts]
+
+
+def _run_load(*subtareas, timed_out=False) -> dict:
+    return {
+        "timed_out": timed_out,
+        "reports": {"caso-1": {"subtasks_by_operation": {"transcode_video": list(subtareas)}}},
+    }
 
 
 def _texto(problemas: list[str]) -> str:
@@ -24,8 +31,8 @@ def _texto(problemas: list[str]) -> str:
 
 
 def test_tres_nodos_distintos_con_reparto_no_tiene_problemas():
-    reparto = _run_load({"nodo-b": 5, "nodo-c": 4, "nodo-d": 6})
-    assert problemas_tres_nodos(_tres_workers(), reparto) == []
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c", "nodo-d"))
+    assert problemas_tres_nodos(_tres_workers(), run_load) == []
 
 
 def test_varios_workers_en_un_mismo_nodo_son_validos():
@@ -112,26 +119,77 @@ def test_sin_workers_se_rechaza():
 
 
 def test_reparto_en_dos_hosts_no_basta():
-    problemas = problemas_de_reparto(_tres_workers(), _run_load({"nodo-b": 5, "nodo-c": 4}))
-    assert "hosts con sub-tareas: 2" in _texto(problemas)
+    problemas = problemas_de_reparto(_tres_workers(), _run_load(*_subtareas("nodo-b", "nodo-c")))
+    assert "hosts con sub-tareas completadas: 2" in _texto(problemas)
 
 
-def test_host_sin_subtareas_no_cuenta():
-    problemas = problemas_de_reparto(_tres_workers(), _run_load({"nodo-b": 5, "nodo-c": 4, "nodo-d": 0}))
-    assert "hosts con sub-tareas: 2" in _texto(problemas)
+def test_reparto_se_suma_entre_casos_y_operaciones():
+    run_load = {
+        "timed_out": False,
+        "reports": {
+            "caso-1": {"subtasks_by_operation": {
+                "transcode_video": _subtareas("nodo-b"),
+                "extract_audio": _subtareas("nodo-c"),
+            }},
+            "caso-2": {"subtasks_by_operation": {"extract_metadata": _subtareas("nodo-d")}},
+        },
+    }
+    assert problemas_de_reparto(_tres_workers(), run_load) == []
+
+
+def test_nodo_solo_con_fallidas_no_cuenta_para_el_minimo():
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c"), *_subtareas("nodo-d", status="failed"))
+    assert "hosts con sub-tareas completadas: 2" in _texto(problemas_de_reparto(_tres_workers(), run_load))
+
+
+def test_nodo_con_completadas_y_fallidas_cuenta():
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c", "nodo-d"), *_subtareas("nodo-d", status="failed"))
+    assert problemas_de_reparto(_tres_workers(), run_load) == []
+
+
+@pytest.mark.parametrize("status", ["pending", "processing", "cancelled", None])
+def test_estado_distinto_de_completada_no_cuenta(status):
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c"), *_subtareas("nodo-d", status=status))
+    assert "hosts con sub-tareas completadas: 2" in _texto(problemas_de_reparto(_tres_workers(), run_load))
+
+
+def test_subtarea_completada_sin_host_no_cuenta():
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c", None))
+    assert "hosts con sub-tareas completadas: 2" in _texto(problemas_de_reparto(_tres_workers(), run_load))
+
+
+def test_metricas_agregadas_no_sustituyen_a_los_reportes():
+    run_load = {
+        "timed_out": False,
+        "metrics": {"subtasks_per_host": {"nodo-b": 5, "nodo-c": 4, "nodo-d": 6}},
+        "reports": {},
+    }
+    assert "hosts con sub-tareas completadas: 0" in _texto(problemas_de_reparto(_tres_workers(), run_load))
+
+
+def test_corrida_con_timed_out_se_rechaza():
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c", "nodo-d"), timed_out=True)
+    assert "timed_out" in _texto(problemas_de_reparto(_tres_workers(), run_load))
 
 
 def test_host_ajeno_a_los_activos_se_rechaza():
-    reparto = _run_load({"nodo-b": 5, "nodo-c": 4, "nodo-d": 6, "nodo-x": 1})
-    assert "'nodo-x'" in _texto(problemas_de_reparto(_tres_workers(), reparto))
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c", "nodo-d", "nodo-x"))
+    assert "'nodo-x'" in _texto(problemas_de_reparto(_tres_workers(), run_load))
 
 
 def test_host_de_un_worker_caido_se_rechaza():
     workers = _tres_workers() + [_worker("nodo-e", "100.64.0.5", alive=False)]
-    reparto = _run_load({"nodo-b": 5, "nodo-c": 4, "nodo-d": 6, "nodo-e": 1})
-    assert "'nodo-e'" in _texto(problemas_de_reparto(workers, reparto))
+    run_load = _run_load(*_subtareas("nodo-b", "nodo-c", "nodo-d", "nodo-e"))
+    assert "'nodo-e'" in _texto(problemas_de_reparto(workers, run_load))
 
 
-@pytest.mark.parametrize("run_load", [{}, {"metrics": {}}, _run_load({})])
-def test_json_de_run_load_sin_reparto_se_rechaza(run_load):
-    assert "hosts con sub-tareas: 0" in _texto(problemas_de_reparto(_tres_workers(), run_load))
+@pytest.mark.parametrize("run_load", [
+    {},
+    {"reports": {}},
+    {"reports": {"caso-1": None}},
+    {"reports": {"caso-1": {}}},
+    {"reports": {"caso-1": {"subtasks_by_operation": None}}},
+    _run_load(),
+])
+def test_json_de_run_load_sin_reportes_se_rechaza(run_load):
+    assert "hosts con sub-tareas completadas: 0" in _texto(problemas_de_reparto(_tres_workers(), run_load))

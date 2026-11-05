@@ -50,14 +50,25 @@ def problemas_de_workers(workers: list[dict]) -> list[str]:
     return problemas
 
 
+def _hosts_con_completadas(run_load: dict) -> list[str]:
+    # metrics.subtasks_per_host no sirve aqui: cuenta tambien las sub-tareas fallidas.
+    hosts = set()
+    for reporte in run_load.get("reports", {}).values():
+        for subtareas in ((reporte or {}).get("subtasks_by_operation") or {}).values():
+            hosts.update(s.get("host") for s in subtareas if s.get("status") == "completed" and s.get("host"))
+    return sorted(hosts)
+
+
 def problemas_de_reparto(workers: list[dict], run_load: dict) -> list[str]:
-    reparto = run_load.get("metrics", {}).get("subtasks_per_host", {})
-    hosts = sorted(host for host, cantidad in reparto.items() if cantidad > 0)
+    hosts = _hosts_con_completadas(run_load)
     activos = {worker.get("hostname") for worker in _activos(workers)}
 
-    problemas = [f"host {host!r} con sub-tareas no es un hostname activo" for host in hosts if host not in activos]
+    problemas = [f"host {host!r} con sub-tareas completadas no es un hostname activo"
+                 for host in hosts if host not in activos]
     if len(hosts) < MINIMO_NODOS:
-        problemas.append(f"hosts con sub-tareas: {len(hosts)}, se exigen {MINIMO_NODOS}")
+        problemas.append(f"hosts con sub-tareas completadas: {len(hosts)}, se exigen {MINIMO_NODOS}")
+    if run_load.get("timed_out"):
+        problemas.append("run_load termino con timed_out: la corrida esta incompleta")
     return problemas
 
 
