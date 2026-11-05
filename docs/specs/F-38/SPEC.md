@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 495f58d
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -164,3 +164,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code (Opus 5.5), orquestador; arquitecto en subagente | 2026-11-05 | Lei el SPEC completo y el diff contra main: solo docs/specs/F-38/SPEC.md, 166 lineas, sin campos pendientes (grep = 0). Criterios de US-38 presentes. Contraste con el codigo: heartbeat.py:88 y :148, config.py:26 y :156, rutas_monitoreo.py:44, worker_node.py:323, run_load.py:320, :353 y --limit, Dockerfile.worker 3.14 y USER appuser, docker-compose.yml sin coordinador, ARQUITECTURA AD-22 en 3.13, CONTRATOS.md:38 y :40. Hallazgo sin bloqueo: responsabilidades.md:7 asigna deploy/ a M1 y CONTRATOS.md:40 a Kenni. Sin comprobar: Docker, Compose, imagen y run_load en red; WSL2 con network_mode host; estimacion de lineas. (495f58d) |
