@@ -1,6 +1,6 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests bc1fe65
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
@@ -208,3 +208,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (Opus 5.5), orquestador; arquitecto en subagente | 2026-11-05 | Tercera verificacion del plan, sobre 2f5a6cd. Lei el diff: solo SPEC y ARQUITECTURA; decisiones finales de Kenni aplicadas, sin preguntas abiertas ni campos pendientes. conformidad repo: 0 problemas. pytest no ejecutado: no esta instalado y no hay codigo. Sin comprobar: Docker, Compose, imagen, Tailscale desde WSL2, cgroups v2 en WSL2. (2f5a6cd) |
 | plan | Kenni Rodriguez | 2026-11-05 |  |
 | verificación IA de tests | Claude Code (Opus 5.5), orquestador; developer en subagente | 2026-11-05 | Verificacion de tests sobre bc1fe65. Diff: solo tests/. Lei las pruebas y ejecute la suite con un venv del scratchpad: 18 failed, 650 passed, 3 skipped, 1 deselected; las 600 preexistentes siguen en verde. Las 18 rojas fallan por falta de funcionalidad: Settings sin node_ip, heartbeat con la IP detectada, sin coordinator, puertos sin NODE_IP, python 3.14, NODE_IP ausente. Devolvi un hallazgo al developer: nodo solo con fallidas contaba como procesa; corregido y reproducido por mi con datos sinteticos. Aceptacion se omite sin variables. conformidad repo: 0 problemas. Sin comprobar: aceptacion contra nodos reales y contra un servidor con la logica nueva; Docker y Compose. (bc1fe65) |
+| tests | Kenni Rodriguez | 2026-11-05 |  |
