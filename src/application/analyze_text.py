@@ -1,6 +1,6 @@
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 from src.domain.chat_message import ChatMessage
 from src.domain.finding import EvidenceRef, Finding
@@ -24,6 +24,23 @@ class TextSettings:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "umbral_ofensa", umbral_valido(self.umbral_ofensa, "umbral_ofensa"))
+        _exigir_entero_positivo(self.tamano_lote, "tamano_lote")
+        _exigir_entero_positivo(self.n_palabras_clave, "n_palabras_clave")
+        _exigir_lexico(self.lexico)
+
+
+def _exigir_entero_positivo(valor: Any, nombre: str) -> None:
+    # bool es subclase de int: sin excluirlo, `true` en el TOML pasaría como 1.
+    if not isinstance(valor, int) or isinstance(valor, bool) or valor <= 0:
+        raise ValueError(f"{nombre} debe ser un entero positivo: {valor!r}")
+
+
+def _exigir_lexico(lexico: Any) -> None:
+    def es_lista_de_texto(palabras: Any) -> bool:
+        return isinstance(palabras, (list, tuple)) and all(isinstance(p, str) for p in palabras)
+
+    if not isinstance(lexico, Mapping) or not all(es_lista_de_texto(p) for p in lexico.values()):
+        raise ValueError(f"temas debe ser una tabla de listas de palabras: {lexico!r}")
 
 
 def analyze_conversation(
