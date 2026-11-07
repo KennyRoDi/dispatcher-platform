@@ -9,7 +9,7 @@
 | F-04 | pendiente |
 | F-05 | pendiente |
 | F-06 | pendiente |
-| F-07 | plan |
+| F-07 | tests |
 | F-08 | pendiente |
 | F-09 | pendiente |
 | F-10 | pendiente |
