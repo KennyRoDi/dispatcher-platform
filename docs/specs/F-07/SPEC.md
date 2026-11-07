@@ -183,8 +183,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 **Preguntas abiertas, para José Andrés:**
 
-1. **Modelo de HuggingFace concreto.** AD-19 no lo fija. Candidatos en español, sin evaluar aquí: `pysentimiento/robertuito-sentiment-analysis` para sentimiento y `pysentimiento/robertuito-hate-speech` para ofensa, o un solo modelo multilingüe de toxicidad para cumplir el recorte 4. Hay que confirmar en la ficha de cada modelo su licencia y si permite uso académico, su tamaño y su idioma. ¿Cuál se usa, y uno o dos?
-2. **Modelo de spaCy.** `es_core_news_sm` o `es_core_news_md`. Falta confirmar su licencia en la ficha del modelo antes de citarla.
+1. **Modelo de HuggingFace concreto.** *Resuelta por José Andrés para la parte 2:* dos modelos en español. Sentimiento con `pysentimiento/robertuito-sentiment-analysis` (etiquetas `POS`, `NEG`, `NEU`, que se traducen a `positivo`, `negativo`, `neutral`) y ofensa con `pysentimiento/robertuito-hate-speech` (multietiqueta `HS`, `TR`, `AG`). Ambos dependen de datasets de uso no comercial, válido para el uso académico del proyecto; se citan con su licencia en el código y en la documentación (Parte I §9).
+2. **Modelo de spaCy.** *Resuelta por José Andrés para la parte 2:* `es_core_news_sm`, licencia GPL-3.0, para lemas, palabras vacías y `Matcher` de patrones de amenaza. Se cita con su licencia en el código y en la documentación (Parte I §9).
 3. **Idioma.** Se supone que las conversaciones sintéticas están en español, como `tests/datos/chat_whatsapp.txt`. Si F-03 genera otro idioma o mezcla, cambia la elección de modelos.
 4. **Qué es «un lote».** SUP-12 dice que una sub-tarea puede ser «un lote de mensajes de tamaño configurable». Si F-05 ya parte la conversación en lotes, `TextAnalyzer` recibe un lote y produce un solo grupo de cuatro salidas; si recibe la conversación completa, la parte él. El diseño admite ambos casos con `tamaño_lote`. ¿Qué tamaño por defecto se usa (se propone 50 mensajes) y quién parte: F-05 o F-07?
 5. **Clasificación temática por léxico.** AD-26 propone léxico en configuración en lugar de un modelo *zero-shot*, por memoria y explicabilidad. ¿Se acepta, y qué temas define el equipo? Deben coincidir con las etiquetas de la verdad de referencia.
@@ -213,6 +213,14 @@ Observaciones del QA de la parte 1 que José Andrés decidió posponer. O6, O1 y
 - O4: configuración mal formada da `KeyError`/`TypeError`/`AttributeError` en vez de `ValueError` con mensaje.
 - O5: `tamano_lote` se valida al analizar, no al cargar; `true` se toma como 1.
 - O7: la etiqueta de sentimiento del modelo no se valida contra positivo/neutral/negativo.
+
+José Andrés decidió que O2, O4, O5 y O7 entran en la parte 2, junto con validar que `sentiment_score` y `offense_score` del modelo estén en [0, 1]:
+
+- O2: dos reglas de la misma categoría se rechazan con `ValueError`.
+- O4: una configuración mal formada (regla sin `categoria`, `nivel` o `umbral`; `severidad` que no es lista; `temas` que no es tabla de listas) se rechaza con `ValueError` y mensaje claro.
+- O5: `tamano_lote` y `n_palabras_clave` se validan al cargar como enteros positivos; se rechazan `bool`, flotantes y texto.
+- O7: una etiqueta de sentimiento fuera de positivo/neutral/negativo se rechaza con `ValueError`.
+- Puntajes: `sentiment_score` u `offense_score` fuera de [0, 1] se rechazan con `ValueError` claro, en vez del error de `Finding`.
 
 ## Aprobaciones
 
