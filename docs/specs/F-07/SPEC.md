@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-07-1-worker-de-texto
 **Verificación IA:** tests 3d78120
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -244,3 +244,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (orquestador; subagente revisor general-purpose) | 2026-11-07 | Revisor APROBADO sin hallazgos bloqueantes. Confirme: git diff --name-only origin/main...HEAD da solo los 14 archivos de la fila 1 del plan (src de F-07, config/texto.toml, pruebas, ARQUITECTURA, CONTRATOS, SPEC); SPEC lineas 19 y 91 citan patrones de amenaza en config/texto.toml que la parte 1 no tiene (observacion 1, para parte 2); arbol limpio; py -m pytest -q -m 'not integration and not acceptance': 744 passed. Releí el codigo de src completo en fases anteriores y el diff posterior (H1, O6, O1, O3). Observaciones del revisor 1-3 son menores y quedan para decision de Jose Andres. (f592a96) |
 | revision | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | Parte 2, fase tests. git diff 06951cf: solo SPEC (decisiones de modelos de Jose Andres, preguntas 1 y 2 resueltas) y tests/; nada en src/ ni config/; 0 lineas borradas en tests. Rojo: suite rapida con --continue-on-collection-errors da 68 failed, 757 passed, 1 error (coleccion de test_spacy_hf_text_models por ModuleNotFoundError del adaptador nuevo), todos en archivos de F-07; las 744 previas siguen pasando. Integracion se salta (spacy no instalado). Pruebas cubren O2, O4, O5, O7, puntajes en [0,1], adaptador con dobles (una llamada por lote, importacion diferida, citas de licencia) y config de modelos y patrones. Confirme en config.json de HF que robertuito-hate-speech usa hateful/targeted/aggressive (las pruebas aceptan ambos juegos). No verificado: comportamiento real de spaCy Matcher y pipelines. (3d78120) |
+| tests | José Andrés Loría Herrera | 2026-11-07 |  |
