@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests 0310411
+**Verificación IA:** implementacion 2468160
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
 
 ## Objetivo
@@ -216,3 +216,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | Lei el diff completo desde 70f4adb: solo tests/ y filas del script en SPEC; nada en src/ ni config/. Rojo: py -m pytest de test_text_analyzer, test_text_analysis y test_severity da 3 errores de coleccion por ModuleNotFoundError de src.adapters.text_analyzer y src.domain.text_analysis (falta de funcionalidad). Suite completa con --continue-on-collection-errors: 683 pasan, 3 fallan (test_contract.py, preexistentes), 3 errores (los nuevos). Pruebas cubren criterio US-07 (4 salidas por lote, sin_ofensa explicito), SUP-07 (amenaza alta, TOML cambia severidad), RF-14 (sha256 y posicion). comprobar_analyzer es aditivo y el doble la pasa. No verificado: firmas elegidas por el developer que el SPEC no fija. (0310411) |
 | tests | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | git diff b5eddfa -- tests vacio: pruebas no se tocaron ni debilitaron. Lei los 5 archivos nuevos: dominio solo stdlib y src.domain, aplicacion sin adaptadores, sin spacy/transformers/torch. 236 lineas fuera de tests/docs (git diff --numstat). py -m pytest -q -m 'not integration and not acceptance': 713 pasan, 3 fallan en tests/test_contract.py, preexistentes y ajenas a F-07: PurePosixPath(...).name no separa rutas de Windows (lineas 129, 233), solo fallan en Windows. Pruebas de F-07 y arquitectura: 43 pasan. conformidad repo: 0 problemas. Decisiones no fijadas por pruebas: umbral_ofensa 0.5 en TOML, confianza sin_ofensa = 1 - max ofensa. No verificado: lint (ruff no instalado); zip trunca si el modelo devuelve menos analisis que mensajes. (2468160) |
