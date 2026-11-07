@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 70f4adb
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -213,3 +213,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador; subagente arquitecto general-purpose) | 2026-11-05 | Lei SPEC completo y diff (solo SPEC y una fila AD-26 en ARQUITECTURA §8). grep de puntos suspensivos = 0; py -m scripts.conformidad repo = 0 problemas; arbol limpio. Contraste citas: RF-06, RF-14, RNF-25, SUP-07/12/15/17 en REQUERIMIENTOS; B.4 en ENUNCIADO:302; recorte 4 en IMPLEMENTACION §1.3; FakeConversationParser en tests/dobles.py; TERCEROS_PROHIBIDOS en test_arquitectura.py:7; AD-25 propuesta en SPEC de F-03 (git grep). Criterio de US-07 copiado. No verificado: licencias/tamano de modelos HF y spaCy, estimacion de lineas por parte. (941a52f) |
 | verificación IA de plan | Claude Code (orquestador; subagente arquitecto general-purpose) | 2026-11-07 | Reverificacion tras corregir mi resumen anterior, que contenia el marcador de campo vacio. Contenido del SPEC sin cambios desde 941a52f (git diff solo toca la fila de verificacion). Comprobaciones previas siguen validas: citas contrastadas, conformidad repo 0 problemas, 0 marcadores. (70f4adb) |
+| plan | José Andrés Loría Herrera | 2026-11-07 |  |
