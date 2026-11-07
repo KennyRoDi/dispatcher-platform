@@ -198,3 +198,32 @@ def test_text_analyzer_cumple_el_contrato_de_analyzer(archivo):
 
     assert isinstance(instancia, Analyzer)
     comprobar_analyzer(instancia, archivo)
+
+
+class ModelosConCantidadErronea:
+    def __init__(self, sobrantes):
+        self.sobrantes = sobrantes
+
+    def analyze_messages(self, texts):
+        analisis = [AMENAZA if "vas a ver" in texto else NEUTRAL for texto in texts]
+        return (analisis + [NEUTRAL] * self.sobrantes)[: len(texts) + self.sobrantes]
+
+
+@pytest.mark.parametrize("sobrantes", [-1, 1])
+def test_modelo_con_un_analisis_por_mensaje_distinto_se_rechaza(archivo, sobrantes):
+    # Si el modelo omite el último mensaje, la amenaza desaparecería y el lote saldría sin_ofensa.
+    lista = mensajes(3, {2: "pagas o vas a ver"})
+
+    with pytest.raises(ValueError):
+        analizador(lista, ModelosConCantidadErronea(sobrantes)).analyze(archivo)
+
+
+def test_confianza_de_ofensivo_es_el_maximo_de_los_marcados(archivo):
+    leve = MessageAnalysis(("tonto",), "negativo", 0.7, 0.6, ())
+    lista = mensajes(3, {0: "eres un tonto", 2: "eres muy tonto"})
+    modelos = FakeTextModels({"eres un tonto": leve, "eres muy tonto": OFENSA})
+
+    hallazgo = por_categoria(analizador(lista, modelos).analyze(archivo))["ofensivo"]
+
+    assert hallazgo.confidence == pytest.approx(0.9)
+    assert hallazgo.evidence.position == "mensajes 0,2"
