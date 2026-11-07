@@ -55,13 +55,16 @@ class SpacyHfTextModels:
         from transformers import pipeline
 
         nlp = spacy.load(config.spacy.nombre)
-        if nlp.meta.get("version") != config.spacy.revision:
-            raise ValueError(f"{config.spacy.nombre} instalado es {nlp.meta.get('version')}, se fijó {config.spacy.revision}")
+        instalada = nlp.meta.get("version")
+        if instalada != config.spacy.revision:
+            raise ValueError(f"{config.spacy.nombre} instalado es {instalada}, se fijó {config.spacy.revision}")
         matcher = Matcher(nlp.vocab)
         for patron in config.patrones_amenaza:
             matcher.add(patron.nombre, [[dict(token) for token in patron.tokens]])
-        sentimiento = pipeline("text-classification", model=config.sentimiento.nombre, revision=config.sentimiento.revision)
-        ofensa = pipeline("text-classification", model=config.ofensa.nombre, revision=config.ofensa.revision)
+        sentimiento, ofensa = (
+            pipeline("text-classification", model=modelo.nombre, revision=modelo.revision)
+            for modelo in (config.sentimiento, config.ofensa)
+        )
         return cls(nlp, matcher, sentimiento, ofensa)
 
     def analyze_messages(self, texts: Sequence[str]) -> list[MessageAnalysis]:
