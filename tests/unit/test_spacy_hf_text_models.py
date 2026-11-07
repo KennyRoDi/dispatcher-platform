@@ -2,6 +2,7 @@ import importlib
 import re
 import sys
 import tomllib
+import types
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -319,3 +320,77 @@ def test_modelos_mal_formados_se_rechazan(modelos_toml, mensaje):
 
     with pytest.raises(ValueError, match=mensaje):
         leer_config_modelos(datos)
+
+
+class SpacyFalso:
+    def __init__(self, version):
+        self.version = version
+        self.cargados = []
+        self.matchers = []
+        self.llamadas_pipeline = []
+
+    def instalar(self, monkeypatch):
+        spacy = types.ModuleType("spacy")
+        spacy.load = self._load
+        matcher = types.ModuleType("spacy.matcher")
+        matcher.Matcher = self._matcher
+        transformers = types.ModuleType("transformers")
+        transformers.pipeline = self._pipeline
+        monkeypatch.setitem(sys.modules, "spacy", spacy)
+        monkeypatch.setitem(sys.modules, "spacy.matcher", matcher)
+        monkeypatch.setitem(sys.modules, "transformers", transformers)
+        return self
+
+    def _load(self, nombre):
+        self.cargados.append(nombre)
+        return types.SimpleNamespace(meta={"version": self.version}, vocab="vocab")
+
+    def _matcher(self, vocab):
+        matcher = types.SimpleNamespace(vocab=vocab, agregados=[])
+        matcher.add = lambda nombre, patrones: matcher.agregados.append((nombre, patrones))
+        self.matchers.append(matcher)
+        return matcher
+
+    def _pipeline(self, tarea, **kwargs):
+        self.llamadas_pipeline.append((tarea, kwargs))
+        return FakePipeline(por_defecto=NEUTRO)
+
+
+def test_from_config_carga_spacy_fijado_y_los_pipelines_con_su_revision(monkeypatch):
+    config = leer_repo()
+    falso = SpacyFalso(config.spacy.revision).instalar(monkeypatch)
+
+    modelos_cargados = SpacyHfTextModels.from_config(CONFIG_REPO)
+
+    assert falso.cargados == ["es_core_news_sm"]
+    assert [kwargs for _, kwargs in falso.llamadas_pipeline] == [
+        {"model": config.sentimiento.nombre, "revision": config.sentimiento.revision},
+        {"model": config.ofensa.nombre, "revision": config.ofensa.revision},
+    ]
+    assert isinstance(modelos_cargados, SpacyHfTextModels)
+
+
+def test_from_config_agrega_cada_patron_de_amenaza_con_su_nombre(monkeypatch, tmp_path):
+    ruta = tmp_path / "texto.toml"
+    ruta.write_text(
+        CONFIG_REPO.read_text(encoding="utf-8")
+        + '\n[[patrones_amenaza]]\nnombre = "te_voy_a"\npatron = [{ LOWER = "te" }, { LOWER = "voy" }, { LOWER = "a" }]\n',
+        encoding="utf-8",
+    )
+    falso = SpacyFalso(leer_repo().spacy.revision).instalar(monkeypatch)
+
+    SpacyHfTextModels.from_config(ruta)
+
+    [matcher] = falso.matchers
+    assert matcher.vocab == "vocab"
+    with open(ruta, "rb") as archivo:
+        esperados = [(p.nombre, [[dict(t) for t in p.tokens]]) for p in leer_config_modelos(tomllib.load(archivo)).patrones_amenaza]
+    assert matcher.agregados == esperados
+    assert [nombre for nombre, _ in matcher.agregados][-1] == "te_voy_a"
+
+
+def test_from_config_rechaza_una_version_de_spacy_distinta_a_la_fijada(monkeypatch):
+    SpacyFalso("0.0.1").instalar(monkeypatch)
+
+    with pytest.raises(ValueError, match="0.0.1"):
+        SpacyHfTextModels.from_config(CONFIG_REPO)
