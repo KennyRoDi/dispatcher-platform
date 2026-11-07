@@ -4,7 +4,7 @@ from typing import Protocol
 
 from src.domain.chat_message import ChatMessage
 from src.domain.finding import EvidenceRef, Finding
-from src.domain.severity import SeverityRules
+from src.domain.severity import SeverityRules, umbral_valido
 from src.domain.text_analysis import MessageAnalysis, lotes, palabras_clave, sentimiento_del_lote, tema
 
 Indexado = tuple[int, ChatMessage]
@@ -21,6 +21,9 @@ class TextSettings:
     tamano_lote: int = 50
     n_palabras_clave: int = 5
     umbral_ofensa: float = 0.5
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "umbral_ofensa", umbral_valido(self.umbral_ofensa, "umbral_ofensa"))
 
 
 def analyze_conversation(
