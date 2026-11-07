@@ -82,3 +82,29 @@ def test_cambiar_el_archivo_toml_cambia_la_severidad(tmp_path):
 
 def test_configuracion_del_repositorio_marca_amenaza_como_alta(tmp_path):
     assert severidad_de_amenaza(RAIZ / "config" / "texto.toml", tmp_path) is Severity.ALTA
+
+
+@pytest.mark.parametrize(
+    "datos",
+    [
+        {},
+        {"severidad": []},
+        {"severidad": [{"categoria": "ofensivo", "umbral": 0.5, "nivel": "media"}]},
+    ],
+)
+def test_configuracion_sin_regla_de_amenaza_se_rechaza(datos):
+    with pytest.raises(ValueError, match="amenaza"):
+        SeverityRules.from_dict(datos)
+
+
+@pytest.mark.parametrize("umbral", [5, -0.1, 1.5, float("nan"), float("inf"), "0.5", "alto", True])
+def test_umbral_de_regla_fuera_de_rango_se_rechaza(umbral):
+    with pytest.raises(ValueError, match="umbral"):
+        SeverityRules.from_dict({"severidad": [{"categoria": "amenaza", "umbral": umbral, "nivel": "alta"}]})
+
+
+@pytest.mark.parametrize("umbral", [0, 0.0, 1, 1.0])
+def test_umbral_en_los_extremos_se_acepta(umbral):
+    reglas = SeverityRules.from_dict({"severidad": [{"categoria": "amenaza", "umbral": umbral, "nivel": "alta"}]})
+
+    assert reglas.por_categoria["amenaza"].umbral == umbral

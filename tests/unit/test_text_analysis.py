@@ -56,3 +56,16 @@ def test_sentimiento_elige_la_etiqueta_mayoritaria_y_promedia_su_puntaje():
 
 def test_sentimiento_de_un_solo_mensaje_conserva_su_puntaje():
     assert sentimiento_del_lote([analisis("positivo", 0.65)]) == ("positivo", pytest.approx(0.65))
+
+
+def test_tema_ignora_tildes_y_mayusculas_de_los_lemas():
+    assert tema(["Reunión", "café"], {"reunion": ["reunion", "cafe"]}) == ("reunion", 1.0)
+
+
+def test_tema_ignora_tildes_y_mayusculas_del_lexico():
+    assert tema(["reunion", "deuda"], {"reunion": ["Reunión"], "conflicto": ["DEUDA"]})[1] == 0.5
+    assert tema(["cafe", "cafe"], {"reunion": ["Café"]}) == ("reunion", 1.0)
+
+
+def test_tema_trata_la_enie_como_n():
+    assert tema(["año"], {"tiempo": ["ano"]}) == ("tiempo", 1.0)

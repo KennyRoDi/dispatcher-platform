@@ -227,3 +227,30 @@ def test_confianza_de_ofensivo_es_el_maximo_de_los_marcados(archivo):
 
     assert hallazgo.confidence == pytest.approx(0.9)
     assert hallazgo.evidence.position == "mensajes 0,2"
+
+
+@pytest.mark.parametrize("umbral_ofensa", [2, -0.1, float("nan"), float("inf"), "0.5", True])
+def test_umbral_de_ofensa_fuera_de_rango_se_rechaza(umbral_ofensa):
+    with pytest.raises(ValueError, match="umbral_ofensa"):
+        TextAnalyzer(
+            FakeConversationParser([]),
+            FakeTextModels(),
+            SeverityRules.from_dict(REGLAS),
+            LEXICO,
+            umbral_ofensa=umbral_ofensa,
+        )
+
+
+def test_from_config_rechaza_umbral_de_ofensa_fuera_de_rango(tmp_path):
+    config = tmp_path / "texto.toml"
+    config.write_text(
+        "umbral_ofensa = 2\n\n"
+        "[[severidad]]\n"
+        'categoria = "amenaza"\n'
+        "umbral = 0.5\n"
+        'nivel = "alta"\n',
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="umbral_ofensa"):
+        TextAnalyzer.from_config(FakeConversationParser([]), FakeTextModels(), config)
