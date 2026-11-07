@@ -55,6 +55,10 @@ def _categoria(regla: Any) -> str:
     faltantes = [campo for campo in CAMPOS_DE_REGLA if campo not in regla]
     if faltantes:
         raise ValueError(f"a la regla de severidad le falta {', '.join(faltantes)}: {dict(regla)!r}")
+    # Una clave suelta escrita tras [[severidad]] en el TOML cae dentro de la regla, no en la raíz.
+    desconocidos = [campo for campo in regla if campo not in CAMPOS_DE_REGLA]
+    if desconocidos:
+        raise ValueError(f"campo desconocido en la regla de severidad: {', '.join(map(str, desconocidos))}")
     categoria = regla["categoria"]
     if not isinstance(categoria, str) or not categoria:
         raise ValueError(f"la categoria de una regla debe ser texto no vacío: {categoria!r}")
