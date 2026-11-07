@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 0310411
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -215,3 +215,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (orquestador; subagente arquitecto general-purpose) | 2026-11-07 | Reverificacion tras corregir mi resumen anterior, que contenia el marcador de campo vacio. Contenido del SPEC sin cambios desde 941a52f (git diff solo toca la fila de verificacion). Comprobaciones previas siguen validas: citas contrastadas, conformidad repo 0 problemas, 0 marcadores. (70f4adb) |
 | plan | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | Lei el diff completo desde 70f4adb: solo tests/ y filas del script en SPEC; nada en src/ ni config/. Rojo: py -m pytest de test_text_analyzer, test_text_analysis y test_severity da 3 errores de coleccion por ModuleNotFoundError de src.adapters.text_analyzer y src.domain.text_analysis (falta de funcionalidad). Suite completa con --continue-on-collection-errors: 683 pasan, 3 fallan (test_contract.py, preexistentes), 3 errores (los nuevos). Pruebas cubren criterio US-07 (4 salidas por lote, sin_ofensa explicito), SUP-07 (amenaza alta, TOML cambia severidad), RF-14 (sha256 y posicion). comprobar_analyzer es aditivo y el doble la pasa. No verificado: firmas elegidas por el developer que el SPEC no fija. (0310411) |
+| tests | José Andrés Loría Herrera | 2026-11-07 |  |
