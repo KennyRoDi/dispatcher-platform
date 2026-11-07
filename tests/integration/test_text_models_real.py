@@ -17,8 +17,9 @@ MUESTRA = [
     "Hola, ¿nos vemos mañana a las cinco en la plaza?",
     "¡Qué alegría! Gracias por invitarme al café.",
     "Si no me pagas la deuda, vas a ver lo que te pasa.",
+    "Vas a ver lo que te pasa si no pagas.",
 ]
-INDICE_AMENAZA = 2
+INDICES_AMENAZA = {2, 3}
 
 
 @pytest.fixture(scope="module")
@@ -37,5 +38,5 @@ def test_devuelve_un_analisis_valido_por_mensaje(analisis):
 
 
 def test_la_amenaza_ficticia_se_marca_y_los_mensajes_tranquilos_no(analisis):
-    assert analisis[INDICE_AMENAZA].threat_patterns
-    assert all(not a.threat_patterns for i, a in enumerate(analisis) if i != INDICE_AMENAZA)
+    assert all("vas_a_ver" in analisis[i].threat_patterns for i in INDICES_AMENAZA)
+    assert all(not a.threat_patterns for i, a in enumerate(analisis) if i not in INDICES_AMENAZA)

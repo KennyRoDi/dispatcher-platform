@@ -394,3 +394,32 @@ def test_from_config_rechaza_una_version_de_spacy_distinta_a_la_fijada(monkeypat
 
     with pytest.raises(ValueError, match="0.0.1"):
         SpacyHfTextModels.from_config(CONFIG_REPO)
+
+
+SALIDAS_CON_FORMA_INESPERADA = [
+    [{"label": "POS", "score": 1.0}],
+    ["POS"],
+    [None],
+    [[]],
+    [["POS"]],
+    [[{"label": "POS"}]],
+    [[{"score": 1.0}]],
+]
+
+
+@pytest.mark.parametrize("modelo", ["sentimiento", "ofensa"])
+@pytest.mark.parametrize("salida", SALIDAS_CON_FORMA_INESPERADA)
+def test_salida_del_pipeline_con_forma_inesperada_se_rechaza_nombrando_el_modelo(modelo, salida):
+    inesperado = {modelo: lambda textos, **_: salida}
+
+    with pytest.raises(ValueError, match=modelo):
+        modelos(**inesperado).analyze_messages(["hola"])
+
+
+ATRIBUTOS_INSENSIBLES_A_MAYUSCULAS = {"LOWER", "NORM", "OP"}
+
+
+def test_patrones_de_amenaza_del_repositorio_no_dependen_de_mayusculas_ni_del_lematizador():
+    for patron in leer_repo().patrones_amenaza:
+        for token in patron.tokens:
+            assert set(token) <= ATRIBUTOS_INSENSIBLES_A_MAYUSCULAS, f"{patron.nombre}: {dict(token)}"
