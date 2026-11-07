@@ -4,8 +4,11 @@ from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TypeVar
 
+from src.domain.severity import umbral_valido
+
 T = TypeVar("T")
 SIN_TEMA = "sin_tema"
+ETIQUETAS_DE_SENTIMIENTO = ("positivo", "neutral", "negativo")
 
 
 @dataclass(frozen=True)
@@ -15,6 +18,12 @@ class MessageAnalysis:
     sentiment_score: float
     offense_score: float
     threat_patterns: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if self.sentiment_label not in ETIQUETAS_DE_SENTIMIENTO:
+            raise ValueError(f"etiqueta de sentimiento desconocida: {self.sentiment_label!r}")
+        for campo in ("sentiment_score", "offense_score"):
+            object.__setattr__(self, campo, umbral_valido(getattr(self, campo), campo))
 
 
 def lotes(elementos: Sequence[T], tamano: int) -> Iterator[Sequence[T]]:
