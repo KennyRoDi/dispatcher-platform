@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 0bc28b2
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -232,3 +232,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador; subagentes qa-tester y developer general-purpose) | 2026-11-07 | Tras H1, Jose Andres pidio corregir en la parte 1 las observaciones mas importantes (O6 tildes/mayusculas en tema, O1 regla de amenaza obligatoria, O3 umbrales en [0,1]) y posponer O2, O4, O5, O7 a la parte 2 (anotadas en el SPEC). Rojo comprobado: worktree en f2d9c15 (pruebas nuevas, codigo viejo) da 21 failed, 37 passed. Pruebas existentes sin lineas eliminadas (git diff --numstat 09d9cda -- tests). Diff de src leido: dominio solo stdlib (math, unicodedata); validacion de umbral_ofensa en TextSettings (aplicacion). py -m pytest -q -m 'not integration and not acceptance': 744 passed. 265 lineas fuera de tests/docs. Decision: normalizar convierte ñ en n para comparar con el lexico. No verificado: palabras_clave no normaliza (Deuda y deuda cuentan aparte). (ef359e2) |
 | verificacion | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-07 | Lei el diff de 0bc28b2: ARQUITECTURA §4 agrega text_analysis y analyze_text (existen en src); AD-26 refleja lo implementado en la parte 1 sin afirmar modelos reales y sigue provisional con medicion pendiente; CONTRATOS asigna a Jose Andres text_analysis, severity (aviso a Kenni), analyze_text y config/texto.toml, y cita comprobar_analyzer. Sin fichas (F-07 no es M1-M5), sin reutilizacion ni README (no aplica). conformidad repo: 0 problemas. Borrador de bitacora contrastado con git log y la conversacion; corregido: developer actuo en 4 rondas (tests, implementacion, H1, O6/O1/O3), no 3; errores (3) y (5) confirmados por el informe de QA y por la conversacion con Jose Andres. (0bc28b2) |
+| documentacion | José Andrés Loría Herrera | 2026-11-07 |  |
