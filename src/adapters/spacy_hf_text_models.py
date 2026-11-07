@@ -86,7 +86,18 @@ def _clasificar(pipeline: Pipeline, textos: list[str], nombre: str, **opciones: 
     salidas = pipeline(textos, **opciones)
     if len(salidas) != len(textos):
         raise ValueError(f"el modelo de {nombre} devolvió {len(salidas)} resultados para {len(textos)} textos")
-    return [{puntaje["label"]: puntaje["score"] for puntaje in salida} for salida in salidas]
+    return [_puntajes(salida, nombre) for salida in salidas]
+
+
+def _puntajes(salida: Any, nombre: str) -> dict[str, float]:
+    bien_formada = isinstance(salida, list) and salida and all(_es_puntaje(p) for p in salida)
+    if not bien_formada:
+        raise ValueError(f"el modelo de {nombre} devolvió una salida sin lista de label y score: {salida!r}")
+    return {puntaje["label"]: puntaje["score"] for puntaje in salida}
+
+
+def _es_puntaje(valor: Any) -> bool:
+    return isinstance(valor, Mapping) and "label" in valor and "score" in valor
 
 
 def _lemas(doc: Any) -> tuple[str, ...]:
