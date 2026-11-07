@@ -30,6 +30,8 @@ def analyze_conversation(
     hallazgos: list[Finding] = []
     for lote in lotes(indexados, ajustes.tamano_lote):
         analisis = models.analyze_messages([mensaje.text for _, mensaje in lote])
+        if len(analisis) != len(lote):
+            raise ValueError(f"se esperaban {len(lote)} análisis, llegaron {len(analisis)}")
         hallazgos.extend(_LoteAnalizado(lote, analisis, sha256, ajustes).hallazgos())
     return hallazgos
 
@@ -55,7 +57,7 @@ class _LoteAnalizado:
         ]
 
     def _ofensa(self, rango: str) -> Finding:
-        pares = list(zip(self.lote, self.analisis))
+        pares = list(zip(self.lote, self.analisis, strict=True))
         amenazas = [indexado for indexado, analisis in pares if analisis.threat_patterns]
         if amenazas:
             return self._finding("amenaza", 1.0, _detalle(amenazas), _lista(amenazas))
