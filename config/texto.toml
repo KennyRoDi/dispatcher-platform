@@ -1,0 +1,19 @@
+# Umbrales provisionales (SUP-17): se calibran con la tabla de aciertos de la Parte 3.
+tamano_lote = 50
+n_palabras_clave = 5
+umbral_ofensa = 0.5
+
+[[severidad]]
+categoria = "amenaza"
+umbral = 0.5
+nivel = "alta"
+
+[[severidad]]
+categoria = "ofensivo"
+umbral = 0.5
+nivel = "media"
+
+# Léxico sintético mínimo; los temas definitivos deben coincidir con la verdad de referencia.
+[temas]
+conflicto = ["deuda", "pagar", "dinero", "amenazar"]
+reunion = ["reunion", "cafe", "plaza", "hora"]
