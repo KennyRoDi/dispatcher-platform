@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-07-1-worker-de-texto
 **Verificación IA:** implementacion dae36b1
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -246,3 +246,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | Parte 2, fase tests. git diff 06951cf: solo SPEC (decisiones de modelos de Jose Andres, preguntas 1 y 2 resueltas) y tests/; nada en src/ ni config/; 0 lineas borradas en tests. Rojo: suite rapida con --continue-on-collection-errors da 68 failed, 757 passed, 1 error (coleccion de test_spacy_hf_text_models por ModuleNotFoundError del adaptador nuevo), todos en archivos de F-07; las 744 previas siguen pasando. Integracion se salta (spacy no instalado). Pruebas cubren O2, O4, O5, O7, puntajes en [0,1], adaptador con dobles (una llamada por lote, importacion diferida, citas de licencia) y config de modelos y patrones. Confirme en config.json de HF que robertuito-hate-speech usa hateful/targeted/aggressive (las pruebas aceptan ambos juegos). No verificado: comportamiento real de spaCy Matcher y pipelines. (3d78120) |
 | tests | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de implementacion | Claude Code (Opus 5.5) | 2026-11-07 | Pruebas intactas desde 3d78120; 866 verdes, 1 saltada (integracion sin spacy); 227 lineas fuera de tests/docs; capas OK; SHAs de HF y versiones de PyPI comprobados por red (dae36b1) |
+| implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
