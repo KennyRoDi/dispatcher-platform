@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion e2618ed
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -218,3 +218,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | git diff b5eddfa -- tests vacio: pruebas no se tocaron ni debilitaron. Lei los 5 archivos nuevos: dominio solo stdlib y src.domain, aplicacion sin adaptadores, sin spacy/transformers/torch. 236 lineas fuera de tests/docs (git diff --numstat). py -m pytest -q -m 'not integration and not acceptance': 713 pasan, 3 fallan en tests/test_contract.py, preexistentes y ajenas a F-07: PurePosixPath(...).name no separa rutas de Windows (lineas 129, 233), solo fallan en Windows. Pruebas de F-07 y arquitectura: 43 pasan. conformidad repo: 0 problemas. Decisiones no fijadas por pruebas: umbral_ofensa 0.5 en TOML, confianza sin_ofensa = 1 - max ofensa. No verificado: lint (ruff no instalado); zip trunca si el modelo devuelve menos analisis que mensajes. (2468160) |
 | verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | Reverificacion tras merge de origin/main (PR #27, arreglo de rutas de Windows en tests/test_contract.py, fusionada con autorizacion de Jose Andres). git diff 2468160: solo entra tests/test_contract.py de main; codigo de F-07 sin cambios. Pruebas de F-07 sin cambios desde la aprobacion de tests (diff vacio). py -m pytest -q -m 'not integration and not acceptance': 716 passed, 0 failed. Revision previa del codigo sigue valida: capas correctas, 236 lineas fuera de tests/docs. No verificado: lint (ruff no instalado). (e2618ed) |
+| implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
