@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-07-1-worker-de-texto
-**Verificación IA:** implementacion dae36b1
+**Verificación IA:** verificacion 4744bb2
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
 
 ## Objetivo
@@ -247,3 +247,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de implementacion | Claude Code (Opus 5.5) | 2026-11-07 | Pruebas intactas desde 3d78120; 866 verdes, 1 saltada (integracion sin spacy); 227 lineas fuera de tests/docs; capas OK; SHAs de HF y versiones de PyPI comprobados por red (dae36b1) |
 | implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | QA sin hallazgos H; 8 observaciones O (O1: from_config sin prueba del camino feliz). Confirme O1, O2 y O3 por mi cuenta; 866 verdes; integracion saltada sin spacy (4744bb2) |
