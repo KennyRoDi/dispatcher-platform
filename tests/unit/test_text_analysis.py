@@ -69,3 +69,36 @@ def test_tema_ignora_tildes_y_mayusculas_del_lexico():
 
 def test_tema_trata_la_enie_como_n():
     assert tema(["año"], {"tiempo": ["ano"]}) == ("tiempo", 1.0)
+
+
+def analisis_con(**cambios):
+    campos = dict(lemmas=(), sentiment_label="neutral", sentiment_score=0.5, offense_score=0.0, threat_patterns=())
+    campos.update(cambios)
+    return MessageAnalysis(**campos)
+
+
+@pytest.mark.parametrize("etiqueta", ["positivo", "neutral", "negativo"])
+def test_etiquetas_de_sentimiento_validas_se_aceptan(etiqueta):
+    assert analisis_con(sentiment_label=etiqueta).sentiment_label == etiqueta
+
+
+@pytest.mark.parametrize("etiqueta", ["POS", "Positivo", "feliz", "", None])
+def test_etiqueta_de_sentimiento_desconocida_se_rechaza(etiqueta):
+    with pytest.raises(ValueError, match="etiqueta de sentimiento"):
+        analisis_con(sentiment_label=etiqueta)
+
+
+PUNTAJES_INVALIDOS = [-0.1, 1.1, float("nan"), float("inf"), True, "0.5", None]
+
+
+@pytest.mark.parametrize("campo", ["sentiment_score", "offense_score"])
+@pytest.mark.parametrize("puntaje", PUNTAJES_INVALIDOS)
+def test_puntaje_del_modelo_fuera_de_rango_se_rechaza(campo, puntaje):
+    with pytest.raises(ValueError, match=campo):
+        analisis_con(**{campo: puntaje})
+
+
+@pytest.mark.parametrize("campo", ["sentiment_score", "offense_score"])
+@pytest.mark.parametrize("puntaje", [0, 0.0, 1, 1.0])
+def test_puntaje_en_los_extremos_se_acepta(campo, puntaje):
+    assert getattr(analisis_con(**{campo: puntaje}), campo) == puntaje
