@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-07-1-worker-de-texto
 **Verificación IA:** verificacion c889c73
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -249,3 +249,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | QA sin hallazgos H; 8 observaciones O (O1: from_config sin prueba del camino feliz). Confirme O1, O2 y O3 por mi cuenta; 866 verdes; integracion saltada sin spacy (4744bb2) |
 | verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | Corregidas O1 (pruebas de from_config con modulos falsos), O2 (ValueError ante salida mal formada) y patron vas_a_ver con LOWER; 884 verdes; 237 lineas; integracion aun saltada sin spacy (c889c73) |
+| verificacion | José Andrés Loría Herrera | 2026-11-07 |  |
