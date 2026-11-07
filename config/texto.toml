@@ -17,3 +17,22 @@ nivel = "media"
 [temas]
 conflicto = ["deuda", "pagar", "dinero", "amenazar"]
 reunion = ["reunion", "cafe", "plaza", "hora"]
+
+# Modelos ya entrenados [B.1]; se fija la versión para que la evidencia sea reproducible.
+# Las revisiones de HuggingFace son el campo `sha` de https://huggingface.co/api/models/<nombre>.
+[modelos.spacy]
+nombre = "es_core_news_sm"
+revision = "3.8.0"
+
+[modelos.sentimiento]
+nombre = "pysentimiento/robertuito-sentiment-analysis"
+revision = "a2cc0f67ebd705c55191e25a05ba23d885fcc09b"
+
+[modelos.ofensa]
+nombre = "pysentimiento/robertuito-hate-speech"
+revision = "db125ee7be2ad74457b900ae49a7e0f14f7a496c"
+
+# Patrones del Matcher de spaCy; solo detectan amenazas explícitas, no implícitas.
+[[patrones_amenaza]]
+nombre = "vas_a_ver"
+patron = [{ LEMMA = "ir" }, { LOWER = "a" }, { LOWER = "ver" }]
