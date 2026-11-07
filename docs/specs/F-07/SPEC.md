@@ -205,6 +205,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - **Choque de números de AD.** AD-25 está propuesta en la rama de F-03, aún sin fusionar. Si cambia, se renumera AD-26 al fusionar.
 - **Archivos compartidos.** `tests/contratos.py` y, si se aprueba, `tests/unit/test_arquitectura.py` son compartidos. Cambios aditivos de pocas líneas.
 
+### Pendientes para la parte 2
+
+Observaciones del QA de la parte 1 que José Andrés decidió posponer. O6, O1 y O3 se corrigieron en la parte 1 durante la verificación.
+
+- O2: dos reglas de la misma categoría: gana la última sin avisar (`src/domain/severity.py`).
+- O4: configuración mal formada da `KeyError`/`TypeError`/`AttributeError` en vez de `ValueError` con mensaje.
+- O5: `tamano_lote` se valida al analizar, no al cargar; `true` se toma como 1.
+- O7: la etiqueta de sentimiento del modelo no se valida contra positivo/neutral/negativo.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
