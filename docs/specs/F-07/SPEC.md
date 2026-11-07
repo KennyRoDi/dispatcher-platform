@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion ef359e2
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -230,3 +230,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de verificacion | Claude Code (orquestador; subagentes qa-tester y developer general-purpose) | 2026-11-07 | QA devolvio H1 (media): zip truncaba si TextModels devolvia otra cantidad de analisis; agrego test_modelo_con_un_analisis_por_mensaje_distinto_se_rechaza[-1,1] y test_confianza_de_ofensivo_es_el_maximo_de_los_marcados (detecta mutacion max->min). Reproduje H1: 2 failed antes del arreglo. Developer corrigio en analyze_text.py (ValueError si len difiere, zip strict); git diff 1321474 solo toca src/application/analyze_text.py (+3 -1), tests intactos. py -m pytest -q -m 'not integration and not acceptance': 719 passed. 238 lineas fuera de tests/docs. QA: 12 mutaciones, todas detectadas. Criterios US-07 (dobles), RF-06, SUP-07, RF-14, RNF-25 con evidencia. Pendiente decision humana: observaciones O1-O7 (validacion de config, minusculas/tildes en lexico). Pruebas I y A fuera de la parte 1. (09d9cda) |
 | verificación IA de verificacion | Claude Code (orquestador; subagentes qa-tester y developer general-purpose) | 2026-11-07 | Tras H1, Jose Andres pidio corregir en la parte 1 las observaciones mas importantes (O6 tildes/mayusculas en tema, O1 regla de amenaza obligatoria, O3 umbrales en [0,1]) y posponer O2, O4, O5, O7 a la parte 2 (anotadas en el SPEC). Rojo comprobado: worktree en f2d9c15 (pruebas nuevas, codigo viejo) da 21 failed, 37 passed. Pruebas existentes sin lineas eliminadas (git diff --numstat 09d9cda -- tests). Diff de src leido: dominio solo stdlib (math, unicodedata); validacion de umbral_ofensa en TextSettings (aplicacion). py -m pytest -q -m 'not integration and not acceptance': 744 passed. 265 lineas fuera de tests/docs. Decision: normalizar convierte ñ en n para comparar con el lexico. No verificado: palabras_clave no normaliza (Deuda y deuda cuentan aparte). (ef359e2) |
+| verificacion | José Andrés Loría Herrera | 2026-11-07 |  |
