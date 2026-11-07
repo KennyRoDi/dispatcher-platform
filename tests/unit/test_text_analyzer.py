@@ -254,3 +254,88 @@ def test_from_config_rechaza_umbral_de_ofensa_fuera_de_rango(tmp_path):
 
     with pytest.raises(ValueError, match="umbral_ofensa"):
         TextAnalyzer.from_config(FakeConversationParser([]), FakeTextModels(), config)
+
+
+VALORES_NO_ENTEROS_POSITIVOS = [0, -1, True, False, 2.0, 2.5, "50", None]
+
+
+@pytest.mark.parametrize("campo", ["tamano_lote", "n_palabras_clave"])
+@pytest.mark.parametrize("valor", VALORES_NO_ENTEROS_POSITIVOS)
+def test_parametro_entero_invalido_se_rechaza_al_construir(campo, valor):
+    with pytest.raises(ValueError, match=campo):
+        TextAnalyzer(
+            FakeConversationParser(mensajes(3)),
+            FakeTextModels(),
+            SeverityRules.from_dict(REGLAS),
+            LEXICO,
+            **{campo: valor},
+        )
+
+
+def config_minima(tmp_path, extra_raiz="", temas=""):
+    config = tmp_path / "texto.toml"
+    config.write_text(
+        f"{extra_raiz}\n"
+        "[[severidad]]\n"
+        'categoria = "amenaza"\n'
+        "umbral = 0.5\n"
+        'nivel = "alta"\n\n'
+        f"{temas}\n",
+        encoding="utf-8",
+    )
+    return config
+
+
+@pytest.mark.parametrize("campo", ["tamano_lote", "n_palabras_clave"])
+@pytest.mark.parametrize("valor_toml", ["0", "-3", "true", "2.0", '"50"'])
+def test_from_config_rechaza_parametro_entero_invalido_al_cargar(tmp_path, campo, valor_toml):
+    config = config_minima(tmp_path, extra_raiz=f"{campo} = {valor_toml}")
+
+    with pytest.raises(ValueError, match=campo):
+        TextAnalyzer.from_config(FakeConversationParser(mensajes(3)), FakeTextModels(), config)
+
+
+@pytest.mark.parametrize("valor", [1, 50])
+def test_parametros_enteros_positivos_se_aceptan(archivo, valor):
+    instancia = TextAnalyzer(
+        FakeConversationParser(mensajes(3)),
+        FakeTextModels(),
+        SeverityRules.from_dict(REGLAS),
+        LEXICO,
+        tamano_lote=valor,
+        n_palabras_clave=valor,
+    )
+
+    assert instancia.analyze(archivo)
+
+
+@pytest.mark.parametrize(
+    "temas",
+    [
+        'temas = ["deuda", "pagar"]',
+        'temas = "conflicto"',
+        '[temas]\nconflicto = "deuda"',
+        "[temas]\nconflicto = [1, 2]",
+        "[temas]\nconflicto = [[\"deuda\"]]",
+        "[temas.conflicto]\npalabras = [\"deuda\"]",
+    ],
+)
+def test_from_config_rechaza_temas_que_no_son_tabla_de_listas_de_texto(tmp_path, temas):
+    config = config_minima(tmp_path, temas=temas)
+
+    with pytest.raises(ValueError, match="temas"):
+        TextAnalyzer.from_config(FakeConversationParser([]), FakeTextModels(), config)
+
+
+@pytest.mark.parametrize("lexico", [["deuda"], {"conflicto": "deuda"}, {"conflicto": [1]}])
+def test_constructor_rechaza_lexico_mal_formado(lexico):
+    with pytest.raises(ValueError, match="temas|léxico|lexico"):
+        TextAnalyzer(FakeConversationParser([]), FakeTextModels(), SeverityRules.from_dict(REGLAS), lexico)
+
+
+def test_from_config_rechaza_regla_sin_nivel_con_value_error(tmp_path):
+    config = tmp_path / "texto.toml"
+    config.write_text('[[severidad]]\ncategoria = "amenaza"\numbral = 0.5\n', encoding="utf-8")
+
+    with pytest.raises(ValueError, match="nivel"):
+        TextAnalyzer.from_config(FakeConversationParser([]), FakeTextModels(), config)
