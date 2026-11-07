@@ -1,3 +1,4 @@
+import unicodedata
 from collections import Counter
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
@@ -29,11 +30,20 @@ def palabras_clave(lemas: Sequence[str], n: int) -> list[str]:
 
 
 def tema(lemas: Sequence[str], lexico: Mapping[str, Sequence[str]]) -> tuple[str, float]:
-    coincidencias = {nombre: _coincidencias(lemas, set(palabras)) for nombre, palabras in lexico.items()}
+    normalizados = [normalizar(lema) for lema in lemas]
+    coincidencias = {
+        nombre: _coincidencias(normalizados, {normalizar(p) for p in palabras}) for nombre, palabras in lexico.items()
+    }
     mejor = max(coincidencias, key=coincidencias.get, default=None)
     if mejor is None or coincidencias[mejor] == 0:
         return SIN_TEMA, 0.0
     return mejor, coincidencias[mejor] / len(lemas)
+
+
+def normalizar(palabra: str) -> str:
+    # Quitar todos los combinantes convierte también «ñ» en «n»; se acepta para comparar con el léxico.
+    descompuesta = unicodedata.normalize("NFKD", palabra.casefold())
+    return "".join(c for c in descompuesta if not unicodedata.combining(c))
 
 
 def _coincidencias(lemas: Sequence[str], palabras: set[str]) -> int:
