@@ -75,10 +75,11 @@ def leer_etiquetas(ruta: Path) -> Etiquetas:
 
 
 def _etiqueta(datos: Mapping[str, Any]) -> EtiquetaLote:
-    faltantes = [campo for campo in ("mensajes", "tema", "sentimiento", "ofensa") if not isinstance(datos.get(campo), str)]
+    campos = ("mensajes", "tema", "sentimiento", "ofensa")
+    faltantes = [campo for campo in campos if not isinstance(datos.get(campo), str)]
     if faltantes:
         raise ValueError(f"etiqueta sin {', '.join(faltantes)}: {datos!r}")
-    etiqueta = EtiquetaLote(datos["mensajes"], datos["tema"], datos["sentimiento"], datos["ofensa"])
+    etiqueta = EtiquetaLote(*(datos[campo] for campo in campos))
     if etiqueta.sentimiento not in ETIQUETAS_DE_SENTIMIENTO:
         raise ValueError(f"sentimiento desconocido en la etiqueta: {etiqueta.sentimiento!r}")
     if etiqueta.ofensa not in CUARTA_SALIDA:
@@ -165,8 +166,10 @@ def _fila(categoria: str, pares: Sequence[tuple[EtiquetaLote, EtiquetaLote]], ca
     return FilaAciertos(categoria, len(pares), aciertos, len(pares) - aciertos)
 
 
-def generar_markdown(comando: str, config: Mapping[str, Any], tamano_lote: int, resultados: Sequence[ResultadoLote]) -> str:
-    modelos = [f"- {clave}: `{config['modelos'][clave]['nombre']}`, revisión `{config['modelos'][clave]['revision']}`" for clave in MODELOS]
+def generar_markdown(
+    comando: str, config: Mapping[str, Any], tamano_lote: int, resultados: Sequence[ResultadoLote]
+) -> str:
+    modelos = [_linea_de_modelo(clave, config["modelos"][clave]) for clave in MODELOS]
     filas = [f"| {f.categoria} | {f.lotes} | {f.aciertos} | {f.errores} |" for f in tabla_aciertos(resultados)]
     detalle = [
         f"| mensajes {r.esperado.mensajes} | {r.esperado.tema} / {r.obtenido.tema} | "
@@ -197,6 +200,10 @@ def generar_markdown(comando: str, config: Mapping[str, Any], tamano_lote: int, 
             "",
         ]
     )
+
+
+def _linea_de_modelo(clave: str, modelo: Mapping[str, str]) -> str:
+    return f"- {clave}: `{modelo['nombre']}`, revisión `{modelo['revision']}`"
 
 
 def construir_analizador(config: Path, modelos: TextModels, tamano_lote: int) -> TextAnalyzer:
