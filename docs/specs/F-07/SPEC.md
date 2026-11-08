@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-07-2-inferir-con-spacy-y-huggingface
 **Verificación IA:** revision 2fb3f00
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
