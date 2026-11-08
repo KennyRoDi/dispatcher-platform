@@ -18,6 +18,7 @@ MUESTRA = [
     "¡Qué alegría! Gracias por invitarme al café.",
     "Si no me pagas la deuda, vas a ver lo que te pasa.",
     "Vas a ver lo que te pasa si no pagas.",
+    "Vamos a ver qué dice el profesor mañana.",
 ]
 INDICES_AMENAZA = {2, 3}
 

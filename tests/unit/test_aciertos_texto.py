@@ -296,3 +296,35 @@ def test_solo_el_lote_de_amenaza_contiene_el_patron_explicito():
     for indice, etiqueta_lote in enumerate(etiquetas):
         lote_textos = " ".join(textos[indice * 10 : (indice + 1) * 10])
         assert ("vas a ver" in lote_textos) == (etiqueta_lote.ofensa == "amenaza")
+
+
+def seccion_limites(texto):
+    assert "## Límites" in texto
+    return texto.split("## Límites", 1)[1].lower()
+
+
+def test_markdown_declara_sus_limites_con_el_tamano_de_muestra_calculado():
+    with open(CONFIG, "rb") as archivo:
+        config = tomllib.load(archivo)
+
+    limites = seccion_limites(generar_markdown("cmd", config, 10, resultados_de_ejemplo()))
+
+    assert re.search(r"\b3 lotes\b", limites)
+    assert re.search(r"\b30 mensajes\b", limites)
+    assert "sintética" in limites and "ia" in re.findall(r"\w+", limites)
+    assert "léxico de temas" in limites and "patrones de amenaza" in limites
+    assert "explícitas" in limites and "implícitas" in limites
+    assert "punta a punta" in limites and "precisión" in limites
+
+
+def test_tamano_de_muestra_de_los_limites_sale_de_los_resultados():
+    with open(CONFIG, "rb") as archivo:
+        config = tomllib.load(archivo)
+    amenaza = EtiquetaLote("0-9", "conflicto", "negativo", "amenaza")
+    tranquilo = EtiquetaLote("10-14", "reunion", "neutral", "sin_ofensa")
+    resultados = [ResultadoLote(amenaza, amenaza), ResultadoLote(tranquilo, tranquilo)]
+
+    limites = seccion_limites(generar_markdown("cmd", config, 10, resultados))
+
+    assert re.search(r"\b2 lotes\b", limites)
+    assert re.search(r"\b15 mensajes\b", limites)

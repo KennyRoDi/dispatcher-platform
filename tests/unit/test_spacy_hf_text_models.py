@@ -423,3 +423,11 @@ def test_patrones_de_amenaza_del_repositorio_no_dependen_de_mayusculas_ni_del_le
     for patron in leer_repo().patrones_amenaza:
         for token in patron.tokens:
             assert set(token) <= ATRIBUTOS_INSENSIBLES_A_MAYUSCULAS, f"{patron.nombre}: {dict(token)}"
+
+
+def test_patron_vas_a_ver_del_repositorio_solo_acepta_formas_dirigidas_a_otra_persona():
+    [patron] = [p for p in leer_repo().patrones_amenaza if p.nombre == "vas_a_ver"]
+    formas = set(patron.tokens[0]["LOWER"]["IN"])
+
+    assert "vas" in formas
+    assert not formas & {"voy", "vamos"}
