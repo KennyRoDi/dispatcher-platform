@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-07-2-inferir-con-spacy-y-huggingface
 **Verificación IA:** revision 2fb3f00
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -297,3 +297,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Opus 5.5) | 2026-11-07 | Revise el diff de docs: AD-26 sigue provisional con la medicion funcional y sus limites; SPEC con limites al cerrar F-07 sin campos sin completar; README con comandos de evidencia; CONTRATOS; 913 verdes. Bitacora: corrijo lineas a 267 y agrego componente (e411601) |
 | documentacion | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de revision | Claude Code (Opus 5.5) | 2026-11-07 | Revisor APROBADO sin bloqueantes; regenero la evidencia con modelos reales y es identica salvo la ruta de salida (lo compare yo); arbol limpio; 913 verdes; observaciones menores no bloqueantes (2fb3f00) |
+| revision | José Andrés Loría Herrera | 2026-11-07 |  |
