@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-07-2-inferir-con-spacy-y-huggingface
 **Verificación IA:** tests 67f12f2
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -266,3 +266,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (Opus 5.5) | 2026-11-07 | Revisor APROBADO sin bloqueantes; confirme arbol limpio, 884 verdes y la nota de pytest.ini; observaciones menores no bloqueantes (319af90) |
 | revision | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de tests | Claude Code (Opus 5.5) | 2026-11-07 | Solo tests/ cambia (567 lineas: conversacion y etiquetas sinteticas, 24 unitarias, aceptacion con importorskip); rojo: error de coleccion por scripts.aciertos_texto inexistente, resto 884 verdes; lei los 40 mensajes: ficticios, sin personas reales (67f12f2) |
+| tests | José Andrés Loría Herrera | 2026-11-07 |  |
