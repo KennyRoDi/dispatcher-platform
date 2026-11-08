@@ -198,8 +198,23 @@ def generar_markdown(
             "|---|---|---|---|",
             *detalle,
             "",
+            *_limites(resultados),
         ]
     )
+
+
+def _limites(resultados: Sequence[ResultadoLote]) -> list[str]:
+    mensajes = sum(len(_indices(r.esperado.mensajes)) for r in resultados)
+    return [
+        "## Límites",
+        "",
+        f"- Muestra pequeña: {len(resultados)} lotes y {mensajes} mensajes.",
+        "- La conversación es sintética y fue redactada con IA conociendo el léxico de temas y los patrones de "
+        "amenaza, así que favorece los aciertos.",
+        "- Los patrones solo detectan amenazas explícitas, no las implícitas.",
+        "- La tabla prueba el funcionamiento de punta a punta, no la precisión del analizador.",
+        "",
+    ]
 
 
 def _linea_de_modelo(clave: str, modelo: Mapping[str, str]) -> str:
