@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-07-1-worker-de-texto
 **Verificación IA:** documentacion 9f0a540
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -262,3 +262,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | Corregidas O1 (pruebas de from_config con modulos falsos), O2 (ValueError ante salida mal formada) y patron vas_a_ver con LOWER; 884 verdes; 237 lineas; integracion aun saltada sin spacy (c889c73) |
 | verificacion | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de documentacion | Claude Code (Opus 5.5) | 2026-11-07 | Revise el diff de docs: README instala requirements-texto con citas; ARQUITECTURA R11 y R12; CONTRATOS; SPEC con pendientes para la parte 3 sin campos sin completar; 884 verdes (9f0a540) |
+| documentacion | José Andrés Loría Herrera | 2026-11-07 |  |
