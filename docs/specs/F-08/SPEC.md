@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 19b2add
+**Verificación IA:** tests 09d2bb4
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
 
 ## Objetivo
@@ -219,3 +219,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador; subagente arquitecto general-purpose) | 2026-11-08 | Lei SPEC completo y git diff de 0cffc1c: solo SPEC, 1 fila AD-27 en ARQUITECTURA §8 y 1 fila SUP-22 en REQUERIMIENTOS §3. SPEC sin campos pendientes (grep). Criterios de US-08 copiados tal cual; adicionales trazan a RF-07, SUP-07, RF-14, RNF-25, B.3. Contrasté con ENUNCIADO: B.4 pide clasificacion o deteccion de objetos/contenido sensible, B.7 sugiere YOLO; AD-19 ya fija YOLO nano; prueba roja coincide con IMPLEMENTACION §4 linea 127. PR #28 abierta (gh pr view); SeverityRules y _sha256 existen en feat/F-07-1; torch==2.15.0 coincide con requirements-texto.txt de F-07-2/3. Plan de pila 3 PR estimadas 200/90/110 lineas (menos de 400). Sin llaves ni datos de terceros. No verificado: licencia AGPL de Ultralytics y pesos, wheels para 3.13/3.14. Re-registrada: la anterior (a92f221, revertida en 19b2add) contenia el caracter de campo pendiente. (19b2add) |
 | plan | José Andrés Loría Herrera | 2026-11-08 |  |
+| verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff 5327f5a..09d2bb4: solo tests/ (5 archivos, +279/-1), nada en src, config ni requirements. Lei test_image_analyzer.py y test_image_detection.py completos y los diffs de test_severity.py y test_arquitectura.py: cubren cada fila unitaria del SPEC (prueba roja de IMPLEMENTACION §4, lista vacia, fuera del mapa, bajo umbral, agrupacion, comprobar_analyzer, from_config valido e invalido, Detection, sensitive_findings, obligatoria parametrizada, ultralytics y cv2 prohibidos). py -m pytest -q -m 'not integration and not acceptance': 3 errores de coleccion por ModuleNotFoundError de src.adapters.hashing, src.adapters.image_analyzer y src.domain.image_detection; ignorandolos, 745 pasan y 1 falla (TypeError por el parametro obligatoria inexistente). Todos los fallos se deben a funcionalidad faltante. Interpretaciones del developer aceptadas: umbral minimo inclusivo, caja sin exigir x2>=x1. Detalle menor: test_severity.py sin salto de linea final. (09d2bb4) |
