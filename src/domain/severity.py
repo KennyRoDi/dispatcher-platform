@@ -6,6 +6,7 @@ from typing import Any
 from src.domain.finding import Severity
 
 CATEGORIA_OBLIGATORIA = "amenaza"
+CAMPOS_DE_REGLA = ("categoria", "umbral", "nivel")
 
 
 @dataclass(frozen=True)
@@ -20,7 +21,15 @@ class SeverityRules:
 
     @classmethod
     def from_dict(cls, datos: Mapping[str, Any]) -> "SeverityRules":
-        reglas = {regla["categoria"]: _regla(regla) for regla in datos.get("severidad", [])}
+        lista = datos.get("severidad", [])
+        if not isinstance(lista, list):
+            raise ValueError(f"severidad debe ser una lista de reglas: {lista!r}")
+        reglas: dict[str, SeverityRule] = {}
+        for regla in lista:
+            categoria = _categoria(regla)
+            if categoria in reglas:
+                raise ValueError(f"regla de severidad duplicada para la categoría «{categoria}»")
+            reglas[categoria] = _regla(regla)
         if CATEGORIA_OBLIGATORIA not in reglas:
             raise ValueError(f"falta una regla de severidad para la categoría «{CATEGORIA_OBLIGATORIA}» (SUP-07)")
         return cls(reglas)
@@ -38,6 +47,22 @@ def umbral_valido(valor: Any, nombre: str) -> float:
     if not es_numero or not math.isfinite(valor) or not 0 <= valor <= 1:
         raise ValueError(f"{nombre} debe ser un número finito entre 0 y 1: {valor!r}")
     return float(valor)
+
+
+def _categoria(regla: Any) -> str:
+    if not isinstance(regla, Mapping):
+        raise ValueError(f"cada regla de severidad debe ser una tabla: {regla!r}")
+    faltantes = [campo for campo in CAMPOS_DE_REGLA if campo not in regla]
+    if faltantes:
+        raise ValueError(f"a la regla de severidad le falta {', '.join(faltantes)}: {dict(regla)!r}")
+    # Una clave suelta escrita tras [[severidad]] en el TOML cae dentro de la regla, no en la raíz.
+    desconocidos = [campo for campo in regla if campo not in CAMPOS_DE_REGLA]
+    if desconocidos:
+        raise ValueError(f"campo desconocido en la regla de severidad: {', '.join(map(str, desconocidos))}")
+    categoria = regla["categoria"]
+    if not isinstance(categoria, str) or not categoria:
+        raise ValueError(f"la categoria de una regla debe ser texto no vacío: {categoria!r}")
+    return categoria
 
 
 def _regla(datos: Mapping[str, Any]) -> SeverityRule:

@@ -108,3 +108,42 @@ def test_umbral_en_los_extremos_se_acepta(umbral):
     reglas = SeverityRules.from_dict({"severidad": [{"categoria": "amenaza", "umbral": umbral, "nivel": "alta"}]})
 
     assert reglas.por_categoria["amenaza"].umbral == umbral
+
+
+def test_dos_reglas_de_la_misma_categoria_se_rechazan():
+    duplicadas = {
+        "severidad": [
+            {"categoria": "amenaza", "umbral": 0.5, "nivel": "alta"},
+            {"categoria": "amenaza", "umbral": 0.9, "nivel": "media"},
+        ]
+    }
+
+    with pytest.raises(ValueError, match="duplicada.*amenaza"):
+        SeverityRules.from_dict(duplicadas)
+
+
+@pytest.mark.parametrize("campo", ["categoria", "umbral", "nivel"])
+def test_regla_sin_campo_obligatorio_se_rechaza_nombrando_el_campo(campo):
+    regla = {"categoria": "amenaza", "umbral": 0.5, "nivel": "alta"}
+    del regla[campo]
+
+    with pytest.raises(ValueError, match=campo):
+        SeverityRules.from_dict({"severidad": [regla]})
+
+
+@pytest.mark.parametrize("severidad", [{"categoria": "amenaza", "umbral": 0.5, "nivel": "alta"}, "alta", 3])
+def test_severidad_que_no_es_lista_se_rechaza(severidad):
+    with pytest.raises(ValueError, match="severidad"):
+        SeverityRules.from_dict({"severidad": severidad})
+
+
+@pytest.mark.parametrize("regla", ["amenaza", 0.5, ["amenaza", 0.5, "alta"]])
+def test_regla_que_no_es_tabla_se_rechaza(regla):
+    with pytest.raises(ValueError, match="regla"):
+        SeverityRules.from_dict({"severidad": [regla]})
+
+
+@pytest.mark.parametrize("categoria", [5, "", None])
+def test_categoria_que_no_es_texto_se_rechaza(categoria):
+    with pytest.raises(ValueError, match="categoria"):
+        SeverityRules.from_dict({"severidad": [{"categoria": categoria, "umbral": 0.5, "nivel": "alta"}]})
