@@ -67,6 +67,16 @@ pip install -r requirements-texto.txt
 
 Incluye el modelo de spaCy `es_core_news_sm` 3.8.0 (Explosion AI, GPL-3.0). Los modelos `pysentimiento/robertuito-sentiment-analysis` y `pysentimiento/robertuito-hate-speech` (Pérez et al., github.com/pysentimiento/pysentimiento) se descargan de HuggingFace con la revisión fijada en `config/texto.toml`; se entrenaron con datasets de uso no comercial, admitido solo por el uso académico del proyecto. Referencias R11 y R12 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
 
+La primera carga descarga unos 870 MB de HuggingFace y necesita red. Para generar la tabla de aciertos, desde la raíz del repositorio:
+
+```bash
+pytest -m integration tests/integration/test_text_models_real.py
+python -m scripts.aciertos_texto --conversacion tests/datos/aciertos_texto_conversacion.json --etiquetas tests/datos/aciertos_texto_etiquetas.json --salida docs/evidencia/F-07_aciertos_<fecha>.md
+pytest -m acceptance tests/acceptance/test_texto_aciertos.py
+```
+
+El script usa el tamaño de lote del archivo de etiquetas. La conversación es sintética; la tabla prueba el funcionamiento de punta a punta, no la precisión. La corrida del 2026-11-07 está en `docs/evidencia/F-07_aciertos_2026-11-07.md`.
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*

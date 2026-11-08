@@ -24,12 +24,12 @@ class TextSettings:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "umbral_ofensa", umbral_valido(self.umbral_ofensa, "umbral_ofensa"))
-        _exigir_entero_positivo(self.tamano_lote, "tamano_lote")
-        _exigir_entero_positivo(self.n_palabras_clave, "n_palabras_clave")
+        exigir_entero_positivo(self.tamano_lote, "tamano_lote")
+        exigir_entero_positivo(self.n_palabras_clave, "n_palabras_clave")
         _exigir_lexico(self.lexico)
 
 
-def _exigir_entero_positivo(valor: Any, nombre: str) -> None:
+def exigir_entero_positivo(valor: Any, nombre: str) -> None:
     # bool es subclase de int: sin excluirlo, `true` en el TOML pasaría como 1.
     if not isinstance(valor, int) or isinstance(valor, bool) or valor <= 0:
         raise ValueError(f"{nombre} debe ser un entero positivo: {valor!r}")
