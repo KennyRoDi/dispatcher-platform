@@ -45,3 +45,13 @@ def comprobar_finding_store(almacen):
     almacen.add("c1", [hallazgo])
     assert almacen.list("c1") == [hallazgo]
     assert almacen.list("c2") == []
+
+
+def comprobar_analyzer(analizador, path):
+    hallazgos = analizador.analyze(path)
+    assert isinstance(hallazgos, list)
+    for hallazgo in hallazgos:
+        assert isinstance(hallazgo, Finding)
+        assert hallazgo.evidence.object_sha256
+        assert hallazgo.evidence.position
+        assert 0 <= hallazgo.confidence <= 1
