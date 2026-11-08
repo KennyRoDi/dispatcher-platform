@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-07-2-inferir-con-spacy-y-huggingface
-**Verificación IA:** implementacion 68c3672
+**Verificación IA:** verificacion fe49517
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
 
 ## Objetivo
@@ -269,3 +269,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de implementacion | Claude Code (Opus 5.5) | 2026-11-07 | Pruebas intactas desde 67f12f2; 910 verdes, aceptacion saltada sin spacy; 246 lineas (script 243, analyze_text renombra exigir_entero_positivo); lei construir_analizador y main; sin evidencia ni cifras escritas (68c3672) |
 | implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | Modelos reales ejecutados en venv aparte: integracion 2 y aceptacion 1 pasan; evidencia regenerada con seccion Limites (4/4, 1/1, 1/1, 2/2). QA: tabla no mide precision; corregidos H1 (limites) y falso positivo voy/vamos a ver; confirme margenes clave por mi cuenta; 913 verdes (fe49517) |
