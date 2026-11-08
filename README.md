@@ -58,6 +58,15 @@ python scripts/flujo.py empezables
 
 *Pendiente.*
 
+**Analizador de texto (F-07).** Sus dependencias van en `requirements-texto.txt`, aparte de `requirements-dev.txt` para que CI no instale torch. torch se instala primero, solo CPU:
+
+```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-texto.txt
+```
+
+Incluye el modelo de spaCy `es_core_news_sm` 3.8.0 (Explosion AI, GPL-3.0). Los modelos `pysentimiento/robertuito-sentiment-analysis` y `pysentimiento/robertuito-hate-speech` (Pérez et al., github.com/pysentimiento/pysentimiento) se descargan de HuggingFace con la revisión fijada en `config/texto.toml`; se entrenaron con datasets de uso no comercial, admitido solo por el uso académico del proyecto. Referencias R11 y R12 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*

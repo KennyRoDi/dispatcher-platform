@@ -156,14 +156,14 @@ Las unitarias no usan red, `sleep`, reloj real ni modelos. `TextModels` falso se
 Destino: `docs/evidencia/F-07_aciertos_<fecha>.md`, con el comando exacto, los identificadores y revisiones de los modelos, el tamaño de lote y la tabla de aciertos y errores por categoría. Ningún valor se escribe de antemano.
 
 ```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-texto.txt
-python -m spacy download <modelo_spacy>
 pytest -m integration tests/integration/test_text_models_real.py
 python -m scripts.aciertos_texto --conversacion <archivo> --etiquetas <archivo> --salida docs/evidencia/F-07_aciertos_<fecha>.md
 pytest -m acceptance tests/acceptance/test_texto_aciertos.py
 ```
 
-Los nombres de modelo y de archivos se fijan al responder las preguntas abiertas.
+La parte 2 fijó los modelos y sus revisiones en `config/texto.toml`; el modelo de spaCy se instala como *wheel* desde `requirements-texto.txt`, así que no hace falta `spacy download`. Los pesos de HuggingFace se descargan en la primera carga y necesitan red. Los nombres de los archivos de la parte 3 se fijan al implementarla.
 
 ## Mediciones
 
@@ -221,6 +221,17 @@ José Andrés decidió que O2, O4, O5 y O7 entran en la parte 2, junto con valid
 - O5: `tamano_lote` y `n_palabras_clave` se validan al cargar como enteros positivos; se rechazan `bool`, flotantes y texto.
 - O7: una etiqueta de sentimiento fuera de positivo/neutral/negativo se rechaza con `ValueError`.
 - Puntajes: `sentiment_score` u `offense_score` fuera de [0, 1] se rechazan con `ValueError` claro, en vez del error de `Finding`.
+
+### Pendientes para la parte 3
+
+Observaciones del QA de la parte 2, sin hallazgos H, que José Andrés decide si se corrigen en la parte 3. En la parte 2 se corrigieron la prueba del camino feliz de `from_config`, el `ValueError` ante una salida mal formada del pipeline y la detección de «Vas a ver» con mayúscula inicial.
+
+- Puntajes del pipeline: un `NaN` en una etiqueta que no gana se ignora, y un empate se resuelve por el orden de salida del pipeline.
+- Validador de patrones de amenaza: es más estricto o más laxo que spaCy según el caso. Acepta un token vacío `{}`, claves extra y atributos mal escritos, y no rechaza nombres de patrón repetidos.
+- Reglas de severidad: `amenaza` y `Amenaza` coexisten como categorías distintas, y las claves desconocidas en la raíz de `config/texto.toml` se ignoran sin aviso, por ejemplo `tamano_lotes`.
+- `from_config` sin spaCy instalado da `ModuleNotFoundError` sin indicar que falta `requirements-texto.txt`, y acepta `revision = "main"`, que no fija una versión.
+- No se aplica `preprocess_tweet` de pysentimiento antes de inferir ni se configura `batch_size` en los pipelines.
+- La prueba de integración `tests/integration/test_text_models_real.py` nunca se ha ejecutado, porque spaCy no está instalado en el equipo de desarrollo. Ningún modelo real se ha corrido todavía.
 
 ## Aprobaciones
 
