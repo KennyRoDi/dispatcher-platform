@@ -159,11 +159,11 @@ Destino: `docs/evidencia/F-07_aciertos_<fecha>.md`, con el comando exacto, los i
 pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-texto.txt
 pytest -m integration tests/integration/test_text_models_real.py
-python -m scripts.aciertos_texto --conversacion <archivo> --etiquetas <archivo> --salida docs/evidencia/F-07_aciertos_<fecha>.md
+python -m scripts.aciertos_texto --conversacion tests/datos/aciertos_texto_conversacion.json --etiquetas tests/datos/aciertos_texto_etiquetas.json --salida docs/evidencia/F-07_aciertos_<fecha>.md
 pytest -m acceptance tests/acceptance/test_texto_aciertos.py
 ```
 
-La parte 2 fijó los modelos y sus revisiones en `config/texto.toml`; el modelo de spaCy se instala como *wheel* desde `requirements-texto.txt`, así que no hace falta `spacy download`. Los pesos de HuggingFace se descargan en la primera carga y necesitan red. Los nombres de los archivos de la parte 3 se fijan al implementarla.
+La parte 2 fijó los modelos y sus revisiones en `config/texto.toml`; el modelo de spaCy se instala como *wheel* desde `requirements-texto.txt`, así que no hace falta `spacy download`. Los pesos de HuggingFace, unos 870 MB, se descargan en la primera carga y necesitan red. El script corre como módulo desde la raíz del repositorio y usa el tamaño de lote del archivo de etiquetas (10), no el de `config/texto.toml` (50). La evidencia del 2026-11-07 está en `docs/evidencia/F-07_aciertos_2026-11-07.md`.
 
 ## Mediciones
 
@@ -189,7 +189,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 4. **Qué es «un lote».** SUP-12 dice que una sub-tarea puede ser «un lote de mensajes de tamaño configurable». Si F-05 ya parte la conversación en lotes, `TextAnalyzer` recibe un lote y produce un solo grupo de cuatro salidas; si recibe la conversación completa, la parte él. El diseño admite ambos casos con `tamaño_lote`. ¿Qué tamaño por defecto se usa (se propone 50 mensajes) y quién parte: F-05 o F-07?
 5. **Clasificación temática por léxico.** AD-26 propone léxico en configuración en lugar de un modelo *zero-shot*, por memoria y explicabilidad. ¿Se acepta, y qué temas define el equipo? Deben coincidir con las etiquetas de la verdad de referencia.
 6. **Amenaza por patrones.** Se propone `Matcher` de spaCy con patrones en configuración, porque no se encontró un clasificador de amenazas en español ya identificado. ¿Se acepta? Un patrón no detecta amenazas implícitas; se declarará así en la evidencia.
-7. **Umbrales de severidad.** 0.5 es provisional. SUP-07 define qué es alta, no el umbral. Se calibran con la tabla de aciertos de la Parte 3.
+7. **Umbrales de severidad.** 0.5 es provisional. SUP-07 define qué es alta, no el umbral. Se calibran con la tabla de aciertos de la Parte 3. *Sin resolver al cerrar F-07:* la muestra de la parte 3 no permite calibrarlos y siguen provisionales; ver «Límites conocidos al cerrar F-07».
 8. **Verdad de referencia.** *Resuelta por José Andrés para la parte 3:* conversación etiquetada sintética redactada con IA, revisada por José Andrés y declarada en la bitácora, en `tests/datos/`; la parte 3 se limita a lo mínimo (script, prueba de aceptación, conversación y evidencia) y las observaciones menores de QA quedan anotadas sin corregir. Las etiquetas formales son de F-04 (Kenni), aún pendiente, y F-03 está en plan. Para no depender de otro responsable, se propone que la Parte 3 use una conversación etiquetada sintética, corta, escrita por José Andrés en `tests/datos/`, sin personas reales [B.3]; si se redacta con IA, se declara en la bitácora. Cuando F-04 exista, la misma prueba se repite sobre su manifiesto. ¿Se acepta? F-03 pregunta además si sus plantillas incluirán frases de amenaza ficticias para F-07 (pregunta 5 de su SPEC).
 9. **Formato de `EvidenceRef.position`.** Se propone `mensajes 12-23` y `mensajes 15,18`, índices en el orden de `parse`. Lo leerán el reporte y las alertas de Kenni (F-11, F-14). ¿Se acuerda con Kenni ahora o se deja como está hasta que F-11 lo necesite?
 10. **Conexión con el worker.** El bucle heredado no consume `Subtask` y F-12 lo reemplaza. Se propone no conectar `TextAnalyzer` al worker en F-07 y que F-12, también de José Andrés, invoque cualquier `Analyzer` por tipo de contenido. ¿Se acepta, o se agrega una Parte 4 que lo conecte al worker actual?
@@ -224,14 +224,37 @@ José Andrés decidió que O2, O4, O5 y O7 entran en la parte 2, junto con valid
 
 ### Pendientes para la parte 3
 
-Observaciones del QA de la parte 2, sin hallazgos H, que José Andrés decide si se corrigen en la parte 3. En la parte 2 se corrigieron la prueba del camino feliz de `from_config`, el `ValueError` ante una salida mal formada del pipeline y la detección de «Vas a ver» con mayúscula inicial.
+Observaciones del QA de la parte 2, sin hallazgos H. José Andrés decidió no corregirlas en la parte 3, que se limitó al alcance mínimo, y siguen abiertas, salvo la última, que la parte 3 resolvió. En la parte 2 se corrigieron la prueba del camino feliz de `from_config`, el `ValueError` ante una salida mal formada del pipeline y la detección de «Vas a ver» con mayúscula inicial.
 
 - Puntajes del pipeline: un `NaN` en una etiqueta que no gana se ignora, y un empate se resuelve por el orden de salida del pipeline.
 - Validador de patrones de amenaza: es más estricto o más laxo que spaCy según el caso. Acepta un token vacío `{}`, claves extra y atributos mal escritos, y no rechaza nombres de patrón repetidos.
 - Reglas de severidad: `amenaza` y `Amenaza` coexisten como categorías distintas, y las claves desconocidas en la raíz de `config/texto.toml` se ignoran sin aviso, por ejemplo `tamano_lotes`.
 - `from_config` sin spaCy instalado da `ModuleNotFoundError` sin indicar que falta `requirements-texto.txt`, y acepta `revision = "main"`, que no fija una versión.
 - No se aplica `preprocess_tweet` de pysentimiento antes de inferir ni se configura `batch_size` en los pipelines.
-- La prueba de integración `tests/integration/test_text_models_real.py` nunca se ha ejecutado, porque spaCy no está instalado en el equipo de desarrollo. Ningún modelo real se ha corrido todavía.
+- *Resuelta en la parte 3:* la prueba de integración `tests/integration/test_text_models_real.py` no se había ejecutado. El 2026-11-07 corrió con los modelos reales en un venv aparte: 2 passed.
+
+### Límites conocidos al cerrar F-07
+
+Ejecución real del 2026-11-07 en Windows, en un venv aparte con torch 2.15.0+cpu, spacy 3.8.18, transformers 5.22.2 y `es_core_news_sm` 3.8.0: integración 2 passed y aceptación 1 passed. Tabla: tema 4/4, sentimiento 4/4, amenaza 1/1, ofensivo 1/1 y sin ofensa 2/2.
+
+La tabla prueba el funcionamiento de punta a punta, no la precisión. Lo que sigue viene de pruebas exploratorias de QA con los modelos reales, no de la evidencia formal:
+
+- El lote ofensivo acierta por 2 de 10 insultos, con puntaje cercano a 0.99; los otros 8 quedan entre 0.014 y 0.033. El modelo de odio no detecta insultos genéricos.
+- Las amenazas sin patrón, como «te voy a matar» o «sé dónde vivís», no se detectan, y la ironía se lee como positiva.
+- Los puntajes de ofensa de la muestra quedan en 0.133 o menos y en 0.981 o más, así que `umbral_ofensa` no se puede calibrar con ella. Los umbrales siguen provisionales (pregunta 7).
+- La tabla depende del tamaño de lote 10, y en un lote la amenaza tapa a ofensivo.
+- La conversación la redactó IA conociendo el léxico y los patrones, así que favorece los aciertos.
+
+Corregido en la parte 3: la evidencia declara sus límites (H1) y el patrón `vas_a_ver` quedó en «vas» y «van», porque «voy» y «vamos a ver», introducidos en la parte 2, daban amenazas altas falsas.
+
+Sin corregir, por el alcance mínimo de la parte 3:
+
+- Un archivo inexistente o un JSON mal formado salen como traceback, no como `error:` con código 1. Un JSON con BOM se rechaza.
+- El comando registrado en la evidencia no lleva comillas ni las versiones de torch y transformers.
+- La etiqueta `tema` del archivo de etiquetas no se valida contra los temas del léxico.
+- El script solo corre como `python -m` desde la raíz del repositorio.
+- Las palabras clave incluyen ruido como «vo», «sos» o «enviastir».
+- Siguen abiertos los pendientes de la parte 2 listados arriba.
 
 ## Aprobaciones
 
