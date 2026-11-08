@@ -1,6 +1,6 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-07-2-inferir-con-spacy-y-huggingface
 **Verificación IA:** implementacion 68c3672
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
@@ -268,3 +268,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (Opus 5.5) | 2026-11-07 | Solo tests/ cambia (567 lineas: conversacion y etiquetas sinteticas, 24 unitarias, aceptacion con importorskip); rojo: error de coleccion por scripts.aciertos_texto inexistente, resto 884 verdes; lei los 40 mensajes: ficticios, sin personas reales (67f12f2) |
 | tests | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de implementacion | Claude Code (Opus 5.5) | 2026-11-07 | Pruebas intactas desde 67f12f2; 910 verdes, aceptacion saltada sin spacy; 246 lineas (script 243, analyze_text renombra exigir_entero_positivo); lei construir_analizador y main; sin evidencia ni cifras escritas (68c3672) |
+| implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
