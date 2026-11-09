@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-08-1-worker-de-imagen
 **Verificación IA:** implementacion 73f32ef
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -241,3 +241,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff f18cb6e..dc1857d: solo tests (4 archivos, 346 lineas nuevas, 0 borradas en los archivos existentes). py -m pytest -q -m 'not integration and not acceptance' ignorando test_yolo_detector.py: 10 failed, 793 passed; los 10 son DID NOT RAISE de caja invertida, etiqueta, N3 y la mutacion del mapa, por validaciones que faltan. test_yolo_detector.py falla al cargar con ModuleNotFoundError de src.adapters.yolo_detector. La integracion se salta porque ultralytics no esta instalado. Leí las pruebas de sha256: ninguna fija un hash concreto; test_config_del_repositorio_fija_los_pesos_con_su_sha256 exige un hash de 64 hex en config/imagen.toml, que solo se puede calcular sobre el archivo yolo11n.pt descargado (decision pendiente de la persona antes de implementar). N3 esta fuera del SPEC original, pero lo pidio la revision para la parte 2. (dc1857d) |
 | tests | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff 9455ea4 -- tests vacio (0 bytes): no se tocaron ni debilitaron pruebas. git diff --numstat 9455ea4: 91 lineas mas y 6 menos fuera de tests y docs. Leí el diff completo: yolo_detector.py en adaptadores, con importacion diferida de ultralytics y cita de Ultralytics y AGPL-3.0; el dominio y la aplicacion no importan terceros. config/imagen.toml fija el sha256 0ebbc80d que calculé con sha256sum sobre yolo11n.pt de la release v8.4.0 (5613764 bytes), y coincide con el digest de GitHub. *.pt en .gitignore; los pesos no estan en el repositorio. Confirmé ultralytics 8.4.208 con pip index versions. py -m pytest -q -m 'not integration and not acceptance': 821 passed, 1 skipped (la integracion, porque ultralytics no esta instalado). No verificado: YOLO real e integracion, wheels de torch 2.15.0 y ultralytics para Python 3.13, lint (ruff no instalado). (73f32ef) |
+| implementacion | José Andrés Loría Herrera | 2026-11-08 |  |
