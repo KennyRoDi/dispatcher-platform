@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-08-1-worker-de-imagen
 **Verificación IA:** tests dc1857d
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -239,3 +239,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (orquestador; subagente revisor general-purpose) | 2026-11-08 | Revisor independiente: APROBADO sin bloqueantes; criterio a criterio contra el SPEC de la parte 1, pytest 792 passed, conformidad 0 problemas, commits validos. Lo comprobé yo: git diff --name-only 5327f5a..7e694b7 solo trae archivos de la parte 1 y documentos, nada de las partes 2 y 3; 174 lineas mas y 17 menos en src y config; git diff 09d2bb4 -- tests sin lineas borradas; releí image_analyzer.py:20-25 y confirmé N3 (sin clases o sin umbral_minimo se usan valores por defecto sin aviso). No bloqueantes: N1 ambito refactor(F-07) en e7bd288; N2 aviso a Kenni por severity.py pendiente (accion humana); N3 valores por defecto silenciosos, a considerar en la parte 2; N4 test_severity.py sin salto de linea final. (7e694b7) |
 | revision | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff f18cb6e..dc1857d: solo tests (4 archivos, 346 lineas nuevas, 0 borradas en los archivos existentes). py -m pytest -q -m 'not integration and not acceptance' ignorando test_yolo_detector.py: 10 failed, 793 passed; los 10 son DID NOT RAISE de caja invertida, etiqueta, N3 y la mutacion del mapa, por validaciones que faltan. test_yolo_detector.py falla al cargar con ModuleNotFoundError de src.adapters.yolo_detector. La integracion se salta porque ultralytics no esta instalado. Leí las pruebas de sha256: ninguna fija un hash concreto; test_config_del_repositorio_fija_los_pesos_con_su_sha256 exige un hash de 64 hex en config/imagen.toml, que solo se puede calcular sobre el archivo yolo11n.pt descargado (decision pendiente de la persona antes de implementar). N3 esta fuera del SPEC original, pero lo pidio la revision para la parte 2. (dc1857d) |
+| tests | José Andrés Loría Herrera | 2026-11-08 |  |
