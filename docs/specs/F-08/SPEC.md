@@ -1,7 +1,7 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** pr
-**Base:** feat/F-08-1-worker-de-imagen
+**Fase:** tests
+**Base:** feat/F-08-2-worker-de-imagen
 **Verificación IA:** revision aa4e941
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
 
