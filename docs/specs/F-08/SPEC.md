@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-08-1-worker-de-imagen
 **Verificación IA:** revision aa4e941
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -259,3 +259,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-08 | git diff f10cddb..4581ea5: solo docs (README, ARQUITECTURA, CONTRATOS, SPEC; 30 lineas mas y 8 menos). Contrasté con el código: las versiones del README (torch 2.15.0, ultralytics 8.4.208) coinciden con requirements-imagen.txt; las variables F08_DIRECTORIO_PESOS y F08_IMAGEN_POSITIVA existen en test_yolo_detector_real.py:16-18; yolo_detector existe en src/adapters. AD-27 sigue provisional con medición pendiente. R13 nueva porque R11 y R12 ya se usan en las ramas de F-07-2 y F-07-3 (git grep). Los pendientes de la parte 3 del SPEC coinciden con R1-R3 y O1 de QA. El documentador reporta conformidad repo 0 problemas y 822 passed, 1 skipped. Borrador de bitácora revisado: tres errores reales de la IA con su commit o riesgo. (4581ea5) |
 | documentacion | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de revision | Claude Code (orquestador; subagente revisor general-purpose) | 2026-11-08 | Revisor independiente: APROBADO sin bloqueantes; criterio a criterio contra el SPEC de la parte 2, SHA-256 de los pesos recalculado y coincidente, pytest 822 passed 1 skipped, conformidad 0 problemas, 12 commits validos. Lo comprobé yo: git diff --name-only f18cb6e..aa4e941 solo trae archivos de la parte 2, los pendientes de la parte 1 y documentos; 100 lineas mas y 6 menos fuera de tests y docs; 0 lineas borradas en tests; git ls-files '*.pt' vacio. No bloqueantes: AD-27 dice que rechaza una imagen ilegible y solo cubre FileNotFoundError y resultados vacios (R1); pip install -r sin el indice CPU traeria torch con CUDA; integracion real nunca ejecutada (parte 3); R2, R3 y O1 ya registrados en el SPEC. (aa4e941) |
+| revision | José Andrés Loría Herrera | 2026-11-08 |  |
