@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 1beeb6c
+**Verificación IA:** documentacion 802c592
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
 
 ## Objetivo
@@ -234,3 +234,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de verificacion | Claude Code (orquestador; subagentes qa-tester y developer general-purpose) | 2026-11-08 | QA (1 ronda, retomado tras corte de sesion) comprobo cada criterio de la parte 1; los que dependen del modelo real y la muestra quedan fuera de esta parte (partes 2 y 3). Hallo D1 (config mal formada da AttributeError/KeyError/TypeError en vez de ValueError) y D2 (regla duplicada de arma degrada la severidad a baja en silencio) y dejo 5 pruebas rojas en fd6f3b6. Reproduje ambos con py -c: D2 daba Severity.BAJA a 0.95, D1 daba AttributeError. El developer corrigio en 1beeb6c (severity.py valida lista, campos y duplicados; ImageSettings valida Mapping y rechaza espacios al borde, R1). git diff fd6f3b6 -- tests: solo una prueba nueva, sin lineas borradas. Tras la correccion: D1 y D2 dan ValueError con mensaje; py -m pytest -q -m 'not integration and not acceptance': 792 passed, 0 fallos. Parte: 191 lineas en src y config. Sin mediciones de SO en el SPEC. Observaciones menores sin corregir: caja x2<x1, label vacio, mapa guardado por referencia; tipos numpy para la parte 2. No verificado: lint (ruff no instalado). (1beeb6c) |
 | verificacion | José Andrés Loría Herrera | 2026-11-08 |  |
+| verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-08 | git diff cf47823..802c592: solo docs (ARQUITECTURA, CONTRATOS, REQUERIMIENTOS, SPEC; 15 lineas mas y 6 menos). Contrasté con el código: image_detection, analyze_image, hashing e imagen.toml existen en src y config; la tabla de capas de ARQUITECTURA §4 y la fila de dueños de CONTRATOS los listan sin perder entradas previas (texto.toml sigue). AD-27 sigue provisional con medición pendiente. SUP-22 pierde la marca de confirmación porque José Andrés aprobó el plan. La sección Pendientes para la parte 2 del SPEC coincide con las observaciones de QA. Sin fichas de medición (el SPEC no las tiene). El documentador reporta conformidad repo 0 problemas y 792 passed. Borrador de bitácora revisado: errores D1, D2, R1, mutaciones y el carácter rechazado por aprobar, con commits reales. Pendiente humano: avisar a Kenni del cambio de validación en severity.py (CONTRATOS lo pide por F-14). (802c592) |
