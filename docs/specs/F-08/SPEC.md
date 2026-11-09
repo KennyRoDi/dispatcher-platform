@@ -211,6 +211,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - **Choque de números.** AD-25 (F-03), AD-26 (F-07) y AD-27 (F-08) están sin fusionar y en la misma tabla; si cambia el orden de fusión, se renumera y se resuelve el conflicto de líneas.
 - **Archivos compartidos.** `src/domain/severity.py` y `src/adapters/text_analyzer.py` son de F-07, del mismo responsable; `tests/unit/test_arquitectura.py` es compartido. Cambios aditivos de pocas líneas.
 
+### Pendientes para la parte 2
+
+Observaciones del QA de la parte 1 sin corregir. D1, D2 y R1 se corrigieron en la parte 1 durante la verificación (1beeb6c).
+
+- La caja con `x2 < x1` o `y2 < y1` se acepta (`src/domain/image_detection.py`).
+- Una `Detection` con `label` vacío se acepta.
+- `ImageSettings` guarda el mapa de clases por referencia: cambiarlo después de crear los ajustes cambia el análisis.
+- `YoloDetector` debe convertir a `int` y `float` nativos las coordenadas y confianzas de numpy, porque `Detection` rechaza los enteros de numpy en la caja y `numpy.float32` en la confianza.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
