@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-08-2-worker-de-imagen
-**Verificación IA:** tests 6019acc
+**Verificación IA:** implementacion 342e706
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
 
 ## Objetivo
@@ -262,3 +262,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-09 | git diff d06b7b9..6019acc: solo tests (3 archivos, 466 lineas nuevas, 0 borradas en test_yolo_detector.py); sin imagenes ni datos. py -m pytest -q -m 'not integration and not acceptance' ignorando test_aciertos_imagen.py: 11 failed, 823 passed, 1 skipped; los 11 son R1, R2, R3 y O1 del detector, por funcionalidad que falta. test_aciertos_imagen.py falla al cargar con ModuleNotFoundError de scripts.aciertos_imagen. La aceptacion se salta porque ultralytics no esta instalado. Leí test_aciertos_imagen.py:328-333: exige el etiquetas.json real de la muestra, que solo puede aportar José Andrés con sus fotos. Interpretaciones del developer pendientes de confirmar: la aceptacion exige al menos una positiva acertada, categoria obligatoria (null para negativas), y R1 traduce OSError a ValueError sin confirmar que lanza ultralytics 8.4.208. (6019acc) |
 | tests | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-09 | git diff bf7631a -- tests vacio: no se tocaron ni debilitaron pruebas. git diff --numstat bf7631a: scripts/aciertos_imagen.py 199 y yolo_detector.py 24 mas y 4 menos (227 fuera de tests y docs). Leí el diff de yolo_detector: R1 captura OSError, R2 rechaza no finitos y recorta negativos a 0, R3 ValueError con la clase, O1 es_nombre_de_archivo. Medí R1 con YOLO real (venv con torch 2.15.0+cpu, ultralytics 8.4.208, Python 3.14, pesos yolo11n.pt): archivo de texto, bytes aleatorios y JPEG truncado devuelven lista vacia con aviso Image Read Error; archivo inexistente da FileNotFoundError. Devolví al developer dos comentarios que lo contradecian; corregidos en 342e706, solo comentarios. Integracion real en el venv: 1 passed (archivo que no es imagen), 1 skipped (falta F08_IMAGEN_POSITIVA). Aceptacion: skipped, falta etiquetas.json. Unitarias (global y venv): 864 passed, 1 failed, la prueba de la muestra del repositorio, roja aprobada hasta que José Andrés agregue sus fotos. No verificado: tabla de aciertos, lint (ruff no instalado). (342e706) |
