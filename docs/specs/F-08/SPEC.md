@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-08-1-worker-de-imagen
 **Verificación IA:** documentacion 4581ea5
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -257,3 +257,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador; subagente qa-tester general-purpose) | 2026-11-08 | QA (1 ronda, sin instalar ultralytics por acuerdo con la persona) comprobo cada criterio de la parte 2 y recalculo el SHA-256 de yolo11n.pt (0ebbc80d, 5613764 bytes), que coincide con config/imagen.toml. Hizo 19 mutaciones: 14 detectadas, 4 equivalentes y 1 que sobrevivia (sin rechazar resultados vacios), que ahora detecta la prueba de 080eddb (solo agrega 15 lineas en tests). Sin defectos en el alcance. Reproduje sus riesgos con un modelo falso via py -c: cls fuera de names da KeyError 99, coordenada inf da OverflowError y -0.6 da ValueError por la caja (-1,2,3,4). py -m pytest -q -m 'not integration and not acceptance': 822 passed, 1 skipped (integracion). No verificado: YOLO real (parte 3), que excepcion lanza ultralytics 8.4.208 ante un archivo corrupto, y wheels para Python 3.13. (080eddb) |
 | verificacion | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-08 | git diff f10cddb..4581ea5: solo docs (README, ARQUITECTURA, CONTRATOS, SPEC; 30 lineas mas y 8 menos). Contrasté con el código: las versiones del README (torch 2.15.0, ultralytics 8.4.208) coinciden con requirements-imagen.txt; las variables F08_DIRECTORIO_PESOS y F08_IMAGEN_POSITIVA existen en test_yolo_detector_real.py:16-18; yolo_detector existe en src/adapters. AD-27 sigue provisional con medición pendiente. R13 nueva porque R11 y R12 ya se usan en las ramas de F-07-2 y F-07-3 (git grep). Los pendientes de la parte 3 del SPEC coinciden con R1-R3 y O1 de QA. El documentador reporta conformidad repo 0 problemas y 822 passed, 1 skipped. Borrador de bitácora revisado: tres errores reales de la IA con su commit o riesgo. (4581ea5) |
+| documentacion | José Andrés Loría Herrera | 2026-11-08 |  |
