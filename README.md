@@ -58,6 +58,15 @@ python scripts/flujo.py empezables
 
 *Pendiente.*
 
+**Analizador de imagen (F-08).** Sus dependencias van en `requirements-imagen.txt`, aparte de `requirements-dev.txt` para que CI no instale torch. torch se instala primero, solo CPU:
+
+```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-imagen.txt
+```
+
+Usa Ultralytics YOLO 8.4.208 (AGPL-3.0) con los pesos `yolo11n.pt` de la release v8.4.0 de github.com/ultralytics/assets, también AGPL-3.0. Los pesos no van en el repositorio (`*.pt` está en `.gitignore`): se descargan a mano y se colocan en el directorio de pesos que recibe `YoloDetector.from_config`, que comprueba antes de cargarlos el SHA-256 fijado en `config/imagen.toml`. La prueba de integración toma ese directorio de `F08_DIRECTORIO_PESOS` (por defecto, la raíz del repositorio) y la imagen positiva de `F08_IMAGEN_POSITIVA`. Referencia R13 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*

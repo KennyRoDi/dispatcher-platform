@@ -172,7 +172,7 @@ python -m scripts.aciertos_imagen --muestra tests/datos/imagenes --etiquetas tes
 pytest -m acceptance tests/acceptance/test_imagen_aciertos.py
 ```
 
-La versión de torch se toma de F-07 y se confirma en la parte 2.
+La parte 2 fijó `torch==2.15.0` y `ultralytics==8.4.208` en `requirements-imagen.txt`, y los pesos `yolo11n.pt` con su SHA-256 en `config/imagen.toml`. Los pesos se descargan a mano y se pasan como directorio a `YoloDetector.from_config`; la prueba de integración se salta si ultralytics no está instalado.
 
 ## Mediciones
 
@@ -215,10 +215,22 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 Observaciones del QA de la parte 1 sin corregir. D1, D2 y R1 se corrigieron en la parte 1 durante la verificación (1beeb6c).
 
-- La caja con `x2 < x1` o `y2 < y1` se acepta (`src/domain/image_detection.py`).
-- Una `Detection` con `label` vacío se acepta.
-- `ImageSettings` guarda el mapa de clases por referencia: cambiarlo después de crear los ajustes cambia el análisis.
-- `YoloDetector` debe convertir a `int` y `float` nativos las coordenadas y confianzas de numpy, porque `Detection` rechaza los enteros de numpy en la caja y `numpy.float32` en la confianza.
+Las cuatro se resolvieron en la parte 2 (7fd0a3f).
+
+- Resuelto: la caja con `x2 < x1` o `y2 < y1` se rechaza (`src/domain/image_detection.py`).
+- Resuelto: una `Detection` con `label` vacío se rechaza.
+- Resuelto: `ImageSettings` copia el mapa de clases; además `[clases]` y `umbral_minimo` son obligatorios en `config/imagen.toml`.
+- Resuelto: `YoloDetector` convierte a `int` y `float` nativos las coordenadas y confianzas de numpy.
+
+### Pendientes para la parte 3
+
+Observaciones del QA de la parte 2, sin hallazgos H, que José Andrés decide si se corrigen en la parte 3. En la parte 2 se agregó la prueba de la imagen omitida por el modelo (080eddb).
+
+- R1: `detect` solo traduce `FileNotFoundError` a `ValueError`. Falta confirmar qué lanza ultralytics 8.4.208 ante un archivo corrupto o que no es imagen.
+- R2: una coordenada de -0.6 redondea a -1 y `Detection` la rechaza, con lo que se descarta la imagen; una coordenada `inf` da `OverflowError`.
+- R3: un `cls` fuera de `names` da `KeyError`, no `ValueError`.
+- O1: `[modelo] pesos` acepta rutas con `..`, aunque el mensaje de error dice «nombre de archivo».
+- La prueba de integración `tests/integration/test_yolo_detector_real.py` nunca se ha ejecutado, porque ultralytics no está instalado en el equipo de desarrollo, y no se ha comprobado que torch 2.15.0 y ultralytics 8.4.208 instalen y funcionen con Python 3.13. YOLO real no se ha corrido todavía.
 
 ## Aprobaciones
 
