@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 7e694b7
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -237,3 +237,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-08 | git diff cf47823..802c592: solo docs (ARQUITECTURA, CONTRATOS, REQUERIMIENTOS, SPEC; 15 lineas mas y 6 menos). Contrasté con el código: image_detection, analyze_image, hashing e imagen.toml existen en src y config; la tabla de capas de ARQUITECTURA §4 y la fila de dueños de CONTRATOS los listan sin perder entradas previas (texto.toml sigue). AD-27 sigue provisional con medición pendiente. SUP-22 pierde la marca de confirmación porque José Andrés aprobó el plan. La sección Pendientes para la parte 2 del SPEC coincide con las observaciones de QA. Sin fichas de medición (el SPEC no las tiene). El documentador reporta conformidad repo 0 problemas y 792 passed. Borrador de bitácora revisado: errores D1, D2, R1, mutaciones y el carácter rechazado por aprobar, con commits reales. Pendiente humano: avisar a Kenni del cambio de validación en severity.py (CONTRATOS lo pide por F-14). (802c592) |
 | documentacion | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de revision | Claude Code (orquestador; subagente revisor general-purpose) | 2026-11-08 | Revisor independiente: APROBADO sin bloqueantes; criterio a criterio contra el SPEC de la parte 1, pytest 792 passed, conformidad 0 problemas, commits validos. Lo comprobé yo: git diff --name-only 5327f5a..7e694b7 solo trae archivos de la parte 1 y documentos, nada de las partes 2 y 3; 174 lineas mas y 17 menos en src y config; git diff 09d2bb4 -- tests sin lineas borradas; releí image_analyzer.py:20-25 y confirmé N3 (sin clases o sin umbral_minimo se usan valores por defecto sin aviso). No bloqueantes: N1 ambito refactor(F-07) en e7bd288; N2 aviso a Kenni por severity.py pendiente (accion humana); N3 valores por defecto silenciosos, a considerar en la parte 2; N4 test_severity.py sin salto de linea final. (7e694b7) |
+| revision | José Andrés Loría Herrera | 2026-11-08 |  |
