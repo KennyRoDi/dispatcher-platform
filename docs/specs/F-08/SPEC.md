@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 4938666
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -222,3 +222,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff 5327f5a..09d2bb4: solo tests/ (5 archivos, +279/-1), nada en src, config ni requirements. Lei test_image_analyzer.py y test_image_detection.py completos y los diffs de test_severity.py y test_arquitectura.py: cubren cada fila unitaria del SPEC (prueba roja de IMPLEMENTACION §4, lista vacia, fuera del mapa, bajo umbral, agrupacion, comprobar_analyzer, from_config valido e invalido, Detection, sensitive_findings, obligatoria parametrizada, ultralytics y cv2 prohibidos). py -m pytest -q -m 'not integration and not acceptance': 3 errores de coleccion por ModuleNotFoundError de src.adapters.hashing, src.adapters.image_analyzer y src.domain.image_detection; ignorandolos, 745 pasan y 1 falla (TypeError por el parametro obligatoria inexistente). Todos los fallos se deben a funcionalidad faltante. Interpretaciones del developer aceptadas: umbral minimo inclusivo, caja sin exigir x2>=x1. Detalle menor: test_severity.py sin salto de linea final. (09d2bb4) |
 | tests | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff 251af80 -- tests vacio: pruebas no se tocaron ni debilitaron. git diff --numstat 251af80: 148 lineas mas y 17 menos en src y config (menos de 400). Lei el diff completo: el dominio (image_detection, severity) solo importa stdlib y src.domain; la aplicacion (analyze_image) no importa adaptadores; ImageAnalyzer en adaptadores con tomllib; sha256 extraido a hashing.py sin duplicar (grep: no quedan _sha256 ni BLOQUE_LECTURA en text_analyzer). config/imagen.toml sin hash inventado. py -m pytest -q -m 'not integration and not acceptance': 784 passed, 1 deselected, 0 fallos. Decisiones no fijadas por pruebas: detail siempre con cuenta y orden alfabetico (knife x1), desempate por caja, umbral_minimo 0.25 por defecto. No verificado: lint (ruff no instalado). (4938666) |
+| implementacion | José Andrés Loría Herrera | 2026-11-08 |  |
