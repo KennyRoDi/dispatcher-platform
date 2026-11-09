@@ -32,10 +32,11 @@ class YoloDetector:
     def detect(self, path: Path) -> list[Detection]:
         try:
             resultados = self.modelo.predict(str(path), device="cpu", verbose=False)
-        # Ultralytics da FileNotFoundError ante un archivo que no decodifica, y PIL da OSError ante uno corrupto.
+        # Ultralytics 8.4.208 da FileNotFoundError ante un archivo inexistente (medido); se captura OSError
+        # por precaución ante otros errores de lectura.
         except OSError as error:
             raise ValueError(f"no es una imagen legible: {path}") from error
-        # Según la versión, Ultralytics omite con un aviso la imagen que no decodifica en vez de fallar.
+        # Ultralytics 8.4.208 no falla ante un archivo que no decodifica: avisa y devuelve una lista vacía (medido).
         if not resultados:
             raise ValueError(f"no es una imagen legible: {path}")
         return _detecciones(resultados[0])
