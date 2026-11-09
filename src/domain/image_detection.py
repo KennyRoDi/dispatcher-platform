@@ -15,9 +15,11 @@ class Detection:
     box: Box
 
     def __post_init__(self) -> None:
+        if not isinstance(self.label, str) or not self.label:
+            raise ValueError(f"la etiqueta debe ser texto no vacío: {self.label!r}")
         umbral_valido(self.confidence, "confidence")
         if not _caja_valida(self.box):
-            raise ValueError(f"la caja debe ser x1,y1,x2,y2 en enteros no negativos: {self.box!r}")
+            raise ValueError(f"la caja debe ser x1,y1,x2,y2 en enteros no negativos, con x1<=x2 e y1<=y2: {self.box!r}")
 
 
 def sensitive_findings(
@@ -51,4 +53,7 @@ def _caja_valida(caja: object) -> bool:
     if not isinstance(caja, tuple) or len(caja) != 4:
         return False
     # bool es subclase de int: sin excluirlo, True pasaría como la coordenada 1.
-    return all(isinstance(valor, int) and not isinstance(valor, bool) and valor >= 0 for valor in caja)
+    if not all(isinstance(valor, int) and not isinstance(valor, bool) and valor >= 0 for valor in caja):
+        return False
+    x1, y1, x2, y2 = caja
+    return x1 <= x2 and y1 <= y2
