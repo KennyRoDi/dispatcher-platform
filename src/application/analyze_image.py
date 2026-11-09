@@ -20,13 +20,16 @@ class ImageSettings:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "umbral_minimo", umbral_valido(self.umbral_minimo, "umbral_minimo"))
-        vacias = sorted(clase for clase, categoria in self.mapa.items() if not _categoria_valida(categoria))
-        if vacias:
-            raise ValueError(f"clases sin categoría en el mapa: {', '.join(vacias)}")
+        if not isinstance(self.mapa, Mapping):
+            raise ValueError(f"clases debe ser una tabla de clase a categoría: {self.mapa!r}")
+        invalidas = sorted(clase for clase, categoria in self.mapa.items() if not _categoria_valida(categoria))
+        if invalidas:
+            raise ValueError(f"clases con categoría vacía o con espacios al borde: {', '.join(invalidas)}")
 
 
 def _categoria_valida(categoria: object) -> bool:
-    return isinstance(categoria, str) and bool(categoria.strip())
+    # Se rechaza en vez de normalizar: « arma » no casaría con la regla «arma» y quedaría en baja sin aviso.
+    return isinstance(categoria, str) and bool(categoria) and categoria == categoria.strip()
 
 
 def analyze_image(detecciones: list[Detection], sha256: str, ajustes: ImageSettings) -> list[Finding]:

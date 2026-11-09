@@ -194,3 +194,10 @@ def test_regla_duplicada_de_arma_no_degrada_la_severidad_en_silencio(tmp_path):
 
     with pytest.raises(ValueError, match="arma"):
         ImageAnalyzer.from_config(FakeObjectDetector([]), config)
+
+
+def test_from_config_rechaza_categoria_con_espacios_al_borde(tmp_path):
+    config = escribir_config(tmp_path / "imagen.toml", clase='knife = " arma "')
+
+    with pytest.raises(ValueError, match="knife"):
+        ImageAnalyzer.from_config(FakeObjectDetector([]), config)
