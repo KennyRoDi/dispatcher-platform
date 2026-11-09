@@ -164,3 +164,33 @@ def test_from_config_rechaza_configuracion_invalida(tmp_path, cambios, mensaje):
 
     with pytest.raises(ValueError, match=mensaje):
         ImageAnalyzer.from_config(FakeObjectDetector([]), config)
+
+
+REGLA_ARMA = '[[severidad]]\ncategoria = "arma"\numbral = 0.5\nnivel = "alta"\n'
+
+
+@pytest.mark.parametrize(
+    "contenido",
+    [
+        'clases = "knife"\n' + REGLA_ARMA,
+        'clases = ["knife"]\n' + REGLA_ARMA,
+        '[clases]\nknife = "arma"\n\n[[severidad]]\ncategoria = "arma"\nnivel = "alta"\n',
+        '[clases]\nknife = "arma"\n\n[severidad]\ncategoria = "arma"\numbral = 0.5\nnivel = "alta"\n',
+    ],
+    ids=["clases-texto", "clases-lista", "regla-sin-umbral", "severidad-tabla"],
+)
+def test_from_config_mal_formado_falla_con_value_error(tmp_path, contenido):
+    config = tmp_path / "imagen.toml"
+    config.write_text(contenido, encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        ImageAnalyzer.from_config(FakeObjectDetector([]), config)
+
+
+def test_regla_duplicada_de_arma_no_degrada_la_severidad_en_silencio(tmp_path):
+    config = tmp_path / "imagen.toml"
+    duplicada = '[[severidad]]\ncategoria = "arma"\numbral = 0.9\nnivel = "baja"\n'
+    config.write_text('[clases]\nknife = "arma"\n\n' + REGLA_ARMA + "\n" + duplicada, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="arma"):
+        ImageAnalyzer.from_config(FakeObjectDetector([]), config)

@@ -79,3 +79,14 @@ def test_es_determinista_ante_el_orden_de_entrada():
     detecciones = [Detection("knife", 0.6, (1, 2, 3, 4)), Detection("knife", 0.8, (5, 6, 7, 8))]
 
     assert hallazgos(detecciones) == hallazgos(list(reversed(detecciones)))
+
+
+def test_detection_rechaza_coordenadas_booleanas():
+    with pytest.raises(ValueError):
+        Detection("knife", 0.9, (True, 0, 10, 10))
+
+
+def test_empate_de_confianza_elige_la_misma_caja_sin_importar_el_orden():
+    detecciones = [Detection("knife", 0.8, (1, 2, 3, 4)), Detection("knife", 0.8, (5, 6, 7, 8))]
+
+    assert hallazgos(detecciones) == hallazgos(list(reversed(detecciones)))
