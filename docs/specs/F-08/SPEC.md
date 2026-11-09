@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-08-2-worker-de-imagen
-**Verificación IA:** revision aa4e941
+**Verificación IA:** tests 6019acc
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
 
 ## Objetivo
@@ -260,3 +260,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de revision | Claude Code (orquestador; subagente revisor general-purpose) | 2026-11-08 | Revisor independiente: APROBADO sin bloqueantes; criterio a criterio contra el SPEC de la parte 2, SHA-256 de los pesos recalculado y coincidente, pytest 822 passed 1 skipped, conformidad 0 problemas, 12 commits validos. Lo comprobé yo: git diff --name-only f18cb6e..aa4e941 solo trae archivos de la parte 2, los pendientes de la parte 1 y documentos; 100 lineas mas y 6 menos fuera de tests y docs; 0 lineas borradas en tests; git ls-files '*.pt' vacio. No bloqueantes: AD-27 dice que rechaza una imagen ilegible y solo cubre FileNotFoundError y resultados vacios (R1); pip install -r sin el indice CPU traeria torch con CUDA; integracion real nunca ejecutada (parte 3); R2, R3 y O1 ya registrados en el SPEC. (aa4e941) |
 | revision | José Andrés Loría Herrera | 2026-11-08 |  |
+| verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-09 | git diff d06b7b9..6019acc: solo tests (3 archivos, 466 lineas nuevas, 0 borradas en test_yolo_detector.py); sin imagenes ni datos. py -m pytest -q -m 'not integration and not acceptance' ignorando test_aciertos_imagen.py: 11 failed, 823 passed, 1 skipped; los 11 son R1, R2, R3 y O1 del detector, por funcionalidad que falta. test_aciertos_imagen.py falla al cargar con ModuleNotFoundError de scripts.aciertos_imagen. La aceptacion se salta porque ultralytics no esta instalado. Leí test_aciertos_imagen.py:328-333: exige el etiquetas.json real de la muestra, que solo puede aportar José Andrés con sus fotos. Interpretaciones del developer pendientes de confirmar: la aceptacion exige al menos una positiva acertada, categoria obligatoria (null para negativas), y R1 traduce OSError a ValueError sin confirmar que lanza ultralytics 8.4.208. (6019acc) |
