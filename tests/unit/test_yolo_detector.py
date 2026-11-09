@@ -138,6 +138,21 @@ def test_archivo_que_no_es_imagen_se_rechaza_con_value_error(tmp_path):
         YoloDetector(modelo).detect(texto)
 
 
+class YoloQueOmiteLaImagen(FakeYolo):
+    def predict(self, fuente, **opciones):
+        self.llamadas.append((fuente, opciones))
+        return []
+
+
+def test_imagen_omitida_por_el_modelo_se_rechaza_con_value_error(tmp_path):
+    # Hay versiones de Ultralytics que solo avisan y no devuelven ningún resultado para la imagen ilegible.
+    texto = tmp_path / "omitida.jpg"
+    texto.write_text("esto no es una imagen", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="omitida.jpg"):
+        YoloDetector(YoloQueOmiteLaImagen()).detect(texto)
+
+
 def test_importar_el_modulo_no_importa_ultralytics_ni_torch(monkeypatch):
     # Un None en sys.modules hace fallar cualquier `import` de esa biblioteca, esté o no instalada.
     for biblioteca in BIBLIOTECAS_PESADAS:
