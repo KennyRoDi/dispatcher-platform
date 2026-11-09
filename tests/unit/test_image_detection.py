@@ -90,3 +90,19 @@ def test_empate_de_confianza_elige_la_misma_caja_sin_importar_el_orden():
     detecciones = [Detection("knife", 0.8, (1, 2, 3, 4)), Detection("knife", 0.8, (5, 6, 7, 8))]
 
     assert hallazgos(detecciones) == hallazgos(list(reversed(detecciones)))
+
+
+@pytest.mark.parametrize("caja", [(10, 0, 5, 10), (0, 10, 10, 5), (10, 10, 0, 0)], ids=["x2<x1", "y2<y1", "ambas"])
+def test_detection_rechaza_caja_con_esquinas_invertidas(caja):
+    with pytest.raises(ValueError):
+        Detection("knife", 0.9, caja)
+
+
+def test_detection_acepta_caja_degenerada_de_ancho_o_alto_cero():
+    assert Detection("knife", 0.9, (5, 5, 5, 9)).box == (5, 5, 5, 9)
+
+
+@pytest.mark.parametrize("etiqueta", ["", None, 43, b"knife"], ids=["vacia", "none", "entero", "bytes"])
+def test_detection_rechaza_etiqueta_vacia_o_que_no_es_texto(etiqueta):
+    with pytest.raises(ValueError):
+        Detection(etiqueta, 0.9, (0, 0, 10, 10))
