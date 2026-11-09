@@ -1,6 +1,6 @@
 # SPEC F-08: Worker de imagen
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-08-1-worker-de-imagen
 **Verificación IA:** verificacion 080eddb
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
@@ -243,3 +243,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-08 | git diff 9455ea4 -- tests vacio (0 bytes): no se tocaron ni debilitaron pruebas. git diff --numstat 9455ea4: 91 lineas mas y 6 menos fuera de tests y docs. Leí el diff completo: yolo_detector.py en adaptadores, con importacion diferida de ultralytics y cita de Ultralytics y AGPL-3.0; el dominio y la aplicacion no importan terceros. config/imagen.toml fija el sha256 0ebbc80d que calculé con sha256sum sobre yolo11n.pt de la release v8.4.0 (5613764 bytes), y coincide con el digest de GitHub. *.pt en .gitignore; los pesos no estan en el repositorio. Confirmé ultralytics 8.4.208 con pip index versions. py -m pytest -q -m 'not integration and not acceptance': 821 passed, 1 skipped (la integracion, porque ultralytics no esta instalado). No verificado: YOLO real e integracion, wheels de torch 2.15.0 y ultralytics para Python 3.13, lint (ruff no instalado). (73f32ef) |
 | implementacion | José Andrés Loría Herrera | 2026-11-08 |  |
 | verificación IA de verificacion | Claude Code (orquestador; subagente qa-tester general-purpose) | 2026-11-08 | QA (1 ronda, sin instalar ultralytics por acuerdo con la persona) comprobo cada criterio de la parte 2 y recalculo el SHA-256 de yolo11n.pt (0ebbc80d, 5613764 bytes), que coincide con config/imagen.toml. Hizo 19 mutaciones: 14 detectadas, 4 equivalentes y 1 que sobrevivia (sin rechazar resultados vacios), que ahora detecta la prueba de 080eddb (solo agrega 15 lineas en tests). Sin defectos en el alcance. Reproduje sus riesgos con un modelo falso via py -c: cls fuera de names da KeyError 99, coordenada inf da OverflowError y -0.6 da ValueError por la caja (-1,2,3,4). py -m pytest -q -m 'not integration and not acceptance': 822 passed, 1 skipped (integracion). No verificado: YOLO real (parte 3), que excepcion lanza ultralytics 8.4.208 ante un archivo corrupto, y wheels para Python 3.13. (080eddb) |
+| verificacion | José Andrés Loría Herrera | 2026-11-08 |  |
