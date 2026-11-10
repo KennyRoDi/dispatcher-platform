@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan bc1ea57
+**Verificación IA:** tests f386432
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -114,3 +114,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (subagente arquitecto, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | SPEC releído tras la devolución: sin campos pendientes (grep), solo toca SPEC, commit empujado, árbol limpio. Recoge opción A (10 heterogéneos: 5 livianos y 5 pesados), chats sintéticos, imágenes y audio públicos con fallback sintético, pesados en local y Drive, pila de 6 PR. Sin código ni pruebas en esta fase. (49972ce) |
 | verificación IA de plan | Claude Code (subagente arquitecto, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | SPEC releído: todo sintético, sin media_source ni referencias a datasets públicos fuera de No incluye y decisiones (grep), sin campos pendientes, solo toca SPEC, commit empujado, árbol limpio. Mantiene opción A, pesados en local y Drive, pila de 6 PR. Sin código ni pruebas en esta fase. (bc1ea57) |
 | plan | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_dataset_plan.py: 1 error de colección por ModuleNotFoundError de src.domain.dataset_plan (rojo por código ausente, no por sintaxis). Solo se añadió ese archivo de pruebas, src/ intacto, commit empujado. Leí las 7 pruebas: cubren mínimos B.3, 5 livianos y 5 pesados, determinismo, proporción positiva, duraciones y reporte de cada mínimo. Ajusté el SPEC: ruta ~/scratch/dataset y check_minimums sobre el plan. (f386432) |
