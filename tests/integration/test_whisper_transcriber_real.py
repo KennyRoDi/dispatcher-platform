@@ -14,8 +14,9 @@ CONFIG_REPO = Path(__file__).resolve().parents[2] / "config" / "audio.toml"
 # La muestra con transcripción conocida llega en la parte 3; hasta entonces la nota se indica a mano.
 NOTA = os.environ.get("F09_NOTA")
 FRECUENCIA_DE_WHISPER = 16000
-# Whisper redondea los timestamps a pasos de 20 ms; el último puede pasar un poco del final del audio.
-HOLGURA_S = 0.1
+# Caso borde medido con el modelo real: una nota de 4.86 s dio un segmento con fin 5.00 s y otras salieron
+# con tiempos redondeados de forma gruesa (4.00, 5.00), así que 20 ms no alcanza; 0.5 s los cubre.
+HOLGURA_S = 0.5
 
 
 @pytest.fixture(scope="module")

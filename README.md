@@ -111,6 +111,19 @@ F09_NOTA=<ruta> pytest -m integration tests/integration/test_whisper_transcriber
 
 Referencia R14 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
 
+La muestra de `tests/datos/audio/` son 5 notas de voz `.ogg` Opus (2 con una amenaza explícita y 3 neutras), con su transcripción esperada, procedencia y licencia en `transcripciones.json`. Son la voz propia de José Andrés leyendo guiones sintéticos y ficticios, redactados con IA, bajo licencia CC BY 4.0 [B.3]. El script `scripts/comparar_transcripcion.py` compara la transcripción obtenida con la esperada y calcula la tasa de error por palabra (WER) tras normalizar mayúsculas, tildes y puntuación, sin umbral.
+
+`requirements-audio.txt` fija `av==18.1.0`: faster-whisper 1.2.1 falla con PyAV 19.0.2 (`TypeError ... metadata_errors`), medido en la corrida.
+
+**La corrida con el modelo real se hizo el 2026-11-10** (faster-whisper 1.2.1, av 18.1.0, pesos `base` fijados, Python 3.14, CPU, `int8`). Su evidencia, con las observaciones medidas, está en `docs/evidencia/F-09_transcripcion_2026-11-10.md`: WER de 15.4, 9.1, 36.4, 27.3 y 0.0 % sobre las 5 notas. US-09 queda demostrada solo con esa muestra de 5 notas propias y sintéticas, sin representatividad: `amenaza_01` es un falso negativo, porque Whisper `base` oyó «más a ver» en vez de «vas a ver», y un tono sostenido produce un segmento inventado de `...`. Para repetirla, desde la raíz del repositorio y con `requirements-audio.txt` instalado:
+
+```bash
+F09_NOTA=tests/datos/audio/amenaza_01.ogg pytest -m integration tests/integration/test_whisper_transcriber_real.py
+pytest -m integration tests/integration/test_whisper_errores_de_av_reales.py
+python -m scripts.comparar_transcripcion --muestra tests/datos/audio --esperadas tests/datos/audio/transcripciones.json --salida docs/evidencia/F-09_transcripcion_<fecha>.md
+pytest -m acceptance tests/acceptance/test_audio_transcripcion.py
+```
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*
