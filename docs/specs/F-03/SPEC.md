@@ -1,8 +1,8 @@
 # SPEC F-03: Dataset sintético
 
 **Fase:** pr
-**Base:** feat/F-03-1-dataset-sintetico
-**Verificación IA:** revision 10d3f1a
+**Base:** feat/F-03-2-dataset-sintetico
+**Verificación IA:** revision 98563c9
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -18,7 +18,7 @@ El equipo obtiene un dataset reproducible que cumple el mínimo de [B.3 Dataset 
 - Casos pesados (≥ 200 MB) generados en local, en una ruta configurable, no versionados.
 - 10 casos heterogéneos: 5 livianos y 5 pesados; los otros 30 casos pueden ser de uno o pocos tipos.
 - Manifiesto con origen, licencia y conteos por tipo; validador de mínimos B.3.
-- `docs/dataset.md` con la procedencia («generado por el equipo», con la licencia del repo), qué casos cumplen cada condición, la salida real del validador, la limitación de los patrones sintéticos y cómo los integrantes obtienen los casos pesados.
+- `docs/dataset.md` con la procedencia («generado por el equipo», con la licencia «generado por el equipo, uso academico», provisional porque el repo no tiene `LICENSE`), qué casos cumplen cada condición, la salida real del validador, la limitación de los patrones sintéticos y cómo los integrantes obtienen los casos pesados.
 
 **No incluye:** comparador y fallo por licencia ausente (F-04); parsers y validación de formatos de ingesta (F-02); subir los casos a la API (F-01); análisis de los archivos (F-07 a F-09). Entrenar modelos [B.1]. Datasets públicos de terceros. Versionar el dataset pesado o los medios. Publicar el dataset en Google Drive: lo hace la persona, fuera del repo.
 
@@ -28,7 +28,7 @@ El equipo obtiene un dataset reproducible que cumple el mínimo de [B.3 Dataset 
 - **Cuando** se ejecuta
 - **Entonces** hay ≥ 40 casos, ≥ 10 heterogéneos (5 livianos y 5 pesados), ≥ 20 000 mensajes, ≥ 300 imágenes, ≥ 150 audios y ≥ 5 casos con archivos ≥ 200 MB
 
-Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (mismos nombres, conteos y hashes de contenido); el manifiesto declara la proporción de contenido positivo por categoría de imagen (RF-20) y duraciones distintas de audio (RF-21); todos los archivos tienen origen `sintetico` y la licencia del repo (RNF-04); cada caso pesado es heterogéneo.
+Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (mismos nombres, conteos y hashes de contenido); el manifiesto declara la proporción de contenido positivo por categoría de imagen (RF-20) y duraciones distintas de audio (RF-21); todos los archivos tienen origen `sintetico` y la licencia `generado por el equipo, uso academico` (RNF-04; provisional, el repo no tiene `LICENSE`); cada caso pesado es heterogéneo.
 
 ## Diseño
 
@@ -42,15 +42,15 @@ Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (
 
 **Decisiones.**
 - **AD-25 aprobada por la persona:** generador nuevo y determinista en vez de ampliar `scripts/build_dataset.py`, que solo cubre video y audio, no tiene texto ni imágenes y su manifiesto trae `generated_at` (no reproducible). Alternativa: extender el heredado. Criterio: RF-18 a RF-22 exigen texto e imágenes y reproducibilidad. El arquitecto no toca `docs/ARQUITECTURA.md` en esta fase: registrar AD-25 en §8 es tarea de la fase documentación (parte 6).
-- Dataset totalmente sintético, decisión de la persona: sin datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) para evitar consideraciones legales y de licencia. Procedencia declarada en `docs/dataset.md`: «generado por el equipo», con la licencia del repo. Si se usa IA para redactar plantillas, se declara en `docs/BITACORA_IA.md`.
+- Dataset totalmente sintético, decisión de la persona: sin datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) para evitar consideraciones legales y de licencia. Procedencia declarada en `docs/dataset.md`: «generado por el equipo», con la licencia «generado por el equipo, uso academico», provisional porque el repo no tiene `LICENSE`. Si se usa IA para redactar plantillas, se declara en `docs/BITACORA_IA.md`.
 - Ruta de salida: parámetro `--out`. Ubicación de desarrollo decidida por la persona: `~/scratch/dataset`, fuera del repo (hay 106 GB libres y no depende de `/scratch`, que no existe). Debe ser disco, no `tmpfs`, que cuenta en el cgroup (`docs/ARQUITECTURA.md` §4). `dataset/media/` ya está en `.gitignore`. Solo se versionan el manifiesto y `docs/dataset.md`.
 - Distribución: el repo es público, así que los casos pesados no se versionan. Se generan en local; la persona los sube a Google Drive y los demás integrantes los descargan y los usan en local. El enlace, el procedimiento y la verificación por `sha256` del manifiesto se documentan en `docs/dataset.md`, sin llaves ni credenciales en el repo.
 - Mensajes de chat: plantillas con vocabulario neutro y un subconjunto con frases de amenaza ficticias para F-07, aprobadas por la persona; sin personas ni datos reales.
-- Imágenes: patrones sintéticos generados con `ffmpeg` (`lavfi`) o equivalente, con proporción positiva conocida por categoría y etiqueta (positivo/negativo) asignada por el generador. Audios: tonos o ruido con duraciones distintas y etiqueta del generador, reutilizando las constantes `AUDIO_*` de `scripts/build_dataset.py`.
+- Imágenes: patrones sintéticos generados con `ffmpeg` (`lavfi`) o equivalente, con proporción positiva conocida por categoría y etiqueta (`positivo` o `neutro`) asignada por el generador. Audios: tonos o ruido con duraciones distintas y etiqueta del generador, reutilizando las constantes `AUDIO_*` de `scripts/build_dataset.py`.
 - Limitación a documentar en `docs/dataset.md`: F-08 medirá la detección sobre patrones sintéticos, no sobre fotos reales; sus resultados no se extrapolan a imágenes reales.
 - Heterogéneos (opción A): 10 casos, 5 livianos (texto, imagen, audio y documento) y 5 pesados (≥ 200 MB; texto, imagen, audio y video o documento). Los 5 pesados son parte de los 10 y de los ≥ 5 pesados de B.3. Los otros 30 casos pueden ser de uno o pocos tipos.
 - Casos pesados: el archivo grande es video sintético con bitrate fijo hasta superar 200 MiB (o documento grande); el generador falla si el archivo queda por debajo. El resto de sus archivos (texto, imagen, audio) sale de los mismos generadores.
-- Manifiesto (`manifest.json`) con campos `case`, `kind` (`texto|imagen|audio|video|documento`), `path`, `bytes`, `sha256`, `origen` (siempre `sintetico`), `licencia` (la del repo), `semilla`, `etiqueta` (verdad asignada por el generador, en imágenes y audio) y `heterogeneo` (`liviano|pesado|no`). Sin marca de tiempo. F-04 lo extiende; no se renombran campos.
+- Manifiesto (`manifest.json`) con campos `case`, `kind` (`texto|imagen|audio|video|documento`), `path`, `bytes`, `sha256`, `origen` (siempre `sintetico`), `licencia` (`generado por el equipo, uso academico`, provisional), `semilla`, `etiqueta` (verdad asignada por el generador, en imágenes y audio) y `heterogeneo` (`liviano|pesado|no`). Sin marca de tiempo. F-04 lo extiende; no se renombran campos.
 
 **Reutiliza del I Proyecto:** `ffmpeg_args` y constantes de duración de `scripts/build_dataset.py`, sin copiar historial. Se copia solo lo necesario, con cita en comentario.
 
@@ -64,7 +64,7 @@ Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (
 | Unitaria | `test_plan_bajo_el_minimo_se_reporta` | `check_minimums` nombra cada mínimo incumplido |
 | Unitaria | `test_plan_declara_proporcion_positiva_y_duraciones_distintas` | Cada categoría de imagen tiene proporción positiva declarada y los audios tienen duraciones distintas (RF-20, RF-21) |
 | Unitaria | `test_exportacion_whatsapp_se_parsea_con_timestamp_y_remitente` | Formato realista, UTF-8, con el parser existente o su doble |
-| Unitaria | `test_medios_llevan_etiqueta_y_origen_sintetico` | Con ejecutor falso: cada imagen y audio sale con etiqueta del generador, origen `sintetico` y licencia del repo |
+| Unitaria | `test_medios_llevan_etiqueta_y_origen_sintetico` | Con ejecutor falso: cada imagen y audio sale con etiqueta del generador, origen `sintetico` y licencia `generado por el equipo, uso academico` |
 | Unitaria | `test_caso_pesado_falla_si_no_alcanza_200_mib` | Con ejecutor falso; sin `ffmpeg` real ni red |
 | Integración | `test_generacion_reducida_escribe_manifiesto` | Parámetros reducidos con `ffmpeg` real en `tmp_path`: archivos y manifiesto coherentes |
 | Aceptación | `test_validador_sobre_dataset_completo` | Marcada `acceptance`: el validador sobre la ruta de `--out` cumple B.3; su salida va a `docs/dataset.md` |
@@ -133,4 +133,21 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README y ARQUITECTURA no mencionan el generador, docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio y sin commits nuevos. Borrador de bitácora con hechos del historial: plantillas redactadas por IA, prueba roja inconsistente con date_unixtime, 2 defectos menores de QA abiertos en xfail. (6fe0440) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 2: APROBADO sin bloqueantes. Confirmé en el código que case.name sin validar (línea 58) y la falta de conversión a UTC en los renderizadores corresponden a los xfail ya aceptados. El cambio de regex FECHA_UNIX en la prueba se evaluó como legítimo. Árbol limpio, commit empujado. (10d3f1a) |
+| revision | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_media_generator.py: error de colección por ModuleNotFoundError de src.adapters.media_generator (rojo por módulo ausente). Solo se añadió ese archivo de pruebas (18), src/ intacto, commit empujado. Confirmé que el repo no tiene archivo LICENSE: la licencia de los medios queda por decidir. La API (generate_media, MediaFile, ORIGIN, LICENSE_NAME) la fijó el developer. (825284f) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 768 passed, 3 skipped, 8 xfailed. Se añadió src/adapters/media_generator.py (122 líneas); pruebas intactas; commit empujado. Probé con ffmpeg real: 18 archivos (jpg, mp3, png) generados. Único comentario cita la procedencia de AUDIO_CODECS. Desviación menor: etiqueta neutro frente a negativo del SPEC. (cd1aae0) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA B1: con ffmpeg real la misma semilla no produce los mismos bytes (anoisesrc sin seed, ogg con serial aleatorio); el SPEC exige hashes de contenido reproducibles |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Corrección de B1 verificada: pytest unitario 785 passed, 3 skipped, 10 xfailed sin XPASS; prueba de integración con ffmpeg real 2 passed. Generé dos veces el mismo plan con distinto PYTHONHASHSEED y ffmpeg real: mismo hash de bytes (b677f4a1a244c3bd, 18 archivos). Solo cambió src/adapters/media_generator.py (+6/-2), pruebas intactas, commit empujado. (13fcffa) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Segunda ronda QA: APROBADO, B1 resuelto. Reejecuté pytest unitario: 785 passed, 3 skipped, 10 xfailed sin XPASS. QA generó el plan completo (450 archivos) dos veces con ffmpeg real y distinto PYTHONHASHSEED: los 450 sha256 coinciden; semilla distinta da contenido distinto. ffprobe: duraciones y códecs correctos tras bitexact. Sin hallazgos nuevos bloqueantes; observación: colisiones de imágenes por color en rango pequeño. src/ intacto, árbol limpio. (9e5e007) |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | Ampliar variación de color de imágenes: 160 png dan 102 hashes únicos y 140 jpg dan 92 (colisiones) |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Variación de color verificada: pytest unitario 788 passed, 3 skipped, 10 xfailed sin XPASS; integración con ffmpeg real 2 passed. Con ffmpeg real y semilla 9 reproduje 160 de 160 png únicos y 140 de 140 jpg únicos. Cambios: prueba nueva en rojo (190e8a4) y fix en media_generator.py (b846164). Una línea de una prueba de QA existente se relajó (neutro con dispersión de canales <=16 en vez de gris puro); la revisé y es coherente con gris o similar. (b846164) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Ronda final QA: APROBADO. Reejecuté pytest unitario: 788 passed, 3 skipped, 10 xfailed sin XPASS; src y tests sin cambios desde b846164, árbol limpio. QA: paletas positiva y neutra disjuntas (dispersión mínima 112 contra máxima 16), tres corridas con ffmpeg real y distinto PYTHONHASHSEED con sha256 idénticos en los 450 archivos, imágenes únicas por semilla, bordes y proporción por categoría correctos. Limitación: una corrida completa con semilla 2 murió en segundo plano; la unicidad de imágenes no depende de los audios. (8989d75) |
+| verificacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador solo ajustó el SPEC en 5 líneas: etiqueta neutro en vez de negativo y licencia provisional generado por el equipo, uso academico. Revisé el diff: cambios mínimos, sin tocar aprobaciones ni fase, sin campos pendientes. README, ARQUITECTURA y CONTRATOS no mencionan el generador. Borrador de bitácora con hechos del historial: error B1 de bytes no reproducibles, colisiones de imágenes y xfail abiertos. (555c21d) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 3: APROBADO sin bloqueantes. Comprobé en el código los comentarios citados (BITEXACT, seed de ruido, paleta, procedencia de AUDIO_CODECS) y que subprocess recibe lista sin shell. Observaciones menores anotadas. Árbol limpio, commit empujado. (98563c9) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
