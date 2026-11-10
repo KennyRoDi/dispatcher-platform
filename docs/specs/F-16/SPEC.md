@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** documentacion 229e43f
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -96,3 +96,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Codex | 2026-11-10 | QA de F-16 parte 2 tras fix de NODE_IP; 11 focalizadas y suite completa 1149 passed, 2 skipped, 3 deselected; informe a980c3c; sin Docker ni mediciones físicas, pendientes y documentadas. (60d66a5) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | Codex | 2026-11-10 | Revision independiente de documentacion F-16 parte 2: contrastados README, ficha M1, SPEC y borrador Anexo 3 con scripts/preflight.py, scripts/start_worker.py, Compose y QA-parte-2.md. Los comandos CPU/GPU y limites descritos existen; WORKER_MEM_LIMIT sigue sin valor asignado y no se presentan mediciones B/C/D ni cgroups inexistentes como evidencia. Bitacora borrador registra el hallazgo real de NODE_IP y su correccion, cifras QA atribuidas al informe y ausencia de ejecucion Docker. git diff HEAD~2..HEAD --check sin errores; arbol limpio. Mediciones fisicas y revision final pendientes. (229e43f) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
