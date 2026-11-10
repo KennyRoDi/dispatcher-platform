@@ -264,3 +264,80 @@ def test_cargar_ajustes_de_texto_rechaza_umbral_de_ofensa_fuera_de_rango(tmp_pat
 
     with pytest.raises(ValueError, match="umbral_ofensa"):
         cargar_ajustes_de_texto(config)
+
+
+def test_archivo_inexistente_falla_antes_de_transcribir(tmp_path):
+    transcriptor = FakeTranscriber([TranscriptSegment(0.0, 1.0, "hola", 0.9)])
+
+    with pytest.raises(FileNotFoundError):
+        AudioAnalyzer(transcriptor, FakeTextModels(), ajustes()).analyze(tmp_path / "no_existe.ogg")
+
+    assert transcriptor.llamadas == []
+
+
+class TranscriptorQueFalla:
+    def transcribe(self, path):
+        raise RuntimeError("el decodificador falló")
+
+
+def test_error_del_transcriptor_se_propaga_sin_analizar(nota):
+    modelos = FakeTextModels()
+
+    with pytest.raises(RuntimeError, match="decodificador"):
+        AudioAnalyzer(TranscriptorQueFalla(), modelos, ajustes()).analyze(nota)
+
+    assert modelos.llamadas == []
+
+
+def test_indices_de_segmento_se_renumeran_tras_descartar_vacios(nota):
+    segmentos = [
+        TranscriptSegment(0.0, 1.0, "", 0.1),
+        TranscriptSegment(1.0, 2.0, "hola", 0.9),
+        TranscriptSegment(2.0, 3.0, " ", 0.1),
+        TranscriptSegment(3.0, 4.5, TEXTO_AMENAZA, 0.9),
+    ]
+
+    hallazgos = analizador(segmentos, FakeTextModels({TEXTO_AMENAZA: AMENAZA})).analyze(nota)
+
+    assert [h.evidence.position for h in de_categoria(hallazgos, "transcripcion")] == [
+        "segmento 0 t=1.00-2.00s",
+        "segmento 1 t=3.00-4.50s",
+    ]
+    (amenaza,) = de_categoria(hallazgos, "amenaza")
+    assert amenaza.evidence.position == "segmentos 1 t=3.00-4.50s"
+    (clave,) = de_categoria(hallazgos, "palabras_clave")
+    assert clave.evidence.position == "segmentos 0-1 t=1.00-4.50s"
+
+
+def test_un_solo_segmento_usa_posicion_sin_rango(nota):
+    hallazgos = analizador([TranscriptSegment(1.0, 2.0, "hola", 0.9)]).analyze(nota)
+
+    for categoria in RF06 | {"sin_ofensa"}:
+        (hallazgo,) = de_categoria(hallazgos, categoria)
+        assert hallazgo.evidence.position == "segmentos 0 t=1.00-2.00s"
+
+
+def test_ofensa_en_audio_produce_ofensivo_con_segmentos_y_tiempos(nota):
+    ofensa = MessageAnalysis(
+        lemmas=("idiota",), sentiment_label="negativo", sentiment_score=0.9, offense_score=0.8, threat_patterns=()
+    )
+    segmentos = [TranscriptSegment(0.0, 2.0, "hola", 0.9), TranscriptSegment(2.0, 5.5, "eres un idiota", 0.9)]
+
+    hallazgos = analizador(segmentos, FakeTextModels({"eres un idiota": ofensa})).analyze(nota)
+
+    assert de_categoria(hallazgos, "amenaza") == []
+    (ofensivo,) = de_categoria(hallazgos, "ofensivo")
+    assert ofensivo.severity is Severity.MEDIA
+    assert ofensivo.confidence == pytest.approx(0.8)
+    assert ofensivo.evidence.position == "segmentos 1 t=2.00-5.50s"
+    assert ofensivo.detail == "1 t=2.00-5.50s"
+
+
+def test_amenaza_en_segundo_lote_conserva_indice_global(nota):
+    segmentos = segmentos_regulares(3) + [TranscriptSegment(10.65, 14.2, TEXTO_AMENAZA, 0.9)]
+
+    hallazgos = analizador(segmentos, FakeTextModels({TEXTO_AMENAZA: AMENAZA}), tamano_lote=2).analyze(nota)
+
+    (amenaza,) = de_categoria(hallazgos, "amenaza")
+    assert amenaza.severity is Severity.ALTA
+    assert amenaza.evidence.position == "segmentos 3 t=10.65-14.20s"

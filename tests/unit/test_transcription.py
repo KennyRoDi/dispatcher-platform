@@ -73,3 +73,11 @@ def test_segmentos_como_mensajes_usa_hora_en_utc():
 
 def test_segmentos_como_mensajes_sin_segmentos_devuelve_lista_vacia():
     assert segmentos_como_mensajes([]) == []
+
+
+@pytest.mark.parametrize(
+    "inicio, fin", [(0.0, float("inf")), (float("inf"), float("inf")), (float("nan"), 1.0), (0.0, float("nan"))]
+)
+def test_segmento_rechaza_tiempos_no_finitos(inicio, fin):
+    with pytest.raises(ValueError):
+        TranscriptSegment(inicio, fin, "hola", 0.5)
