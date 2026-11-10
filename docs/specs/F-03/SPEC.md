@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-03-2-dataset-sintetico
 **Verificación IA:** revision 98563c9
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -150,3 +150,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador solo ajustó el SPEC en 5 líneas: etiqueta neutro en vez de negativo y licencia provisional generado por el equipo, uso academico. Revisé el diff: cambios mínimos, sin tocar aprobaciones ni fase, sin campos pendientes. README, ARQUITECTURA y CONTRATOS no mencionan el generador. Borrador de bitácora con hechos del historial: error B1 de bytes no reproducibles, colisiones de imágenes y xfail abiertos. (555c21d) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 3: APROBADO sin bloqueantes. Comprobé en el código los comentarios citados (BITEXACT, seed de ruido, paleta, procedencia de AUDIO_CODECS) y que subprocess recibe lista sin shell. Observaciones menores anotadas. Árbol limpio, commit empujado. (98563c9) |
+| revision | Kenni Rodriguez | 2026-11-10 |  |
