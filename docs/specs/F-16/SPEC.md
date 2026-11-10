@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** tests de02cc2
+**Verificación IA:** implementacion b7abcff
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -100,3 +100,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Agregar prueba que confirme que start_worker rechaza presupuesto excesivo sin invocar docker compose up, conforme al criterio de aceptación del SPEC y hallazgo del revisor |
 | verificación IA de tests | Codex | 2026-11-10 | Verificacion independiente de tests tras devolucion del revisor: el commit de02cc2 agrega solo una prueba de arranque; diff revisado y git diff --check limpio. Reproduje py -m pytest -q tests/unit/test_f16_preflight.py --tb=short: 10 passed. La prueba confirma que presupuesto excesivo devuelve 1 y no invoca subprocess.run/Compose. No queda roja contra el codigo actual porque start_worker ya rechaza el exceso; no se introdujo una regresion artificial. Para avanzar se requiere aprobacion humana de excepcion a la exigencia de rojo, motivada por cobertura faltante descubierta en revision. (de02cc2) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | Prueba de aceptación añadida tras hallazgo de revisión; el bloqueo del arranque ya está implementado y cubierto. La prueba pasa contra la implementación correcta. No se fuerza rojo introduciendo una regresión artificial. |
+| verificación IA de implementacion | Codex | 2026-11-10 | Verificación independiente de implementación tras hallazgo de revisión: no se necesitó cambio de producción; start_worker valida configuración y presupuesto antes de invocar Compose. La prueba de02cc2 verifica retorno de error y cero llamadas a subprocess.run ante exceso de presupuesto. Reproduje pytest -q con marcadores excluyendo integration y acceptance: 1150 passed, 2 skipped, 3 deselected, una advertencia preexistente Starlette, 41.27s. El commit nuevo solo modifica tests/unit/test_f16_preflight.py, sin debilitar pruebas; diff --check limpio y árbol limpio. No se ejecutó Docker ni se midieron nodos o cgroups reales; evidencia B/C/D pendiente. (b7abcff) |
