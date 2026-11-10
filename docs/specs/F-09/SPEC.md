@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-09-2-worker-de-audio
-**Verificación IA:** documentacion 9e9317e
+**Verificación IA:** tests 0b4bec3
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -299,3 +299,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-10 | Revisé el diff de 9e9317e. La documentación declara que el modelo real no se ejecutó, que no existe docs/evidencia/F-09_transcripcion_<fecha>.md y que no hay WER medido ni cifra inventada; US-09 figura como no cumplida. AD-28 mantiene Medición pendiente. El borrador de bitácora usa hashes que existen y reconoce mis errores: la prueba de WER que no detecté y el JSON con nombres viejos. No hay el carácter de puntos suspensivos y no quedan cambios sin commit. Sin comprobar: nada de lo documentado con modelo real. (9e9317e) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Revision y corrida real: la aceptacion lanza KeyError ctranslate2 (pasa solo la version de faster-whisper); la integracion exige duracion con holgura de 0.1 s pero el modelo real da fin 5.00 s para audio de 4.86 s |
+| verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé el diff de 0b4bec3: solo tests/, 20 líneas añadidas y 3 borradas. La aceptación pasa ahora las dos versiones. La holgura de la integración sube a 0.5 s, justificada por el dato medido. Agrega test_comparar_transcripcion_versiones.py, con 2 pruebas rojas esperadas: generar_markdown debe dar ValueError, no KeyError, si falta una versión, y se corrige en implementación. Ejecuté con el entorno real, faster-whisper 1.2.1, av 18.1.0 y los modelos reales, las 6 pruebas de integración y aceptación: 6 passed, incluida la aceptación que antes fallaba. Suite unitaria: 1259 passed y 2 failed, las rojas esperadas. Sin comprobar: Python 3.13. (0b4bec3) |
