@@ -158,7 +158,7 @@ Las unitarias no usan red, `sleep`, reloj real ni modelos. El detector falso se 
 
 ### Muestra etiquetada
 
-`tests/datos/imagenes/` con unas 20 imágenes reducidas a 640 px de lado mayor, mitad positivas y mitad negativas, y `tests/datos/imagenes/etiquetas.json` con, por imagen, la categoría esperada (o ninguna), la procedencia y la licencia [B.3]. La propuesta es que sean fotos tomadas por José Andrés de objetos, sin personas ni datos de terceros (pregunta 3).
+`tests/datos/imagenes/` con unas 20 imágenes reducidas a 640 px de lado mayor, mitad positivas y mitad negativas, y `tests/datos/imagenes/etiquetas.json` con, por imagen, la categoría esperada (o ninguna), la procedencia y la licencia [B.3]. La propuesta es que sean fotos tomadas por José Andrés de objetos, sin personas ni datos de terceros (pregunta 3). *Resuelta en la parte 3:* 20 fotos propias de José Andrés, 10 con cuchillo y 10 sin, reducidas a 480x640, con licencia CC BY 4.0 confirmada por él. Aparecen su mano o su brazo, que no son datos de terceros [B.3].
 
 ### Evidencia, a cargo de la persona
 
@@ -172,7 +172,7 @@ python -m scripts.aciertos_imagen --muestra tests/datos/imagenes --etiquetas tes
 pytest -m acceptance tests/acceptance/test_imagen_aciertos.py
 ```
 
-La parte 2 fijó `torch==2.15.0` y `ultralytics==8.4.208` en `requirements-imagen.txt`, y los pesos `yolo11n.pt` con su SHA-256 en `config/imagen.toml`. Los pesos se descargan a mano y se pasan como directorio a `YoloDetector.from_config`; la prueba de integración se salta si ultralytics no está instalado.
+La parte 2 fijó `torch==2.15.0` y `ultralytics==8.4.208` en `requirements-imagen.txt`, y los pesos `yolo11n.pt` con su SHA-256 en `config/imagen.toml`. Los pesos se descargan a mano y se pasan como directorio a `YoloDetector.from_config`; la prueba de integración se salta si ultralytics no está instalado. El script recibe ese directorio con `--pesos`, y la integración y la aceptación con `F08_DIRECTORIO_PESOS`. La integración usa `F08_IMAGEN_POSITIVA=tests/datos/imagenes/cuchillo_02.jpg`: con `cuchillo_01.jpg` falla, porque YOLO no detecta `knife` en ella. La evidencia del 2026-11-09 está en `docs/evidencia/F-08_aciertos_2026-11-09.md`.
 
 ## Mediciones
 
@@ -194,10 +194,10 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 1. **Modelo.** Se recomienda Ultralytics YOLO11n (`yolo11n.pt`, COCO, unos 5 MB, AGPL-3.0), que es la variante nano de AD-19. Alternativa: YOLOv8n, igual de pequeño y más documentado. Decisión pendiente de aprobación.
 2. **Categorías sensibles (SUP-22 ⚠).** Se recomienda empezar con `knife` → `arma`, la única clase de COCO que es un arma. COCO no tiene armas de fuego, así que «arma» significa arma blanca; se declarará como límite. Alternativas: agregar `scissors` o `baseball bat` como `arma`, con más falsos positivos; o sumar un clasificador NSFW de HuggingFace como segundo modelo, con más memoria y una categoría que [B.4] no exige. Decisión pendiente de aprobación.
-3. **Muestra etiquetada [B.3].** Se recomienda que José Andrés tome unas 20 fotos de objetos (cuchillos de cocina y escenas sin cuchillo), sin personas, con licencia propia declarada en `etiquetas.json`, porque [B.3] admite imágenes «producidas por el propio equipo» y no necesita red. Alternativa: imágenes de COCO val2017 filtradas por licencia CC BY, con atribución por imagen. Si se generan con IA, se declara en la bitácora. Decisión pendiente de aprobación.
+3. **Muestra etiquetada [B.3].** Se recomienda que José Andrés tome unas 20 fotos de objetos (cuchillos de cocina y escenas sin cuchillo), sin personas, con licencia propia declarada en `etiquetas.json`, porque [B.3] admite imágenes «producidas por el propio equipo» y no necesita red. Alternativa: imágenes de COCO val2017 filtradas por licencia CC BY, con atribución por imagen. Si se generan con IA, se declara en la bitácora. *Resuelta en la parte 3:* fotos propias de José Andrés, en las que aparecen su mano o su brazo; ver «Muestra etiquetada».
 4. **Imagen sin contenido sensible.** Se propone devolver una lista vacía, porque RF-07 solo pide reportar lo positivo y un hallazgo es evidencia de algo. F-07 emite `sin_ofensa` porque RF-06 exige las cuatro salidas; aquí no hay tal requisito. ¿Se acepta, o se emite un hallazgo `sin_contenido_sensible` para que el reporte distinga «analizada sin hallazgos» de «no analizada»?
 5. **Dependencia de F-07.** La parte 1 reutiliza `SeverityRules`, `comprobar_analyzer` y el cálculo de SHA-256 de la PR #28, aún abierta. Se propone esperar a que #28 se fusione en `main` antes de la fase de pruebas de la parte 1. Alternativa: apilar la parte 1 sobre `feat/F-07-1-worker-de-texto`. No se duplica el código.
-6. **Umbrales.** `umbral_minimo = 0.25` es el valor por defecto de Ultralytics y `umbral = 0.5` para `alta` sigue a F-07. Son provisionales (SUP-17) y se revisan con la tabla de la parte 3.
+6. **Umbrales.** `umbral_minimo = 0.25` es el valor por defecto de Ultralytics y `umbral = 0.5` para `alta` sigue a F-07. Son provisionales (SUP-17) y se revisan con la tabla de la parte 3. *Revisado en la parte 3:* José Andrés decidió mantener `umbral_minimo = 0.25`, porque bajarlo con la misma muestra con que se mide daría una tabla optimista; ver «Límites conocidos al cerrar F-08».
 7. **Formato de `EvidenceRef.position`.** Se propone `caja x1,y1,x2,y2` en píxeles de la imagen original. Para fotogramas de video, el timestamp del fotograma lo aporta F-05 al extraerlo; ¿se acuerda con Nahúm y con Kenni (F-11) ahora o cuando F-11 lo necesite?
 8. **Conexión con el worker.** Como en F-07, se propone no conectar `ImageAnalyzer` al bucle del worker en F-08 y que F-12 invoque cualquier `Analyzer` por tipo de contenido.
 
@@ -205,7 +205,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 - **Dataset sintético de F-03.** F-03 propone imágenes sintéticas generadas con FFmpeg (su pregunta 3). YOLO no detecta cuchillos en patrones sintéticos, así que la proporción de positivos de RF-20 no sería medible con el modelo. Hay que avisar a Kenni: las imágenes positivas deben ser fotos propias o públicas con licencia.
 - **AGPL-3.0.** Ultralytics y sus pesos son AGPL-3.0. El repositorio es público, así que se cumple publicando el código; se cita en el código y la documentación.
-- **Dependencias pesadas.** `ultralytics` trae torch, OpenCV y numpy. Puede no haber *wheels* para Python 3.14; AD-22 fija 3.13 en las imágenes de workers. Sin comprobar.
+- **Dependencias pesadas.** `ultralytics` trae torch, OpenCV y numpy. Puede no haber *wheels* para Python 3.14; AD-22 fija 3.13 en las imágenes de workers. En la parte 3, torch 2.15.0+cpu y ultralytics 8.4.208 se instalaron y corrieron en Python 3.14.0, en un venv aparte; con 3.13, sin comprobar.
 - **Descarga de pesos.** `yolo11n.pt` se descarga de GitHub en la primera carga y necesita red; se fija su SHA-256 para que la evidencia sea reproducible. Nunca en las unitarias.
 - **Calidad.** Una muestra de 20 imágenes da una tabla pequeña y no representativa; se declara su tamaño. Detectar solo cuchillos cubre una parte mínima de «contenido sensible».
 - **Choque de números.** AD-25 (F-03), AD-26 (F-07) y AD-27 (F-08) están sin fusionar y en la misma tabla; si cambia el orden de fusión, se renumera y se resuelve el conflicto de líneas.
@@ -224,13 +224,23 @@ Las cuatro se resolvieron en la parte 2 (7fd0a3f).
 
 ### Pendientes para la parte 3
 
-Observaciones del QA de la parte 2, sin hallazgos H, que José Andrés decide si se corrigen en la parte 3. En la parte 2 se agregó la prueba de la imagen omitida por el modelo (080eddb).
+Observaciones del QA de la parte 2, sin hallazgos H. Todas se resolvieron en la parte 3 (07674bd, 342e706 y fbdcdd8). En la parte 2 se agregó la prueba de la imagen omitida por el modelo (080eddb).
 
-- R1: `detect` solo traduce `FileNotFoundError` a `ValueError`. Falta confirmar qué lanza ultralytics 8.4.208 ante un archivo corrupto o que no es imagen.
-- R2: una coordenada de -0.6 redondea a -1 y `Detection` la rechaza, con lo que se descarta la imagen; una coordenada `inf` da `OverflowError`.
-- R3: un `cls` fuera de `names` da `KeyError`, no `ValueError`.
-- O1: `[modelo] pesos` acepta rutas con `..`, aunque el mensaje de error dice «nombre de archivo».
-- La prueba de integración `tests/integration/test_yolo_detector_real.py` nunca se ha ejecutado, porque ultralytics no está instalado en el equipo de desarrollo, y no se ha comprobado que torch 2.15.0 y ultralytics 8.4.208 instalen y funcionen con Python 3.13. YOLO real no se ha corrido todavía.
+- Resuelto: R1. Medido con ultralytics 8.4.208: un archivo de texto, bytes aleatorios o un JPEG truncado no fallan, sino que dan una lista vacía con el aviso «Image Read Error», y un archivo inexistente da `FileNotFoundError`. `detect` traduce ambos casos y cualquier `OSError` a `ValueError` (07674bd); los comentarios del código se corrigieron según lo medido (342e706).
+- Resuelto: R2. Una coordenada negativa se recorta a 0 y una no finita da `ValueError` (07674bd).
+- Resuelto: R3. Un `cls` fuera de `names` da `ValueError` con la clase (07674bd).
+- Resuelto: O1. `[modelo] pesos` solo acepta un nombre de archivo simple, sin `/`, `\`, `:` ni `..` (07674bd); la prueba de `C:yolo11n.pt` se agregó en fbdcdd8.
+- Resuelto: la prueba de integración `tests/integration/test_yolo_detector_real.py` corrió con YOLO real en un venv con Python 3.14.0, torch 2.15.0+cpu y ultralytics 8.4.208, con `F08_IMAGEN_POSITIVA=tests/datos/imagenes/cuchillo_02.jpg`: integración y aceptación, 3 passed. Con Python 3.13 sigue sin comprobar.
+
+### Límites conocidos al cerrar F-08
+
+Tabla del 2026-11-09 con YOLO11n real y `umbral_minimo = 0.25`: `arma` VP 4, FP 0, FN 6, VN 10. QA la reprodujo idéntica. Prueba el funcionamiento de punta a punta, no la precisión. El análisis, con sus comandos y salidas, está al final de `docs/evidencia/F-08_aciertos_2026-11-09.md`:
+
+- Las 10 positivas muestran el mismo cuchillo. Los 4 aciertos lo tienen en diagonal u horizontal; los 6 fallos, en vertical o casi.
+- En 3 de los 6 fallos YOLO detecta `tie` donde está la hoja, y en cuchillo_06 y cuchillo_10 detecta `knife` con 0.15, bajo el umbral. José Andrés decidió mantener 0.25 (SUP-17), porque calibrar con la misma muestra daría una tabla optimista.
+- De los 4 aciertos, cuchillo_05 queda en severidad `baja`, con confianza 0.37.
+- YOLO detecta las manos del autor como `person`; no generan hallazgos porque el mapa solo incluye `knife`.
+- La ejecución fue con Python 3.14.0, no con el 3.13 de AD-22, y el comando de la evidencia lleva una ruta local de pesos.
 
 ## Aprobaciones
 
