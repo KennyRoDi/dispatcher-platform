@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** implementacion b1ec7d7
+**Verificación IA:** verificacion 63a0aad
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -243,3 +243,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-09 | QA: NaN en avg_logprob da confianza 1.0 (H1) y archivo sin pista de audio deja escapar IndexError (H2), whisper_transcriber.py |
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el commit b1ec7d7, que solo toca src/adapters/whisper_transcriber.py (23 líneas añadidas y 4 borradas). Con eso: H1, un avg_logprob NaN da ValueError; H2, se capturan IndexError y av.error.FFmpegError, este último con importación diferida, mientras RuntimeError y MemoryError genéricos siguen escapando; H3, un segmento inválido da ValueError con la ruta. git diff 4f1dc5f..HEAD -- tests/ sale vacío. pytest -q -m 'not integration and not acceptance': 1148 passed. Sin comprobar: cómo se comporta PyAV en ejecución, porque no está instalado. (b1ec7d7) |
 | implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5), orquestador sin subagente | 2026-11-09 | Re-verificación NO independiente: José Andrés pidió omitir al QA tester, así que la hizo el orquestador. Antes, en la primera ronda, el QA había devuelto H1 y H2 con pruebas rojas (4f1dc5f), y se corrigieron en b1ec7d7. Mutaciones: quitar la comprobación de NaN hace fallar 1 prueba, y quitar IndexError del except también falla 1; las dos se revirtieron y git status quedó limpio. pytest -q -m 'not integration and not acceptance': 1148 passed. Nadie volvió a probar el resto de los criterios. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (63a0aad) |
