@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 082b106
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -181,3 +181,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude (Opus 5.5) | 2026-11-10 | Plan revisado contra main: AD-27 ya usado por F-08, se renumera a AD-28. Verificacion no independiente. (082b106) |
