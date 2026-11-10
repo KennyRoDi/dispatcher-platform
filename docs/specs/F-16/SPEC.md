@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** revision 060aaaa
+**Verificación IA:** tests 50b3069
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -87,3 +87,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Codex | 2026-11-10 | Revision independiente del revisor sobre 060aaaa: releido diff completo origin/main...HEAD contra SPEC y plan de parte 1, sin hallazgos. Leido REVISION-parte-1.md, pruebas focalizadas del revisor 66 passed. Comprobe 52 lineas de producto, contratos y capas conservados, tests sin cambios desde adbb225, tres entradas de bitacora en origin/estado, diff --check correcto y arbol limpio; ultimo commit solo informe. Main actualizado 691846cf y ancestro comun a96bbe29. No repeti suite sin cambios producto. Aprobacion IA solo parte 1; CLI, Compose y mediciones Docker/WSL2 quedan pendientes parte 2. (060aaaa) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | Codex | 2026-11-10 | Revision independiente fase tests parte 2: diff solo agrega tests unitarios YAML de Compose CPU/GPU y aclara en SPEC interfaz de arranque pendiente; no toca codigo ni deploy. git diff --check correcto y arbol limpio. py -m pytest -q tests/unit/test_f16_compose_memory.py --tb=short: 2 failed, ambas por mem_limit ausente, sin errores de coleccion. Pruebas no fijan nombres de CLI, wrapper ni replicas. Pruebas heredadas parte1: 53 passed en ejecucion focalizada. Aun pendiente coordinar con Kenni contrato del preflight/arranque antes de implementación; no hay mediciones SO en fase tests. (50b3069) |
