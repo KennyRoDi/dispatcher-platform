@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** revision 8e262c2
+**Verificación IA:** implementacion 06df373
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -260,3 +260,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-09 | El revisor dio APROBADO con 2 hallazgos importantes y 3 menores, todos pendientes de que José Andrés decida. Comprobé los importantes en el código fuente. En faster-whisper 1.2.1, tokenizer.py lanza ValueError ante un idioma inválido, así que ese error se reporta como audio ilegible. En PyAV 19.0.2, av/error.py:213-230 hace que ENOMEM, ETIMEDOUT, EAGAIN y EACCES hereden de MemoryError, TimeoutError, BlockingIOError y PermissionError, y quedan capturados como audio ilegible; la frase de mi verificación anterior sobre MemoryError era imprecisa. Releí el diff completo de la parte 2: 158 líneas fuera de tests y docs. pytest: 1148 passed. git status limpio. (8e262c2) |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-09 | Revisor: idioma invalido se reporta como audio ilegible; errores transitorios de PyAV (ENOMEM, ETIMEDOUT, EAGAIN, EACCES) se reportan como audio ilegible; comentario de decodificacion inexacto; falta prueba de FFmpegError |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé 324c2d2, f8b866d, b21d671 y 06df373, que cierran los hallazgos del revisor con TDD. Hallazgo 1: el idioma se valida al cargar contra IDIOMAS_DE_WHISPER, y comparé ese conjunto con _LANGUAGE_CODES de faster-whisper v1.2.1 descargado: los 100 códigos son iguales. Hallazgo 2: los errores transitorios de PyAV se propagan sin convertirse. Hallazgo 3: comentario corregido. Hallazgo 4: nueva prueba de FFmpegError con un av falso. Además encontré una regresión mía, idioma no textual con TypeError, que el developer corrigió con prueba roja previa. Las pruebas existentes no se tocaron: el diff de tests/ solo agrega archivos y casos. pytest -q -m 'not integration and not acceptance': 1183 passed. Sin comprobar: PyAV y faster-whisper reales. Nota: los commits del developer llevan el pie Claude Sonnet 5.5 por el recordatorio de atribución vigente. (06df373) |
