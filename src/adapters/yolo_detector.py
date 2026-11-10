@@ -59,7 +59,7 @@ def _etiqueta(nombres: dict[int, str], clase: float) -> str:
 def _coordenada(valor: float) -> int:
     if not math.isfinite(valor):
         raise ValueError(f"el modelo devolvió una coordenada no finita: {valor!r}")
-    # Ultralytics recorta la caja al borde, pero el error de float32 puede dejar valores como -0.6.
+    # Ultralytics 8.4.208 ya recorta la caja a la imagen; esto protege si otra versión o modelo no lo hace.
     return round(max(0.0, float(valor)))
 
 
