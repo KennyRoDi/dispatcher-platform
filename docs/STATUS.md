@@ -5,13 +5,13 @@
 |---|---|
 | F-01 | pendiente |
 | F-02 | pendiente |
-| F-03 | implementacion |
+| F-03 | verificacion |
 | F-04 | pendiente |
 | F-05 | pendiente |
 | F-06 | pendiente |
 | F-07 | hecha |
 | F-08 | hecha |
-| F-09 | revision |
+| F-09 | tests |
 | F-10 | pendiente |
 | F-11 | pendiente |
 | F-12 | pendiente |
