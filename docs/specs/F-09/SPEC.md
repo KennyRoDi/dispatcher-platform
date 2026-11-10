@@ -1,8 +1,8 @@
 # SPEC F-09: Worker de audio
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 716a86d
+**Base:** feat/F-09-1-worker-de-audio
+**Verificación IA:** revision 314e968
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -112,14 +112,14 @@ Los timestamps son segundos desde el inicio del audio, con dos decimales. Ejempl
 ```toml
 [modelo]
 nombre = "base"
-revision = "se fija en la parte 2 con el commit del repositorio de pesos"
+revision = "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66"
 idioma = "es"
 compute_type = "int8"
 beam_size = 5
 hilos = 0
 ```
 
-Un idioma vacío, un `compute_type` desconocido o un `beam_size` menor que 1 hacen fallar la carga con `ValueError`.
+Un `idioma` que no sea un código de Whisper (100 códigos, sin espacios ni mayúsculas), un `compute_type` desconocido o un `beam_size` menor que 1 hacen fallar la carga con `ValueError`.
 
 ### Decisiones
 
@@ -166,7 +166,7 @@ python -m scripts.comparar_transcripcion --muestra tests/datos/audio --esperadas
 pytest -m acceptance tests/acceptance/test_audio_transcripcion.py
 ```
 
-La versión de torch se toma de F-07 y se confirma en la parte 2.
+La parte 2 fijó `faster-whisper==1.2.1` en `requirements-audio.txt`, que incluye `requirements-texto.txt` con `torch==2.15.0` CPU de F-07, y la revisión `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66` de `Systran/faster-whisper-base` en `config/audio.toml`. Los pesos se descargan a la caché de Hugging Face en la primera carga; la prueba de integración toma la nota de `F09_NOTA` y se salta si faster-whisper no está instalado.
 
 ## Mediciones
 
@@ -197,7 +197,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 **Riesgos:**
 
-- **Las partes 2 y 3 de F-07 y F-08 no están en `main`.** Las PR #29, #30, #32 y #33 figuran como fusionadas, pero sus bases eran las ramas de la parte anterior, no `main`: `origin/main` no tiene `requirements-texto.txt`, `src/adapters/spacy_hf_text_models.py` ni `src/adapters/yolo_detector.py` (comprobado con `git ls-tree origin/main`). La parte 1 de F-09 no los necesita; la parte 2 necesita `requirements-texto.txt` y la 3 los modelos reales de texto. Hay que llevar ese código a `main` antes de la parte 2 de F-09.
+- **Las partes 2 y 3 de F-07 y F-08 no están en `main`.** Las PR #29, #30, #32 y #33 figuran como fusionadas, pero sus bases eran las ramas de la parte anterior, no `main`: `origin/main` no tiene `requirements-texto.txt`, `src/adapters/spacy_hf_text_models.py` ni `src/adapters/yolo_detector.py` (comprobado con `git ls-tree origin/main`). La parte 1 de F-09 no los necesita; la parte 2 necesita `requirements-texto.txt` y la 3 los modelos reales de texto. Hay que llevar ese código a `main` antes de la parte 2 de F-09. Resuelto: 43416f1 lo llevó a `main` y la parte 2 parte de esa base (0a6d31c); `git ls-tree origin/main` ya muestra los tres archivos.
 - **Calidad.** Whisper `base` comete errores en español con ruido o habla rápida, y puede inventar texto en silencios largos. Una muestra de 5 notas no es representativa; se declara su tamaño. Un error de transcripción puede ocultar una amenaza: es un límite que se declara.
 - **Descarga de pesos.** El modelo se descarga de Hugging Face en la primera carga y necesita red; se fija su revisión para que la evidencia sea reproducible. Nunca en las unitarias.
 - **Dependencias.** faster-whisper trae CTranslate2 y PyAV. Puede no haber *wheels* para Python 3.14; AD-22 fija 3.13 en los workers. La imagen del worker de audio también lleva torch por los modelos de texto. Sin comprobar.
@@ -207,12 +207,25 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 ### Pendientes para la parte 2
 
-Observaciones menores del QA de la parte 1 sin corregir. Los tiempos infinitos se corrigieron en la parte 1 durante la verificación (f0ce6dc).
+Observaciones menores del QA de la parte 1. Los tiempos infinitos se corrigieron en la parte 1 durante la verificación (f0ce6dc). Las cuatro se resolvieron en la parte 2 (388af7d y c1e58fc).
 
-- Un timestamp de 1e12 s o más da `OverflowError` en `segmentos_como_mensajes` (`src/domain/transcription.py`), en vez de `ValueError`.
-- `TranscriptSegment` acepta `bool` como tiempo de inicio o fin.
-- Con segmentos desordenados o solapados, `SegmentPositions.rango` da un rango invertido o más corto que el lote. La integración con el transcriptor real debe garantizar el orden.
-- `TranscriptSegment` rechaza `numpy.float32` como confianza: el transcriptor real debe convertir a `float` nativo.
+- Resuelto: un timestamp de 1e12 s o más ya no da `OverflowError` en `segmentos_como_mensajes`: `TranscriptSegment` rechaza con `ValueError` tiempos mayores que `TIEMPO_MAXIMO_S` (`src/domain/transcription.py`).
+- Resuelto: `TranscriptSegment` rechaza `bool` como tiempo de inicio o fin.
+- Resuelto: `WhisperTranscriber` ordena los segmentos por inicio antes de devolverlos.
+- Resuelto: `WhisperTranscriber` convierte a `float` nativo los tiempos y la confianza, incluido `numpy.float32`.
+
+### Pendientes para la parte 3
+
+Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 3. H1 (NaN en `avg_logprob`) y H2 (excepciones de PyAV sin capturar) se corrigieron en la parte 2 (pruebas en 4f1dc5f y corrección en b1ec7d7).
+
+- Confirmar con PyAV y faster-whisper reales qué excepción se lanza ante un audio ilegible y ante un archivo sin pista de audio; lo capturado se dedujo del código fuente de PyAV 19.0.2, sin ejecutarlo.
+- `BugError` de PyAV hereda de `FFmpegError` y de `RuntimeError` y se reporta como «no es un audio legible», aunque sea un fallo interno de FFmpeg. ENOMEM, ETIMEDOUT, EAGAIN y EACCES ya no: se propagan (f8b866d).
+- `ConnectionError` y `BrokenPipeError` se reportan como audio ilegible; es aceptable en rutas locales.
+- Los 100 códigos de `IDIOMAS_DE_WHISPER` son una copia estática de faster-whisper v1.2.1: revisarlos al subir de versión.
+- Los segmentos solapados no se corrigen: el adaptador solo los ordena por inicio.
+- No se ha comprobado con Python 3.13, que fija AD-22; el equipo de desarrollo usa Python 3.14.
+- Las claves extra de `[modelo]` en `config/audio.toml` se ignoran sin aviso.
+- La prueba de integración `tests/integration/test_whisper_transcriber_real.py` nunca se ha ejecutado, porque faster-whisper no está instalado en el equipo de desarrollo.
 
 ## Aprobaciones
 
@@ -236,3 +249,24 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-09 | El revisor dio APROBADO con 3 hallazgos menores, que quedan para que José Andrés los acepte: FakeTextModels duplicado en test_text_analyzer, TERCEROS_PROHIBIDOS para la parte 2 y los pendientes de QA ya anotados en el SPEC. Releí el diff completo origin/main...HEAD contra el SPEC de la parte 1: solo toca los archivos del plan, con 171 líneas añadidas y 24 borradas en src. pytest -q -m 'not integration and not acceptance': 832 passed. git status limpio. (716a86d) |
 | revision | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el diff de bc67928: solo toca tests/ (3 archivos nuevos, TERCEROS_PROHIBIDOS con faster_whisper, ctranslate2 y av, y 2 pruebas agregadas a test_transcription sin tocar las existentes). Ejecuté pytest: test_whisper_config y test_whisper_transcriber fallan al recolectar por ModuleNotFoundError de src.adapters.whisper_transcriber; los 5 casos de test_transcription (bool y tiempo fuera de rango) fallan por DID NOT RAISE u OverflowError. El resto da 1085 passed y la integración se salta sin faster-whisper. numpy llega a CI de forma transitiva por pandas, como en F-08. Sin comprobar: qué excepción da PyAV, que es una suposición del developer. (bc67928) |
+| tests | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el diff 3a8ac21..c1e58fc: 139 líneas fuera de tests y docs. git diff bc67928..HEAD -- tests/ sale vacío, así que las pruebas no se debilitaron. faster_whisper se importa solo dentro de from_config, en adaptadores. La validación de segmentos queda fuera del try, de modo que no se confunde con un error de decodificación. Confirmé por mi cuenta que el campo sha de huggingface.co/api/models/Systran/faster-whisper-base es ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66 y que faster-whisper 1.2.1 existe en PyPI con licencia MIT. pytest -q -m 'not integration and not acceptance': 1139 passed. La integración se salta porque faster-whisper no está instalado. Sin comprobar: que PyAV lance InvalidDataError subclase de ValueError; el comentario del código lo afirma sin haberlo medido. (c1e58fc) |
+| implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| devuelta de verificacion | José Andrés Loría Herrera | 2026-11-09 | QA: NaN en avg_logprob da confianza 1.0 (H1) y archivo sin pista de audio deja escapar IndexError (H2), whisper_transcriber.py |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el commit b1ec7d7, que solo toca src/adapters/whisper_transcriber.py (23 líneas añadidas y 4 borradas). Con eso: H1, un avg_logprob NaN da ValueError; H2, se capturan IndexError y av.error.FFmpegError, este último con importación diferida, mientras RuntimeError y MemoryError genéricos siguen escapando; H3, un segmento inválido da ValueError con la ruta. git diff 4f1dc5f..HEAD -- tests/ sale vacío. pytest -q -m 'not integration and not acceptance': 1148 passed. Sin comprobar: cómo se comporta PyAV en ejecución, porque no está instalado. (b1ec7d7) |
+| implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5), orquestador sin subagente | 2026-11-09 | Re-verificación NO independiente: José Andrés pidió omitir al QA tester, así que la hizo el orquestador. Antes, en la primera ronda, el QA había devuelto H1 y H2 con pruebas rojas (4f1dc5f), y se corrigieron en b1ec7d7. Mutaciones: quitar la comprobación de NaN hace fallar 1 prueba, y quitar IndexError del except también falla 1; las dos se revirtieron y git status quedó limpio. pytest -q -m 'not integration and not acceptance': 1148 passed. Nadie volvió a probar el resto de los criterios. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (63a0aad) |
+| verificacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de 5e58d31. El README del audio coincide con requirements-audio.txt y config/audio.toml. R14 tiene la revisión que comprobé en Hugging Face. AD-28 describe lo implementado en b1ec7d7. CONTRATOS suma los 3 archivos de la parte 2. En el SPEC, los pendientes de la parte 1 quedan resueltos y se agregan los de la parte 3; también marca como resuelto el riesgo de F-07 y F-08 en main, que confirmé antes. El borrador de bitácora usa hashes reales y declara que la re-verificación no fue independiente. Queda desactualizado el esbozo de audio.toml en la línea 115 del SPEC; es menor. (5e58d31) |
+| documentacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-09 | El revisor dio APROBADO con 2 hallazgos importantes y 3 menores, todos pendientes de que José Andrés decida. Comprobé los importantes en el código fuente. En faster-whisper 1.2.1, tokenizer.py lanza ValueError ante un idioma inválido, así que ese error se reporta como audio ilegible. En PyAV 19.0.2, av/error.py:213-230 hace que ENOMEM, ETIMEDOUT, EAGAIN y EACCES hereden de MemoryError, TimeoutError, BlockingIOError y PermissionError, y quedan capturados como audio ilegible; la frase de mi verificación anterior sobre MemoryError era imprecisa. Releí el diff completo de la parte 2: 158 líneas fuera de tests y docs. pytest: 1148 passed. git status limpio. (8e262c2) |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-09 | Revisor: idioma invalido se reporta como audio ilegible; errores transitorios de PyAV (ENOMEM, ETIMEDOUT, EAGAIN, EACCES) se reportan como audio ilegible; comentario de decodificacion inexacto; falta prueba de FFmpegError |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé 324c2d2, f8b866d, b21d671 y 06df373, que cierran los hallazgos del revisor con TDD. Hallazgo 1: el idioma se valida al cargar contra IDIOMAS_DE_WHISPER, y comparé ese conjunto con _LANGUAGE_CODES de faster-whisper v1.2.1 descargado: los 100 códigos son iguales. Hallazgo 2: los errores transitorios de PyAV se propagan sin convertirse. Hallazgo 3: comentario corregido. Hallazgo 4: nueva prueba de FFmpegError con un av falso. Además encontré una regresión mía, idioma no textual con TypeError, que el developer corrigió con prueba roja previa. Las pruebas existentes no se tocaron: el diff de tests/ solo agrega archivos y casos. pytest -q -m 'not integration and not acceptance': 1183 passed. Sin comprobar: PyAV y faster-whisper reales. Nota: los commits del developer llevan el pie Claude Sonnet 5.5 por el recordatorio de atribución vigente. (06df373) |
+| implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-09 | QA re-verificó solo lo nuevo y dio APROBADO. Probó 11 mutaciones sobre el idioma y los errores transitorios y todas se detectaron; contrastó por su cuenta los 100 códigos de idioma con faster-whisper v1.2.1 y son idénticos; agregó 5 pruebas en d0c3846, solo en tests/. Repetí yo 2 mutaciones (quitar isinstance falla 3 pruebas, quitar la relanzada de transitorios falla 10), las revertí y git status quedó limpio. pytest -q -m 'not integration and not acceptance': 1188 passed. Observación menor: ConnectionError y BrokenPipeError se reportan como audio ilegible, aceptable para rutas locales. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (d0c3846) |
+| verificacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de 01f58b0: README, AD-28 y SPEC describen lo implementado en f8b866d y 06df373. Los 7 hashes citados en el borrador de la segunda entrada de bitácora existen en git. El borrador reconoce mi afirmación imprecisa sobre MemoryError y la regresión del TypeError. No hay el carácter de puntos suspensivos en lo editado. No quedan cambios sin commit. (01f58b0) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-10 | El revisor aprobó la re-revisión sin hallazgos bloqueantes ni importantes y con 3 observaciones menores sin acción. Verifiqué los puntos clave: el diff de src de la parte 2 no tiene más cambios desde mi verificación, la tupla de _errores_de_decodificacion cubre ERRORES_TRANSITORIOS y las pruebas con av falso usan monkeypatch. pytest -q -m 'not integration and not acceptance': 1188 passed. git status limpio. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (314e968) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
