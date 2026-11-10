@@ -453,3 +453,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aceptado tras corregir H1. Melany Vindas aprobo cada fase con flujo.py aprobar. Riesgo 8 aceptado: ObjectStore no debe confirmar el objeto si la lectura lanza; pendiente llevarlo al contrato en una PR aparte. H2 (carrera entre receive y discard) queda para la parte 2 |
 | Cómo se validó | pytest -q -m 'not integration and not acceptance': test_chunks 44/44 y suite 1086 passed. QA ataco el flujo con 14 lectores, chunks alterados en disco y concurrencia con hilos, sin ningun objeto con contenido distinto a su clave. Conformidad del repositorio: 0 problemas. Sin comprobar: subida real entre nodos y throughput, de las partes 2 y 3 |
 | Error de la IA | (1) H1: la primera implementacion del developer calculaba el SHA-256 total en una pasada y releia el staging para put; un chunk cambiado entre las dos pasadas llegaba a ObjectStore con un SHA-256 ajeno. Lo detecto QA con una prueba en rojo; se devolvio a implementacion y se corrigio en 9e5b2b4 calculando el hash sobre el mismo flujo que lee put. (2) La primera verificacion de implementacion no fue independiente (el orquestador hizo el rol sin subagente) y no detecto H1. (3) Las pruebas iniciales del developer dejaban 5 mutantes vivos; QA las reforzo y en la segunda verificacion agrego pruebas que detectaron 3 mutantes mas. (4) La verificacion de la fase 4 se registro antes de aplicar las 12 pruebas de QA (cd0d180) porque un git am quedo a medias: el resumen decia 44/44 y la rama tenia 32. Se corrigio aplicando el parche despues |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 (`feat/F-03-4-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5), orquestador y subagentes arquitecto, developer, QA y documentador |
+| Componente | F-03 |
+| Propósito | Generar los archivos grandes de los casos pesados del dataset sintetico de F-03 (video mpeg2 de 40 Mbit/s hasta >= 200 MiB) en src/adapters/heavy_case_generator.py |
+| Consulta resumida | SPEC de la parte, pruebas rojas, implementacion (4b6b32f) y pruebas de QA (77faa7c); la IA redacto el modulo y sus pruebas |
+| Resultado obtenido | Modulo, 10 pruebas unitarias y 12 de QA (4 xfail). Todo caso pesado sale en video por decision de la persona; el SPEC admite video o documento |
+| Validado / corregido / descartado | La persona aprobo cada fase. pytest: 806 passed, 14 xfailed. Un caso real con ffmpeg dio 209,34 MiB con sha256 reproducible |
+| Cómo se validó | El orquestador reejecuto pytest y reprodujo el caso real sin fiarse de los subagentes; la persona leyo cada informe |
+| Error de la IA | El SPEC no definia la API del modulo: el developer la fijo en las pruebas y la persona la aprobo. El developer duplico _produce por el bug del archivo previo de media_generator. QA hallo fallos no cubiertos por el developer: case.name con ../ o absoluto escapa de out_dir, directorio vacio tras fallo y stderr de ffmpeg ausente |
