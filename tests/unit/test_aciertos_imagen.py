@@ -133,6 +133,16 @@ def test_etiquetas_mal_formadas_se_rechazan(muestra, datos):
         leer_etiquetas(escribir_json(muestra / "etiquetas.json", datos), muestra, CATEGORIAS)
 
 
+@pytest.mark.parametrize(
+    "datos",
+    [["cuchillo_1.jpg"], {"imagenes": ["cuchillo_1.jpg"]}, {"imagenes": [None]}],
+    ids=["raiz-es-lista", "elemento-es-texto", "elemento-nulo"],
+)
+def test_etiquetas_con_estructura_inesperada_se_rechazan_con_value_error(muestra, datos):
+    with pytest.raises(ValueError):
+        leer_etiquetas(escribir_json(muestra / "etiquetas.json", datos), muestra, CATEGORIAS)
+
+
 def test_evalua_cada_imagen_de_la_muestra_con_el_analizador(muestra):
     etiquetas = leer_etiquetas(etiquetas_de_muestra(muestra), muestra, CATEGORIAS)
     analizador = FakeAnalyzer({"cuchillo_1.jpg": [finding(confianza=0.8)], "mesa_2.jpg": [finding(confianza=0.3)]})
@@ -311,6 +321,17 @@ def test_main_con_imagen_ilegible_falla_sin_escribir(muestra, tmp_path, capsys):
 
     assert "legible" in capsys.readouterr().err
     assert not salida.exists()
+
+
+def test_main_con_salida_no_escribible_falla_con_mensaje(muestra, tmp_path, capsys):
+    archivo = tmp_path / "no_es_directorio"
+    archivo.write_text("ocupa la ruta del directorio de salida", encoding="utf-8")
+    salida = archivo / "F-08_aciertos.md"
+
+    codigo = main(argumentos(muestra, etiquetas_de_muestra(muestra), salida), detector=FakeObjectDetector({}), versiones=VERSIONES)
+
+    assert codigo == 1
+    assert "no_es_directorio" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("faltante", ["--muestra", "--etiquetas", "--salida"])
