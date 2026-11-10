@@ -648,7 +648,7 @@ def make_admission_worker(tmp_path, redis_client, uso, margin=100, footprint=300
 
     from src.domain.admission import FootprintTable
 
-    worker = make_worker(tmp_path, redis_client=redis_client, worker_queues=("extract_audio",))
+    worker = make_worker(tmp_path, redis_client=redis_client, WORKER_QUEUES="extract_audio")[0]
     worker.resource_reader = FakeResourceReader(uso)
     worker.footprints = FootprintTable({"extract_audio": footprint})
     worker.admission_margin = margin
@@ -673,7 +673,6 @@ def test_poll_once_consume_si_cabe(tmp_path):
     redis_client = fakeredis.FakeRedis(decode_responses=True)
     storage = FakeStorage()
     seed_subtask(redis_client, storage, "s1", operation="extract_audio")
-    redis_client.rpush("queue:extract_audio", "s1")
     uso = ResourceUsage("w1", memory_current=100, memory_max=1000)
     worker = make_admission_worker(tmp_path, redis_client, uso)
     worker.storage = storage
@@ -703,7 +702,6 @@ def test_dos_workers_con_limite_bajo_dejan_la_subtarea_al_otro(tmp_path):
     redis_client = fakeredis.FakeRedis(decode_responses=True)
     storage = FakeStorage()
     seed_subtask(redis_client, storage, "s1", operation="extract_audio")
-    redis_client.rpush("queue:extract_audio", "s1")
     lleno = make_admission_worker(
         tmp_path / "a", redis_client, ResourceUsage("a", memory_current=900, memory_max=1000)
     )
