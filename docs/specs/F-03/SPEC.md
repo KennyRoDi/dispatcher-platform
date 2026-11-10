@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-03-2-dataset-sintetico
-**Verificación IA:** implementacion cd1aae0
+**Verificación IA:** implementacion 13fcffa
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 768 passed, 3 skipped, 8 xfailed. Se añadió src/adapters/media_generator.py (122 líneas); pruebas intactas; commit empujado. Probé con ffmpeg real: 18 archivos (jpg, mp3, png) generados. Único comentario cita la procedencia de AUDIO_CODECS. Desviación menor: etiqueta neutro frente a negativo del SPEC. (cd1aae0) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA B1: con ffmpeg real la misma semilla no produce los mismos bytes (anoisesrc sin seed, ogg con serial aleatorio); el SPEC exige hashes de contenido reproducibles |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Corrección de B1 verificada: pytest unitario 785 passed, 3 skipped, 10 xfailed sin XPASS; prueba de integración con ffmpeg real 2 passed. Generé dos veces el mismo plan con distinto PYTHONHASHSEED y ffmpeg real: mismo hash de bytes (b677f4a1a244c3bd, 18 archivos). Solo cambió src/adapters/media_generator.py (+6/-2), pruebas intactas, commit empujado. (13fcffa) |
