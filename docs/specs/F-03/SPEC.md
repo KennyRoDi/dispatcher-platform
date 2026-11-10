@@ -1,7 +1,7 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** pr
-**Base:** feat/F-03-1-dataset-sintetico
+**Fase:** tests
+**Base:** feat/F-03-2-dataset-sintetico
 **Verificación IA:** revision 10d3f1a
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
