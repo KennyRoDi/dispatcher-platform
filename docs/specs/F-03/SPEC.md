@@ -95,10 +95,9 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - Validez: los patrones sintéticos no equivalen a fotos reales; F-08 mide detección sobre ellos y la limitación se declara en `docs/dataset.md`.
 - Distribución: el enlace de Google Drive depende de la persona y queda fuera del repo; si no se sube, los demás integrantes deben regenerar los casos en local.
 
-**Preguntas abiertas.**
-1. Formato y ubicación del documento grande de los casos pesados cuando no se use video (documento ≥ 200 MB): tipo de archivo, a definir en la fase de tests.
+**Preguntas abiertas.** Ninguna.
 
-**Resueltas por la persona (2026-11-10).** AD-25 aprobada; mensajes siempre sintéticos y frases de amenaza ficticias aprobadas; dataset pesado en local y distribuido por Google Drive fuera del repo; opción A para heterogéneos (5 livianos y 5 pesados, los pesados incluidos); todo el dataset sintético (chats, imágenes y audio) generado por el equipo, se descartan los datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) por consideraciones legales y de licencia, lo que cierra las preguntas de selección de datasets y de redistribución.
+**Resueltas por la persona (2026-11-10).** Todo caso pesado se genera como video `.mpg` (el SPEC admitía video o documento), lo que cierra la pregunta del formato del documento grande; AD-25 aprobada; mensajes siempre sintéticos y frases de amenaza ficticias aprobadas; dataset pesado en local y distribuido por Google Drive fuera del repo; opción A para heterogéneos (5 livianos y 5 pesados, los pesados incluidos); todo el dataset sintético (chats, imágenes y audio) generado por el equipo, se descartan los datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) por consideraciones legales y de licencia, lo que cierra las preguntas de selección de datasets y de redistribución.
 
 
 ## Aprobaciones
