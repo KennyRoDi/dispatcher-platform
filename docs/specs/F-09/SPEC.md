@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-09-2-worker-de-audio
-**Verificación IA:** tests 3127c0f
+**Verificación IA:** implementacion 21e406b
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -275,3 +275,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de implementacion | José Andrés Loría Herrera | 2026-11-10 | test_wer_normaliza_antes_de_comparar espera 1/8 pero la normalizacion quita tildes y el WER es 0.0; contradice test_normaliza_mayusculas_tildes_y_puntuacion |
 | verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé 3127c0f: cambia 3 líneas, solo en tests/unit/test_comparar_transcripcion.py. La prueba ahora comprueba dos cosas: tildes y mayúsculas dan WER 0.0, y una diferencia real, 've' por 'ver', da 1/8; confirmé ambos valores contra el script antes. Ninguna otra prueba se tocó. Ejecuté pytest -q -m 'not integration and not acceptance': 1249 passed y 1 failed, que es test_muestra_del_repositorio, esperada hasta que José Andrés aporte las notas. Nota: el script ya existe desde 582581b, que se hizo antes de devolver la fase, así que esta verificación de tests no cumple 'sin código'. (3127c0f) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | El script scripts/comparar_transcripcion.py ya existia (582581b) porque la fase se devolvio desde implementacion para corregir una prueba de WER incorrecta; la persona autorizo la excepcion |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé scripts/comparar_transcripcion.py completo (255 líneas, solo ese archivo fuera de tests) contra las pruebas aprobadas. Las pruebas no se tocaron desde 3127c0f. pytest -q -m 'not integration and not acceptance': 1249 passed y 1 failed, la de la muestra del repositorio, esperada hasta que José Andrés aporte las notas. No se crearon datos de muestra ni evidencia. Observaciones que QA debe mirar: main solo captura ValueError y OSError, así que un ImportError de faster_whisper o un PackageNotFoundError saldría con traceback; la sección Límites del Markdown afirma que las notas de amenaza son guiones sintéticos leídos sin leerlo de los datos. Sin comprobar: nada se ejecutó con audio, modelo ni PyAV reales. (21e406b) |
