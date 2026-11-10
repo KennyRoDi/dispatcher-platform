@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-03-3-dataset-sintetico
 **Verificación IA:** revision 397158d
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -160,3 +160,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 4: APROBADO sin bloqueantes. Comprobé en el código el timeout de 300 s (media_generator.py:15) y la pregunta abierta del SPEC (línea 99). Árbol limpio, pruebas en verde en la fase anterior (806 passed, 14 xfailed). (2172591) |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5) | 2026-11-10 | Revisión APROBADA por el revisor (subagente). Tras ella solo cambió el SPEC: se cerró la pregunta abierta del formato (todo caso pesado es video, decisión de la persona). Árbol limpio, commit empujado, sin cambios de código. (397158d) (397158d) |
+| revision | Kenni Rodriguez | 2026-11-10 |  |
