@@ -9,6 +9,7 @@ from scripts.aciertos_imagen import (
     EtiquetaImagen,
     FilaAciertos,
     ResultadoImagen,
+    categorias_de,
     construir_analizador,
     evaluar,
     generar_markdown,
@@ -332,6 +333,45 @@ def test_main_con_salida_no_escribible_falla_con_mensaje(muestra, tmp_path, caps
 
     assert codigo == 1
     assert "no_es_directorio" in capsys.readouterr().err
+
+
+class DetectorQueNoDebeLlamarse:
+    def detect(self, path):
+        raise AssertionError(f"se analizó {path} con una salida no escribible")
+
+
+@pytest.mark.parametrize("forma", ["directorio", "bajo-un-archivo"])
+def test_main_valida_la_salida_antes_de_analizar_la_muestra(muestra, tmp_path, capsys, forma):
+    archivo = tmp_path / "ocupado"
+    archivo.write_text("ocupa la ruta", encoding="utf-8")
+    salida = {"directorio": tmp_path, "bajo-un-archivo": archivo / "sub" / "F-08_aciertos.md"}[forma]
+
+    codigo = main(argumentos(muestra, etiquetas_de_muestra(muestra), salida), detector=DetectorQueNoDebeLlamarse(), versiones=VERSIONES)
+
+    assert codigo == 1
+    assert str(salida) in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "contenido",
+    [None, "esto no es [toml", 'umbral_minimo = 0.25\n\n[modelo]\npesos = "yolo11n.pt"\n'],
+    ids=["inexistente", "toml-roto", "sin-clases"],
+)
+def test_main_con_config_invalida_falla_sin_escribir(muestra, tmp_path, capsys, contenido):
+    config = tmp_path / "imagen.toml"
+    if contenido is not None:
+        config.write_text(contenido, encoding="utf-8")
+    salida = tmp_path / "F-08_aciertos.md"
+    argv = argumentos(muestra, etiquetas_de_muestra(muestra), salida) + ["--config", str(config)]
+
+    assert main(argv, detector=FakeObjectDetector({}), versiones=VERSIONES) == 1
+
+    assert capsys.readouterr().err.startswith("error:")
+    assert not salida.exists()
+
+
+def test_categorias_de_devuelve_cada_categoria_una_vez_y_ordenada():
+    assert categorias_de({"clases": {"knife": "arma", "pill": "droga", "gun": "arma"}}) == ("arma", "droga")
 
 
 @pytest.mark.parametrize("faltante", ["--muestra", "--etiquetas", "--salida"])

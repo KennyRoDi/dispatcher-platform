@@ -321,7 +321,7 @@ def escribir_config_con_pesos_literales(ruta, pesos, sha256):
     return ruta
 
 
-@pytest.mark.parametrize("forma", ["padre", "subdirectorio", "barra-invertida", "absoluta", "punto-punto"])
+@pytest.mark.parametrize("forma", ["padre", "subdirectorio", "barra-invertida", "absoluta", "punto-punto", "unidad-relativa"])
 def test_pesos_que_no_son_un_nombre_de_archivo_se_rechazan_antes_de_cargar(monkeypatch, tmp_path, pesos, forma):
     falso = UltralyticsFalso().instalar(monkeypatch)
     directorio = pesos.parent
@@ -335,6 +335,7 @@ def test_pesos_que_no_son_un_nombre_de_archivo_se_rechazan_antes_de_cargar(monke
         "barra-invertida": "sub\\" + pesos.name,
         "absoluta": str(pesos),
         "punto-punto": "..",
+        "unidad-relativa": f"C:{pesos.name}",
     }[forma]
     config = escribir_config_con_pesos_literales(tmp_path / "imagen.toml", valor, sha256_de(pesos))
 

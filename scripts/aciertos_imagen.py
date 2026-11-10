@@ -29,9 +29,10 @@ class EtiquetaImagen:
 
 
 def leer_etiquetas(ruta: Path, muestra: Path, categorias: Sequence[str]) -> list[EtiquetaImagen]:
-    imagenes = json.loads(Path(ruta).read_text(encoding="utf-8")).get("imagenes")
-    if not isinstance(imagenes, list) or not imagenes:
-        raise ValueError(f"{ruta} debe tener una lista no vacía en imagenes")
+    datos = json.loads(Path(ruta).read_text(encoding="utf-8"))
+    imagenes = datos.get("imagenes") if isinstance(datos, dict) else None
+    if not isinstance(imagenes, list) or not imagenes or not all(isinstance(d, dict) for d in imagenes):
+        raise ValueError(f"{ruta} debe ser un objeto con una lista no vacía de objetos en imagenes")
     etiquetas = [_etiqueta(datos, Path(muestra), categorias) for datos in imagenes]
     repetidos = sorted(a for a, n in Counter(e.archivo for e in etiquetas).items() if n > 1)
     if repetidos:
@@ -89,7 +90,10 @@ def _obtenidas(resultado: ResultadoImagen) -> set[str]:
 
 
 def categorias_de(config: Mapping[str, Any]) -> tuple[str, ...]:
-    return tuple(sorted(set(config["clases"].values())))
+    clases = config.get("clases")
+    if not isinstance(clases, Mapping):
+        raise ValueError("la configuración no tiene la tabla [clases]")
+    return tuple(sorted(set(clases.values())))
 
 
 def generar_markdown(
@@ -164,34 +168,60 @@ def _versiones_instaladas() -> dict[str, str]:
     return {biblioteca: metadata.version(biblioteca) for biblioteca in BIBLIOTECAS}
 
 
-def main(
-    argv: list[str] | None = None,
-    detector: ObjectDetector | None = None,
-    versiones: Mapping[str, str] | None = None,
-) -> int:
-    argv = sys.argv[1:] if argv is None else argv
+def _leer_config(ruta: Path) -> dict[str, Any]:
+    with open(ruta, "rb") as archivo:
+        return tomllib.load(archivo)
+
+
+def _validar_salida(salida: Path) -> None:
+    if salida.is_dir():
+        raise ValueError(f"la salida es un directorio: {salida}")
+    # Se valida antes de analizar la muestra, sin crear nada: basta el primer ancestro existente.
+    ancestro = next((padre for padre in salida.parents if padre.exists()), None)
+    if ancestro is None or not ancestro.is_dir():
+        raise ValueError(f"no se puede crear la salida {salida}")
+
+
+def _argumentos(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Compara el analizador de imagen con una muestra etiquetada.")
     parser.add_argument("--muestra", type=Path, required=True)
     parser.add_argument("--etiquetas", type=Path, required=True)
     parser.add_argument("--salida", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--pesos", type=Path, default=RAIZ, help="directorio con los pesos fijados en la config")
-    args = parser.parse_args(argv)
-    with open(args.config, "rb") as archivo:
-        config = tomllib.load(archivo)
-    try:
-        if not args.muestra.is_dir():
-            raise ValueError(f"la muestra no es un directorio: {args.muestra}")
-        etiquetas = leer_etiquetas(args.etiquetas, args.muestra, categorias_de(config))
-        detector = detector or YoloDetector.from_config(args.config, args.pesos)
-        resultados = evaluar(construir_analizador(args.config, detector), args.muestra, etiquetas)
-    except (ValueError, OSError) as error:
-        print(f"error: {error}", file=sys.stderr)
-        return 1
-    comando = "python -m scripts.aciertos_imagen " + " ".join(argv)
+    return parser.parse_args(argv)
+
+
+def _ejecutar(
+    args: argparse.Namespace,
+    comando: str,
+    detector: ObjectDetector | None,
+    versiones: Mapping[str, str] | None,
+) -> None:
+    _validar_salida(args.salida)
+    config = _leer_config(args.config)
+    if not args.muestra.is_dir():
+        raise ValueError(f"la muestra no es un directorio: {args.muestra}")
+    etiquetas = leer_etiquetas(args.etiquetas, args.muestra, categorias_de(config))
+    detector = detector or YoloDetector.from_config(args.config, args.pesos)
+    resultados = evaluar(construir_analizador(args.config, detector), args.muestra, etiquetas)
     texto = generar_markdown(comando, config, versiones or _versiones_instaladas(), etiquetas, resultados)
     args.salida.parent.mkdir(parents=True, exist_ok=True)
     args.salida.write_text(texto, encoding="utf-8")
+
+
+def main(
+    argv: list[str] | None = None,
+    detector: ObjectDetector | None = None,
+    versiones: Mapping[str, str] | None = None,
+) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    args = _argumentos(argv)
+    try:
+        _ejecutar(args, "python -m scripts.aciertos_imagen " + " ".join(argv), detector, versiones)
+    except (ValueError, OSError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
     return 0
 
 
