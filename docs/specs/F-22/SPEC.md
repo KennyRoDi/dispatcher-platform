@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** implementacion 316b0de
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -187,3 +187,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Melany Vindas | 2026-11-10 |  |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-10 | 1069 pruebas en verde con test_chunks 27/27 y capas; 254 lineas; commits validos. Desviacion: el staging no se borra si el sha256 total no coincide. Verificacion no independiente. (316b0de) |
 | implementacion | Melany Vindas | 2026-11-10 |  |
+| devuelta de verificacion | Melany Vindas | 2026-11-10 | QA: H1, complete relee el staging y un chunk cambiado entre pasadas llega a ObjectStore con sha256 ajeno (test e7273fe en rojo) |
