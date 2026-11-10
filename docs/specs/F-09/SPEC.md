@@ -205,6 +205,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - **Dataset de F-03.** F-03 propone audio sintético. Si son tonos o ruido, Whisper no produce texto y el análisis de las 150 notas sería vacío. Hay que avisar a Kenni: las notas deben tener voz, propia o con licencia.
 - **Archivos compartidos.** `src/application/analyze_text.py` y `src/adapters/text_analyzer.py` son de F-07, del mismo responsable; `tests/unit/test_arquitectura.py` es compartido. Cambios aditivos de pocas líneas.
 
+### Pendientes para la parte 2
+
+Observaciones menores del QA de la parte 1 sin corregir. Los tiempos infinitos se corrigieron en la parte 1 durante la verificación (f0ce6dc).
+
+- Un timestamp de 1e12 s o más da `OverflowError` en `segmentos_como_mensajes` (`src/domain/transcription.py`), en vez de `ValueError`.
+- `TranscriptSegment` acepta `bool` como tiempo de inicio o fin.
+- Con segmentos desordenados o solapados, `SegmentPositions.rango` da un rango invertido o más corto que el lote. La integración con el transcriptor real debe garantizar el orden.
+- `TranscriptSegment` rechaza `numpy.float32` como confianza: el transcriptor real debe convertir a `float` nativo.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
