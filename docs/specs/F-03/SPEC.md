@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-03-3-dataset-sintetico
 **Verificación IA:** tests b3418b0
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -152,3 +152,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 3: APROBADO sin bloqueantes. Comprobé en el código los comentarios citados (BITEXACT, seed de ruido, paleta, procedencia de AUDIO_CODECS) y que subprocess recibe lista sin shell. Observaciones menores anotadas. Árbol limpio, commit empujado. (98563c9) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_heavy_case_generator.py: 1 error de colección por ModuleNotFoundError de src.adapters.heavy_case_generator (rojo por módulo ausente). Solo se añadió ese archivo de pruebas (10 funciones, 120 líneas), src/ intacto, commit empujado, árbol limpio. La API (generate_heavy_cases, LICENSE_NAME, ORIGIN, ValueError/FileNotFoundError) la fijó el developer porque el SPEC no la define. (b3418b0) (b3418b0) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
