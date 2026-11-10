@@ -85,6 +85,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | 4 | `feat(F-03): generar archivos grandes de los casos pesados` | `src/adapters/heavy_case_generator.py`: video o documento ≥ 200 MiB, falla si no alcanza, ~100 líneas |
 | 5 | `feat(F-03): componer casos heterogeneos y manifiesto con CLI` | `src/adapters/document_generator.py` (documentos livianos) y `scripts/dataset_sintetico.py`: arma los 10 heterogéneos, manifiesto, `--validar`, ~150 líneas |
 | 6 | `docs(F-03): registrar procedencia, distribucion y salida del validador` | `docs/dataset.md` (procedencia «generado por el equipo», limitación sintética, casos por condición, enlace de Drive, salida real del validador) y AD-25 en `docs/ARQUITECTURA.md` §8. Sin código; va al final porque necesita el dataset generado |
+| 7 | `fix(F-03): corregir defectos menores de los generadores y del plan` | Cierra los xfail estrictos y observaciones menores de las partes 1 a 5: `_produce` borra el archivo previo y lo reutiliza `heavy_case_generator`, UTC en renderizadores de chat, validación de `case.name` y de parámetros fuera de rango, `cases` que recorta, constantes `MIN_*` compartidas, mensajes de error con `stderr`. Rama `fix/`. Las decisiones de la persona (licencia, etiqueta neutro, archivos huérfanos) se incorporan al definirlas. Sin dataset nuevo ni cambio de manifiesto |
 
 ## Riesgos y preguntas abiertas
 
