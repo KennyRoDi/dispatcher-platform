@@ -36,7 +36,9 @@ python scripts/preflight.py --gpu
 python scripts/start_worker.py --gpu
 ```
 
-Por cada contenedor worker iniciado, sustituir `<id>` por su identificador real y conservar comando resuelto y salida cruda en `docs/evidencia/F-16/`:
+En cada uno de los tres arranques por nodo, guardar primero el comando y la salida de configuración efectiva: `docker compose --env-file .env -f deploy/docker-compose.worker.yml config --format json`; para GPU agregar `-f deploy/docker-compose.worker-gpu.yml` antes de `config`. El wrapper usa esos mismos archivos y ejecuta `up -d --build` solo tras pasar la validación. Guardar comandos resueltos y salidas crudas en `docs/evidencia/F-16/`.
+
+Por cada contenedor worker iniciado, sustituir `<id>` por su identificador real y guardar estas tres lecturas con el ID:
 
 ```sh
 docker exec <id> cat /sys/fs/cgroup/cgroup.controllers
@@ -44,7 +46,7 @@ docker exec <id> cat /sys/fs/cgroup/memory.max
 docker exec <id> cat /sys/fs/cgroup/memory.swap.max
 ```
 
-Comparar bytes observados con la configuración efectiva y verificar ausencia de swap. En cada repetición conservar la salida de `docker compose --env-file .env -f deploy/docker-compose.worker.yml config --format json` (agregar `-f deploy/docker-compose.worker-gpu.yml` para GPU), el comando resuelto y cada ID de contenedor; guardar salidas crudas en `docs/evidencia/F-16/`. Consultar por contenedor:
+Comparar `memory.max` con `mem_limit` y verificar que `memory.swap.max` coincida con `memswap_limit` (el Compose fija ambos al mismo valor). Registrar también fallos de configuración o arranque; no estimar los valores faltantes.
 
 ## 4. Resultados
 
