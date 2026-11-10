@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-16-2-limites-por-worker
-**Verificación IA:** verificacion 7e1fee3
+**Verificación IA:** documentacion 1d55da4
 **Historia:** US-17 · **Requisitos:** RF-25 · **Responsable:** J
 
 ## Objetivo
@@ -79,3 +79,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | pytest | 2026-11-10 | QA en la misma sesión (no independiente): 69 pruebas en verde, 88 líneas de código; intentos de romper: valores bool, negativos y no ASCII rechazados, error de lectura no consume. Hallazgo: memory.max=max hace que el worker nunca admita (se registra el error cada ciclo). Medición M1 pendiente, sin nodos WSL2 ni F-16 parte 2 (7e1fee3) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de documentacion | git diff --stat | 2026-11-10 | Documentación por subagente haiku: AD-30 en ARQUITECTURA, ficha M1 con medición pendiente y variables obligatorias en WORKER_CONTRACT; 3 archivos, 21 líneas, sin código (1d55da4) |
