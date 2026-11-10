@@ -67,6 +67,16 @@ pip install -r requirements-imagen.txt
 
 Usa Ultralytics YOLO 8.4.208 (AGPL-3.0) con los pesos `yolo11n.pt` de la release v8.4.0 de github.com/ultralytics/assets, también AGPL-3.0. Los pesos no van en el repositorio (`*.pt` está en `.gitignore`): se descargan a mano y se colocan en el directorio de pesos que recibe `YoloDetector.from_config`, que comprueba antes de cargarlos el SHA-256 fijado en `config/imagen.toml`. La prueba de integración toma ese directorio de `F08_DIRECTORIO_PESOS` (por defecto, la raíz del repositorio) y la imagen positiva de `F08_IMAGEN_POSITIVA`. Referencia R13 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
 
+Para generar la tabla de aciertos, desde la raíz del repositorio, con el directorio de pesos en `F08_DIRECTORIO_PESOS`:
+
+```bash
+F08_IMAGEN_POSITIVA=tests/datos/imagenes/cuchillo_02.jpg pytest -m integration tests/integration/test_yolo_detector_real.py
+python -m scripts.aciertos_imagen --muestra tests/datos/imagenes --etiquetas tests/datos/imagenes/etiquetas.json --salida docs/evidencia/F-08_aciertos_<fecha>.md --pesos "$F08_DIRECTORIO_PESOS"
+pytest -m acceptance tests/acceptance/test_imagen_aciertos.py
+```
+
+La muestra son 20 fotos propias de José Andrés (CC BY 4.0); la tabla prueba el funcionamiento de punta a punta, no la precisión. La corrida del 2026-11-09, con el análisis de sus fallos, está en `docs/evidencia/F-08_aciertos_2026-11-09.md`.
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*

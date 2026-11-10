@@ -269,3 +269,77 @@ def test_el_modulo_cita_ultralytics_y_su_licencia():
 
     assert "Ultralytics" in fuente
     assert "AGPL-3.0" in fuente
+
+
+def test_coordenada_con_error_numerico_negativo_se_recorta_a_cero(imagen):
+    # Ultralytics recorta las cajas al borde de la imagen, pero el redondeo en float32 puede dejar -0.6.
+    [deteccion] = YoloDetector(FakeYolo([([-0.6, 2.2, 30.0, 40.0], 0.8, 43)])).detect(imagen)
+
+    assert deteccion.box == (0, 2, 30, 40)
+
+
+@pytest.mark.parametrize("coordenada", [float("inf"), float("-inf"), float("nan")], ids=["inf", "menos-inf", "nan"])
+def test_coordenada_no_finita_se_rechaza_con_value_error(imagen, coordenada):
+    modelo = FakeYolo([([1.0, 2.0, coordenada, 40.0], 0.8, 43)])
+
+    with pytest.raises(ValueError):
+        YoloDetector(modelo).detect(imagen)
+
+
+def test_clase_fuera_de_names_se_rechaza_con_value_error(imagen):
+    with pytest.raises(ValueError, match="99"):
+        YoloDetector(FakeYolo([([1, 1, 2, 2], 0.8, 99)])).detect(imagen)
+
+
+class UnidentifiedImageErrorFalso(OSError):
+    pass
+
+
+# Qué lanza ultralytics 8.4.208 ante un archivo corrupto se confirma en la integración; aquí se fija que
+# cualquier error de lectura del archivo, de la familia OSError, llegue al llamador como ValueError.
+@pytest.mark.parametrize(
+    "error",
+    [OSError("cannot identify image file"), UnidentifiedImageErrorFalso("cannot identify image file")],
+    ids=["oserror", "subclase-de-oserror"],
+)
+def test_error_de_lectura_de_la_imagen_se_traduce_a_value_error(tmp_path, error):
+    corrupta = tmp_path / "corrupta.jpg"
+    corrupta.write_bytes(b"\xff\xd8\xff cabecera jpeg truncada")
+
+    with pytest.raises(ValueError, match="corrupta.jpg"):
+        YoloDetector(FakeYolo(error=error)).detect(corrupta)
+
+
+def escribir_config_con_pesos_literales(ruta, pesos, sha256):
+    # Cadena literal de TOML para que la barra invertida de Windows llegue sin escapar.
+    ruta.write_text(
+        'umbral_minimo = 0.25\n\n[clases]\nknife = "arma"\n\n'
+        '[[severidad]]\ncategoria = "arma"\numbral = 0.5\nnivel = "alta"\n\n'
+        f"[modelo]\npesos = '{pesos}'\nsha256 = \"{sha256}\"\n",
+        encoding="utf-8",
+    )
+    return ruta
+
+
+@pytest.mark.parametrize("forma", ["padre", "subdirectorio", "barra-invertida", "absoluta", "punto-punto", "unidad-relativa"])
+def test_pesos_que_no_son_un_nombre_de_archivo_se_rechazan_antes_de_cargar(monkeypatch, tmp_path, pesos, forma):
+    falso = UltralyticsFalso().instalar(monkeypatch)
+    directorio = pesos.parent
+    subdirectorio = directorio / "sub"
+    subdirectorio.mkdir()
+    (subdirectorio / pesos.name).write_bytes(pesos.read_bytes())
+    # Cada forma apunta a un archivo que existe y cuyo sha256 coincide: solo la forma del nombre debe fallar.
+    valor = {
+        "padre": f"../{directorio.name}/{pesos.name}",
+        "subdirectorio": f"sub/{pesos.name}",
+        "barra-invertida": "sub\\" + pesos.name,
+        "absoluta": str(pesos),
+        "punto-punto": "..",
+        "unidad-relativa": f"C:{pesos.name}",
+    }[forma]
+    config = escribir_config_con_pesos_literales(tmp_path / "imagen.toml", valor, sha256_de(pesos))
+
+    with pytest.raises(ValueError, match="pesos"):
+        YoloDetector.from_config(config, directorio)
+
+    assert falso.cargados == []
