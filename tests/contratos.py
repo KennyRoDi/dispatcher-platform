@@ -55,3 +55,20 @@ def comprobar_analyzer(analizador, path):
         assert hallazgo.evidence.object_sha256
         assert hallazgo.evidence.position
         assert 0 <= hallazgo.confidence <= 1
+
+
+def comprobar_chunk_staging(staging):
+    """`staging` empieza vacío; `load_manifest` de una subida inexistente lanza KeyError."""
+    with pytest.raises(KeyError):
+        staging.load_manifest("u1")
+    staging.save_manifest("u1", {"sha256": "abc", "size": 6})
+    assert staging.load_manifest("u1") == {"sha256": "abc", "size": 6}
+    assert staging.received("u1") == set()
+    staging.put_chunk("u1", 1, b"def")
+    staging.put_chunk("u1", 0, b"abc")
+    staging.put_chunk("u1", 0, b"abc")
+    assert staging.received("u1") == {0, 1}
+    assert staging.open_chunk("u1", 1).read() == b"def"
+    staging.discard("u1")
+    with pytest.raises(KeyError):
+        staging.load_manifest("u1")
