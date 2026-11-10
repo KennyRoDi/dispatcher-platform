@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-09-1-worker-de-audio
 **Verificación IA:** revision 314e968
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -269,3 +269,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de 01f58b0: README, AD-28 y SPEC describen lo implementado en f8b866d y 06df373. Los 7 hashes citados en el borrador de la segunda entrada de bitácora existen en git. El borrador reconoce mi afirmación imprecisa sobre MemoryError y la regresión del TypeError. No hay el carácter de puntos suspensivos en lo editado. No quedan cambios sin commit. (01f58b0) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-10 | El revisor aprobó la re-revisión sin hallazgos bloqueantes ni importantes y con 3 observaciones menores sin acción. Verifiqué los puntos clave: el diff de src de la parte 2 no tiene más cambios desde mi verificación, la tupla de _errores_de_decodificacion cubre ERRORES_TRANSITORIOS y las pruebas con av falso usan monkeypatch. pytest -q -m 'not integration and not acceptance': 1188 passed. git status limpio. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (314e968) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
