@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** implementacion 06df373
+**Verificación IA:** verificacion d0c3846
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -262,3 +262,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-09 | Revisor: idioma invalido se reporta como audio ilegible; errores transitorios de PyAV (ENOMEM, ETIMEDOUT, EAGAIN, EACCES) se reportan como audio ilegible; comentario de decodificacion inexacto; falta prueba de FFmpegError |
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé 324c2d2, f8b866d, b21d671 y 06df373, que cierran los hallazgos del revisor con TDD. Hallazgo 1: el idioma se valida al cargar contra IDIOMAS_DE_WHISPER, y comparé ese conjunto con _LANGUAGE_CODES de faster-whisper v1.2.1 descargado: los 100 códigos son iguales. Hallazgo 2: los errores transitorios de PyAV se propagan sin convertirse. Hallazgo 3: comentario corregido. Hallazgo 4: nueva prueba de FFmpegError con un av falso. Además encontré una regresión mía, idioma no textual con TypeError, que el developer corrigió con prueba roja previa. Las pruebas existentes no se tocaron: el diff de tests/ solo agrega archivos y casos. pytest -q -m 'not integration and not acceptance': 1183 passed. Sin comprobar: PyAV y faster-whisper reales. Nota: los commits del developer llevan el pie Claude Sonnet 5.5 por el recordatorio de atribución vigente. (06df373) |
 | implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-09 | QA re-verificó solo lo nuevo y dio APROBADO. Probó 11 mutaciones sobre el idioma y los errores transitorios y todas se detectaron; contrastó por su cuenta los 100 códigos de idioma con faster-whisper v1.2.1 y son idénticos; agregó 5 pruebas en d0c3846, solo en tests/. Repetí yo 2 mutaciones (quitar isinstance falla 3 pruebas, quitar la relanzada de transitorios falla 10), las revertí y git status quedó limpio. pytest -q -m 'not integration and not acceptance': 1188 passed. Observación menor: ConnectionError y BrokenPipeError se reportan como audio ilegible, aceptable para rutas locales. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (d0c3846) |
