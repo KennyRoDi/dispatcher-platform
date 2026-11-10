@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion afe8672
+**Verificación IA:** revision 8a01b29
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -122,3 +122,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README no menciona dataset, docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio y sin commits nuevos. Entregó borrador de bitácora con hechos del historial; los 3 defectos de QA se registran como abiertos (xfail), no corregidos. (afe8672) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 1: APROBADO sin bloqueantes. Comprobé en el código las observaciones de dataset_plan.py (mínimos fijos en check_minimums, exigencia solo de 10 heterogéneos en total, nombre HEAVY_KINDS). Árbol limpio, commit empujado, pruebas en verde en la fase anterior. (8a01b29) |
