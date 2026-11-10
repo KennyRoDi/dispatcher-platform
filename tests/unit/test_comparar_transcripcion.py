@@ -139,7 +139,8 @@ def test_wer_puede_superar_uno_porque_no_se_acota():
 def test_wer_normaliza_antes_de_comparar():
     esperada = "Si no pagas la deuda, vas a ver."
 
-    assert tasa_de_error_por_palabra(esperada, "si NO pagás la deuda vas a ver") == pytest.approx(1 / 8)
+    assert tasa_de_error_por_palabra(esperada, "si NO pagás la deuda vas a ver") == 0.0
+    assert tasa_de_error_por_palabra(esperada, "si NO pagás la deuda vas a ve") == pytest.approx(1 / 8)
 
 
 def test_wer_con_esperado_vacio_y_obtenida_con_texto_es_infinito():
