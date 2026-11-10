@@ -113,3 +113,27 @@ class FakeAlertPublisher:
 
     def publish(self, kind, case_id, detail):
         self.alertas.append((kind, case_id, detail))
+
+class FakeChunkStaging:
+    def __init__(self):
+        self.manifiestos = {}
+        self.chunks = defaultdict(dict)
+
+    def save_manifest(self, upload_id, manifest):
+        self.manifiestos[upload_id] = dict(manifest)
+
+    def load_manifest(self, upload_id):
+        return dict(self.manifiestos[upload_id])
+
+    def put_chunk(self, upload_id, index, data):
+        self.chunks[upload_id][index] = bytes(data)
+
+    def received(self, upload_id):
+        return set(self.chunks.get(upload_id, {}))
+
+    def open_chunk(self, upload_id, index):
+        return io.BytesIO(self.chunks[upload_id][index])
+
+    def discard(self, upload_id):
+        self.manifiestos.pop(upload_id, None)
+        self.chunks.pop(upload_id, None)
