@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion e5cb8cf
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -81,3 +81,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-10 | Revision independiente del developer sobre c19dc26: solo node_budget.py y cgroup_resources.py, 52 lineas de producto; logica pura en dominio y lectura de archivos en infraestructura, contratos conservados. git diff 2a84751..HEAD -- tests/ vacio: pruebas aprobadas sin cambios; git diff --check correcto y arbol limpio. Ejecute py -m pytest -q -m not-integration/not-acceptance mediante expresion de marcadores del proyecto: 1138 passed, 2 skipped, 3 deselected, una advertencia preexistente de Starlette, 42.50s. Sin Docker ni mediciones fisicas en parte 1; cableado y evidencia quedan para parte 2. (c19dc26) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Codex | 2026-11-10 | Revision independiente de QA parte 1 sobre e5cb8cf: leido QA-parte-1.md y diff; sin cambios de src ni tests desde aprobacion implementacion, arbol limpio y diff --check correcto. Reproduje py -m pytest -q tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py tests/unit/test_arquitectura.py: 57 passed. Reproduje mutacion en memoria que acepta cualquier presupuesto: test_preflight_rechaza_suma_de_limites_mayor_a_ram falla como esperado, 1 failed y 26 deselected. QA documento suite 1138 passed, 2 skipped, 3 deselected y seis mutaciones detectadas. Sin hallazgos parte 1; no hubo mediciones SO, Docker/WSL2 y cableado corresponden a parte 2. (e5cb8cf) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
