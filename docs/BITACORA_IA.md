@@ -388,3 +388,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | `QA-parte-1.md`, ficha `docs/modulo-M1-memoria.md`, actualización de AD-29/SUP-23 con aprobación de diseño ya registrada y este borrador |
 | Validado / corregido / descartado | QA no encontró fallos reproducibles de producción en parte 1; fase verificación aprobada por José Andrés. Documentación entregada para verificación del orquestador y aprobación humana. Mediciones Docker/WSL2, integración y aceptación de arranque permanecen pendientes para parte 2 |
 | Cómo se validó | QA ejecutó la suite: 1138 aprobadas, 2 omitidas y 3 deseleccionadas; detectó seis mutaciones y comprobó nueve bordes exploratorios. Orquestador reprodujo 57 pruebas de presupuesto, lector y arquitectura y una mutación que permite todo presupuesto, detectada. Documentador contrastó ficha y borrador con implementación, SPEC, QA y anexos 2/3; `git diff --check`. Evidencia detallada en `QA-parte-1.md` y aprobaciones del SPEC |
+
+## 2026-11-10 · Kenni Rodriguez · Generador de imágenes y audio sintéticos (F-03 parte 3) (`feat/F-03-3-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Sonnet 5.5; orquestador y subagentes por rol (developer, QA tester, documentador) |
+| Componente | Generador de imágenes y audio sintéticos (F-03 parte 3) |
+| Propósito | Generar con ffmpeg las 300 imágenes y 150 audios sintéticos del dataset de B.3, con etiqueta de verdad asignada por el generador, origen sintetico y reproducibles por semilla. |
+| Consulta resumida | Pedir pruebas rojas e implementación de media_generator a partir de DatasetPlan, con etiquetas positivo o neutro en imágenes y tono o ruido en audio; pedir al QA que intentara romperlo con ffmpeg real. |
+| Resultado obtenido | src/adapters/media_generator.py y sus pruebas (tests/unit/test_media_generator*.py, tests/integration/test_media_generator_ffmpeg.py). La IA generó el código y la lógica de etiquetas y colores. Plan completo medido por QA con carga en paralelo: 450 archivos, 720 MB en 166,8 s. |
+| Validado / corregido / descartado | Verificación IA de cada fase y aprobación humana explícita. Pruebas unitarias 788 passed, 3 skipped, 10 xfailed sin XPASS; integración con ffmpeg real 2 passed. |
+| Cómo se validó | El QA ejecutó ffmpeg real y comparó hashes entre corridas con distinto PYTHONHASHSEED: 450 sha256 idénticos con la misma semilla. Con ffmpeg real: 160 de 160 png y 140 de 140 jpg únicos. El orquestador reejecutó pytest en cada fase. Quedan 2 xfail abiertos de media_generator: un archivo previo oculta un ejecutor que no produjo nada, y el reparto de formatos se reinicia por caso. Decisiones de la persona: licencia provisional 'generado por el equipo, uso academico' (el repo no tiene LICENSE) y ampliar la variación de color; ajuste del SPEC a etiqueta neutro en vez de negativo (555c21d). |
+| Error de la IA | QA: las imágenes colisionaban (160 png daban 102 hashes únicos y 140 jpg daban 92) por color en rango pequeño; corregido en b846164 a petición de la persona, y una línea de una prueba de QA pasó de gris puro a dispersión de canales <= 16. |
