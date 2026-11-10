@@ -26,6 +26,7 @@ CABECERA_WHATSAPP = re.compile(
     r"^(\d{1,2})/(\d{1,2})/(\d{2}), (\d{2}):(\d{2}) - ([^:\n]+): (.*)$"
 )
 DATO_REAL = re.compile(r"@|https?://|www\.|\d{7,}")
+FECHA_UNIX = re.compile(r'"date_unixtime": "\d+",\n')
 UTC = timezone.utc
 
 
@@ -280,7 +281,7 @@ def test_los_archivos_exportados_son_utf8_validos_sin_datos_reales(exportacion_c
 
     for ruta in archivos.values():
         texto = ruta.read_bytes().decode("utf-8")
-        assert not DATO_REAL.search(texto), ruta.name
+        assert not DATO_REAL.search(FECHA_UNIX.sub("", texto)), ruta.name
 
 
 def test_los_casos_no_comparten_el_mismo_contenido(exportacion_completa):
