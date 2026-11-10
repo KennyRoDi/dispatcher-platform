@@ -19,6 +19,9 @@ AUDIO_FORMATS = ("mp3", "wav", "flac", "ogg", "m4a")
 AUDIO_SAMPLE_RATE = 44100
 TONE_RANGE_HZ = (220, 880)
 AUDIO_SOURCES = ("tono", "ruido")
+NOISE_SEED_LIMIT = 2**31
+# Sin bitexact los muxers estampan datos no deterministas (p. ej. el serial aleatorio de ogg).
+BITEXACT = ["-fflags", "+bitexact", "-flags:a", "+bitexact"]
 
 # Codecs tomados de AUDIO_*/ffmpeg_args de scripts/build_dataset.py (I Proyecto); no se importa desde scripts/.
 AUDIO_CODECS = {
@@ -104,11 +107,12 @@ def _color(rng: random.Random, etiqueta: str) -> str:
 def _audio_args(rng: random.Random, duration: int, path: Path) -> tuple[str, list[str]]:
     etiqueta = rng.choice(AUDIO_SOURCES)
     if etiqueta == "ruido":
-        source = f"anoisesrc=color=pink:amplitude=0.3:sample_rate={AUDIO_SAMPLE_RATE}"
+        # anoisesrc sin seed usa una semilla aleatoria propia y rompe la reproducibilidad.
+        source = f"anoisesrc=color=pink:amplitude=0.3:sample_rate={AUDIO_SAMPLE_RATE}:seed={rng.randrange(NOISE_SEED_LIMIT)}"
     else:
         source = f"sine=frequency={rng.randint(*TONE_RANGE_HZ)}:sample_rate={AUDIO_SAMPLE_RATE}"
     codec = AUDIO_CODECS[path.suffix.lstrip(".")]
-    return etiqueta, FFMPEG_BASE + ["-f", "lavfi", "-i", source, "-t", str(duration)] + codec + [str(path)]
+    return etiqueta, FFMPEG_BASE + ["-f", "lavfi", "-i", source, "-t", str(duration)] + BITEXACT + codec + [str(path)]
 
 
 def _produce(runner: Runner, args: list[str], path: Path) -> None:
