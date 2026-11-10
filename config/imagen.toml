@@ -1,4 +1,4 @@
-# Umbrales provisionales (SUP-17): se calibran con la tabla de aciertos de la parte 3.
+# Umbrales provisionales (SUP-17); 0.25 se mantiene por decisión de José Andrés (SUP-22) hasta calibrar con datos independientes.
 umbral_minimo = 0.25
 
 # Clases de COCO que se consideran contenido sensible (SUP-22).
@@ -10,6 +10,9 @@ categoria = "arma"
 umbral = 0.5
 nivel = "alta"
 
-# El sha256 de los pesos se fija en la parte 2, con el archivo descargado.
+# Pesos de la release v8.4.0 de ultralytics/assets (AGPL-3.0):
+# https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo11n.pt, 5613764 bytes.
+# El sha256 se calculó sobre el archivo descargado; se colocan en el directorio de pesos, no en el repositorio.
 [modelo]
 pesos = "yolo11n.pt"
+sha256 = "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"

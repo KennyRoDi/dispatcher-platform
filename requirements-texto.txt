@@ -1,0 +1,9 @@
+# Dependencias del analizador de texto (F-07). Aparte de requirements-dev.txt para que CI no instale torch.
+# torch solo CPU, antes que el resto:
+#   pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-texto.txt
+torch==2.15.0
+spacy==3.8.18
+transformers==5.22.2
+# Modelo de spaCy, licencia GPL-3.0; su versión debe coincidir con [modelos.spacy] de config/texto.toml.
+es_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl
