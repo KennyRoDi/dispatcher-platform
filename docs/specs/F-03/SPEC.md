@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-03-2-dataset-sintetico
 **Verificación IA:** verificacion 8989d75
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -146,3 +146,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Variación de color verificada: pytest unitario 788 passed, 3 skipped, 10 xfailed sin XPASS; integración con ffmpeg real 2 passed. Con ffmpeg real y semilla 9 reproduje 160 de 160 png únicos y 140 de 140 jpg únicos. Cambios: prueba nueva en rojo (190e8a4) y fix en media_generator.py (b846164). Una línea de una prueba de QA existente se relajó (neutro con dispersión de canales <=16 en vez de gris puro); la revisé y es coherente con gris o similar. (b846164) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Ronda final QA: APROBADO. Reejecuté pytest unitario: 788 passed, 3 skipped, 10 xfailed sin XPASS; src y tests sin cambios desde b846164, árbol limpio. QA: paletas positiva y neutra disjuntas (dispersión mínima 112 contra máxima 16), tres corridas con ffmpeg real y distinto PYTHONHASHSEED con sha256 idénticos en los 450 archivos, imágenes únicas por semilla, bordes y proporción por categoría correctos. Limitación: una corrida completa con semilla 2 murió en segundo plano; la unicidad de imágenes no depende de los audios. (8989d75) |
+| verificacion | Kenni Rodriguez | 2026-11-10 |  |
