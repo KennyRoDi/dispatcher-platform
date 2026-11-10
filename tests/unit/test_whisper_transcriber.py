@@ -130,6 +130,12 @@ def test_segmentos_desordenados_se_devuelven_ordenados_por_inicio(nota):
     assert [s.inicio for s in resultado] == [0.0, 4.0, 9.0]
 
 
+def test_avg_logprob_nan_no_se_reporta_como_confianza_maxima(nota):
+    # min(0.0, nan) devuelve 0.0 porque toda comparación con NaN es falsa: sin rechazarlo, la confianza sería 1.0.
+    with pytest.raises(ValueError):
+        transcribir([FakeSegment(0.0, 1.0, " hola", float("nan"))], nota)
+
+
 class InvalidDataErrorFalso(ValueError):
     pass
 
@@ -262,3 +268,14 @@ def test_el_modulo_cita_faster_whisper_whisper_y_su_licencia_mit():
     assert "SYSTRAN" in fuente
     assert "OpenAI" in fuente
     assert "MIT" in fuente
+
+
+# PyAV 19.0.2 (av/container/streams.py, _get_streams) indexa la tupla de pistas de audio: un archivo que FFmpeg
+# abre pero no trae audio, como un video sin pista de audio o una imagen, da IndexError en container.decode(audio=0).
+def test_archivo_sin_pista_de_audio_se_rechaza_con_value_error(tmp_path):
+    imagen = tmp_path / "sin_audio.ogg"
+    imagen.write_bytes(b"PNG imagen sintetica sin pista de audio")
+    modelo = FakeWhisperModel(error=IndexError("tuple index out of range"))
+
+    with pytest.raises(ValueError, match="sin_audio.ogg"):
+        WhisperTranscriber(modelo, CONFIG).transcribe(imagen)

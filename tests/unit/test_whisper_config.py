@@ -68,6 +68,13 @@ def test_admite_los_compute_type_que_compara_m5(tmp_path, compute_type):
         {"revision": None},
         {"hilos": "-1"},
         {"hilos": '"cuatro"'},
+        {"hilos": "true"},
+        {"compute_type": '"float16"'},
+        {"revision": f'"{"A" * 40}"'},
+        {"revision": f'"{"a" * 39}"'},
+        {"revision": f'"{"a" * 41}"'},
+        {"revision": f'"{"g" * 40}"'},
+        {"revision": '"main"'},
     ],
     ids=[
         "idioma-vacio",
@@ -87,6 +94,13 @@ def test_admite_los_compute_type_que_compara_m5(tmp_path, compute_type):
         "sin-revision",
         "hilos-negativo",
         "hilos-texto",
+        "hilos-bool",
+        "compute-type-float16",
+        "revision-mayusculas",
+        "revision-corta",
+        "revision-larga",
+        "revision-no-hex",
+        "revision-rama",
     ],
 )
 def test_config_invalida_falla_con_value_error(tmp_path, cambios):
