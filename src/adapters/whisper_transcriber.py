@@ -129,7 +129,7 @@ def _texto(modelo: dict, clave: str) -> str:
 
 def _idioma(modelo: dict) -> str:
     idioma = modelo.get("idioma")
-    if idioma not in IDIOMAS_DE_WHISPER:
+    if not isinstance(idioma, str) or idioma not in IDIOMAS_DE_WHISPER:
         raise ValueError(f"[modelo] idioma debe ser un código de idioma de Whisper, como \"es\": {idioma!r}")
     return idioma
 
