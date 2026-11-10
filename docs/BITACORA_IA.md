@@ -376,3 +376,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Pruebas unitarias y comprobador de contrato; `node_budget.py` y `cgroup_resources.py`, 52 líneas de producto |
 | Validado / corregido / descartado | Fases tests e implementación aprobadas por José Andrés. No se agregaron CLI de arranque, cambios de workers ni Compose; pertenecen a parte 2 |
 | Cómo se validó | `py -m pytest -q tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py --tb=short`: 50 fallos esperados por módulos ausentes y 3 pruebas del doble aprobadas en rojo. `py -m pytest -q tests/unit/test_contratos.py`: 9 aprobadas. Tras implementar, `py -m pytest -q -m "not integration and not acceptance"`: 1138 aprobadas, 2 omitidas y 3 deseleccionadas. Diff de tests desde aprobación vacío y `git diff --check` correcto; evidencia en SPEC, producto `c19dc26` Incidencia: Un comando de aprobación del flujo en Windows falló por codificación de salida. Se resolvió usando `PYTHONIOENCODING`; no implicó corregir el producto ni se presenta como fallo de lógica encontrado por QA |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-16 (`feat/F-16-1-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex, orquestador, subagente QA y subagente documentador |
+| Componente | F-16 |
+| Propósito | Intentar romper las garantías y documentar resultados reales con límites explícitos de evidencia |
+| Consulta resumida | Revisar aceptación y sensibilidad de pruebas; preparar ficha de cinco elementos y bitácora sin atribuir datos sintéticos al SO |
+| Resultado obtenido | `QA-parte-1.md`, ficha `docs/modulo-M1-memoria.md`, actualización de AD-29/SUP-23 con aprobación de diseño ya registrada y este borrador |
+| Validado / corregido / descartado | QA no encontró fallos reproducibles de producción en parte 1; fase verificación aprobada por José Andrés. Documentación entregada para verificación del orquestador y aprobación humana. Mediciones Docker/WSL2, integración y aceptación de arranque permanecen pendientes para parte 2 |
+| Cómo se validó | QA ejecutó la suite: 1138 aprobadas, 2 omitidas y 3 deseleccionadas; detectó seis mutaciones y comprobó nueve bordes exploratorios. Orquestador reprodujo 57 pruebas de presupuesto, lector y arquitectura y una mutación que permite todo presupuesto, detectada. Documentador contrastó ficha y borrador con implementación, SPEC, QA y anexos 2/3; `git diff --check`. Evidencia detallada en `QA-parte-1.md` y aprobaciones del SPEC |
