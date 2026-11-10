@@ -29,7 +29,7 @@ def normalizar(texto: str) -> str:
     # La ñ no se descompone: "año" y "ano" son palabras distintas.
     sin_tildes = "".join(
         letra if letra in "ñÑ" else "".join(c for c in unicodedata.normalize("NFD", letra) if not unicodedata.combining(c))
-        for letra in texto
+        for letra in unicodedata.normalize("NFC", texto)
     )
     return " ".join(NO_ALFANUMERICO.sub(" ", sin_tildes.lower()).split())
 
@@ -190,7 +190,17 @@ def _limites(cantidad: int) -> list[str]:
 
 
 def _versiones_instaladas() -> dict[str, str]:
-    return {biblioteca: metadata.version(biblioteca) for biblioteca in BIBLIOTECAS}
+    try:
+        return {biblioteca: metadata.version(biblioteca) for biblioteca in BIBLIOTECAS}
+    except metadata.PackageNotFoundError as error:
+        raise ValueError(f"falta instalar {error}; instale requirements-audio.txt") from error
+
+
+def _transcriptor_de_whisper(config: Path) -> Transcriber:
+    try:
+        return WhisperTranscriber.from_config(config)
+    except ImportError as error:
+        raise ValueError(f"falta una biblioteca de audio ({error}); instale requirements-audio.txt") from error
 
 
 def _validar_salida(salida: Path) -> None:
@@ -224,13 +234,14 @@ def _ejecutar(
     if not args.muestra.is_dir():
         raise ValueError(f"la muestra no es un directorio: {args.muestra}")
     notas = leer_esperadas(args.esperadas, args.muestra)
+    versiones = versiones or _versiones_instaladas()
     if modelos is None:
         from src.adapters.spacy_hf_text_models import SpacyHfTextModels
 
         modelos = SpacyHfTextModels.from_config(args.config_texto)
-    transcriptor = transcriptor or WhisperTranscriber.from_config(args.config)
+    transcriptor = transcriptor or _transcriptor_de_whisper(args.config)
     resultados = evaluar(transcriptor, modelos, args.config_texto, args.muestra, notas)
-    texto = generar_markdown(comando, config, versiones or _versiones_instaladas(), notas, resultados)
+    texto = generar_markdown(comando, config, versiones, notas, resultados)
     args.salida.parent.mkdir(parents=True, exist_ok=True)
     args.salida.write_text(texto, encoding="utf-8")
 
