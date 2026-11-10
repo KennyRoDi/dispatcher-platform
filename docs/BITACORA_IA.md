@@ -414,3 +414,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | QA halló que NODE_IP aceptaba texto no IP; se corrigió con ipaddress.ip_address y pruebas IPv4/IPv6. WORKER_MEM_LIMIT queda pendiente de medición por nodo. No se ejecutó Docker/Compose real ni se midieron nodos; no hubo reutilización del I Proyecto. |
 | Cómo se validó | QA-parte-2.md documenta cobertura estática y que su intento de suite no inició; el orquestador informó 11 pruebas focalizadas y suite completa 1149/2/3. No se afirma medición de SO ni ejecución Compose. |
 | Error de la IA | La implementación inicial aceptaba NODE_IP con cualquier texto no vacío. QA detectó el error; se corrigió validando IPv4/IPv6 con ipaddress.ip_address y agregando pruebas de IPv6 válido y texto inválido. |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: verificación y documentación (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador, QA y documentador) |
+| Componente | M1, F-16 parte 2: verificación y documentación |
+| Propósito | Registrar los resultados de QA y separar evidencia de software de mediciones reales |
+| Consulta resumida | Intentar romper configuración y preflight; documentar ficha M1, instrucciones de arranque y limitaciones de medición |
+| Resultado obtenido | QA-parte-2.md, ficha M1 actualizada, README y borrador de bitácora revisados |
+| Validado / corregido / descartado | La documentación coincide con scripts, Compose y QA; WORKER_MEM_LIMIT y datos B/C/D siguen pendientes. No se ejecutaron Docker/Compose ni cgroups reales. |
+| Cómo se validó | Se contrastó el diff con SPEC, scripts y QA-parte-2.md. Los conteos 1149/2/3 están atribuidos al orquestador/informe de QA. Mediciones memory.max y memory.swap.max tres veces por nodo siguen pendientes. |
+| Error de la IA | QA detectó el error real de validación de NODE_IP descrito en la entrada anterior; quedó corregido con pruebas. |
