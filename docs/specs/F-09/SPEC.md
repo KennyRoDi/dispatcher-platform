@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** implementacion c1e58fc
+**Verificación IA:** implementacion b1ec7d7
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -241,3 +241,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el diff 3a8ac21..c1e58fc: 139 líneas fuera de tests y docs. git diff bc67928..HEAD -- tests/ sale vacío, así que las pruebas no se debilitaron. faster_whisper se importa solo dentro de from_config, en adaptadores. La validación de segmentos queda fuera del try, de modo que no se confunde con un error de decodificación. Confirmé por mi cuenta que el campo sha de huggingface.co/api/models/Systran/faster-whisper-base es ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66 y que faster-whisper 1.2.1 existe en PyPI con licencia MIT. pytest -q -m 'not integration and not acceptance': 1139 passed. La integración se salta porque faster-whisper no está instalado. Sin comprobar: que PyAV lance InvalidDataError subclase de ValueError; el comentario del código lo afirma sin haberlo medido. (c1e58fc) |
 | implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-09 | QA: NaN en avg_logprob da confianza 1.0 (H1) y archivo sin pista de audio deja escapar IndexError (H2), whisper_transcriber.py |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el commit b1ec7d7, que solo toca src/adapters/whisper_transcriber.py (23 líneas añadidas y 4 borradas). Con eso: H1, un avg_logprob NaN da ValueError; H2, se capturan IndexError y av.error.FFmpegError, este último con importación diferida, mientras RuntimeError y MemoryError genéricos siguen escapando; H3, un segmento inválido da ValueError con la ruta. git diff 4f1dc5f..HEAD -- tests/ sale vacío. pytest -q -m 'not integration and not acceptance': 1148 passed. Sin comprobar: cómo se comporta PyAV en ejecución, porque no está instalado. (b1ec7d7) |
