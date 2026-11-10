@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-09-2-worker-de-audio
-**Verificación IA:** tests 9f36b33
+**Verificación IA:** tests 3127c0f
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -273,3 +273,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé el diff de 9f36b33: solo agrega 3 archivos en tests/, sin tocar ninguno existente, y no hay código en scripts/ ni datos de muestra. test_comparar_transcripcion falla al recolectar con ModuleNotFoundError de scripts.comparar_transcripcion; la suite restante da 1188 passed, y la aceptación y la integración nuevas se saltan sin faster-whisper. test_muestra_del_repositorio exige 5 o más notas reales en tests/datos/audio, igual que test_aciertos_imagen en F-08: quedará en rojo hasta que José Andrés aporte las grabaciones. Sin comprobar: nada se ejecutó con audio, modelo ni PyAV reales. (9f36b33) |
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de implementacion | José Andrés Loría Herrera | 2026-11-10 | test_wer_normaliza_antes_de_comparar espera 1/8 pero la normalizacion quita tildes y el WER es 0.0; contradice test_normaliza_mayusculas_tildes_y_puntuacion |
+| verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé 3127c0f: cambia 3 líneas, solo en tests/unit/test_comparar_transcripcion.py. La prueba ahora comprueba dos cosas: tildes y mayúsculas dan WER 0.0, y una diferencia real, 've' por 'ver', da 1/8; confirmé ambos valores contra el script antes. Ninguna otra prueba se tocó. Ejecuté pytest -q -m 'not integration and not acceptance': 1249 passed y 1 failed, que es test_muestra_del_repositorio, esperada hasta que José Andrés aporte las notas. Nota: el script ya existe desde 582581b, que se hizo antes de devolver la fase, así que esta verificación de tests no cumple 'sin código'. (3127c0f) |
