@@ -1,8 +1,8 @@
 # SPEC F-07: Worker de texto
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision f592a96
+**Fase:** cerrada
+**Base:** feat/F-07-2-inferir-con-spacy-y-huggingface
+**Verificación IA:** revision 2fb3f00
 **Historia:** US-07 · **Requisitos:** RF-06, RNF-25; RF-14 (referencia a la evidencia); SUP-07, SUP-12, SUP-15; [B.4 Workers de análisis], [B.3], [B.7 Texto] · **Responsable:** J
 
 ## Objetivo
@@ -156,14 +156,14 @@ Las unitarias no usan red, `sleep`, reloj real ni modelos. `TextModels` falso se
 Destino: `docs/evidencia/F-07_aciertos_<fecha>.md`, con el comando exacto, los identificadores y revisiones de los modelos, el tamaño de lote y la tabla de aciertos y errores por categoría. Ningún valor se escribe de antemano.
 
 ```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-texto.txt
-python -m spacy download <modelo_spacy>
 pytest -m integration tests/integration/test_text_models_real.py
-python -m scripts.aciertos_texto --conversacion <archivo> --etiquetas <archivo> --salida docs/evidencia/F-07_aciertos_<fecha>.md
+python -m scripts.aciertos_texto --conversacion tests/datos/aciertos_texto_conversacion.json --etiquetas tests/datos/aciertos_texto_etiquetas.json --salida docs/evidencia/F-07_aciertos_<fecha>.md
 pytest -m acceptance tests/acceptance/test_texto_aciertos.py
 ```
 
-Los nombres de modelo y de archivos se fijan al responder las preguntas abiertas.
+La parte 2 fijó los modelos y sus revisiones en `config/texto.toml`; el modelo de spaCy se instala como *wheel* desde `requirements-texto.txt`, así que no hace falta `spacy download`. Los pesos de HuggingFace, unos 870 MB, se descargan en la primera carga y necesitan red. El script corre como módulo desde la raíz del repositorio y usa el tamaño de lote del archivo de etiquetas (10), no el de `config/texto.toml` (50). La evidencia del 2026-11-07 está en `docs/evidencia/F-07_aciertos_2026-11-07.md`.
 
 ## Mediciones
 
@@ -183,14 +183,14 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 **Preguntas abiertas, para José Andrés:**
 
-1. **Modelo de HuggingFace concreto.** AD-19 no lo fija. Candidatos en español, sin evaluar aquí: `pysentimiento/robertuito-sentiment-analysis` para sentimiento y `pysentimiento/robertuito-hate-speech` para ofensa, o un solo modelo multilingüe de toxicidad para cumplir el recorte 4. Hay que confirmar en la ficha de cada modelo su licencia y si permite uso académico, su tamaño y su idioma. ¿Cuál se usa, y uno o dos?
-2. **Modelo de spaCy.** `es_core_news_sm` o `es_core_news_md`. Falta confirmar su licencia en la ficha del modelo antes de citarla.
+1. **Modelo de HuggingFace concreto.** *Resuelta por José Andrés para la parte 2:* dos modelos en español. Sentimiento con `pysentimiento/robertuito-sentiment-analysis` (etiquetas `POS`, `NEG`, `NEU`, que se traducen a `positivo`, `negativo`, `neutral`) y ofensa con `pysentimiento/robertuito-hate-speech` (multietiqueta `HS`, `TR`, `AG`). Ambos dependen de datasets de uso no comercial, válido para el uso académico del proyecto; se citan con su licencia en el código y en la documentación (Parte I §9).
+2. **Modelo de spaCy.** *Resuelta por José Andrés para la parte 2:* `es_core_news_sm`, licencia GPL-3.0, para lemas, palabras vacías y `Matcher` de patrones de amenaza. Se cita con su licencia en el código y en la documentación (Parte I §9).
 3. **Idioma.** Se supone que las conversaciones sintéticas están en español, como `tests/datos/chat_whatsapp.txt`. Si F-03 genera otro idioma o mezcla, cambia la elección de modelos.
 4. **Qué es «un lote».** SUP-12 dice que una sub-tarea puede ser «un lote de mensajes de tamaño configurable». Si F-05 ya parte la conversación en lotes, `TextAnalyzer` recibe un lote y produce un solo grupo de cuatro salidas; si recibe la conversación completa, la parte él. El diseño admite ambos casos con `tamaño_lote`. ¿Qué tamaño por defecto se usa (se propone 50 mensajes) y quién parte: F-05 o F-07?
 5. **Clasificación temática por léxico.** AD-26 propone léxico en configuración en lugar de un modelo *zero-shot*, por memoria y explicabilidad. ¿Se acepta, y qué temas define el equipo? Deben coincidir con las etiquetas de la verdad de referencia.
 6. **Amenaza por patrones.** Se propone `Matcher` de spaCy con patrones en configuración, porque no se encontró un clasificador de amenazas en español ya identificado. ¿Se acepta? Un patrón no detecta amenazas implícitas; se declarará así en la evidencia.
-7. **Umbrales de severidad.** 0.5 es provisional. SUP-07 define qué es alta, no el umbral. Se calibran con la tabla de aciertos de la Parte 3.
-8. **Verdad de referencia.** Las etiquetas formales son de F-04 (Kenni), aún pendiente, y F-03 está en plan. Para no depender de otro responsable, se propone que la Parte 3 use una conversación etiquetada sintética, corta, escrita por José Andrés en `tests/datos/`, sin personas reales [B.3]; si se redacta con IA, se declara en la bitácora. Cuando F-04 exista, la misma prueba se repite sobre su manifiesto. ¿Se acepta? F-03 pregunta además si sus plantillas incluirán frases de amenaza ficticias para F-07 (pregunta 5 de su SPEC).
+7. **Umbrales de severidad.** 0.5 es provisional. SUP-07 define qué es alta, no el umbral. Se calibran con la tabla de aciertos de la Parte 3. *Sin resolver al cerrar F-07:* la muestra de la parte 3 no permite calibrarlos y siguen provisionales; ver «Límites conocidos al cerrar F-07».
+8. **Verdad de referencia.** *Resuelta por José Andrés para la parte 3:* conversación etiquetada sintética redactada con IA, revisada por José Andrés y declarada en la bitácora, en `tests/datos/`; la parte 3 se limita a lo mínimo (script, prueba de aceptación, conversación y evidencia) y las observaciones menores de QA quedan anotadas sin corregir. Las etiquetas formales son de F-04 (Kenni), aún pendiente, y F-03 está en plan. Para no depender de otro responsable, se propone que la Parte 3 use una conversación etiquetada sintética, corta, escrita por José Andrés en `tests/datos/`, sin personas reales [B.3]; si se redacta con IA, se declara en la bitácora. Cuando F-04 exista, la misma prueba se repite sobre su manifiesto. ¿Se acepta? F-03 pregunta además si sus plantillas incluirán frases de amenaza ficticias para F-07 (pregunta 5 de su SPEC).
 9. **Formato de `EvidenceRef.position`.** Se propone `mensajes 12-23` y `mensajes 15,18`, índices en el orden de `parse`. Lo leerán el reporte y las alertas de Kenni (F-11, F-14). ¿Se acuerda con Kenni ahora o se deja como está hasta que F-11 lo necesite?
 10. **Conexión con el worker.** El bucle heredado no consume `Subtask` y F-12 lo reemplaza. Se propone no conectar `TextAnalyzer` al worker en F-07 y que F-12, también de José Andrés, invoque cualquier `Analyzer` por tipo de contenido. ¿Se acepta, o se agrega una Parte 4 que lo conecte al worker actual?
 11. **Dueño de `src/domain/severity.py`.** `docs/CONTRATOS.md` no lo asigna. F-07 lo crea y F-14 lo reutiliza. Se propone que sea de José Andrés y avisar a Kenni.
@@ -214,6 +214,48 @@ Observaciones del QA de la parte 1 que José Andrés decidió posponer. O6, O1 y
 - O5: `tamano_lote` se valida al analizar, no al cargar; `true` se toma como 1.
 - O7: la etiqueta de sentimiento del modelo no se valida contra positivo/neutral/negativo.
 
+José Andrés decidió que O2, O4, O5 y O7 entran en la parte 2, junto con validar que `sentiment_score` y `offense_score` del modelo estén en [0, 1]:
+
+- O2: dos reglas de la misma categoría se rechazan con `ValueError`.
+- O4: una configuración mal formada (regla sin `categoria`, `nivel` o `umbral`; `severidad` que no es lista; `temas` que no es tabla de listas) se rechaza con `ValueError` y mensaje claro.
+- O5: `tamano_lote` y `n_palabras_clave` se validan al cargar como enteros positivos; se rechazan `bool`, flotantes y texto.
+- O7: una etiqueta de sentimiento fuera de positivo/neutral/negativo se rechaza con `ValueError`.
+- Puntajes: `sentiment_score` u `offense_score` fuera de [0, 1] se rechazan con `ValueError` claro, en vez del error de `Finding`.
+
+### Pendientes para la parte 3
+
+Observaciones del QA de la parte 2, sin hallazgos H. José Andrés decidió no corregirlas en la parte 3, que se limitó al alcance mínimo, y siguen abiertas, salvo la última, que la parte 3 resolvió. En la parte 2 se corrigieron la prueba del camino feliz de `from_config`, el `ValueError` ante una salida mal formada del pipeline y la detección de «Vas a ver» con mayúscula inicial.
+
+- Puntajes del pipeline: un `NaN` en una etiqueta que no gana se ignora, y un empate se resuelve por el orden de salida del pipeline.
+- Validador de patrones de amenaza: es más estricto o más laxo que spaCy según el caso. Acepta un token vacío `{}`, claves extra y atributos mal escritos, y no rechaza nombres de patrón repetidos.
+- Reglas de severidad: `amenaza` y `Amenaza` coexisten como categorías distintas, y las claves desconocidas en la raíz de `config/texto.toml` se ignoran sin aviso, por ejemplo `tamano_lotes`.
+- `from_config` sin spaCy instalado da `ModuleNotFoundError` sin indicar que falta `requirements-texto.txt`, y acepta `revision = "main"`, que no fija una versión.
+- No se aplica `preprocess_tweet` de pysentimiento antes de inferir ni se configura `batch_size` en los pipelines.
+- *Resuelta en la parte 3:* la prueba de integración `tests/integration/test_text_models_real.py` no se había ejecutado. El 2026-11-07 corrió con los modelos reales en un venv aparte: 2 passed.
+
+### Límites conocidos al cerrar F-07
+
+Ejecución real del 2026-11-07 en Windows, en un venv aparte con torch 2.15.0+cpu, spacy 3.8.18, transformers 5.22.2 y `es_core_news_sm` 3.8.0: integración 2 passed y aceptación 1 passed. Tabla: tema 4/4, sentimiento 4/4, amenaza 1/1, ofensivo 1/1 y sin ofensa 2/2.
+
+La tabla prueba el funcionamiento de punta a punta, no la precisión. Lo que sigue viene de pruebas exploratorias de QA con los modelos reales, no de la evidencia formal:
+
+- El lote ofensivo acierta por 2 de 10 insultos, con puntaje cercano a 0.99; los otros 8 quedan entre 0.014 y 0.033. El modelo de odio no detecta insultos genéricos.
+- Las amenazas sin patrón, como «te voy a matar» o «sé dónde vivís», no se detectan, y la ironía se lee como positiva.
+- Los puntajes de ofensa de la muestra quedan en 0.133 o menos y en 0.981 o más, así que `umbral_ofensa` no se puede calibrar con ella. Los umbrales siguen provisionales (pregunta 7).
+- La tabla depende del tamaño de lote 10, y en un lote la amenaza tapa a ofensivo.
+- La conversación la redactó IA conociendo el léxico y los patrones, así que favorece los aciertos.
+
+Corregido en la parte 3: la evidencia declara sus límites (H1) y el patrón `vas_a_ver` quedó en «vas» y «van», porque «voy» y «vamos a ver», introducidos en la parte 2, daban amenazas altas falsas.
+
+Sin corregir, por el alcance mínimo de la parte 3:
+
+- Un archivo inexistente o un JSON mal formado salen como traceback, no como `error:` con código 1. Un JSON con BOM se rechaza.
+- El comando registrado en la evidencia no lleva comillas ni las versiones de torch y transformers.
+- La etiqueta `tema` del archivo de etiquetas no se valida contra los temas del léxico.
+- El script solo corre como `python -m` desde la raíz del repositorio.
+- Las palabras clave incluyen ruido como «vo», «sos» o «enviastir».
+- Siguen abiertos los pendientes de la parte 2 listados arriba.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
@@ -234,4 +276,25 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-07 | Lei el diff de 0bc28b2: ARQUITECTURA §4 agrega text_analysis y analyze_text (existen en src); AD-26 refleja lo implementado en la parte 1 sin afirmar modelos reales y sigue provisional con medicion pendiente; CONTRATOS asigna a Jose Andres text_analysis, severity (aviso a Kenni), analyze_text y config/texto.toml, y cita comprobar_analyzer. Sin fichas (F-07 no es M1-M5), sin reutilizacion ni README (no aplica). conformidad repo: 0 problemas. Borrador de bitacora contrastado con git log y la conversacion; corregido: developer actuo en 4 rondas (tests, implementacion, H1, O6/O1/O3), no 3; errores (3) y (5) confirmados por el informe de QA y por la conversacion con Jose Andres. (0bc28b2) |
 | documentacion | José Andrés Loría Herrera | 2026-11-07 |  |
 | verificación IA de revision | Claude Code (orquestador; subagente revisor general-purpose) | 2026-11-07 | Revisor APROBADO sin hallazgos bloqueantes. Confirme: git diff --name-only origin/main...HEAD da solo los 14 archivos de la fila 1 del plan (src de F-07, config/texto.toml, pruebas, ARQUITECTURA, CONTRATOS, SPEC); SPEC lineas 19 y 91 citan patrones de amenaza en config/texto.toml que la parte 1 no tiene (observacion 1, para parte 2); arbol limpio; py -m pytest -q -m 'not integration and not acceptance': 744 passed. Releí el codigo de src completo en fases anteriores y el diff posterior (H1, O6, O1, O3). Observaciones del revisor 1-3 son menores y quedan para decision de Jose Andres. (f592a96) |
+| revision | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de tests | Claude Code (orquestador; subagente developer general-purpose) | 2026-11-07 | Parte 2, fase tests. git diff 06951cf: solo SPEC (decisiones de modelos de Jose Andres, preguntas 1 y 2 resueltas) y tests/; nada en src/ ni config/; 0 lineas borradas en tests. Rojo: suite rapida con --continue-on-collection-errors da 68 failed, 757 passed, 1 error (coleccion de test_spacy_hf_text_models por ModuleNotFoundError del adaptador nuevo), todos en archivos de F-07; las 744 previas siguen pasando. Integracion se salta (spacy no instalado). Pruebas cubren O2, O4, O5, O7, puntajes en [0,1], adaptador con dobles (una llamada por lote, importacion diferida, citas de licencia) y config de modelos y patrones. Confirme en config.json de HF que robertuito-hate-speech usa hateful/targeted/aggressive (las pruebas aceptan ambos juegos). No verificado: comportamiento real de spaCy Matcher y pipelines. (3d78120) |
+| tests | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de implementacion | Claude Code (Opus 5.5) | 2026-11-07 | Pruebas intactas desde 3d78120; 866 verdes, 1 saltada (integracion sin spacy); 227 lineas fuera de tests/docs; capas OK; SHAs de HF y versiones de PyPI comprobados por red (dae36b1) |
+| implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | QA sin hallazgos H; 8 observaciones O (O1: from_config sin prueba del camino feliz). Confirme O1, O2 y O3 por mi cuenta; 866 verdes; integracion saltada sin spacy (4744bb2) |
+| verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | Corregidas O1 (pruebas de from_config con modulos falsos), O2 (ValueError ante salida mal formada) y patron vas_a_ver con LOWER; 884 verdes; 237 lineas; integracion aun saltada sin spacy (c889c73) |
+| verificacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5) | 2026-11-07 | Revise el diff de docs: README instala requirements-texto con citas; ARQUITECTURA R11 y R12; CONTRATOS; SPEC con pendientes para la parte 3 sin campos sin completar; 884 verdes (9f0a540) |
+| documentacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de revision | Claude Code (Opus 5.5) | 2026-11-07 | Revisor APROBADO sin bloqueantes; confirme arbol limpio, 884 verdes y la nota de pytest.ini; observaciones menores no bloqueantes (319af90) |
+| revision | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de tests | Claude Code (Opus 5.5) | 2026-11-07 | Solo tests/ cambia (567 lineas: conversacion y etiquetas sinteticas, 24 unitarias, aceptacion con importorskip); rojo: error de coleccion por scripts.aciertos_texto inexistente, resto 884 verdes; lei los 40 mensajes: ficticios, sin personas reales (67f12f2) |
+| tests | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de implementacion | Claude Code (Opus 5.5) | 2026-11-07 | Pruebas intactas desde 67f12f2; 910 verdes, aceptacion saltada sin spacy; 246 lineas (script 243, analyze_text renombra exigir_entero_positivo); lei construir_analizador y main; sin evidencia ni cifras escritas (68c3672) |
+| implementacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de verificacion | Claude Code (Opus 5.5) | 2026-11-07 | Modelos reales ejecutados en venv aparte: integracion 2 y aceptacion 1 pasan; evidencia regenerada con seccion Limites (4/4, 1/1, 1/1, 2/2). QA: tabla no mide precision; corregidos H1 (limites) y falso positivo voy/vamos a ver; confirme margenes clave por mi cuenta; 913 verdes (fe49517) |
+| verificacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5) | 2026-11-07 | Revise el diff de docs: AD-26 sigue provisional con la medicion funcional y sus limites; SPEC con limites al cerrar F-07 sin campos sin completar; README con comandos de evidencia; CONTRATOS; 913 verdes. Bitacora: corrijo lineas a 267 y agrego componente (e411601) |
+| documentacion | José Andrés Loría Herrera | 2026-11-07 |  |
+| verificación IA de revision | Claude Code (Opus 5.5) | 2026-11-07 | Revisor APROBADO sin bloqueantes; regenero la evidencia con modelos reales y es identica salvo la ruta de salida (lo compare yo); arbol limpio; 913 verdes; observaciones menores no bloqueantes (2fb3f00) |
 | revision | José Andrés Loría Herrera | 2026-11-07 |  |

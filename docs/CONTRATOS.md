@@ -35,7 +35,7 @@ Cada módulo crea archivos propios, para que dos PR no choquen.
 | Dueño | Archivos |
 |---|---|
 | Nahúm: coordinador, M2 | `src/coordinator/rutas_casos.py`, `rutas_subtareas.py`, `src/domain/scheduling.py`, `case_state.py`, `retry.py` |
-| José Andrés: workers, M1, M5 | `src/workers/`, `src/domain/admission.py`, `oom_policy.py`, `routing.py`, `text_analysis.py`, `image_detection.py`, `transcription.py`, `severity.py` (F-14 de Kenni lo reutiliza: avisar al cambiarlo), `src/application/analyze_text.py`, `analyze_image.py`, `analyze_audio.py`, `src/adapters/*_analyzer.py`, `hashing.py`, `config/texto.toml`, `imagen.toml` |
+| José Andrés: workers, M1, M5 | `src/workers/`, `src/domain/admission.py`, `oom_policy.py`, `routing.py`, `text_analysis.py`, `image_detection.py`, `transcription.py`, `severity.py` (F-14 de Kenni lo reutiliza: avisar al cambiarlo), `src/application/analyze_text.py`, `analyze_image.py`, `analyze_audio.py`, `src/adapters/*_analyzer.py`, `src/adapters/spacy_hf_text_models.py`, `hashing.py`, `yolo_detector.py`, `config/texto.toml`, `imagen.toml`, `requirements-texto.txt`, `requirements-imagen.txt`, `scripts/aciertos_texto.py`, `scripts/aciertos_imagen.py` |
 | Melany: M3, dashboard | `src/coordinator/rutas_archivos.py` (nuevo), `src/domain/chunks.py`, `src/adapters/minio_object_store.py`, `dashboard/` |
 | Kenni: M4, reporte, alertas, despliegue | `src/domain/rbac.py`, `custody_chain.py`, `src/coordinator/seguridad.py` (nuevo), `src/application/build_report.py`, `deploy/` |
 

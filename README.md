@@ -58,6 +58,44 @@ python scripts/flujo.py empezables
 
 *Pendiente.*
 
+**Analizador de texto (F-07).** Sus dependencias van en `requirements-texto.txt`, aparte de `requirements-dev.txt` para que CI no instale torch. torch se instala primero, solo CPU:
+
+```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-texto.txt
+```
+
+Incluye el modelo de spaCy `es_core_news_sm` 3.8.0 (Explosion AI, GPL-3.0). Los modelos `pysentimiento/robertuito-sentiment-analysis` y `pysentimiento/robertuito-hate-speech` (Pérez et al., github.com/pysentimiento/pysentimiento) se descargan de HuggingFace con la revisión fijada en `config/texto.toml`; se entrenaron con datasets de uso no comercial, admitido solo por el uso académico del proyecto. Referencias R11 y R12 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
+
+La primera carga descarga unos 870 MB de HuggingFace y necesita red. Para generar la tabla de aciertos, desde la raíz del repositorio:
+
+```bash
+pytest -m integration tests/integration/test_text_models_real.py
+python -m scripts.aciertos_texto --conversacion tests/datos/aciertos_texto_conversacion.json --etiquetas tests/datos/aciertos_texto_etiquetas.json --salida docs/evidencia/F-07_aciertos_<fecha>.md
+pytest -m acceptance tests/acceptance/test_texto_aciertos.py
+```
+
+El script usa el tamaño de lote del archivo de etiquetas. La conversación es sintética; la tabla prueba el funcionamiento de punta a punta, no la precisión. La corrida del 2026-11-07 está en `docs/evidencia/F-07_aciertos_2026-11-07.md`.
+
+**Analizador de imagen (F-08).** Sus dependencias van en `requirements-imagen.txt`, aparte de `requirements-dev.txt` para que CI no instale torch. torch se instala primero, solo CPU:
+
+```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-imagen.txt
+```
+
+Usa Ultralytics YOLO 8.4.208 (AGPL-3.0) con los pesos `yolo11n.pt` de la release v8.4.0 de github.com/ultralytics/assets, también AGPL-3.0. Los pesos no van en el repositorio (`*.pt` está en `.gitignore`): se descargan a mano y se colocan en el directorio de pesos que recibe `YoloDetector.from_config`, que comprueba antes de cargarlos el SHA-256 fijado en `config/imagen.toml`. La prueba de integración toma ese directorio de `F08_DIRECTORIO_PESOS` (por defecto, la raíz del repositorio) y la imagen positiva de `F08_IMAGEN_POSITIVA`. Referencia R13 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
+
+Para generar la tabla de aciertos, desde la raíz del repositorio, con el directorio de pesos en `F08_DIRECTORIO_PESOS`:
+
+```bash
+F08_IMAGEN_POSITIVA=tests/datos/imagenes/cuchillo_02.jpg pytest -m integration tests/integration/test_yolo_detector_real.py
+python -m scripts.aciertos_imagen --muestra tests/datos/imagenes --etiquetas tests/datos/imagenes/etiquetas.json --salida docs/evidencia/F-08_aciertos_<fecha>.md --pesos "$F08_DIRECTORIO_PESOS"
+pytest -m acceptance tests/acceptance/test_imagen_aciertos.py
+```
+
+La muestra son 20 fotos propias de José Andrés (CC BY 4.0); la tabla prueba el funcionamiento de punta a punta, no la precisión. La corrida del 2026-11-09, con el análisis de sus fallos, está en `docs/evidencia/F-08_aciertos_2026-11-09.md`.
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*

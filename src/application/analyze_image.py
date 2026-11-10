@@ -22,6 +22,7 @@ class ImageSettings:
         object.__setattr__(self, "umbral_minimo", umbral_valido(self.umbral_minimo, "umbral_minimo"))
         if not isinstance(self.mapa, Mapping):
             raise ValueError(f"clases debe ser una tabla de clase a categoría: {self.mapa!r}")
+        object.__setattr__(self, "mapa", dict(self.mapa))
         invalidas = sorted(clase for clase, categoria in self.mapa.items() if not _categoria_valida(categoria))
         if invalidas:
             raise ValueError(f"clases con categoría vacía o con espacios al borde: {', '.join(invalidas)}")

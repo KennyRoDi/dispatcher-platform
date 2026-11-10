@@ -1,0 +1,30 @@
+{
+  "origen": "Conversación sintética y ficticia, redactada con IA (Claude Code, Opus 5.5) para F-07; la revisa José Andrés antes de usarla como evidencia. No contiene personas ni mensajes reales [B.3]. Declarada en docs/BITACORA_IA.md. Etiquetas por lote según lo que diría una persona leyendo los mensajes, no según la salida del modelo.",
+  "tamano_lote": 10,
+  "lotes": [
+    {
+      "mensajes": "0-9",
+      "tema": "conflicto",
+      "sentimiento": "negativo",
+      "ofensa": "amenaza"
+    },
+    {
+      "mensajes": "10-19",
+      "tema": "conflicto",
+      "sentimiento": "negativo",
+      "ofensa": "ofensivo"
+    },
+    {
+      "mensajes": "20-29",
+      "tema": "reunion",
+      "sentimiento": "positivo",
+      "ofensa": "sin_ofensa"
+    },
+    {
+      "mensajes": "30-39",
+      "tema": "sin_tema",
+      "sentimiento": "neutral",
+      "ofensa": "sin_ofensa"
+    }
+  ]
+}
