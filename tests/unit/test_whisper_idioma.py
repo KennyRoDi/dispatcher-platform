@@ -25,3 +25,20 @@ def test_idioma_que_whisper_conoce_se_acepta(tmp_path, idioma):
 def test_idioma_que_whisper_no_conoce_falla_al_cargar_con_value_error(tmp_path, idioma):
     with pytest.raises(ValueError, match="idioma"):
         cargar_config_de_audio(config_con_idioma(tmp_path / "audio.toml", idioma))
+
+
+@pytest.mark.parametrize(
+    "valor",
+    ['["es"]', '{ codigo = "es" }', "1", "true", "[]"],
+    ids=["lista", "tabla", "entero", "bool", "lista-vacia"],
+)
+def test_idioma_que_no_es_texto_falla_con_value_error(tmp_path, valor):
+    ruta = tmp_path / "audio.toml"
+    ruta.write_text(
+        f'[modelo]\nnombre = "base"\nrevision = "{"a" * 40}"\nidioma = {valor}\n'
+        'compute_type = "int8"\nbeam_size = 5\nhilos = 0\n',
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="idioma"):
+        cargar_config_de_audio(ruta)
