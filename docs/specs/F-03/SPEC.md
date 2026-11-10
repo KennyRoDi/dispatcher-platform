@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion afe8672
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest: 717 passed, 3 skipped, 6 xfailed. src/ intacto, solo pruebas nuevas (ed9ed39) empujadas, árbol limpio. Reproduje la observación 1 (cases=3 devuelve 10 casos). QA reporta 3 observaciones menores no bloqueantes, dejadas como xfail estricto. (ed9ed39) |
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README no menciona dataset, docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio y sin commits nuevos. Entregó borrador de bitácora con hechos del historial; los 3 defectos de QA se registran como abiertos (xfail), no corregidos. (afe8672) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
