@@ -4,8 +4,10 @@ from datetime import datetime, timezone
 
 import pytest
 
+from src.application.ports import ResourceReader
 from src.domain.finding import EvidenceRef, Finding, Severity
 from src.domain.priority import Priority
+from src.domain.resources import ResourceUsage
 from src.domain.subtask import ContentKind, QueueFull, Subtask
 
 
@@ -55,3 +57,14 @@ def comprobar_analyzer(analizador, path):
         assert hallazgo.evidence.object_sha256
         assert hallazgo.evidence.position
         assert 0 <= hallazgo.confidence <= 1
+
+
+def comprobar_resource_reader(lector, esperado):
+    assert isinstance(lector, ResourceReader)
+    uso = lector.read()
+    assert isinstance(uso, ResourceUsage)
+    assert uso == esperado
+    assert isinstance(uso.worker_id, str) and uso.worker_id
+    assert type(uso.memory_current) is int and uso.memory_current >= 0
+    assert type(uso.memory_max) is int and uso.memory_max > 0
+    assert uso.memory_available == max(uso.memory_max - uso.memory_current, 0)
