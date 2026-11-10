@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-03-1-dataset-sintetico
 **Verificación IA:** revision 10d3f1a
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README y ARQUITECTURA no mencionan el generador, docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio y sin commits nuevos. Borrador de bitácora con hechos del historial: plantillas redactadas por IA, prueba roja inconsistente con date_unixtime, 2 defectos menores de QA abiertos en xfail. (6fe0440) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 2: APROBADO sin bloqueantes. Confirmé en el código que case.name sin validar (línea 58) y la falta de conversión a UTC en los renderizadores corresponden a los xfail ya aceptados. El cambio de regex FECHA_UNIX en la prueba se evaluó como legítimo. Árbol limpio, commit empujado. (10d3f1a) |
+| revision | Kenni Rodriguez | 2026-11-10 |  |
