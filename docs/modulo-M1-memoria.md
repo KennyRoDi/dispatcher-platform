@@ -11,6 +11,8 @@
 
 La parte 1 no conecta estos componentes al arranque ni al heartbeat. La CLI `scripts/check_node_budget.py`, los límites Compose sin swap, la expansión efectiva de réplicas y la evidencia real pertenecen a la parte 2 del [SPEC](specs/F-16/SPEC.md). No se modificaron workers ni `deploy/`.
 
+F-17 añade control de admisión en el worker. `src/domain/admission.py` define `admits` y `FootprintTable`; `src/workers/config.py` expone `load_admission_config`, que exige `FOOTPRINT_<OP>_BYTES` y `ADMISSION_MARGIN_BYTES` sin valores predeterminados; `src/workers/worker_node.py` coloca la compuerta en `poll_once`, antes de `blpop`. Decisión: AD-30 en [ARQUITECTURA](ARQUITECTURA.md) §8.
+
 ## 2. Concepto de Sistemas Operativos
 
 Un cgroup v2 contabiliza memoria y permite que el kernel imponga un límite por grupo. Leer un límite no demuestra por sí solo que se haya configurado correctamente al arrancar. El presupuesto previo compara capacidades declaradas; no garantiza memoria libre futura ni reemplaza el control de admisión.
@@ -52,6 +54,22 @@ Comparar bytes observados con Compose efectivo y verificar ausencia de swap. Ant
 | Nodo D, VM WSL2 | Pendiente parte 2 | Pendiente parte 2 | Pendiente parte 2 | Pendiente parte 2 | Ninguna |
 
 La evidencia de software es distinta de esta tabla: [QA-parte-1.md](specs/F-16/QA-parte-1.md) registra 1138 pruebas aprobadas, 2 omitidas y 3 deseleccionadas; seis regresiones introducidas en copias temporales fueron detectadas. Esos conteos describen pruebas de lógica y contrato, no huellas de memoria ni mediciones de Docker/WSL2. No hay cifras sintéticas presentadas como mediciones.
+
+### 4.1 F-17: huella por operación y ráfaga
+
+Sin medir. Requiere nodos WSL2 reales y F-16 parte 2 (arranque con límites).
+
+| Operación | Huella (`FOOTPRINT_<OP>_BYTES`) | Pico observado (`memory.peak`) | Repeticiones |
+|---|---|---|---|
+| transcode_video | pendiente | pendiente | pendiente (0 de 5) |
+| extract_audio | pendiente | pendiente | pendiente (0 de 5) |
+| generate_thumbnail | pendiente | pendiente | pendiente (0 de 5) |
+| convert_audio | pendiente | pendiente | pendiente (0 de 5) |
+| extract_metadata | pendiente | pendiente | pendiente (0 de 5) |
+
+Gráfico de memoria por worker durante ráfaga: pendiente (requiere nodos WSL2 reales y F-16 parte 2).
+
+Método, aún sin ejecutar: `docker exec <id> cat /sys/fs/cgroup/memory.current` y `docker exec <id> cat /sys/fs/cgroup/memory.peak`, antes, durante y después de cada tipo de operación, con 5 repeticiones. Ráfaga: muestrear `memory.current` por worker cada 1 s con cola superior a la capacidad.
 
 ## 5. Interpretación
 
