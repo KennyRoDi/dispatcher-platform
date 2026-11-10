@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** feat/F-16-2-limites-por-worker
-**Verificación IA:** plan 4e97c68
+**Verificación IA:** plan 1dd82fc
 **Historia:** US-17 · **Requisitos:** RF-25 · **Responsable:** J
 
 ## Objetivo
@@ -71,3 +71,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code (misma sesión, no independiente) | 2026-11-10 | SPEC completo sin campos pendientes; alcance, pruebas, pila de 1 parte y preguntas abiertas revisados contra backlog, IMPLEMENTACION §5 y AD-29 (4e97c68) |
+| verificación IA de plan | Claude Code (misma sesión, no independiente) | 2026-11-10 | SPEC completo; alcance, pruebas, pila de 1 parte y preguntas abiertas revisados (1dd82fc) |
