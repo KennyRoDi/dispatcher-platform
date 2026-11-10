@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** implementacion b7abcff
+**Verificación IA:** implementacion b17701e
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -103,3 +103,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-10 | Verificación independiente de implementación tras hallazgo de revisión: no se necesitó cambio de producción; start_worker valida configuración y presupuesto antes de invocar Compose. La prueba de02cc2 verifica retorno de error y cero llamadas a subprocess.run ante exceso de presupuesto. Reproduje pytest -q con marcadores excluyendo integration y acceptance: 1150 passed, 2 skipped, 3 deselected, una advertencia preexistente Starlette, 41.27s. El commit nuevo solo modifica tests/unit/test_f16_preflight.py, sin debilitar pruebas; diff --check limpio y árbol limpio. No se ejecutó Docker ni se midieron nodos o cgroups reales; evidencia B/C/D pendiente. (b7abcff) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | QA encontró que los nodos B/C/D ejecutan el wrapper desde PowerShell en Windows, donde /proc/meminfo no existe. Cambiar lectura a docker info --format '{{.MemTotal}}' (daemon ya requerido), añadir pruebas unitarias y actualizar instrucciones para Docker Desktop/WSL2; mantener mediciones físicas pendientes. |
+| verificación IA de implementacion | Codex | 2026-11-10 | Suite 1157 passed, 2 skipped y 3 deselected; lectura MemTotal desde docker info revisada y diff limpio. Sin daemon Docker ni mediciones reales B/C/D. (b17701e) |
