@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion c19dc26
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -79,3 +79,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Codex | 2026-11-10 | Revision independiente del developer: diff 995914d..HEAD solo agrega pruebas y comprobador en tests; git diff --check correcto. py -m pytest -q tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py --tb=short: 50 failed por ausencia de src.domain.node_budget y src.infrastructure.cgroup_resources, 3 passed del doble, sin errores de coleccion. py -m pytest -q tests/unit/test_contratos.py: 9 passed. Baseline antes de cambios: 1085 passed, 2 skipped, 3 deselected. Revisados presupuesto, reserva, replicas, valores invalidos, lectura temporal y conformidad; sin implementacion ni mediciones fisicas, parte 2 fuera de esta fase. (adbb225) |
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de implementacion | Codex | 2026-11-10 | Revision independiente del developer sobre c19dc26: solo node_budget.py y cgroup_resources.py, 52 lineas de producto; logica pura en dominio y lectura de archivos en infraestructura, contratos conservados. git diff 2a84751..HEAD -- tests/ vacio: pruebas aprobadas sin cambios; git diff --check correcto y arbol limpio. Ejecute py -m pytest -q -m not-integration/not-acceptance mediante expresion de marcadores del proyecto: 1138 passed, 2 skipped, 3 deselected, una advertencia preexistente de Starlette, 42.50s. Sin Docker ni mediciones fisicas en parte 1; cableado y evidencia quedan para parte 2. (c19dc26) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
