@@ -13,6 +13,18 @@ from src.domain.transcription import TranscriptSegment
 COMMIT_HEX = re.compile(r"[0-9a-f]{40}")
 # Solo las variantes que compara M5; otra se agrega cuando se mida.
 COMPUTE_TYPES = frozenset({"int8", "float32"})
+# Copiado de _LANGUAGE_CODES en faster_whisper/tokenizer.py v1.2.1 (SYSTRAN, MIT): un código ajeno a este
+# conjunto hace que Tokenizer lance ValueError al transcribir, y ese error se confundiría con un audio ilegible.
+IDIOMAS_DE_WHISPER = frozenset(
+    (
+        "af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo", "br", "bs", "ca", "cs", "cy", "da", "de",
+        "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "ha", "haw", "he", "hi", "hr", "ht",
+        "hu", "hy", "id", "is", "it", "ja", "jw", "ka", "kk", "km", "kn", "ko", "la", "lb", "ln", "lo", "lt",
+        "lv", "mg", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "ne", "nl", "nn", "no", "oc", "pa", "pl",
+        "ps", "pt", "ro", "ru", "sa", "sd", "si", "sk", "sl", "sn", "so", "sq", "sr", "su", "sv", "sw", "ta",
+        "te", "tg", "th", "tk", "tl", "tr", "tt", "uk", "ur", "uz", "vi", "yi", "yo", "zh", "yue",
+    )
+)
 
 
 @dataclass(frozen=True)
@@ -50,15 +62,22 @@ class WhisperTranscriber:
             segmentos, _ = self.modelo.transcribe(
                 str(path), language=self.config.idioma, beam_size=self.config.beam_size
             )
-            # El generador es perezoso: la decodificación puede fallar al recorrerlo, no solo al llamar.
+            # decode_audio corre al llamar a transcribe(); lo perezoso del generador es la inferencia de CTranslate2.
             crudos = list(segmentos)
         except _errores_de_decodificacion() as error:
+            if isinstance(error, ERRORES_TRANSITORIOS):
+                raise
             raise ValueError(f"no es un audio legible: {path}") from error
         try:
             convertidos = [_segmento(crudo) for crudo in crudos]
         except ValueError as error:
             raise ValueError(f"Whisper devolvió un segmento inválido para {path}: {error}") from error
         return sorted(convertidos, key=lambda segmento: segmento.inicio)
+
+
+# PyAV 19.0.2 (av/error.py) mapea ENOMEM, ETIMEDOUT, EAGAIN/EINTR y EACCES/EPERM a estas clases junto con
+# FFmpegError: no dicen nada del archivo y un reintento puede funcionar, así que se propagan tal cual.
+ERRORES_TRANSITORIOS = (MemoryError, TimeoutError, BlockingIOError, InterruptedError, PermissionError)
 
 
 def _errores_de_decodificacion() -> tuple[type[BaseException], ...]:
@@ -94,7 +113,7 @@ def cargar_config_de_audio(ruta: Path) -> ConfigWhisper:
     return ConfigWhisper(
         nombre=_texto(modelo, "nombre"),
         revision=_revision(modelo),
-        idioma=_texto(modelo, "idioma"),
+        idioma=_idioma(modelo),
         compute_type=_compute_type(modelo),
         beam_size=_entero(modelo, "beam_size", minimo=1),
         hilos=_entero(modelo, "hilos", minimo=0),
@@ -106,6 +125,13 @@ def _texto(modelo: dict, clave: str) -> str:
     if not isinstance(valor, str) or not valor.strip():
         raise ValueError(f"[modelo] {clave} debe ser un texto no vacío: {valor!r}")
     return valor
+
+
+def _idioma(modelo: dict) -> str:
+    idioma = modelo.get("idioma")
+    if idioma not in IDIOMAS_DE_WHISPER:
+        raise ValueError(f"[modelo] idioma debe ser un código de idioma de Whisper, como \"es\": {idioma!r}")
+    return idioma
 
 
 def _revision(modelo: dict) -> str:
