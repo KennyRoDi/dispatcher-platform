@@ -9,7 +9,7 @@
 - `src/infrastructure/cgroup_resources.py`: `CgroupResourceReader`, con ruta e identidad inyectadas, relee `memory.current` y `memory.max` en cada consulta. Admite uso cero y exige límite positivo; rechaza `max` y contenido no decimal ASCII. Propaga errores de lectura, permisos y UTF-8. Devuelve el `ResourceUsage` existente; su disponibilidad queda acotada a cero cuando el uso supera el límite.
 - `tests/unit/test_node_budget.py`, `tests/unit/test_cgroup_resources.py` y `tests/contratos.py`: pruebas con entradas sintéticas y archivos temporales; comprobador compartido aplicado al lector y a `FakeResourceReader`, sin cambiar `ResourceReader.read()`.
 
-La parte 2 agrega `scripts/preflight.py`, que combina el Compose efectivo (CPU o con `--gpu`), valida `NODE_NAME`, `NODE_IP`, límites y presupuesto usando `MemTotal` de `/proc/meminfo`. `scripts/start_worker.py [--gpu]` repite la validación y solo entonces ejecuta `docker compose ... up -d --build`. `WORKER_MEM_LIMIT` es obligatorio; Compose lo aplica como `mem_limit` y `memswap_limit`, y `.env.example` lo deja vacío. Su valor debe medirse y configurarse por nodo antes de arrancar; no se proporciona ni se infiere aquí. La reserva SUP-24 es el máximo entre 1 GiB y 15 % de `MemTotal`: supuesto provisional, no medición del consumo del sistema.
+La parte 2 agrega `scripts/preflight.py`, que combina el Compose efectivo (CPU o con `--gpu`), valida `NODE_NAME`, `NODE_IP`, límites y presupuesto usando `MemTotal` en bytes de `docker info --format '{{.MemTotal}}'`. En Windows, el CLI consulta el daemon Linux de Docker Desktop/WSL2, no el proceso Python ni la RAM física de Windows. `scripts/start_worker.py [--gpu]` repite la validación y solo entonces ejecuta `docker compose ... up -d --build`. `WORKER_MEM_LIMIT` es obligatorio; Compose lo aplica como `mem_limit` y `memswap_limit`, y `.env.example` lo deja vacío. Su valor debe medirse y configurarse por nodo antes de arrancar; no se proporciona ni se infiere aquí. La reserva SUP-24 es el máximo entre 1 GiB y 15 % de `MemTotal`: supuesto provisional, no medición del consumo del sistema.
 
 Estas comprobaciones de configuración y presupuesto no acreditan ejecución real de Docker/Compose ni aplicación del límite en cgroups. `NODE_IP` se valida como IPv4 o IPv6. Compose mantiene un worker por nodo, sin `--scale`.
 
@@ -21,7 +21,7 @@ Referencia bibliográfica: Silberschatz, Galvin y Gagne, *Operating System Conce
 
 ## 3. Método de medición
 
-**No ejecutado.** En cada nodo B/C/D real, medir `MemTotal` desde la VM Linux donde Docker aplica los límites (`grep '^MemTotal:' /proc/meminfo`; convertir kB a bytes). Registrar fecha UTC y entorno; no usar la RAM física de Windows. Calcular y anotar la reserva SUP-24 como supuesto. Medir y decidir `WORKER_MEM_LIMIT` por nodo antes de ponerlo en el `.env`; el proyecto no prescribe su valor. Hacer tres arranques por nodo con `python scripts/start_worker.py` o `python scripts/start_worker.py --gpu`, según corresponda. El nodo A no ejecuta workers.
+**No ejecutado.** En cada nodo B/C/D real, registrar la salida de `docker info --format '{{.MemTotal}}'`, que devuelve bytes de la RAM del daemon Linux donde Docker aplica los límites. Registrar fecha UTC y entorno; no usar la RAM física de Windows. Calcular y anotar la reserva SUP-24 como supuesto. Medir y decidir `WORKER_MEM_LIMIT` por nodo antes de ponerlo en el `.env`; el proyecto no prescribe su valor. Hacer tres arranques por nodo con `python scripts/start_worker.py` o `python scripts/start_worker.py --gpu`, según corresponda. El nodo A no ejecuta workers.
 
 Desde la raíz del repositorio, con `.env` local sin incorporarlo al historial:
 
@@ -29,7 +29,7 @@ Desde la raíz del repositorio, con `.env` local sin incorporarlo al historial:
 python scripts/preflight.py
 ```
 
-El preflight ejecuta internamente `docker compose config --format json`. Para nodo GPU, pasar `--gpu`. El arranque recomendado vuelve a comprobar el presupuesto antes de levantar el worker:
+El preflight ejecuta internamente `docker compose config --format json` y `docker info --format '{{.MemTotal}}'`. Para nodo GPU, pasar `--gpu`. El arranque recomendado vuelve a comprobar el presupuesto antes de levantar el worker:
 
 ```sh
 python scripts/preflight.py --gpu

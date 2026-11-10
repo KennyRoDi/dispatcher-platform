@@ -100,7 +100,7 @@ La muestra son 20 fotos propias de José Andrés (CC BY 4.0); la tabla prueba el
 
 *Pendiente.*
 
-Para workers, configure `WORKER_MEM_LIMIT` en el `.env` local con un límite por worker medido para ese nodo; no hay un valor predeterminado. Desde la raíz del repositorio, valide presupuesto y arranque con `python scripts/start_worker.py`. En el nodo GPU use `python scripts/start_worker.py --gpu`. El wrapper ejecuta el preflight antes de `docker compose up`; también puede ejecutarse por separado con `python scripts/preflight.py [--gpu]`. El preflight lee `MemTotal` de `/proc/meminfo` en el entorno Linux de Docker (WSL2 en B/C/D). Consulte el procedimiento de tres arranques y lecturas de cgroups en [la ficha M1](docs/modulo-M1-memoria.md). Las mediciones reales de límites en nodos siguen pendientes.
+Para workers, configure `WORKER_MEM_LIMIT` en el `.env` local con un límite por worker medido para ese nodo; no hay un valor predeterminado. Desde la raíz del repositorio, valide presupuesto y arranque con `python scripts/start_worker.py`. En el nodo GPU use `python scripts/start_worker.py --gpu`. El wrapper ejecuta el preflight antes de `docker compose up`; también puede ejecutarse por separado con `python scripts/preflight.py [--gpu]`. El preflight obtiene `MemTotal` del daemon Linux de Docker con `docker info --format '{{.MemTotal}}'`; en B/C/D, Docker Desktop consulta su entorno WSL2 aunque Python corra desde PowerShell. Consulte el procedimiento de tres arranques y lecturas de cgroups en [la ficha M1](docs/modulo-M1-memoria.md). Las mediciones reales de límites en nodos siguen pendientes.
 
 ### Uso
 
