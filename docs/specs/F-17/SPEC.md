@@ -1,6 +1,6 @@
 # SPEC F-17: Control de admisión
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-16-2-limites-por-worker
 **Verificación IA:** verificacion 7e1fee3
 **Historia:** US-17 · **Requisitos:** RF-25 · **Responsable:** J
@@ -78,3 +78,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | pytest | 2026-11-10 | admits, FootprintTable, load_admission_config y compuerta en poll_once antes de blpop; 69 pruebas en verde (admission, worker_node, arquitectura); ~100 líneas de código (d0c909a) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | pytest | 2026-11-10 | QA en la misma sesión (no independiente): 69 pruebas en verde, 88 líneas de código; intentos de romper: valores bool, negativos y no ASCII rechazados, error de lectura no consume. Hallazgo: memory.max=max hace que el worker nunca admita (se registra el error cada ciclo). Medición M1 pendiente, sin nodos WSL2 ni F-16 parte 2 (7e1fee3) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
