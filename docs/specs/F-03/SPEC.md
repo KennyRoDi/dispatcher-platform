@@ -36,7 +36,7 @@ Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (
 
 **Capas y archivos (nuevos).**
 - Dominio: `src/domain/dataset_plan.py`. Funciones puras: `plan_dataset(seed, params) -> DatasetPlan` (casos, heterogéneos livianos y pesados, conteos de mensajes, imágenes, audios, proporción positiva) y `check_minimums(plan) -> list[str]` (incumplimientos del plan; la validación del manifiesto real es de la parte 5). Sin E/S, sin reloj, sin `random` global: `random.Random(seed)`. `params` por configuración.
-- Adaptadores (`src/adapters/`): `chat_export_generator.py` (texto WhatsApp/Telegram, UTF-8, timestamps y remitentes sintéticos), `media_generator.py` (imágenes y audios sintéticos con etiqueta del generador, vía `ffmpeg`, ejecutor inyectado), `heavy_case_generator.py` (archivo grande ≥ 200 MiB de los casos pesados, mismo ejecutor).
+- Adaptadores (`src/adapters/`): `chat_export_generator.py` (texto WhatsApp/Telegram, UTF-8, timestamps y remitentes sintéticos), `media_generator.py` (imágenes y audios sintéticos con etiqueta del generador, vía `ffmpeg`, ejecutor inyectado), `heavy_case_generator.py` (archivo grande ≥ 200 MiB de los casos pesados, mismo ejecutor). `document_generator.py` (documentos de texto sintético `.txt` o `.md` de los casos heterogéneos livianos, sin `ffmpeg`, deterministas por semilla, mismo origen y licencia que los medios).
 - Script: `scripts/dataset_sintetico.py`, CLI `--seed`, `--out`, `--params`, `--validar`. Escribe fuera del repo.
 - Documento: `docs/dataset.md`.
 
@@ -50,7 +50,7 @@ Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (
 - Limitación a documentar en `docs/dataset.md`: F-08 medirá la detección sobre patrones sintéticos, no sobre fotos reales; sus resultados no se extrapolan a imágenes reales.
 - Heterogéneos (opción A): 10 casos, 5 livianos (texto, imagen, audio y documento) y 5 pesados (≥ 200 MB; texto, imagen, audio y video o documento). Los 5 pesados son parte de los 10 y de los ≥ 5 pesados de B.3. Los otros 30 casos pueden ser de uno o pocos tipos.
 - Casos pesados: el archivo grande es video sintético con bitrate fijo hasta superar 200 MiB (o documento grande); el generador falla si el archivo queda por debajo. El resto de sus archivos (texto, imagen, audio) sale de los mismos generadores.
-- Manifiesto (`manifest.json`) con campos `case`, `kind` (`texto|imagen|audio|video|documento`), `path`, `bytes`, `sha256`, `origen` (siempre `sintetico`), `licencia` (`generado por el equipo, uso academico`, provisional), `semilla`, `etiqueta` (verdad asignada por el generador, en imágenes y audio) y `heterogeneo` (`liviano|pesado|no`). Sin marca de tiempo. F-04 lo extiende; no se renombran campos.
+- Manifiesto (`manifest.json`) con campos `case`, `kind` (`texto|imagen|audio|video|documento`), `path`, `bytes`, `sha256`, `origen` (siempre `sintetico`), `licencia` (`generado por el equipo, uso academico`, provisional), `semilla`, `etiqueta` (verdad asignada por el generador, en imágenes y audio) y `heterogeneo` (`liviano|pesado|no`), `categoria` (categoría de la imagen; `null` en el resto), `positivo` (booleano en imágenes; `null` en el resto) y `duracion_s` (segundos del audio; `null` en el resto). Sin marca de tiempo. El validador exige al menos 2 duraciones de audio distintas y, por cada categoría de imagen, filas positivas y no positivas. F-04 lo extiende; no se renombran campos.
 
 **Reutiliza del I Proyecto:** `ffmpeg_args` y constantes de duración de `scripts/build_dataset.py`, sin copiar historial. Se copia solo lo necesario, con cita en comentario.
 
@@ -83,7 +83,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | 2 | `feat(F-03): generar exportaciones de chat sinteticas` | `src/adapters/chat_export_generator.py`, WhatsApp y Telegram, ~120 líneas |
 | 3 | `feat(F-03): generar imagenes y audio sinteticos etiquetados` | `src/adapters/media_generator.py` con ejecutor de `ffmpeg` inyectado: imágenes con proporción positiva y audios de duraciones distintas, ~150 líneas |
 | 4 | `feat(F-03): generar archivos grandes de los casos pesados` | `src/adapters/heavy_case_generator.py`: video o documento ≥ 200 MiB, falla si no alcanza, ~100 líneas |
-| 5 | `feat(F-03): componer casos heterogeneos y manifiesto con CLI` | `scripts/dataset_sintetico.py`: arma los 10 heterogéneos, manifiesto, `--validar`, ~150 líneas |
+| 5 | `feat(F-03): componer casos heterogeneos y manifiesto con CLI` | `src/adapters/document_generator.py` (documentos livianos) y `scripts/dataset_sintetico.py`: arma los 10 heterogéneos, manifiesto, `--validar`, ~150 líneas |
 | 6 | `docs(F-03): registrar procedencia, distribucion y salida del validador` | `docs/dataset.md` (procedencia «generado por el equipo», limitación sintética, casos por condición, enlace de Drive, salida real del validador) y AD-25 en `docs/ARQUITECTURA.md` §8. Sin código; va al final porque necesita el dataset generado |
 
 ## Riesgos y preguntas abiertas

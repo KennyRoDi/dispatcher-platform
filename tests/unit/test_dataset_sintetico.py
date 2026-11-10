@@ -6,11 +6,26 @@ from pathlib import Path
 import pytest
 
 from scripts.dataset_sintetico import MANIFEST_NAME, build_manifest, main, validate_manifest
+from src.adapters.document_generator import generate_documents
 from src.adapters.heavy_case_generator import generate_heavy_cases
 from src.adapters.media_generator import generate_media
-from src.domain.dataset_plan import MIB, DatasetParams, plan_dataset
+from src.domain.dataset_plan import IMAGE_CATEGORIES, MIB, DatasetParams, plan_dataset
 
-FIELDS = {"case", "kind", "path", "bytes", "sha256", "origen", "licencia", "semilla", "etiqueta", "heterogeneo"}
+FIELDS = {
+    "case",
+    "kind",
+    "path",
+    "bytes",
+    "sha256",
+    "origen",
+    "licencia",
+    "semilla",
+    "etiqueta",
+    "heterogeneo",
+    "categoria",
+    "positivo",
+    "duracion_s",
+}
 LICENCIA = "generado por el equipo, uso academico"
 KINDS = {"texto", "imagen", "audio", "video", "documento"}
 ETIQUETAS = {"imagen": {"positivo", "neutro"}, "audio": {"tono", "ruido"}}
@@ -70,6 +85,18 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _tipos_por_caso(rows: list[dict], nivel: str) -> dict[str, set[str]]:
+    tipos: dict[str, set[str]] = {r["case"]: set() for r in rows if r["heterogeneo"] == nivel}
+    for row in rows:
+        if row["case"] in tipos:
+            tipos[row["case"]].add(row["kind"])
+    return tipos
+
+
+def _guardar(out: Path, rows: list[dict]) -> None:
+    (out / MANIFEST_NAME).write_text(json.dumps(rows), encoding="utf-8")
+
+
 def _files_on_disk(out: Path) -> set[str]:
     return {p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file() and p.name != MANIFEST_NAME}
 
@@ -119,6 +146,39 @@ def test_las_etiquetas_solo_existen_en_imagenes_y_audios(reduced):
             assert row["etiqueta"] is None
 
 
+def test_categoria_y_positivo_solo_existen_en_imagenes(reduced):
+    for row in _rows(reduced):
+        if row["kind"] == "imagen":
+            assert row["categoria"] in IMAGE_CATEGORIES
+            assert row["positivo"] is (row["etiqueta"] == "positivo")
+        else:
+            assert row["categoria"] is None
+            assert row["positivo"] is None
+
+
+def test_duracion_solo_existe_en_audios_y_es_un_entero_positivo(reduced):
+    for row in _rows(reduced):
+        if row["kind"] == "audio":
+            assert isinstance(row["duracion_s"], int) and not isinstance(row["duracion_s"], bool)
+            assert row["duracion_s"] > 0
+        else:
+            assert row["duracion_s"] is None
+
+
+def test_los_audios_declaran_duraciones_distintas(reduced):
+    duraciones = {r["duracion_s"] for r in _rows(reduced) if r["kind"] == "audio"}
+
+    assert len(duraciones) >= 2
+
+
+def test_cada_categoria_de_imagen_declara_positivos_y_no_positivos(reduced):
+    rows = [r for r in _rows(reduced) if r["kind"] == "imagen"]
+
+    for categoria in IMAGE_CATEGORIES:
+        positivos = {r["positivo"] for r in rows if r["categoria"] == categoria}
+        assert positivos == {True, False}
+
+
 def test_las_rutas_son_relativas_y_el_manifiesto_describe_cada_archivo_del_disco(reduced):
     rows = _rows(reduced)
 
@@ -149,6 +209,7 @@ def test_las_filas_unifican_chat_imagenes_audios_y_videos_del_plan(reduced):
     assert len(por_tipo["audio"]) == REDUCED["audios"]
     assert {r["case"] for r in por_tipo["texto"]} == {c.name for c in plan.cases if c.messages}
     assert {r["case"] for r in por_tipo["video"]} == {c.name for c in plan.cases if c.heavy_bytes}
+    assert {r["case"] for r in por_tipo["documento"]} == {c.name for c in plan.cases if c.heterogeneo == "liviano"}
     assert {r["case"] for r in rows} <= {c.name for c in plan.cases}
     assert {r["heterogeneo"] for r in rows if r["case"] == plan.cases[0].name} == {plan.cases[0].heterogeneo}
 
@@ -157,10 +218,14 @@ def test_las_filas_conservan_etiqueta_y_bytes_de_los_generadores(tmp_path, reduc
     plan = plan_dataset(1, DatasetParams(**REDUCED))
     media = generate_media(plan, tmp_path / "media", FakeRunner())
     heavy = generate_heavy_cases(plan, tmp_path / "heavy", FakeRunner())
+    documentos = generate_documents(plan, tmp_path / "docs")
     rows = _rows(reduced)
 
-    etiquetas = sorted((f.case, f.kind, f.etiqueta) for f in media)
-    assert etiquetas == sorted((r["case"], r["kind"], r["etiqueta"]) for r in rows if r["kind"] in ETIQUETAS)
+    etiquetas = sorted((f.case, f.kind, f.etiqueta, f.categoria, f.duration_s) for f in media)
+    assert etiquetas == sorted(
+        (r["case"], r["kind"], r["etiqueta"], r["categoria"], r["duracion_s"]) for r in rows if r["kind"] in ETIQUETAS
+    )
+    assert sorted(f.case for f in documentos) == sorted(r["case"] for r in rows if r["kind"] == "documento")
     assert sorted((f.case, f.bytes) for f in heavy) == sorted((r["case"], r["bytes"]) for r in rows if r["kind"] == "video")
 
 
@@ -214,15 +279,20 @@ def test_los_heterogeneos_livianos_no_tienen_archivos_pesados(complete):
     assert all(r["bytes"] < 200 * MIB for r in rows if r["heterogeneo"] != "pesado")
 
 
-def test_los_heterogeneos_mezclan_texto_imagen_y_audio(complete):
+def test_los_heterogeneos_livianos_incluyen_texto_imagen_audio_y_documento(complete):
     _, rows = complete
-    heterogeneos = {r["case"]: set() for r in rows if r["heterogeneo"] != "no"}
-    for row in rows:
-        if row["case"] in heterogeneos:
-            heterogeneos[row["case"]].add(row["kind"])
+    tipos = _tipos_por_caso(rows, "liviano")
 
-    assert len(heterogeneos) == 10
-    assert all({"texto", "imagen", "audio"} <= kinds for kinds in heterogeneos.values())
+    assert len(tipos) == 5
+    assert all({"texto", "imagen", "audio", "documento"} <= kinds for kinds in tipos.values())
+
+
+def test_los_heterogeneos_pesados_incluyen_texto_imagen_audio_y_video(complete):
+    _, rows = complete
+    tipos = _tipos_por_caso(rows, "pesado")
+
+    assert len(tipos) == 5
+    assert all({"texto", "imagen", "audio", "video"} <= kinds for kinds in tipos.values())
 
 
 def test_el_dataset_por_defecto_cumple_los_minimos_de_b3(complete):
@@ -303,11 +373,53 @@ def test_validar_detecta_un_archivo_ausente(reduced):
 def test_validar_rechaza_origen_o_licencia_distintos(reduced, campo, valor):
     rows = _rows(reduced)
     rows[0][campo] = valor
-    (reduced / MANIFEST_NAME).write_text(json.dumps(rows), encoding="utf-8")
+    _guardar(reduced, rows)
 
     problemas = validate_manifest(reduced / MANIFEST_NAME)
 
     assert any(campo in p and rows[0]["path"] in p for p in problemas)
+
+
+def test_validar_no_reporta_duraciones_ni_categorias_en_un_dataset_coherente(reduced):
+    problemas = validate_manifest(reduced / MANIFEST_NAME)
+
+    assert not any("duraciones" in p or "categoria" in p for p in problemas)
+
+
+def test_validar_reporta_menos_de_dos_duraciones_de_audio_distintas(reduced):
+    rows = _rows(reduced)
+    for row in rows:
+        if row["kind"] == "audio":
+            row["duracion_s"] = 30
+    _guardar(reduced, rows)
+
+    problemas = validate_manifest(reduced / MANIFEST_NAME)
+
+    assert "duraciones de audio distintas: 1 de al menos 2" in problemas
+
+
+@pytest.mark.parametrize("declarado", [True, False, None])
+def test_validar_reporta_una_categoria_sin_proporcion_positiva_declarada(reduced, declarado):
+    rows = _rows(reduced)
+    for row in rows:
+        if row["kind"] == "imagen" and row["categoria"] == "objetos":
+            row["positivo"] = declarado
+    _guardar(reduced, rows)
+
+    problemas = validate_manifest(reduced / MANIFEST_NAME)
+
+    asunto = [p for p in problemas if "categoria" in p]
+    assert len(asunto) == 1
+    assert "objetos" in asunto[0] and "proporcion positiva" in asunto[0]
+
+
+def test_validar_reporta_una_categoria_de_imagen_sin_filas(reduced):
+    rows = [r for r in _rows(reduced) if not (r["kind"] == "imagen" and r["categoria"] == "paisajes")]
+    _guardar(reduced, rows)
+
+    problemas = validate_manifest(reduced / MANIFEST_NAME)
+
+    assert any("paisajes" in p and "proporcion positiva" in p for p in problemas)
 
 
 def test_la_cli_escribe_en_out_y_no_en_el_directorio_de_trabajo(tmp_path, monkeypatch):

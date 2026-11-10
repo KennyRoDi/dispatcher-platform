@@ -32,7 +32,7 @@ def test_generacion_reducida_escribe_manifiesto(tmp_path):
     assert main(["--seed", "5", "--out", str(out), "--params", str(params)]) == 0
 
     rows = json.loads((out / MANIFEST_NAME).read_text(encoding="utf-8"))
-    assert {r["kind"] for r in rows} == {"texto", "imagen", "audio", "video"}
+    assert {r["kind"] for r in rows} == {"texto", "imagen", "audio", "video", "documento"}
     assert sum(r["kind"] == "imagen" for r in rows) == PARAMS["images"]
     assert sum(r["kind"] == "audio" for r in rows) == PARAMS["audios"]
     for row in rows:
