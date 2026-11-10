@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** plan 34573a4
+**Verificación IA:** plan 49972ce
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -129,3 +129,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (orquestador, Sonnet 5.5) | 2026-11-10 | Releido el SPEC: sin campos pendientes (grep), cubre mínimos de B.3 y ética RNF-04/05, árbol limpio, commit empujado. Sin código ni pruebas en esta fase. (34573a4) |
 | plan | Kenni Rodriguez | 2026-11-10 |  |
 | devuelta de tests | Kenni Rodriguez | 2026-11-10 | Incorporar: imágenes y audio de datasets públicos licenciados (Kaggle) con fallback sintético; chats sintéticos; casos pesados en local/Drive; opción A: 10 heterogéneos, 5 livianos y 5 pesados solapados |
+| verificación IA de plan | Claude Code (subagente arquitecto, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | SPEC releído tras la devolución: sin campos pendientes (grep), solo toca SPEC, commit empujado, árbol limpio. Recoge opción A (10 heterogéneos: 5 livianos y 5 pesados), chats sintéticos, imágenes y audio públicos con fallback sintético, pesados en local y Drive, pila de 6 PR. Sin código ni pruebas en esta fase. (49972ce) |
