@@ -3,37 +3,157 @@
 **Fase:** plan
 **Base:** main
 **Verificación IA:** pendiente
-**Historia:** US-22 · **Requisitos:** … · **Responsable:** V
+**Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
 
-… Qué cambia para quién y por qué, citando el enunciado.
+[B.5 M3] exige «transferencia de archivos grandes en bloques (chunks) de tamaño justificado, con reensamblado verificado por hash» (RF-31), y el dataset incluye al menos cinco casos con archivos ≥ 200 MB (RF-22). Hoy el coordinador solo recibe casos como JSON con rutas (`POST /cases`) y los workers leen de MinIO: no existe forma de subir un archivo grande al sistema, ni de detectar que llegó corrupto. F-22 entrega el protocolo propio por chunks de AD-10: el cliente declara el archivo (SHA-256 y tamaño), envía cada chunk con su propio SHA-256, el coordinador rechaza un chunk alterado, reensambla en orden sin cargar el archivo completo en memoria y solo entrega al almacén un objeto cuyo SHA-256 coincide con el declarado. Es la base de F-25 (recepción no bloqueante), la entrada de F-23 (almacén por contenido) y el instrumento de la medición de throughput de la ficha M3 (RNF-11, QA-04).
 
 ## Alcance
 
-**Incluye:** …
+**Incluye:**
 
-**No incluye:** …
+- Lógica pura de dominio: manifiesto de subida (SHA-256 total, tamaño, tamaño de chunk y número de chunks derivado), verificación del SHA-256 de cada chunk, validación de índice y tamaño, control de chunks recibidos y faltantes, y orden de reensamblado por índice.
+- Caso de uso de aplicación: iniciar subida, recibir chunk, completar subida. Al completar, recorre los chunks en orden, calcula el SHA-256 de forma incremental y, si coincide, entrega el contenido por flujo al puerto `ObjectStore` (`put(sha256, content, size)`).
+- Puerto nuevo `ChunkStaging` para el almacenamiento temporal de chunks y su adaptador en disco local, con un archivo por chunk, para no retener el archivo en RAM.
+- Rutas HTTP en `src/coordinator/rutas_archivos.py` y su `include_router` en `main.py`.
+- Cliente `scripts/subir_por_chunks.py` que lee el archivo por partes, calcula los hashes y lo sube, con tamaño de chunk configurable. Lo usan la prueba de integración y, después, la medición.
+- Tamaño de chunk configurable, con valor provisional de 4 MiB (AD-10) y un máximo aceptado por el servidor para acotar la memoria por petición.
+- Script de medición `scripts/measure/m3_chunks.py` y ficha M3 con MB/s para 256 KiB, 1 MiB, 4 MiB y 16 MiB.
+
+**No incluye:**
+
+- Deduplicación y adaptador real de MinIO (`minio_object_store.py`): es F-23. F-22 programa contra `ObjectStore` y prueba con `FakeObjectStore`.
+- Recepción `async` con escritura en hilo: es F-25. En F-22 los handlers son síncronos; FastAPI ya los ejecuta en su pool de hilos.
+- Backpressure y respuesta 503: F-24.
+- Cifrado AES-GCM del objeto: F-28 (Kenni envuelve `ObjectStore`).
+- Entrada de custodia del ingreso: F-29 (Kenni). F-22 no llama a `CustodyLog`.
+- Autenticación y TLS de las rutas: F-26 y F-27, que se aplican en `main.py` sin tocar estas rutas.
+- Asociar el objeto subido a un caso y crear sus sub-tareas: F-05.
+- Limpieza automática de subidas abandonadas: queda como pregunta abierta.
+- Reanudar una subida desde otro coordinador: el sistema tiene un solo coordinador en el Nodo A.
 
 ## Criterios de aceptación
 
-… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
+Copiados de `docs/backlog/m3-es-almacenamiento.md`, US-22:
+
+- **Dado** un archivo ≥ 200 MB dividido en chunks
+- **Cuando** se envía y reensambla
+- **Entonces** el SHA-256 coincide; un chunk alterado se rechaza
+
+- **Pruebas:** U reensamblado, alteración y orden. I subida real entre nodos.
+- **Demuestra:** prueba I. **Evidencia:** ficha M3: MB/s para ≥ 3 tamaños.
+
+Criterios adicionales derivados de los requisitos:
+
+- RF-31: un chunk cuyo SHA-256 no coincide con el declarado se rechaza con 422 y no se guarda; reenviarlo correcto se acepta.
+- RF-31: los chunks pueden llegar en cualquier orden; el objeto se reensambla por índice.
+- RF-31: completar con chunks faltantes responde 409 y lista los índices que faltan.
+- RF-31: si el SHA-256 del archivo reensamblado no coincide con el declarado, no se entrega nada al `ObjectStore` y se responde 422.
+- [B.5 M3] «archivos grandes»: el servidor nunca mantiene en memoria más de un chunk por petición; el reensamblado es por flujo.
+- AD-10: el tamaño de chunk es un parámetro, no una constante, para poder medir 256 KiB, 1 MiB, 4 MiB y 16 MiB.
 
 ## Diseño
 
-… Contratos de `docs/CONTRATOS.md` que implementa y que usa. Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+### Contratos
+
+| Contrato | Rol de F-22 | Fuente |
+|---|---|---|
+| `ObjectStore.put(sha256, content, size)` | Lo usa al completar la subida. En pruebas, `FakeObjectStore` | `src/application/ports.py`; adaptador real en F-23 |
+| `ChunkStaging` (nuevo) | Lo define e implementa | `src/application/ports.py`, `src/adapters/disk_chunk_staging.py` |
+
+`ChunkStaging` se agrega a `ports.py`, sin modificar los puertos existentes:
+
+```python
+class ChunkStaging(Protocol):
+    def save_manifest(self, upload_id: str, manifest: dict) -> None: ...
+    def load_manifest(self, upload_id: str) -> dict: ...
+    def put_chunk(self, upload_id: str, index: int, data: bytes) -> None: ...
+    def received(self, upload_id: str) -> set[int]: ...
+    def open_chunk(self, upload_id: str, index: int) -> BinaryIO: ...
+    def discard(self, upload_id: str) -> None: ...
+```
+
+Se agrega su doble `FakeChunkStaging` a `tests/dobles.py` y `comprobar_chunk_staging` a `tests/contratos.py`, que valida al doble y al adaptador en disco. Es un agregado: se avisa al equipo porque toca archivos compartidos.
+
+### Protocolo HTTP
+
+| Método y ruta | Cuerpo | Respuesta |
+|---|---|---|
+| `POST /uploads` | JSON `{sha256, size, chunk_size}` | 201 `{upload_id, chunk_count}`; 422 si `chunk_size` excede el máximo o los datos no son válidos |
+| `PUT /uploads/{id}/chunks/{index}` | Bytes del chunk; cabecera `X-Chunk-SHA256` | 204; 422 si el hash no coincide o el tamaño no corresponde al índice; 404 si la subida no existe |
+| `GET /uploads/{id}` | — | 200 `{received, missing}`, para que el cliente reenvíe |
+| `POST /uploads/{id}/complete` | — | 201 `{sha256, size}`; 409 con `missing`; 422 si el SHA-256 total no coincide |
+
+Reenviar un chunk ya recibido con el mismo hash es idempotente.
+
+### Flujo
+
+```
+cliente: sha_total = sha256(archivo); POST /uploads
+por cada índice i (en cualquier orden):
+  dato = leer(archivo, i * chunk_size, chunk_size)
+  PUT /uploads/{id}/chunks/{i}  X-Chunk-SHA256: sha256(dato)
+    dominio: validar índice y tamaño; verificar hash → ChunkRejected
+    staging.put_chunk(id, i, dato)
+POST /uploads/{id}/complete
+  dominio: faltantes(recibidos) → MissingChunks
+  hasher incremental: por i en orden, leer chunk del staging por bloques
+  si hash != sha_total → IntegrityMismatch (no se toca ObjectStore)
+  object_store.put(sha_total, flujo_ordenado, size); staging.discard(id)
+```
+
+### Capas y archivos
+
+| Capa | Archivo | Contenido | Dueño |
+|---|---|---|---|
+| Dominio | `src/domain/chunks.py` | `UploadManifest` (inmutable, `chunk_count` y `expected_size(i)`), `verify_chunk`, `missing_chunks`, excepciones `ChunkRejected`, `MissingChunks`, `IntegrityMismatch`. Solo `hashlib` de la biblioteca estándar | Melany |
+| Aplicación | `src/application/ports.py` | `ChunkStaging` (agregado) | Compartido |
+| Aplicación | `src/application/chunked_upload.py` (nuevo) | Caso de uso `ChunkedUpload(staging, object_store, max_chunk_size)`: `start`, `receive`, `status`, `complete` | Melany (archivo nuevo; ver preguntas) |
+| Adaptador | `src/adapters/disk_chunk_staging.py` (nuevo) | Un directorio por subida, un archivo por chunk escrito a temporal y renombrado de forma atómica; manifiesto en JSON | Melany (archivo nuevo) |
+| Coordinador | `src/coordinator/rutas_archivos.py` (nuevo) | Rutas de la tabla; traduce excepciones de dominio a 404, 409 y 422 | Melany |
+| Coordinador | `src/coordinator/main.py` | Un `include_router` | Compartido, una línea |
+| Scripts | `scripts/subir_por_chunks.py`, `scripts/measure/m3_chunks.py` | Cliente y medición | Melany |
+
+Decisiones que aplica: AD-10 (protocolo propio, chunk provisional de 4 MiB), SUP-13 (el chunk es solo unidad de transferencia; la dedup es por archivo, F-23), SUP-17 (el tamaño se calibra midiendo). Decisión nueva propuesta, que se registra en `docs/ARQUITECTURA.md` §8 al aprobar este plan:
+
+- **AD-28 (provisional).** Staging de chunks en disco del Nodo A, un archivo por chunk, con reensamblado por flujo hacia `ObjectStore`. Alternativas: retener los chunks en memoria; *multipart upload* de MinIO. Criterio: acota la RAM a un chunk por petición [B.5 M3] y deja el control del hash en la aplicación; *multipart* ataría F-22 al adaptador de F-23 y su ETag no es SHA-256. Costo: el archivo se escribe dos veces en disco. **Medición pendiente:** ficha M3.
+
+Código del I Proyecto que reutiliza: la aplicación FastAPI y el patrón de routers de `src/coordinator/`. `src/workers/storage.py` no se toca.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | … | … |
-| Integración | … | … |
-| Aceptación | … | … |
+| Unitaria | `test_reensamblado_coincide_con_sha256` | Un archivo en N chunks reensamblado produce el SHA-256 declarado y llega a `ObjectStore` |
+| Unitaria | `test_chunk_alterado_se_rechaza` | Un chunk con un byte cambiado lanza `ChunkRejected` y no queda en staging |
+| Unitaria | `test_chunk_fuera_de_orden_se_ordena` | Chunks recibidos en orden inverso se reensamblan por índice |
+| Unitaria | `test_completar_con_faltantes_lista_indices` | `MissingChunks` con los índices exactos |
+| Unitaria | `test_hash_total_distinto_no_guarda_objeto` | `IntegrityMismatch` y `ObjectStore` vacío |
+| Unitaria | `test_tamano_de_chunk_invalido_se_rechaza` | Índice fuera de rango, tamaño distinto al esperado y `chunk_size` sobre el máximo |
+| Unitaria | `test_reenvio_del_mismo_chunk_es_idempotente` | Reenviar no duplica ni falla |
+| Unitaria | `comprobar_chunk_staging(FakeChunkStaging())` y sobre `DiskChunkStaging(tmp_path)` | El doble y el adaptador cumplen el mismo contrato |
+| Unitaria | Rutas con `TestClient` y dobles: 201, 204, 409, 422, 404 | Traducción de errores de dominio a HTTP |
+| Integración | `tests/integration/test_subida_por_chunks.py`: uvicorn real y `scripts/subir_por_chunks.py` con un archivo sintético de 200 MiB | El SHA-256 del objeto coincide; un chunk alterado en tránsito recibe 422 |
+| Aceptación | Subida real de un archivo ≥ 200 MB desde un nodo worker al coordinador del Nodo A por Tailscale | Criterio «subida real entre nodos» de US-22 |
+
+Las unitarias no usan red, `sleep` ni reloj real; los archivos grandes solo aparecen en integración y aceptación.
 
 ## Mediciones
 
-… Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
+Throughput de M3, ficha `docs/modulo-M3-es-almacenamiento.md`, datos crudos en `docs/evidencia/`:
+
+```bash
+python scripts/measure/m3_chunks.py --file case_h1.mp4 --chunk 256K,1M,4M,16M --reps 5 --remote nodo-a
+```
+
+- Archivo ≥ 200 MB del dataset sintético (RF-22), desde un nodo worker al Nodo A.
+- 5 repeticiones por tamaño; se reporta media, desviación y el CSV crudo con tiempo total y bytes.
+- MB/s = bytes / tiempo total desde `POST /uploads` hasta la respuesta de `complete`, y por separado el tiempo de `complete` (reensamblado y hash).
+- Se repite cuando entre TLS (F-27), según `docs/IMPLEMENTACION.md` §5.
+- El tamaño elegido con estos datos reemplaza el provisional de AD-10.
+
+Requiere los nodos reales: la hace Melany; la IA no estima ningún dato.
 
 ## Plan de pila
 
@@ -41,11 +161,19 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-22): …` | … |
+| 1 | `feat(F-22): reensamblar chunks verificados por sha-256` | `src/domain/chunks.py`, puerto `ChunkStaging`, `src/application/chunked_upload.py`, `src/adapters/disk_chunk_staging.py`, doble y conformidad. Estimado: ~280 líneas |
+| 2 | `feat(F-22): recibir archivos por chunks en la api` | `src/coordinator/rutas_archivos.py`, `include_router`, `scripts/subir_por_chunks.py`, prueba de integración. Estimado: ~220 líneas |
+| 3 | `docs(F-22): medir throughput por tamano de chunk` | `scripts/measure/m3_chunks.py`, ficha M3 con datos medidos entre nodos, AD-10 actualizado |
 
 ## Riesgos y preguntas abiertas
 
-… Lo que la persona que aprueba debe decidir.
+1. **Archivos nuevos fuera de la tabla de dueños.** `docs/CONTRATOS.md` asigna a Melany `rutas_archivos.py`, `chunks.py` y `minio_object_store.py`. Este plan agrega `src/application/chunked_upload.py` y `src/adapters/disk_chunk_staging.py`. ¿Se aprueban y se agregan a la tabla?
+2. **Puerto compartido.** Agregar `ChunkStaging` a `ports.py` y su doble obliga a avisar al equipo. ¿Se hace en esta misma PR (parte 1) o en una PR aparte solo con el contrato, como sugiere `CONTRATOS.md`?
+3. **Tamaño máximo de chunk aceptado.** Propuesta: 64 MiB, para acotar la memoria por petición y permitir medir 16 MiB con margen.
+4. **Subidas abandonadas.** Quedan en disco hasta un `DELETE` o reinicio manual. ¿Se acepta para el alcance, o se agrega una expiración (por ejemplo 24 h) en una parte posterior?
+5. **Ubicación del staging.** Un volumen del Compose del Nodo A (`deploy/` es de Kenni). Hay que coordinar con él la línea del volumen.
+6. **Doble escritura en disco** (staging y luego MinIO): puede bajar el throughput medido. Se reporta en la ficha; si pesa demasiado, se revisa AD-28.
+7. **Prueba entre nodos** depende de que F-38 (despliegue en tres nodos) esté disponible.
 
 ## Aprobaciones
 
