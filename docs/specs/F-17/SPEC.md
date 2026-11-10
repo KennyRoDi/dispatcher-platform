@@ -1,6 +1,6 @@
 # SPEC F-17: Control de admisión
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-16-2-limites-por-worker
 **Verificación IA:** revision 670a461
 **Historia:** US-17 · **Requisitos:** RF-25 · **Responsable:** J
@@ -82,3 +82,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | git diff --stat | 2026-11-10 | Documentación por subagente haiku: AD-30 en ARQUITECTURA, ficha M1 con medición pendiente y variables obligatorias en WORKER_CONTRACT; 3 archivos, 21 líneas, sin código (1d55da4) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | revision (misma sesión, no independiente) | 2026-11-10 | Revisión del diff contra el SPEC: APROBADO. 69 pruebas en verde, capas respetadas, sin llaves ni datos reales. Observaciones no bloqueantes: CGROUP_PATH nuevo sin documentar (worker_node.py:406); con WORKER_CONCURRENCY>1 los hilos pueden pasar la compuerta a la vez (worker_node.py:189); memory.max=max nunca admite (ya en AD-30) (670a461) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
