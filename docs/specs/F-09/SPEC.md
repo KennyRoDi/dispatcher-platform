@@ -180,7 +180,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 |---|---|---|
 | 1 | `feat(F-09): analizar transcripciones como texto con timestamps` | `src/domain/transcription.py`, `src/application/analyze_audio.py`, `src/adapters/audio_analyzer.py`, refactor de posiciones en `src/application/analyze_text.py` y de `cargar_ajustes_de_texto` en `src/adapters/text_analyzer.py`, y pruebas unitarias con transcriptor y modelos falsos. Unas 150 líneas fuera de `tests/` y `docs/`. Base `main`. **No cierra la feature** |
 | 2 | `feat(F-09): transcribir con faster-whisper` | `src/adapters/whisper_transcriber.py`, `config/audio.toml`, `requirements-audio.txt`, cita de faster-whisper y Whisper con su licencia MIT en el código y la documentación, prueba de integración. Unas 100 líneas |
-| 3 | `test(F-09): comparar transcripción con la esperada` | `scripts/comparar_transcripcion.py` con el WER, prueba de aceptación, muestra con `transcripciones.json` y evidencia `docs/evidencia/F-09_transcripcion_<fecha>.md`. Unas 110 líneas sin contar los audios. Cierra con `cierre --final` |
+| 3 | `test(F-09): comparar transcripción con la esperada` | `scripts/comparar_transcripcion.py` con el WER (273 líneas, más de las 110 estimadas por los errores de entorno y la lectura de esperadas), prueba de aceptación, prueba de errores reales de PyAV, muestra con `transcripciones.json`, `av==18.1.0` en `requirements-audio.txt` y evidencia `docs/evidencia/F-09_transcripcion_2026-11-10.md`. Cierra con `cierre --final` |
 
 ## Riesgos y preguntas abiertas
 
@@ -229,16 +229,17 @@ Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 
 
 ### Pendientes tras la parte 3
 
-La parte 3 entrega el script, las pruebas y la muestra, pero el modelo real nunca se ejecutó: no existe `docs/evidencia/F-09_transcripcion_<fecha>.md`, no hay WER medido y US-09 no está cumplida.
+La corrida real se hizo el 2026-11-10 y su evidencia está en `docs/evidencia/F-09_transcripcion_2026-11-10.md`. Quedaron resueltos: la corrida con el modelo real, la asignación de guiones a las notas neutras (confirmada por la transcripción), las excepciones reales de PyAV (3 pruebas de integración pasan) y el tope de `av==18.1.0`. Sigue pendiente:
 
-- Instalar faster-whisper y los pesos (con autorización de José Andrés) y ejecutar con el modelo real la integración, la aceptación y `scripts/comparar_transcripcion.py`, y guardar la evidencia.
-- Confirmar la asignación de guiones a las 3 notas neutras: se asignó por orden de grabación sin oír el audio, y su procedencia dice «la transcripción real lo confirma», escrito antes de medir. Si la transcripción no coincide, hay que corregir `transcripciones.json`.
+- Python 3.13, que fija AD-22, sigue sin probarse; la corrida usó Python 3.14.
 - 4 de las 5 notas duran entre 4,26 y 4,94 s, menos de los 5 s que pide este SPEC.
 - La comparación no normaliza números: «5» y «cinco» cuentan como error.
-- Los duplicados de nombre que solo difieren en mayúsculas no se detectan.
-- La sección Límites de la tabla es texto fijo y no analiza los fallos de la corrida.
-- Un fallo en la nota N pierde toda la corrida, sin evidencia parcial.
-- Python 3.13 sigue sin probarse, y los 100 códigos de idioma son una copia estática (ver arriba).
+- La sección Límites de la tabla es texto fijo.
+- Un fallo en la nota N pierde toda la corrida.
+- Los 100 códigos de `IDIOMAS_DE_WHISPER` son una copia estática de faster-whisper v1.2.1.
+- Un tono sostenido genera un segmento `...`, que el adaptador acepta como transcripción; descartar los segmentos sin letras es una posible mejora, no hecha.
+- La licencia CC BY 4.0 de la muestra la propuso la IA y José Andrés no la ha confirmado explícitamente.
+- Los nombres `WhatsApp Ptt ...` de las 3 notas neutras llevan la hora de grabación; renombrarlos a `neutra_0N` queda pendiente de decisión de la persona.
 
 ## Aprobaciones
 
