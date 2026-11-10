@@ -24,6 +24,12 @@ def test_preflight_acepta_limite_dentro_del_presupuesto():
     validate_config(_config(), node_memory=16 * 1024**3)
 
 
+def test_preflight_acepta_limites_normalizados_como_bytes_por_compose():
+    config = _config(memory="4294967296", swap="4294967296")
+
+    validate_config(config, node_memory=16 * 1024**3)
+
+
 def test_preflight_acepta_node_ip_ipv6():
     config = _config()
     config["services"]["worker"]["environment"]["NODE_IP"] = "fd7a:115c:a1e0::1"
@@ -36,6 +42,9 @@ def test_preflight_acepta_node_ip_ipv6():
     [
         (_config(memory=None), 16 * 1024**3),
         (_config(memory=4 * 1024**3, swap=8 * 1024**3), 16 * 1024**3),
+        (_config(memory="unknown"), 16 * 1024**3),
+        (_config(memory="-1"), 16 * 1024**3),
+        (_config(memory="4294967296", swap="8589934592"), 16 * 1024**3),
         (_config(), 4 * 1024**3),
         ({"services": {"worker": {"environment": {"NODE_IP": "100.64.0.2"}}}}, 16 * 1024**3),
         ({"services": {"worker": {"hostname": "node-b", "mem_limit": 1}}}, 16 * 1024**3),
