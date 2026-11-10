@@ -469,3 +469,43 @@ def test_muestra_del_repositorio_declara_procedencia_y_licencia_con_notas_neutra
     assert len(notas) >= 5
     assert any("amenaza" in n.archivo.lower() for n in notas)
     assert any("amenaza" not in n.archivo.lower() for n in notas)
+
+
+def test_la_enie_no_se_confunde_con_la_n_en_el_wer():
+    assert normalizar("Año") == "año"
+    assert tasa_de_error_por_palabra("el año", "el ano") == 0.5
+
+
+def test_enie_descompuesta_en_n_y_tilde_combinante_se_normaliza_como_enie():
+    # Un JSON escrito en macOS puede traer la ñ en NFD; hoy se pierde y "año" da "ano".
+    assert normalizar("an\u0303o") == "año"
+
+
+def test_main_sin_metadatos_de_la_biblioteca_falla_con_error_y_codigo_1_sin_traceback(muestra, tmp_path, monkeypatch, capsys):
+    from importlib import metadata
+
+    def sin_paquete(nombre):
+        raise metadata.PackageNotFoundError(nombre)
+
+    monkeypatch.setattr(metadata, "version", sin_paquete)
+    salida = tmp_path / "r.md"
+
+    resultado = main(
+        argumentos(muestra, esperadas_de_muestra(muestra), salida),
+        transcriptor=transcriptor_de_ejemplo(),
+        modelos=modelos_de_ejemplo(),
+    )
+
+    assert resultado == 1
+    assert capsys.readouterr().err.startswith("error:")
+
+
+def test_main_sin_faster_whisper_instalado_falla_con_error_y_codigo_1_sin_traceback(muestra, tmp_path, monkeypatch, capsys):
+    monkeypatch.setitem(__import__("sys").modules, "faster_whisper", None)
+    salida = tmp_path / "r.md"
+
+    resultado = main(argumentos(muestra, esperadas_de_muestra(muestra), salida), modelos=modelos_de_ejemplo(), versiones=VERSIONES)
+
+    assert resultado == 1
+    assert capsys.readouterr().err.startswith("error:")
+    assert not salida.exists()
