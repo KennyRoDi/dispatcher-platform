@@ -8,7 +8,6 @@ from src.domain.dataset_plan import MIN_HEAVY_BYTES
 from tests.unit.test_dataset_sintetico import FakeRunner, REDUCED, _guardar, _rows, reduced  # noqa: F401
 
 
-@pytest.mark.xfail(strict=True, reason="QA parte 5: el validador cuenta filas, no rutas; filas duplicadas inflan los minimos")
 def test_validar_no_cuenta_dos_veces_la_misma_ruta(reduced):  # noqa: F811
     rows = _rows(reduced)
     _guardar(reduced, rows + [r for r in rows if r["kind"] == "imagen"] * 10)
@@ -18,7 +17,6 @@ def test_validar_no_cuenta_dos_veces_la_misma_ruta(reduced):  # noqa: F811
     assert any("imagenes: 60 de al menos 300" in p or "duplicad" in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA parte 5: el validador no comprueba los tipos de cada caso heterogeneo")
 def test_validar_reporta_un_heterogeneo_liviano_sin_todos_los_tipos(reduced):  # noqa: F811
     rows = _rows(reduced)
     victima = next(r["case"] for r in rows if r["heterogeneo"] == "liviano")
@@ -29,7 +27,6 @@ def test_validar_reporta_un_heterogeneo_liviano_sin_todos_los_tipos(reduced):  #
     assert any(victima in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA parte 5: un archivo de 200 MiB en un caso no heterogeneo cuenta como caso pesado")
 def test_validar_no_cuenta_como_pesado_un_caso_no_heterogeneo(reduced):  # noqa: F811
     rows = _rows(reduced)
     fila = next(r for r in rows if r["heterogeneo"] == "no")
@@ -45,7 +42,6 @@ def test_validar_no_cuenta_como_pesado_un_caso_no_heterogeneo(reduced):  # noqa:
     assert "casos pesados de al menos 200 MiB: 0 de al menos 5" in problemas
 
 
-@pytest.mark.xfail(strict=True, reason="QA parte 5: manifiesto corrupto o incompleto da traza en vez de un problema reportado")
 @pytest.mark.parametrize("contenido", ['[{"case": "caso-01"', '[{"case": "caso-01", "path": "x"}]'])
 def test_validar_reporta_un_manifiesto_corrupto_sin_traza(tmp_path, capsys, contenido):
     (tmp_path / MANIFEST_NAME).write_text(contenido, encoding="utf-8")
@@ -54,7 +50,6 @@ def test_validar_reporta_un_manifiesto_corrupto_sin_traza(tmp_path, capsys, cont
     assert capsys.readouterr().out.strip()
 
 
-@pytest.mark.xfail(strict=True, reason="QA parte 5: la CLI acepta parametros negativos o cero y sale 0 con un dataset vacio")
 def test_la_cli_rechaza_parametros_negativos(tmp_path):
     params = tmp_path / "p.json"
     params.write_text(json.dumps({**REDUCED, "messages": -5, "images": -3}), encoding="utf-8")

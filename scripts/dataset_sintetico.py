@@ -1,4 +1,5 @@
 import argparse
+import dataclasses
 import json
 import re
 import sys
@@ -22,6 +23,25 @@ from src.domain.dataset_plan import (
 )
 
 MANIFEST_NAME = "manifest.json"
+MANIFEST_FIELDS = (
+    "case",
+    "kind",
+    "path",
+    "bytes",
+    "sha256",
+    "origen",
+    "licencia",
+    "semilla",
+    "etiqueta",
+    "heterogeneo",
+    "categoria",
+    "positivo",
+    "duracion_s",
+)
+REQUIRED_KINDS = {
+    Level.LIGHT.value: ("texto", "imagen", "audio", "documento"),
+    Level.HEAVY.value: ("texto", "imagen", "audio", "video"),
+}
 CHATS_DIR = "chats"
 DEFAULT_OUT = "~/scratch/dataset"
 MIN_CASES = 40
@@ -62,9 +82,43 @@ def build_manifest(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg
 
 def validate_manifest(manifest_path: Path) -> list[str]:
     root = manifest_path.parent
-    rows = json.loads(manifest_path.read_text(encoding="utf-8"))
-    problems = [p for row in rows for p in _check_row(row, root)]
-    return problems + _check_minimums(rows, root) + _check_declared_labels(rows)
+    try:
+        raw = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return [f"{manifest_path.name}: manifiesto ilegible: {error}"]
+    if not isinstance(raw, list):
+        return [f"{manifest_path.name}: se esperaba una lista de filas"]
+    rows, problems = _usable_rows(raw)
+    problems += [p for row in rows for p in _check_row(row, root)]
+    minimums, message_problems = _check_minimums(rows, root)
+    return problems + minimums + message_problems + _check_kinds(rows) + _check_declared_labels(rows)
+
+
+def _usable_rows(raw: list) -> tuple[list[dict], list[str]]:
+    rows, problems, seen = [], [], set()
+    for index, row in enumerate(raw):
+        defect = _row_defect(row)
+        if defect:
+            problems.append(f"fila {index}: {defect}")
+        elif row["path"] in seen:
+            problems.append(f"{row['path']}: fila duplicada")
+        else:
+            seen.add(row["path"])
+            rows.append(row)
+    return rows, problems
+
+
+def _row_defect(row) -> str | None:
+    if not isinstance(row, dict):
+        return "no es un objeto"
+    missing = [name for name in MANIFEST_FIELDS if name not in row]
+    if missing:
+        return f"faltan campos {missing}"
+    if not isinstance(row["path"], str) or Path(row["path"]).is_absolute() or ".." in Path(row["path"]).parts:
+        return f"ruta invalida {row['path']!r}"
+    if not all(value is None or isinstance(value, (str, int, float)) for value in row.values()):
+        return "hay valores que no son escalares"
+    return None
 
 
 def _check_row(row: dict, root: Path) -> list[str]:
@@ -83,33 +137,53 @@ def _check_row(row: dict, root: Path) -> list[str]:
     return problems
 
 
-def _check_minimums(rows: list[dict], root: Path) -> list[str]:
+def _check_minimums(rows: list[dict], root: Path) -> tuple[list[str], list[str]]:
     cases = {r["case"] for r in rows}
     by_level = {level.value: {r["case"] for r in rows if r["heterogeneo"] == level.value} for level in Level}
-    heavy_files = {r["case"] for r in rows if r["bytes"] >= MIN_HEAVY_BYTES}
+    heavy_files = {r["case"] for r in rows if r["bytes"] >= MIN_HEAVY_BYTES and r["heterogeneo"] == Level.HEAVY.value}
     heterogeneous = by_level[Level.LIGHT.value] | by_level[Level.HEAVY.value]
     durations = {r["duracion_s"] for r in rows if r["kind"] == "audio"}
+    messages, message_problems = _count_messages(rows, root)
     checks = [
         (len(cases), MIN_CASES, "casos"),
         (len(heterogeneous), MIN_HETEROGENEOUS, "casos heterogeneos"),
         (len(by_level[Level.LIGHT.value]), MIN_LIGHT, "casos heterogeneos livianos"),
         (len(by_level[Level.HEAVY.value]), MIN_HEAVY, "casos heterogeneos pesados"),
         (len(heavy_files), MIN_HEAVY, "casos pesados de al menos 200 MiB"),
-        (sum(_count_messages(root / r["path"]) for r in rows if r["kind"] == "texto"), MIN_MESSAGES, "mensajes"),
+        (messages, MIN_MESSAGES, "mensajes"),
         (sum(r["kind"] == "imagen" for r in rows), MIN_IMAGES, "imagenes"),
         (sum(r["kind"] == "audio" for r in rows), MIN_AUDIOS, "audios"),
         (len(durations), MIN_DISTINCT_DURATIONS, "duraciones de audio distintas"),
     ]
-    return [f"{label}: {found} de al menos {minimum}" for found, minimum, label in checks if found < minimum]
+    return [f"{label}: {found} de al menos {minimum}" for found, minimum, label in checks if found < minimum], message_problems
 
 
-def _count_messages(path: Path) -> int:
-    if not path.is_file():
-        return 0
+def _count_messages(rows: list[dict], root: Path) -> tuple[int, list[str]]:
+    total, problems = 0, []
+    for row in (r for r in rows if r["kind"] == "texto" and (root / r["path"]).is_file()):
+        try:
+            total += _messages_in(root / row["path"])
+        except (ValueError, KeyError, TypeError) as error:
+            problems.append(f"{row['path']}: no se pudieron contar los mensajes ({type(error).__name__}: {error})")
+    return total, problems
+
+
+def _messages_in(path: Path) -> int:
     text = path.read_text(encoding="utf-8")
     if path.suffix == ".json":
         return len(json.loads(text)["messages"])
     return len(WHATSAPP_HEADER.findall(text))
+
+
+def _check_kinds(rows: list[dict]) -> list[str]:
+    problems = []
+    for level, required in REQUIRED_KINDS.items():
+        for case in sorted({r["case"] for r in rows if r["heterogeneo"] == level}):
+            present = {r["kind"] for r in rows if r["case"] == case}
+            missing = [kind for kind in required if kind not in present]
+            if missing:
+                problems.append(f"{case}: caso heterogeneo {level} sin los tipos {', '.join(missing)}")
+    return problems
 
 
 def _check_declared_labels(rows: list[dict]) -> list[str]:
@@ -122,15 +196,38 @@ def _check_declared_labels(rows: list[dict]) -> list[str]:
 
 
 def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = run_ffmpeg) -> int:
-    args = _parser().parse_args(argv)
+    parser = _parser()
+    args = parser.parse_args(argv)
     out = Path(args.out).expanduser()
     if args.validar:
         return _validate(out)
-    params = DatasetParams(**json.loads(Path(args.params).read_text(encoding="utf-8"))) if args.params else DatasetParams()
+    try:
+        params = _load_params(args.params)
+    except ValueError as error:
+        parser.error(f"--params: {error}")
     rows = build_manifest(plan_dataset(args.seed, params), out, runner)
     (out / MANIFEST_NAME).write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"{len(rows)} archivos en {out}")
     return 0
+
+
+def _load_params(path: str | None) -> DatasetParams:
+    if path is None:
+        return DatasetParams()
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    except OSError as error:
+        raise ValueError(f"no se pudo leer {path}: {error.strerror}") from error
+    names = {field.name for field in dataclasses.fields(DatasetParams)}
+    if not isinstance(raw, dict) or not set(raw) <= names:
+        raise ValueError(f"se esperaba un objeto con las claves {sorted(names)}")
+    for name, value in raw.items():
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError(f"{name} debe ser un entero no negativo, no {value!r}")
+    params = DatasetParams(**raw)
+    if params.cases < 1:
+        raise ValueError("cases debe ser al menos 1")
+    return params
 
 
 def _validate(out: Path) -> int:
