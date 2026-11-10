@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-03-2-dataset-sintetico
-**Verificación IA:** implementacion 13fcffa
+**Verificación IA:** verificacion 9e5e007
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -141,3 +141,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA B1: con ffmpeg real la misma semilla no produce los mismos bytes (anoisesrc sin seed, ogg con serial aleatorio); el SPEC exige hashes de contenido reproducibles |
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Corrección de B1 verificada: pytest unitario 785 passed, 3 skipped, 10 xfailed sin XPASS; prueba de integración con ffmpeg real 2 passed. Generé dos veces el mismo plan con distinto PYTHONHASHSEED y ffmpeg real: mismo hash de bytes (b677f4a1a244c3bd, 18 archivos). Solo cambió src/adapters/media_generator.py (+6/-2), pruebas intactas, commit empujado. (13fcffa) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Segunda ronda QA: APROBADO, B1 resuelto. Reejecuté pytest unitario: 785 passed, 3 skipped, 10 xfailed sin XPASS. QA generó el plan completo (450 archivos) dos veces con ffmpeg real y distinto PYTHONHASHSEED: los 450 sha256 coinciden; semilla distinta da contenido distinto. ffprobe: duraciones y códecs correctos tras bitexact. Sin hallazgos nuevos bloqueantes; observación: colisiones de imágenes por color en rango pequeño. src/ intacto, árbol limpio. (9e5e007) |
