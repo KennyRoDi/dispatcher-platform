@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-09-2-worker-de-audio
-**Verificación IA:** implementacion 687daa8
+**Verificación IA:** implementacion 102c0e1
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -279,3 +279,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé scripts/comparar_transcripcion.py completo y la muestra aportada por José Andrés (commit 687daa8). pytest -q -m 'not integration and not acceptance': 1250 passed, sin fallos; test_muestra_del_repositorio ya pasa con 5 notas, 2 de amenaza y 3 neutras, todas en Opus. Las pruebas no se tocaron desde 3127c0f. Las dos notas de amenaza se asignaron por nombre, que coincide con el guion. Las tres neutras se asignaron a su guion por orden de grabación, un supuesto que José Andrés aceptó y que solo la transcripción real puede confirmar. Observaciones para QA: main no captura ImportError ni PackageNotFoundError, y la sección Límites afirma sin leerlo de los datos que las notas de amenaza son guiones sintéticos. Sin comprobar: nada se ejecutó con modelo ni PyAV reales. (687daa8) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | QA: main no captura ImportError ni PackageNotFoundError (traceback y pierde la transcripcion); normalizar pierde la n con tilde combinante en n descompuesta |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé 5e159c4, 3bf4115 y 102c0e1 completos. H1: normalizar aplica NFC antes de procesar. H2: las versiones se resuelven antes de transcribir y se convierten en ValueError; la falta de faster-whisper y la de spacy o transformers dan error: y código 1, capturando solo ImportError. El segundo caso, spacy y transformers, lo encontré yo reproduciéndolo; QA no lo había marcado. Las pruebas existentes no se modificaron; solo se agregó tests/unit/test_comparar_transcripcion_entorno.py. pytest -q -m 'not integration and not acceptance': 1255 passed. Sin comprobar: nada se ejecutó con modelo ni PyAV reales. Pendientes de la persona: H6, la frase sobre la confirmación de la transcripción en la procedencia de las tres notas neutras, y H4, la duración menor de 5 s. (102c0e1) |
