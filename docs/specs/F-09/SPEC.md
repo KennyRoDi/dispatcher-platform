@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** verificacion 6dadc88
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -282,3 +282,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé 5e159c4, 3bf4115 y 102c0e1 completos. H1: normalizar aplica NFC antes de procesar. H2: las versiones se resuelven antes de transcribir y se convierten en ValueError; la falta de faster-whisper y la de spacy o transformers dan error: y código 1, capturando solo ImportError. El segundo caso, spacy y transformers, lo encontré yo reproduciéndolo; QA no lo había marcado. Las pruebas existentes no se modificaron; solo se agregó tests/unit/test_comparar_transcripcion_entorno.py. pytest -q -m 'not integration and not acceptance': 1255 passed. Sin comprobar: nada se ejecutó con modelo ni PyAV reales. Pendientes de la persona: H6, la frase sobre la confirmación de la transcripción en la procedencia de las tres notas neutras, y H4, la duración menor de 5 s. (102c0e1) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-10 | QA re-verificó la parte 3 y dio APROBADO. Hizo mutaciones sobre lo nuevo: de 9, 4 sobrevivían y ahora las detectan 4 pruebas nuevas en 6dadc88, solo en tests/. Cubrió también el orden de validaciones, que nada se escribe si falla un paso previo, y que NFC no cambia el WER de textos ya compuestos. Repetí yo una mutación, cambiar PackageNotFoundError por KeyError: fallan 2 pruebas. La revertí y git status quedó limpio. pytest -q -m 'not integration and not acceptance': 1259 passed. La muestra no cambió desde 5093675. Pendientes sin cambio: H4, H6, H5 y H3 como observaciones; y la ejecución real con faster-whisper, que sigue sin hacerse. (6dadc88) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
