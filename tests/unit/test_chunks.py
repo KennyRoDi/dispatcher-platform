@@ -324,3 +324,19 @@ def test_completar_entrega_por_flujo_un_chunk_abierto_a_la_vez_y_los_cierra():
     assert almacen.objetos[sha(datos)] == datos
     assert staging.max_abiertos == 1
     assert staging.abiertos == 0
+
+
+class _AlmacenQueLeeSoloSize(FakeObjectStore):
+    def put(self, sha256, content, size):
+        self.objetos[sha256] = content.read(size)
+
+
+def test_hash_total_distinto_se_detecta_aunque_el_almacen_no_lea_hasta_el_final():
+    almacen = _AlmacenQueLeeSoloSize()
+    caso = ChunkedUpload(FakeChunkStaging(), almacen, max_chunk_size=64)
+    upload_id, _ = iniciar(caso, b"abcdefgh")
+    for indice, parte in enumerate(partir(b"zzzzzzzz")):
+        caso.receive(upload_id, indice, parte, sha(parte))
+    with pytest.raises(IntegrityMismatch):
+        caso.complete(upload_id)
+    assert almacen.objetos == {}

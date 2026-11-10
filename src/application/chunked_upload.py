@@ -44,8 +44,6 @@ class ChunkedUpload:
         faltantes = missing_chunks(manifest, self._staging.received(upload_id))
         if faltantes:
             raise MissingChunks(faltantes)
-        if self._sha256_reensamblado(upload_id, manifest) != manifest.sha256:
-            raise IntegrityMismatch(f"el sha256 de la subida {upload_id} no coincide con el declarado")
         with self._flujo(upload_id, manifest) as flujo:
             self._object_store.put(manifest.sha256, flujo, manifest.size)
         self._staging.discard(upload_id)
@@ -57,28 +55,44 @@ class ChunkedUpload:
         except KeyError:
             raise UploadNotFound(upload_id) from None
 
-    def _sha256_reensamblado(self, upload_id: str, manifest: UploadManifest) -> str:
-        resumen = hashlib.sha256()
-        with self._flujo(upload_id, manifest) as flujo:
-            while bloque := flujo.read(BLOQUE_LECTURA):
-                resumen.update(bloque)
-        return resumen.hexdigest()
-
     def _flujo(self, upload_id: str, manifest: UploadManifest) -> io.BufferedReader:
-        return io.BufferedReader(_ChunksEnOrden(self._staging, upload_id, manifest.chunk_count), BLOQUE_LECTURA)
+        return io.BufferedReader(_ChunksVerificados(self._staging, upload_id, manifest), BLOQUE_LECTURA)
 
 
-class _ChunksEnOrden(io.RawIOBase):
-    """Une los chunks por índice abriendo uno a la vez, para no cargar el archivo en memoria."""
+class _ChunksVerificados(io.RawIOBase):
+    """Une los chunks por índice abriendo uno a la vez, para no cargar el archivo en memoria.
 
-    def __init__(self, staging: ChunkStaging, upload_id: str, chunk_count: int) -> None:
-        self._pendientes = (staging.open_chunk(upload_id, i) for i in range(chunk_count))
+    El staging se lee una sola vez y el SHA-256 se calcula sobre los mismos bytes que recibe
+    `ObjectStore`: un chunk reemplazado por un `receive` concurrente no puede colarse entre el
+    cálculo del hash y la entrega. La verificación ocurre antes de soltar el último byte, así
+    que ante una discrepancia `put` termina con `IntegrityMismatch` sin haber leído el objeto
+    completo.
+    """
+
+    def __init__(self, staging: ChunkStaging, upload_id: str, manifest: UploadManifest) -> None:
+        self._pendientes = (staging.open_chunk(upload_id, i) for i in range(manifest.chunk_count))
         self._actual = None
+        self._upload_id = upload_id
+        self._manifest = manifest
+        self._resumen = hashlib.sha256()
+        self._entregados = 0
 
     def readable(self) -> bool:
         return True
 
     def readinto(self, buffer) -> int:
+        leidos = self._leer_en(buffer)
+        self._resumen.update(memoryview(buffer)[:leidos])
+        self._entregados += leidos
+        if leidos == 0 or self._entregados >= self._manifest.size:
+            self._verificar()
+        return leidos
+
+    def _verificar(self) -> None:
+        if self._entregados != self._manifest.size or self._resumen.hexdigest() != self._manifest.sha256:
+            raise IntegrityMismatch(f"el sha256 de la subida {self._upload_id} no coincide con el declarado")
+
+    def _leer_en(self, buffer) -> int:
         while True:
             if self._actual is None:
                 self._actual = next(self._pendientes, None)
