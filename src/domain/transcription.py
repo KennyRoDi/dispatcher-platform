@@ -1,3 +1,4 @@
+import math
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -19,7 +20,7 @@ class TranscriptSegment:
     confianza: float
 
     def __post_init__(self) -> None:
-        if not 0 <= self.inicio <= self.fin:
+        if not (math.isfinite(self.inicio) and math.isfinite(self.fin) and 0 <= self.inicio <= self.fin):
             raise ValueError(f"tiempos de segmento inválidos: inicio={self.inicio}, fin={self.fin}")
         object.__setattr__(self, "confianza", umbral_valido(self.confianza, "confianza"))
         object.__setattr__(self, "texto", self.texto.strip())
