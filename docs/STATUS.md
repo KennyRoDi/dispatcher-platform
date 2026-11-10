@@ -24,7 +24,7 @@
 | F-19 | pendiente |
 | F-20 | pendiente |
 | F-21 | pendiente |
-| F-22 | implementacion |
+| F-22 | verificacion |
 | F-23 | pendiente |
 | F-24 | pendiente |
 | F-25 | pendiente |
