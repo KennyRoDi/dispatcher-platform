@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** revision afd7484
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
