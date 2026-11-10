@@ -401,3 +401,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Verificación IA de cada fase y aprobación humana explícita. Pruebas unitarias 788 passed, 3 skipped, 10 xfailed sin XPASS; integración con ffmpeg real 2 passed. |
 | Cómo se validó | El QA ejecutó ffmpeg real y comparó hashes entre corridas con distinto PYTHONHASHSEED: 450 sha256 idénticos con la misma semilla. Con ffmpeg real: 160 de 160 png y 140 de 140 jpg únicos. El orquestador reejecutó pytest en cada fase. Quedan 2 xfail abiertos de media_generator: un archivo previo oculta un ejecutor que no produjo nada, y el reparto de formatos se reinicia por caso. Decisiones de la persona: licencia provisional 'generado por el equipo, uso academico' (el repo no tiene LICENSE) y ampliar la variación de color; ajuste del SPEC a etiqueta neutro en vez de negativo (555c21d). |
 | Error de la IA | QA: las imágenes colisionaban (160 png daban 102 hashes únicos y 140 jpg daban 92) por color en rango pequeño; corregido en b846164 a petición de la persona, y una línea de una prueba de QA pasó de gris puro a dispersión de canales <= 16. |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: presupuesto, Compose y arranque (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador y developer) |
+| Componente | M1, F-16 parte 2: presupuesto, Compose y arranque |
+| Propósito | Aplicar el presupuesto al arranque sin inventar límites por worker ni confundir pruebas con mediciones de SO |
+| Consulta resumida | Implementar preflight y wrapper CPU/GPU, validar hostname, dirección IP, límites configurados y reserva derivada de memoria WSL2 antes de compose up |
+| Resultado obtenido | scripts/preflight.py y scripts/start_worker.py; WORKER_MEM_LIMIT obligatorio como mem_limit y memswap_limit; SUP-24 provisional; suite informada: 1149 passed, 2 skipped, 3 deselected |
+| Validado / corregido / descartado | QA halló que NODE_IP aceptaba texto no IP; se corrigió con ipaddress.ip_address y pruebas IPv4/IPv6. WORKER_MEM_LIMIT queda pendiente de medición por nodo. No se ejecutó Docker/Compose real ni se midieron nodos; no hubo reutilización del I Proyecto. |
+| Cómo se validó | QA-parte-2.md documenta cobertura estática y que su intento de suite no inició; el orquestador informó 11 pruebas focalizadas y suite completa 1149/2/3. No se afirma medición de SO ni ejecución Compose. |
+| Error de la IA | La implementación inicial aceptaba NODE_IP con cualquier texto no vacío. QA detectó el error; se corrigió validando IPv4/IPv6 con ipaddress.ip_address y agregando pruebas de IPv6 válido y texto inválido. |
