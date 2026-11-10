@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 1a5e7f8
+**Verificación IA:** documentacion db9617c
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -232,3 +232,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-09 | QA en 2 rondas. La 1.ª devolvió la fase porque TranscriptSegment aceptaba tiempos infinitos; se corrigió en f0ce6dc. La 2.ª da APROBADO. QA probó 17 mutaciones y las pruebas detectaron 16; la restante (transcribir antes del hash) quedó cubierta con una prueba nueva. Comprobé yo: pytest -q -m 'not integration and not acceptance' da 832 passed; reproduje la mutación sin isfinite (2 failed en test_transcription) y la revertí; git status limpio. Mediciones: no aplica según el SPEC. La integración y la aceptación con el modelo real quedan para las partes 2 y 3. (1a5e7f8) |
 | verificacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de db9617c. AD-28 pasa a provisional y describe lo implementado en la parte 1, que coincide con src/ (isfinite, renumeración, formatos de posición, lista vacía sin voz). En CONTRATOS se agregaron transcription.py y analyze_audio.py a los dueños; la tabla de capas está actualizada. En el SPEC quedan los pendientes de QA para la parte 2, iguales a sus informes. El borrador de bitácora coincide con los hashes 63f9d3c, f0ce6dc y ff2b22e y con 832 passed. No hay ficha porque no es M1 a M5. No quedan cambios sin commit. (db9617c) |
