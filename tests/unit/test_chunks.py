@@ -220,3 +220,74 @@ def test_reensamblado_en_disco_de_extremo_a_extremo(tmp_path):
     caso.complete(upload_id)
     assert almacen.open(sha(datos)).read() == datos
     assert list(tmp_path.iterdir()) == []
+
+
+def test_indice_igual_a_la_cantidad_de_chunks_se_rechaza_aunque_venga_vacio():
+    caso, _ = subida()
+    upload_id, cantidad = iniciar(caso, b"abcdefgh")
+    with pytest.raises(ChunkRejected):
+        caso.receive(upload_id, cantidad, b"", sha(b""))
+    assert caso.status(upload_id) == ([], [0, 1])
+
+
+def test_indice_booleano_se_rechaza():
+    manifiesto = UploadManifest(sha(b"abcd"), 4, 4)
+    with pytest.raises(ChunkRejected):
+        verify_chunk(manifiesto, False, b"abcd", sha(b"abcd"))
+
+
+class _ArchivoVigilado(io.BytesIO):
+    def __init__(self, datos, staging):
+        super().__init__(datos)
+        self._staging = staging
+        staging.abiertos += 1
+        staging.max_abiertos = max(staging.max_abiertos, staging.abiertos)
+
+    def close(self):
+        if not self.closed:
+            self._staging.abiertos -= 1
+        super().close()
+
+
+class _StagingVigilado(FakeChunkStaging):
+    def __init__(self):
+        super().__init__()
+        self.abiertos = 0
+        self.max_abiertos = 0
+        self.aperturas = 0
+        self.archivos = []
+
+    def open_chunk(self, upload_id, index):
+        self.aperturas += 1
+        # Se retiene la referencia: así el recolector de CPython no oculta un archivo sin cerrar.
+        self.archivos.append(_ArchivoVigilado(self.chunks[upload_id][index], self))
+        return self.archivos[-1]
+
+
+class _AlmacenQueLeePorBloques(FakeObjectStore):
+    def __init__(self, staging):
+        super().__init__()
+        self._staging = staging
+
+    def put(self, sha256, content, size):
+        assert not isinstance(content, (bytes, bytearray, io.BytesIO))
+        aperturas_antes = self._staging.aperturas
+        partes = [content.read(CHUNK)]
+        assert self._staging.aperturas - aperturas_antes <= 1
+        while bloque := content.read(CHUNK):
+            partes.append(bloque)
+        self.objetos[sha256] = b"".join(partes)
+
+
+def test_completar_entrega_por_flujo_un_chunk_abierto_a_la_vez_y_los_cierra():
+    datos = b"0123456789abcdef!"
+    staging = _StagingVigilado()
+    almacen = _AlmacenQueLeePorBloques(staging)
+    caso = ChunkedUpload(staging, almacen, max_chunk_size=64)
+    upload_id, _ = iniciar(caso, datos)
+    for indice, parte in enumerate(partir(datos)):
+        caso.receive(upload_id, indice, parte, sha(parte))
+    caso.complete(upload_id)
+    assert almacen.objetos[sha(datos)] == datos
+    assert staging.max_abiertos == 1
+    assert staging.abiertos == 0
