@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-03-1-dataset-sintetico
-**Verificación IA:** implementacion 648b23a
+**Verificación IA:** verificacion 5ea6468
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -128,3 +128,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 748 passed, 3 skipped, 6 xfailed. Se añadió src/adapters/chat_export_generator.py (132 líneas, importa solo src.domain, sin comentarios). Revisé el único cambio a pruebas: la regex de datos reales ignora la línea date_unixtime de Telegram, porque la prueba roja era inconsistente (exigía int() y a la vez prohibía 7+ dígitos); el resto de la comprobación sigue intacto. Commit empujado. (648b23a) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest: 750 passed, 3 skipped, 8 xfailed. src/ intacto desde 648b23a, solo pruebas nuevas (5ea6468) empujadas, árbol limpio. QA: APROBADO sin bloqueantes, 2 hallazgos menores en xfail estricto (render sin conversión a UTC, case.name sin validar) y 2 huecos de prueba cerrados. Confirmó que el cambio de regex FECHA_UNIX no debilita la detección de datos reales. (5ea6468) |
