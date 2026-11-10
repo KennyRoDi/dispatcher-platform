@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-09-1-worker-de-audio
 **Verificación IA:** tests bc67928
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -237,3 +237,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-09 | El revisor dio APROBADO con 3 hallazgos menores, que quedan para que José Andrés los acepte: FakeTextModels duplicado en test_text_analyzer, TERCEROS_PROHIBIDOS para la parte 2 y los pendientes de QA ya anotados en el SPEC. Releí el diff completo origin/main...HEAD contra el SPEC de la parte 1: solo toca los archivos del plan, con 171 líneas añadidas y 24 borradas en src. pytest -q -m 'not integration and not acceptance': 832 passed. git status limpio. (716a86d) |
 | revision | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el diff de bc67928: solo toca tests/ (3 archivos nuevos, TERCEROS_PROHIBIDOS con faster_whisper, ctranslate2 y av, y 2 pruebas agregadas a test_transcription sin tocar las existentes). Ejecuté pytest: test_whisper_config y test_whisper_transcriber fallan al recolectar por ModuleNotFoundError de src.adapters.whisper_transcriber; los 5 casos de test_transcription (bool y tiempo fuera de rango) fallan por DID NOT RAISE u OverflowError. El resto da 1085 passed y la integración se salta sin faster-whisper. numpy llega a CI de forma transitiva por pandas, como en F-08. Sin comprobar: qué excepción da PyAV, que es una suposición del developer. (bc67928) |
+| tests | José Andrés Loría Herrera | 2026-11-09 |  |
