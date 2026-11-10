@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion cabfc4b
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -197,3 +197,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-10 | QA (subagente) re-verifico parte 1 tras arreglo de H1: APROBADO. Ataque con 14 lectores, chunks alterados en disco y concurrencia con hilos: ningun objeto con contenido distinto a su clave. 12 pruebas nuevas en verde que matan 3 mutantes. Orquestador: test_chunks 44/44, suite 1086 verde, mutante >= por == detectado, solo tests tocados. Sin mediciones en esta parte (M3 en parte 3). Riesgo 8 y H2 aceptados. Verificacion independiente. (c121d8e) |
 | verificacion | Melany Vindas | 2026-11-10 |  |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-10 | Documentador (subagente): AD-28 provisional en ARQUITECTURA §8 con arreglo H1 y regla del put, capas en §4, ChunkStaging y archivos nuevos en CONTRATOS. Orquestador: diff solo en esos 2 docs, 64 MiB coincide con chunked_upload.py, conformidad 0 problemas. Ficha M3 y reutilizacion no existen todavia (parte 3 y F-39). Bitacora con 4 errores reales de la IA. Verificacion independiente. (cabfc4b) |
+| documentacion | Melany Vindas | 2026-11-10 |  |
