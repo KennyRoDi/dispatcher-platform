@@ -216,16 +216,16 @@ Observaciones menores del QA de la parte 1. Los tiempos infinitos se corrigieron
 
 ### Pendientes para la parte 3
 
-Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 3. H1 (NaN en `avg_logprob`) y H2 (excepciones de PyAV sin capturar) se corrigieron en la parte 2 (pruebas en 4f1dc5f y corrección en b1ec7d7).
+Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 3; la corrida real del 2026-11-10 resolvió las dos que dependían del modelo. H1 (NaN en `avg_logprob`) y H2 (excepciones de PyAV sin capturar) se corrigieron en la parte 2 (pruebas en 4f1dc5f y corrección en b1ec7d7).
 
-- Confirmar con PyAV y faster-whisper reales qué excepción se lanza ante un audio ilegible y ante un archivo sin pista de audio; lo capturado se dedujo del código fuente de PyAV 19.0.2. La parte 3 agregó `tests/integration/test_whisper_errores_de_av_reales.py`, pero no se ha ejecutado con PyAV real: sigue pendiente.
+- Resuelto en la parte 3: la corrida real del 2026-11-10 con PyAV 18.1.0 confirmó que un audio ilegible, un archivo vacío y un mp4 sin pista de audio dan `ValueError` (3 pruebas de `tests/integration/test_whisper_errores_de_av_reales.py`; evidencia en `docs/evidencia/F-09_transcripcion_2026-11-10.md`).
 - `BugError` de PyAV hereda de `FFmpegError` y de `RuntimeError` y se reporta como «no es un audio legible», aunque sea un fallo interno de FFmpeg. ENOMEM, ETIMEDOUT, EAGAIN y EACCES ya no: se propagan (f8b866d).
 - `ConnectionError` y `BrokenPipeError` se reportan como audio ilegible; es aceptable en rutas locales.
 - Los 100 códigos de `IDIOMAS_DE_WHISPER` son una copia estática de faster-whisper v1.2.1: revisarlos al subir de versión.
 - Los segmentos solapados no se corrigen: el adaptador solo los ordena por inicio.
 - No se ha comprobado con Python 3.13, que fija AD-22; el equipo de desarrollo usa Python 3.14.
 - Las claves extra de `[modelo]` en `config/audio.toml` se ignoran sin aviso.
-- La prueba de integración `tests/integration/test_whisper_transcriber_real.py` nunca se ha ejecutado, porque faster-whisper no está instalado en el equipo de desarrollo.
+- Resuelto en la parte 3: `tests/integration/test_whisper_transcriber_real.py` se ejecutó con faster-whisper real el 2026-11-10; las 6 pruebas de integración y aceptación pasaron (evidencia en `docs/evidencia/F-09_transcripcion_2026-11-10.md`).
 
 ### Pendientes tras la parte 3
 
