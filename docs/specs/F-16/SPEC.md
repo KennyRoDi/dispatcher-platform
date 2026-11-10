@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** implementacion 7fef365
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -90,3 +90,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de implementacion | Codex | 2026-11-10 | Revision independiente parte2 implementacion sobre 7fef365: inspeccionadas Compose, preflight, wrapper, SUP-24 y SPEC; WORKER_MEM_LIMIT obligatorio sin valor medido, Compose GPU hereda worker, sin --scale; start_worker valida antes de compose up. git diff --check correcto, arbol limpio. Suite completa py -m pytest -q -m not integration and not acceptance: 1147 passed, 2 skipped, 3 deselected, una advertencia Starlette, 42.54s. Focalizadas CPU/GPU, preflight y parte1: 62 passed. No ejecutar Docker ni hacer mediciones de nodos; límites medidos y M1 pendientes hasta carga pesada B/C/D. Código/tests añadidos dentro scope, no pruebas debilitadas. commit 7fef365 publicado. (7fef365) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | QA encontró que NODE_IP no valida formato IP; agregar prueba y rechazar valor inválido |
