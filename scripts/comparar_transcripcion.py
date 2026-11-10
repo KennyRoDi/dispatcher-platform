@@ -133,6 +133,9 @@ def generar_markdown(
     notas: Sequence[NotaAudio],
     resultados: Sequence[ResultadoNota],
 ) -> str:
+    faltantes = [biblioteca for biblioteca in BIBLIOTECAS if biblioteca not in versiones]
+    if faltantes:
+        raise ValueError(f"falta la versión de {', '.join(faltantes)}")
     procedencias = [f"- `{n.archivo}`: {n.procedencia}; licencia {n.licencia}" for n in notas]
     detalle = [linea for r in resultados for linea in _detalle(r)]
     return "\n".join(
