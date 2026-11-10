@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** implementacion 687daa8
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -278,3 +278,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé scripts/comparar_transcripcion.py completo (255 líneas, solo ese archivo fuera de tests) contra las pruebas aprobadas. Las pruebas no se tocaron desde 3127c0f. pytest -q -m 'not integration and not acceptance': 1249 passed y 1 failed, la de la muestra del repositorio, esperada hasta que José Andrés aporte las notas. No se crearon datos de muestra ni evidencia. Observaciones que QA debe mirar: main solo captura ValueError y OSError, así que un ImportError de faster_whisper o un PackageNotFoundError saldría con traceback; la sección Límites del Markdown afirma que las notas de amenaza son guiones sintéticos leídos sin leerlo de los datos. Sin comprobar: nada se ejecutó con audio, modelo ni PyAV reales. (21e406b) |
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé scripts/comparar_transcripcion.py completo y la muestra aportada por José Andrés (commit 687daa8). pytest -q -m 'not integration and not acceptance': 1250 passed, sin fallos; test_muestra_del_repositorio ya pasa con 5 notas, 2 de amenaza y 3 neutras, todas en Opus. Las pruebas no se tocaron desde 3127c0f. Las dos notas de amenaza se asignaron por nombre, que coincide con el guion. Las tres neutras se asignaron a su guion por orden de grabación, un supuesto que José Andrés aceptó y que solo la transcripción real puede confirmar. Observaciones para QA: main no captura ImportError ni PackageNotFoundError, y la sección Límites afirma sin leerlo de los datos que las notas de amenaza son guiones sintéticos. Sin comprobar: nada se ejecutó con modelo ni PyAV reales. (687daa8) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | QA: main no captura ImportError ni PackageNotFoundError (traceback y pierde la transcripcion); normalizar pierde la n con tilde combinante en n descompuesta |
