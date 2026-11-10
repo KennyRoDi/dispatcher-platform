@@ -427,3 +427,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | La documentación coincide con scripts, Compose y QA; WORKER_MEM_LIMIT y datos B/C/D siguen pendientes. No se ejecutaron Docker/Compose ni cgroups reales. |
 | Cómo se validó | Se contrastó el diff con SPEC, scripts y QA-parte-2.md. Los conteos 1149/2/3 están atribuidos al orquestador/informe de QA. Mediciones memory.max y memory.swap.max tres veces por nodo siguen pendientes. |
 | Error de la IA | QA detectó el error real de validación de NODE_IP descrito en la entrada anterior; quedó corregido con pruebas. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-17 (`feat/F-17-1-control-de-admision`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-17 |
+| Propósito | Plan, pruebas, implementación, QA y documentación de F-17 (control de admisión por huella de memoria) |
+| Consulta resumida | Diseño de admits, tabla de huellas, compuerta antes de blpop en poll_once y AD-30 |
+| Resultado obtenido | admits, FootprintTable, load_admission_config, compuerta en el worker, AD-30 y ficha M1 con medición pendiente |
+| Validado / corregido / descartado | 69 pruebas en verde, revisión humana de cada fase; la medición M1 no se hizo (sin nodos WSL2 ni F-16 parte 2) |
+| Cómo se validó | TDD con pruebas rojas primero; QA intentó romper valores bool, negativos y no ASCII |
+| Error de la IA | En QA, CgroupResourceReader lanza ValueError con memory.max=max y el worker nunca admite; detectado y reportado, no corregido por estar fuera de alcance (F-16) |
