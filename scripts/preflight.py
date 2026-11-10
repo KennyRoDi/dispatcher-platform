@@ -17,14 +17,18 @@ COMPOSE_FILES = ["deploy/docker-compose.worker.yml"]
 GIB = 1024**3
 
 
-def _node_memory_bytes(meminfo: Path = Path("/proc/meminfo")) -> int:
-    for line in meminfo.read_text(encoding="ascii").splitlines():
-        if line.startswith("MemTotal:"):
-            parts = line.split()
-            if len(parts) != 3 or parts[2] != "kB":
-                break
-            return int(parts[1]) * 1024
-    raise ValueError("No se pudo leer MemTotal en /proc/meminfo")
+def _node_memory_bytes() -> int:
+    result = subprocess.run(
+        ["docker", "info", "--format", "{{.MemTotal}}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    output = result.stdout.strip()
+    if not output.isascii() or not output.isdigit() or int(output) <= 0:
+        raise ValueError("Docker no devolvió un MemTotal válido en bytes")
+    return int(output)
 
 
 def _reserve_bytes(node_memory: int) -> int:
