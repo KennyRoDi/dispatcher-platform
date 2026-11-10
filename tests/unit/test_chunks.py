@@ -1,5 +1,6 @@
 import hashlib
 import io
+import threading
 
 import pytest
 
@@ -340,3 +341,95 @@ def test_hash_total_distinto_se_detecta_aunque_el_almacen_no_lea_hasta_el_final(
     with pytest.raises(IntegrityMismatch):
         caso.complete(upload_id)
     assert almacen.objetos == {}
+
+
+def _subida_recibida(staging, almacen, datos):
+    caso = ChunkedUpload(staging, almacen, max_chunk_size=64)
+    upload_id, _ = iniciar(caso, datos)
+    for indice, parte in enumerate(partir(datos)):
+        caso.receive(upload_id, indice, parte, sha(parte))
+    return caso, upload_id
+
+
+def test_chunk_final_mas_largo_en_staging_no_llega_al_almacen_que_lee_solo_size():
+    staging = FakeChunkStaging()
+    almacen = _AlmacenQueLeeSoloSize()
+    caso, upload_id = _subida_recibida(staging, almacen, b"abcdefghij")
+    staging.chunks[upload_id][2] = b"XYZW"
+    with pytest.raises(IntegrityMismatch):
+        caso.complete(upload_id)
+    assert almacen.objetos == {}
+
+
+def test_chunk_final_mas_corto_en_staging_no_llega_al_almacen():
+    staging = FakeChunkStaging()
+    almacen = _AlmacenQueLeeSoloSize()
+    caso, upload_id = _subida_recibida(staging, almacen, b"abcdefghij")
+    staging.chunks[upload_id][2] = b"i"
+    with pytest.raises(IntegrityMismatch):
+        caso.complete(upload_id)
+    assert almacen.objetos == {}
+
+
+@pytest.mark.parametrize("bloque", [1, CHUNK - 1, 100])
+def test_integridad_fallida_a_mitad_de_lectura_cierra_el_chunk_abierto(bloque):
+    staging = _StagingVigilado()
+    almacen = _AlmacenQueLeePorBloques(staging)
+    caso, upload_id = _subida_recibida(staging, almacen, b"0123456789abcdef!")
+    staging.chunks[upload_id][1] = b"XXXX"
+    with pytest.raises(IntegrityMismatch):
+        caso.complete(upload_id)
+    assert staging.max_abiertos == 1
+    assert staging.abiertos == 0
+    assert almacen.objetos == {}
+
+
+def test_reintento_correcto_tras_integridad_fallida_en_disco(tmp_path):
+    datos = b"abcdefghij"
+    almacen = FakeObjectStore()
+    caso, upload_id = _subida_recibida(DiskChunkStaging(tmp_path), almacen, datos)
+    caso.receive(upload_id, 1, b"ZZZZ", sha(b"ZZZZ"))
+    with pytest.raises(IntegrityMismatch):
+        caso.complete(upload_id)
+    assert caso.status(upload_id) == ([0, 1, 2], [])
+    caso.receive(upload_id, 1, b"efgh", sha(b"efgh"))
+    assert caso.complete(upload_id) == (sha(datos), len(datos))
+    assert almacen.objetos == {sha(datos): datos}
+    assert list(tmp_path.iterdir()) == []
+
+
+class _AlmacenQueReemplazaEnOtroHilo(FakeObjectStore):
+    def __init__(self):
+        super().__init__()
+        self.reemplazar = None
+
+    def put(self, sha256, content, size):
+        partes = [content.read(1)]
+        hilo = threading.Thread(target=self.reemplazar)
+        hilo.start()
+        hilo.join()
+        while bloque := content.read(1):
+            partes.append(bloque)
+        self.objetos[sha256] = b"".join(partes)
+
+
+@pytest.mark.parametrize("indice", [1, 2])
+def test_chunk_reemplazado_por_otro_hilo_durante_la_lectura_en_disco(tmp_path, indice):
+    datos = b"abcdefghij"
+    almacen = _AlmacenQueReemplazaEnOtroHilo()
+    caso, upload_id = _subida_recibida(DiskChunkStaging(tmp_path), almacen, datos)
+    nuevo = b"ZZZZ"[: len(partir(datos)[indice])]
+    almacen.reemplazar = lambda: caso.receive(upload_id, indice, nuevo, sha(nuevo))
+    with pytest.raises(IntegrityMismatch):
+        caso.complete(upload_id)
+    assert almacen.objetos == {}
+
+
+@pytest.mark.parametrize("datos, tamano", [(b"abcdefgh", 4), (b"abcd", 4), (b"a", 4), (b"abcdefgh", 1)])
+def test_bordes_de_tamano_se_reensamblan(datos, tamano):
+    caso, almacen = subida()
+    upload_id, _ = iniciar(caso, datos, tamano)
+    for indice, parte in enumerate(partir(datos, tamano)):
+        caso.receive(upload_id, indice, parte, sha(parte))
+    caso.complete(upload_id)
+    assert almacen.objetos == {sha(datos): datos}
