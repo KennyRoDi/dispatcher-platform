@@ -1,8 +1,8 @@
 # SPEC F-03: Dataset sintético
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 8a01b29
+**Base:** feat/F-03-1-dataset-sintetico
+**Verificación IA:** revision 10d3f1a
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -123,4 +123,14 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README no menciona dataset, docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio y sin commits nuevos. Entregó borrador de bitácora con hechos del historial; los 3 defectos de QA se registran como abiertos (xfail), no corregidos. (afe8672) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 1: APROBADO sin bloqueantes. Comprobé en el código las observaciones de dataset_plan.py (mínimos fijos en check_minimums, exigencia solo de 10 heterogéneos en total, nombre HEAVY_KINDS). Árbol limpio, commit empujado, pruebas en verde en la fase anterior. (8a01b29) |
+| revision | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_chat_export_generator.py: 1 error de colección por ModuleNotFoundError de src.adapters.chat_export_generator (rojo por módulo ausente, no por sintaxis). Solo se añadió ese archivo de pruebas (27 funciones), src/ intacto, commit empujado, árbol limpio. La API (generate_chat, render_whatsapp, render_telegram, export_plan_chats) la fijó el developer porque el SPEC no la define. (aa33e8c) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 748 passed, 3 skipped, 6 xfailed. Se añadió src/adapters/chat_export_generator.py (132 líneas, importa solo src.domain, sin comentarios). Revisé el único cambio a pruebas: la regex de datos reales ignora la línea date_unixtime de Telegram, porque la prueba roja era inconsistente (exigía int() y a la vez prohibía 7+ dígitos); el resto de la comprobación sigue intacto. Commit empujado. (648b23a) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest: 750 passed, 3 skipped, 8 xfailed. src/ intacto desde 648b23a, solo pruebas nuevas (5ea6468) empujadas, árbol limpio. QA: APROBADO sin bloqueantes, 2 hallazgos menores en xfail estricto (render sin conversión a UTC, case.name sin validar) y 2 huecos de prueba cerrados. Confirmó que el cambio de regex FECHA_UNIX no debilita la detección de datos reales. (5ea6468) |
+| verificacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README y ARQUITECTURA no mencionan el generador, docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio y sin commits nuevos. Borrador de bitácora con hechos del historial: plantillas redactadas por IA, prueba roja inconsistente con date_unixtime, 2 defectos menores de QA abiertos en xfail. (6fe0440) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 2: APROBADO sin bloqueantes. Confirmé en el código que case.name sin validar (línea 58) y la falta de conversión a UTC en los renderizadores corresponden a los xfail ya aceptados. El cambio de regex FECHA_UNIX en la prueba se evaluó como legítimo. Árbol limpio, commit empujado. (10d3f1a) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
