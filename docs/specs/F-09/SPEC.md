@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** documentacion 14aaf95
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -307,3 +307,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-10 | QA verificó la parte 3 con el entorno real y dio APROBADO. Ejecutó las 6 pruebas de integración y aceptación: 6 passed. Recalculó a mano el WER de las 5 notas sin usar el script y coinciden: 15.4, 9.1, 36.4, 27.3 y 0.0 por ciento. Comprobó determinismo en 2 transcripciones por nota, ValueError con un .ogg de 0 bytes y con un mp4 sin audio, y que una nota de 165 s se transcribe en 23 s. Hallazgo H-Q1: un tono sostenido de 35 s produce un segmento inventado de puntos suspensivos que pasa como transcripción válida; silencio y ruido blanco dan lista vacía. Se documenta en los límites de la evidencia y no bloquea. Yo comprobé: unitarias 1261 passed y git status limpio. Sin comprobar: Python 3.13. (3c1bcc1) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-10 | Revisé 29840c5, 1d4d103 y 14aaf95. La evidencia generada por el script quedó intacta: 0 líneas borradas, solo se agregó la sección de observaciones marcada como escrita a mano, con hechos medidos y la media 17.6 % declarada como cálculo manual. README y AD-28 reflejan la corrida real del 2026-11-10 y mantienen Medición pendiente solo para la huella de F-17. Tras detectar dos pendientes del SPEC que contradecían la evidencia, el documentador los marcó resueltos, y con git grep ya no quedan afirmaciones falsas de que el modelo no se ejecutó. Los 8 hashes del borrador de bitácora existen. No hay el carácter de puntos suspensivos. Solo cambió documentación desde la verificación aprobada, y no ejecuté pytest en esta ronda porque el código no cambió. Sin comprobar: Python 3.13. (14aaf95) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
