@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion bddb8f1
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -171,3 +171,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 1486 passed, 7 skipped, 20 xfailed. src/ y scripts/ intactos desde ec1e2fd; solo se añadió tests/unit/test_dataset_sintetico_qa.py (d5231b9), árbol limpio. Reproduje el hallazgo 5: --params con messages=-5 e images=-3 sale con código 0 y genera archivos. QA: APROBADO sin bloqueantes; generación completa real con semilla 1 (490 archivos, 147,5 s, 1,8 GiB, --validar sale 0); 5 hallazgos menores en xfail estricto. No reproduje yo los otros 4 hallazgos ni la generación completa. (d5231b9) |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | Resolver los 5 hallazgos de QA de la parte 5 (validador: rutas duplicadas, tipos por heterogeneo, pesado no heterogeneo, manifiesto corrupto sin traza; CLI: parametros negativos) y quitar sus xfail; luego regenerar el dataset |
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Corrección de los 5 hallazgos de QA verificada: pytest -m 'not integration and not acceptance' 1517 passed, 7 skipped, 14 xfailed (los de partes 1-4); integración con ffmpeg real 1 passed. Diff de tests/ desde d5231b9: solo se quitaron los 5 marcadores xfail (sin tocar aserciones) y se añadió test_dataset_sintetico_robustez.py. scripts/dataset_sintetico.py +104/-17 (253 líneas); código de la parte 5 ~304 líneas, bajo 400. Árbol limpio, commit empujado (bddb8f1). No reproduje manualmente cada hallazgo. (bddb8f1) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
