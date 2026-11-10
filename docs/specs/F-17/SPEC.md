@@ -1,6 +1,6 @@
 # SPEC F-17: Control de admisión
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-16-2-limites-por-worker
 **Verificación IA:** tests f010bc2
 **Historia:** US-17 · **Requisitos:** RF-25 · **Responsable:** J
@@ -74,3 +74,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (misma sesión, no independiente) | 2026-11-10 | SPEC completo; alcance, pruebas, pila de 1 parte y preguntas abiertas revisados (1dd82fc) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | pytest | 2026-11-10 | Pruebas nuevas en tests/unit/test_admission.py y tests/test_worker_node.py; 20 fallan por módulo o API inexistente, sin código de implementación; cubren admits, tabla, config obligatoria y compuerta de poll_once (f010bc2) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
