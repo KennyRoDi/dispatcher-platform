@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-09-2-worker-de-audio
-**Verificación IA:** revision 314e968
+**Verificación IA:** tests 9f36b33
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -270,3 +270,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-10 | El revisor aprobó la re-revisión sin hallazgos bloqueantes ni importantes y con 3 observaciones menores sin acción. Verifiqué los puntos clave: el diff de src de la parte 2 no tiene más cambios desde mi verificación, la tupla de _errores_de_decodificacion cubre ERRORES_TRANSITORIOS y las pruebas con av falso usan monkeypatch. pytest -q -m 'not integration and not acceptance': 1188 passed. git status limpio. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (314e968) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé el diff de 9f36b33: solo agrega 3 archivos en tests/, sin tocar ninguno existente, y no hay código en scripts/ ni datos de muestra. test_comparar_transcripcion falla al recolectar con ModuleNotFoundError de scripts.comparar_transcripcion; la suite restante da 1188 passed, y la aceptación y la integración nuevas se saltan sin faster-whisper. test_muestra_del_repositorio exige 5 o más notas reales en tests/datos/audio, igual que test_aciertos_imagen en F-08: quedará en rojo hasta que José Andrés aporte las grabaciones. Sin comprobar: nada se ejecutó con audio, modelo ni PyAV reales. (9f36b33) |
