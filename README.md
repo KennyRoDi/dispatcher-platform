@@ -111,6 +111,17 @@ F09_NOTA=<ruta> pytest -m integration tests/integration/test_whisper_transcriber
 
 Referencia R14 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
 
+La muestra de `tests/datos/audio/` son 5 notas de voz `.ogg` Opus (2 con una amenaza explícita y 3 neutras), con su transcripción esperada, procedencia y licencia en `transcripciones.json`. Son la voz propia de José Andrés leyendo guiones sintéticos y ficticios, redactados con IA, bajo licencia CC BY 4.0 [B.3]. El script `scripts/comparar_transcripcion.py` compara la transcripción obtenida con la esperada y calcula la tasa de error por palabra (WER) tras normalizar mayúsculas, tildes y puntuación, sin umbral.
+
+**La corrida con el modelo real está pendiente.** faster-whisper y los pesos aún no se han instalado ni descargado, así que no existe `docs/evidencia/F-09_transcripcion_<fecha>.md` ni hay un WER medido, y US-09 no está cumplida. Para generar la evidencia, desde la raíz del repositorio y con `requirements-audio.txt` instalado:
+
+```bash
+F09_NOTA=tests/datos/audio/amenaza_01.ogg pytest -m integration tests/integration/test_whisper_transcriber_real.py
+pytest -m integration tests/integration/test_whisper_errores_de_av_reales.py
+python -m scripts.comparar_transcripcion --muestra tests/datos/audio --esperadas tests/datos/audio/transcripciones.json --salida docs/evidencia/F-09_transcripcion_<fecha>.md
+pytest -m acceptance tests/acceptance/test_audio_transcripcion.py
+```
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*

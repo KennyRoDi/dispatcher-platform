@@ -218,7 +218,7 @@ Observaciones menores del QA de la parte 1. Los tiempos infinitos se corrigieron
 
 Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 3. H1 (NaN en `avg_logprob`) y H2 (excepciones de PyAV sin capturar) se corrigieron en la parte 2 (pruebas en 4f1dc5f y corrección en b1ec7d7).
 
-- Confirmar con PyAV y faster-whisper reales qué excepción se lanza ante un audio ilegible y ante un archivo sin pista de audio; lo capturado se dedujo del código fuente de PyAV 19.0.2, sin ejecutarlo.
+- Confirmar con PyAV y faster-whisper reales qué excepción se lanza ante un audio ilegible y ante un archivo sin pista de audio; lo capturado se dedujo del código fuente de PyAV 19.0.2. La parte 3 agregó `tests/integration/test_whisper_errores_de_av_reales.py`, pero no se ha ejecutado con PyAV real: sigue pendiente.
 - `BugError` de PyAV hereda de `FFmpegError` y de `RuntimeError` y se reporta como «no es un audio legible», aunque sea un fallo interno de FFmpeg. ENOMEM, ETIMEDOUT, EAGAIN y EACCES ya no: se propagan (f8b866d).
 - `ConnectionError` y `BrokenPipeError` se reportan como audio ilegible; es aceptable en rutas locales.
 - Los 100 códigos de `IDIOMAS_DE_WHISPER` son una copia estática de faster-whisper v1.2.1: revisarlos al subir de versión.
@@ -226,6 +226,19 @@ Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 
 - No se ha comprobado con Python 3.13, que fija AD-22; el equipo de desarrollo usa Python 3.14.
 - Las claves extra de `[modelo]` en `config/audio.toml` se ignoran sin aviso.
 - La prueba de integración `tests/integration/test_whisper_transcriber_real.py` nunca se ha ejecutado, porque faster-whisper no está instalado en el equipo de desarrollo.
+
+### Pendientes tras la parte 3
+
+La parte 3 entrega el script, las pruebas y la muestra, pero el modelo real nunca se ejecutó: no existe `docs/evidencia/F-09_transcripcion_<fecha>.md`, no hay WER medido y US-09 no está cumplida.
+
+- Instalar faster-whisper y los pesos (con autorización de José Andrés) y ejecutar con el modelo real la integración, la aceptación y `scripts/comparar_transcripcion.py`, y guardar la evidencia.
+- Confirmar la asignación de guiones a las 3 notas neutras: se asignó por orden de grabación sin oír el audio, y su procedencia dice «la transcripción real lo confirma», escrito antes de medir. Si la transcripción no coincide, hay que corregir `transcripciones.json`.
+- 4 de las 5 notas duran entre 4,26 y 4,94 s, menos de los 5 s que pide este SPEC.
+- La comparación no normaliza números: «5» y «cinco» cuentan como error.
+- Los duplicados de nombre que solo difieren en mayúsculas no se detectan.
+- La sección Límites de la tabla es texto fijo y no analiza los fallos de la corrida.
+- Un fallo en la nota N pierde toda la corrida, sin evidencia parcial.
+- Python 3.13 sigue sin probarse, y los 100 códigos de idioma son una copia estática (ver arriba).
 
 ## Aprobaciones
 
