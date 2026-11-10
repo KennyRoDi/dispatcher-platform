@@ -63,6 +63,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 ## Riesgos y preguntas abiertas
 
 - Confirmar con Kenni el cableado mínimo de `deploy/`, el mecanismo de arranque y cómo conciliar el worker general actual con los contenedores por tipo de AD-05 antes de la parte 2. El acuerdo debe registrarse; no modifica contratos de aplicación.
+- **Pendiente antes de cerrar la fase tests de la parte 2:** acordar con Kenni el punto de entrada de arranque y la interfaz de configuración del preflight. Hasta que exista ese contrato, no se agregan pruebas que fijen nombres de CLI, variables, wrapper de arranque, cantidad de réplicas o cambios de `deploy/`. Las pruebas de `validate_node_budget` de la parte 1 cubren la suma de límites, reserva y límites repetidos.
 - Confirmar la disponibilidad de nodos B/C/D y cgroups v2 de Docker Desktop/WSL2 para verificar y medir la parte 2. Este plan no afirma haberlos comprobado.
 - Límites y reserva requieren configuración explícita sustentada por medición (SUP-17); no hay un valor predeterminado aprobado. La forma exacta de obtener la RAM efectiva en los nodos se documentará antes de implementar el preflight de arranque.
 - El preflight es una comprobación de presupuesto al arranque, no una garantía de memoria libre futura ni reemplazo de F-17.
