@@ -11,7 +11,7 @@
 | F-06 | pendiente |
 | F-07 | en-pr |
 | F-08 | en-pr |
-| F-09 | pendiente |
+| F-09 | plan |
 | F-10 | pendiente |
 | F-11 | pendiente |
 | F-12 | pendiente |
