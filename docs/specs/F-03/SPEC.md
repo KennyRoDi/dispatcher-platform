@@ -1,8 +1,8 @@
 # SPEC F-03: Dataset sintético
 
 **Fase:** pr
-**Base:** feat/F-03-2-dataset-sintetico
-**Verificación IA:** revision 98563c9
+**Base:** feat/F-03-3-dataset-sintetico
+**Verificación IA:** revision 397158d
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -95,10 +95,9 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - Validez: los patrones sintéticos no equivalen a fotos reales; F-08 mide detección sobre ellos y la limitación se declara en `docs/dataset.md`.
 - Distribución: el enlace de Google Drive depende de la persona y queda fuera del repo; si no se sube, los demás integrantes deben regenerar los casos en local.
 
-**Preguntas abiertas.**
-1. Formato y ubicación del documento grande de los casos pesados cuando no se use video (documento ≥ 200 MB): tipo de archivo, a definir en la fase de tests.
+**Preguntas abiertas.** Ninguna.
 
-**Resueltas por la persona (2026-11-10).** AD-25 aprobada; mensajes siempre sintéticos y frases de amenaza ficticias aprobadas; dataset pesado en local y distribuido por Google Drive fuera del repo; opción A para heterogéneos (5 livianos y 5 pesados, los pesados incluidos); todo el dataset sintético (chats, imágenes y audio) generado por el equipo, se descartan los datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) por consideraciones legales y de licencia, lo que cierra las preguntas de selección de datasets y de redistribución.
+**Resueltas por la persona (2026-11-10).** Todo caso pesado se genera como video `.mpg` (el SPEC admitía video o documento), lo que cierra la pregunta del formato del documento grande; AD-25 aprobada; mensajes siempre sintéticos y frases de amenaza ficticias aprobadas; dataset pesado en local y distribuido por Google Drive fuera del repo; opción A para heterogéneos (5 livianos y 5 pesados, los pesados incluidos); todo el dataset sintético (chats, imágenes y audio) generado por el equipo, se descartan los datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) por consideraciones legales y de licencia, lo que cierra las preguntas de selección de datasets y de redistribución.
 
 
 ## Aprobaciones
@@ -150,4 +149,15 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador solo ajustó el SPEC en 5 líneas: etiqueta neutro en vez de negativo y licencia provisional generado por el equipo, uso academico. Revisé el diff: cambios mínimos, sin tocar aprobaciones ni fase, sin campos pendientes. README, ARQUITECTURA y CONTRATOS no mencionan el generador. Borrador de bitácora con hechos del historial: error B1 de bytes no reproducibles, colisiones de imágenes y xfail abiertos. (555c21d) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 3: APROBADO sin bloqueantes. Comprobé en el código los comentarios citados (BITEXACT, seed de ruido, paleta, procedencia de AUDIO_CODECS) y que subprocess recibe lista sin shell. Observaciones menores anotadas. Árbol limpio, commit empujado. (98563c9) |
+| revision | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_heavy_case_generator.py: 1 error de colección por ModuleNotFoundError de src.adapters.heavy_case_generator (rojo por módulo ausente). Solo se añadió ese archivo de pruebas (10 funciones, 120 líneas), src/ intacto, commit empujado, árbol limpio. La API (generate_heavy_cases, LICENSE_NAME, ORIGIN, ValueError/FileNotFoundError) la fijó el developer porque el SPEC no la define. (b3418b0) (b3418b0) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 798 passed, 3 skipped, 10 xfailed (los de antes). Pruebas intactas (git diff de tests/ desde la fase anterior vacío). Solo se añadió src/adapters/heavy_case_generator.py (62 líneas), capa adaptadores, árbol limpio, commit empujado. No generó documento: todo caso pesado es video; _produce propio duplica algo de media_generator. Sin ruff instalado; no verifiqué ffmpeg real (lo reporta el developer: 209,3 MiB). (4b6b32f) (4b6b32f) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest: 806 passed, 3 skipped, 14 xfailed. src/ intacto, solo pruebas QA nuevas (77faa7c) empujadas, árbol limpio. Reproduje con ffmpeg real un caso pesado: 219512832 B = 209,34 MiB, sha256 783cde6b... idéntico al de QA. 4 hallazgos no bloqueantes dejados como xfail estricto. (77faa7c) |
+| verificacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README y ARQUITECTURA mencionan el dataset solo de forma genérica (comprobé las líneas), docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio, sin commits nuevos. Borrador de bitácora contrastado con el diff: _produce duplicado (heavy_case_generator.py) y API fijada por el developer son reales; hallazgos de QA coinciden con las pruebas xfail. (ab55439) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 4: APROBADO sin bloqueantes. Comprobé en el código el timeout de 300 s (media_generator.py:15) y la pregunta abierta del SPEC (línea 99). Árbol limpio, pruebas en verde en la fase anterior (806 passed, 14 xfailed). (2172591) |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5) | 2026-11-10 | Revisión APROBADA por el revisor (subagente). Tras ella solo cambió el SPEC: se cerró la pregunta abierta del formato (todo caso pesado es video, decisión de la persona). Árbol limpio, commit empujado, sin cambios de código. (397158d) (397158d) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
