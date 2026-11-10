@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** implementacion 845ce39
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -107,3 +107,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | Docker Compose 5.5.1 config --format json devuelve mem_limit y memswap_limit normalizados como cadenas decimales de bytes; validate_config solo acepta int y rechaza una configuración válida. Aceptar formatos JSON reales de Compose con parseo estricto y añadir pruebas; repetir preflight y contenedor cgroup temporal antes de reanudar QA. |
 | verificación IA de implementacion | Codex | 2026-11-10 | Revisión independiente QA-parte-2.md commit 845ce39: pruebas focalizadas reproducidas, 76 passed; suite completa en código 1161 passed, 2 skipped, 3 deselected, 1 warning Starlette. Confirmé en Docker local desktop-linux con preflight sintético y tres contenedores Compose: memory.max=1073741824, memory.swap.max=0, uid 1000; MemTotal local 16728616960 bytes. git diff --check base...HEAD limpio y árbol limpio. Host DESKTOP-796L2A2 no confirmado B/C/D; Tailscale no instalado y falta .env. Mediciones cgroups reales B/C/D y override GPU pendientes; no se declara aceptación completa de integración. (845ce39) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
