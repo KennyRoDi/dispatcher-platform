@@ -19,7 +19,7 @@
 | F-14 | pendiente |
 | F-15 | pendiente |
 | F-16 | documentacion |
-| F-17 | verificacion |
+| F-17 | documentacion |
 | F-18 | pendiente |
 | F-19 | pendiente |
 | F-20 | pendiente |
