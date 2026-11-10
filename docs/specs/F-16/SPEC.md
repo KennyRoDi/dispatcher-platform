@@ -1,7 +1,7 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** revision 060aaaa
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
