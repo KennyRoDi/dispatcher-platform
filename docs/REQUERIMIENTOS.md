@@ -130,6 +130,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-20 ⚠ | La bitácora de IA se llama `docs/BITACORA_IA.md`. | Decisión del equipo. [Parte I §4] y [Anexo 3] la nombran `docs/bitacora_ia.md`; confirmar con el profesor que el cambio de nombre es aceptable. |
 | SUP-19 ⚠ | Las deficiencias de RNF-03 se toman de `docs/DECISIONES_DISENO.md` del I Proyecto. | No se encontró la retroalimentación de la evaluación; solo limitaciones autodeclaradas. |
 | SUP-21 | Las instrucciones de despliegue las valida Kenni Rodriguez, integrante y líder, en vez de la persona externa que pide el criterio de RNF-22. **Límite: Kenni no es externo y es responsable de F-38**, así que la validación no es independiente y puede pasar por alto pasos implícitos. | [B.8] solo pide «instrucciones de despliegue distribuido» y no menciona a nadie externo: ese requisito es un añadido de RNF-22, no del enunciado. Decisión de Kenni Rodriguez. |
+| SUP-22 | «Contenido sensible» en imagen son las clases del detector listadas en `config/imagen.toml`; inicialmente solo `knife` → `arma`, porque es la única clase de COCO que es un arma. No se detectan armas de fuego ni desnudez. | [B.4 Workers de análisis] pide detectar «contenido sensible» sin definirlo, y [B.1] prohíbe entrenar un modelo para otras clases. Aprobado por José Andrés con el plan de F-08. |
 
 ## 4. Discrepancias detectadas al contrastar con el documento
 

@@ -108,3 +108,16 @@ def test_umbral_en_los_extremos_se_acepta(umbral):
     reglas = SeverityRules.from_dict({"severidad": [{"categoria": "amenaza", "umbral": umbral, "nivel": "alta"}]})
 
     assert reglas.por_categoria["amenaza"].umbral == umbral
+
+
+def test_categoria_obligatoria_parametrizada_exige_su_regla():
+    reglas = SeverityRules.from_dict({"severidad": [{"categoria": "arma", "umbral": 0.5, "nivel": "alta"}]}, obligatoria="arma")
+
+    assert reglas.severity_for("arma", 0.9) is Severity.ALTA
+    with pytest.raises(ValueError, match="arma"):
+        SeverityRules.from_dict(REGLAS, obligatoria="arma")
+
+
+def test_sin_parametro_la_categoria_obligatoria_sigue_siendo_amenaza():
+    with pytest.raises(ValueError, match="amenaza"):
+        SeverityRules.from_dict({"severidad": [{"categoria": "arma", "umbral": 0.5, "nivel": "alta"}]})
