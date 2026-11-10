@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-08-2-worker-de-imagen
-**Verificación IA:** verificacion fbdcdd8
+**Verificación IA:** documentacion faed202
 **Historia:** US-08 · **Requisitos:** RF-07, RNF-25; RF-14 (referencia a la evidencia); RNF-04, RNF-05; SUP-07, SUP-11, SUP-22; [B.4 Workers de análisis], [B.1], [B.3], [B.7 Imagen] · **Responsable:** J
 
 ## Objetivo
@@ -277,3 +277,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de verificacion | Claude Code (orquestador; subagentes qa-tester y developer general-purpose) | 2026-11-09 | QA (1 ronda, con YOLO real en el venv) comprobo todos los criterios de US-08 y reprodujo la evidencia: tabla identica (arma VP 4, FP 0, FN 6, VN 10) y recalculo a mano. Hallo D1 (etiquetas con estructura inesperada daban AttributeError) y D2 (salida no escribible sin manejar y detectada despues de analizar); pruebas rojas en bb50ef0. Reproduje D1 con py -c: AttributeError. El developer corrigio D1, D2, R-a (config inexistente o rota) y agrego el caso C:yolo11n.pt en fbdcdd8. git diff bb50ef0 -- tests: solo una linea parametrize reemplazada por la misma lista con un caso mas; resto aditivo. Tras la correccion D1 da rc 1 con error claro. Unitarias (py global): 876 passed, 1 skipped. Integracion y aceptacion con YOLO real (venv, cuchillo_02): 3 passed. Parte: 255 lineas fuera de tests y docs. Pendiente para documentacion: limites medidos que la evidencia no declara (mismo cuchillo, confusion con tie, cuchillo_05 en baja, manos detectadas como person) y la decision de umbral (con 0.15 seria VP 6, FP 0). No verificado: Python 3.13 (el venv usa 3.14) y lint. (fbdcdd8) |
 | verificacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de documentacion | Claude Code (orquestador; subagente documentador general-purpose) | 2026-11-09 | git diff d339619..faed202: solo documentos (README, ARQUITECTURA, CONTRATOS, REQUERIMIENTOS, evidencia, SPEC; 117 lineas mas y 14 menos); nada en src, scripts, tests ni config. La evidencia no borra ninguna linea: la salida del script queda intacta y el analisis va aparte, con los dos comandos y su salida cruda. Contrasté las detecciones crudas con mi propia ejecucion anterior del detector real (cuchillo_01: person 0.40, tie 0.38 y 0.35, car 0.25; cuchillo_03: tie 0.71, cup 0.37; knife 0.88, 0.77, 0.37 y 0.52 en 02, 04, 05 y 08): coinciden. La severidad (05 en baja, el resto en alta) coincide con la regla de 0.5. AD-27 sigue provisional, con el resultado real enlazado. El documentador reporta conformidad 0 problemas y 876 passed, 1 skipped. Borrador de bitacora revisado: cinco errores reales con sus commits. (faed202) |
