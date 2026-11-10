@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 716a86d
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -235,3 +235,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de db9617c. AD-28 pasa a provisional y describe lo implementado en la parte 1, que coincide con src/ (isfinite, renumeración, formatos de posición, lista vacía sin voz). En CONTRATOS se agregaron transcription.py y analyze_audio.py a los dueños; la tabla de capas está actualizada. En el SPEC quedan los pendientes de QA para la parte 2, iguales a sus informes. El borrador de bitácora coincide con los hashes 63f9d3c, f0ce6dc y ff2b22e y con 832 passed. No hay ficha porque no es M1 a M5. No quedan cambios sin commit. (db9617c) |
 | documentacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-09 | El revisor dio APROBADO con 3 hallazgos menores, que quedan para que José Andrés los acepte: FakeTextModels duplicado en test_text_analyzer, TERCEROS_PROHIBIDOS para la parte 2 y los pendientes de QA ya anotados en el SPEC. Releí el diff completo origin/main...HEAD contra el SPEC de la parte 1: solo toca los archivos del plan, con 171 líneas añadidas y 24 borradas en src. pytest -q -m 'not integration and not acceptance': 832 passed. git status limpio. (716a86d) |
+| revision | José Andrés Loría Herrera | 2026-11-09 |  |
