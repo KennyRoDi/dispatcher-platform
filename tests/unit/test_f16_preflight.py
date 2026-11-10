@@ -20,6 +20,13 @@ def test_preflight_acepta_limite_dentro_del_presupuesto():
     validate_config(_config(), node_memory=16 * 1024**3)
 
 
+def test_preflight_acepta_node_ip_ipv6():
+    config = _config()
+    config["services"]["worker"]["environment"]["NODE_IP"] = "fd7a:115c:a1e0::1"
+
+    validate_config(config, node_memory=16 * 1024**3)
+
+
 @pytest.mark.parametrize(
     ("config", "node_memory"),
     [
@@ -33,6 +40,14 @@ def test_preflight_acepta_limite_dentro_del_presupuesto():
 def test_preflight_rechaza_configuracion_o_presupuesto_invalido(config, node_memory):
     with pytest.raises(ValueError):
         validate_config(config, node_memory=node_memory)
+
+
+def test_preflight_rechaza_node_ip_que_no_es_una_direccion_ip():
+    config = _config()
+    config["services"]["worker"]["environment"]["NODE_IP"] = "not-an-ip"
+
+    with pytest.raises(ValueError):
+        validate_config(config, node_memory=16 * 1024**3)
 
 
 def test_preflight_suma_limites_de_todos_los_workers():

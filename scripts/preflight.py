@@ -1,5 +1,6 @@
 """Valida el presupuesto de memoria antes de iniciar workers con Compose."""
 
+import ipaddress
 import json
 import os
 import subprocess
@@ -62,6 +63,11 @@ def validate_config(config: dict, node_memory: int) -> None:
                 value = service.get("hostname") if variable == "NODE_NAME" else environment.get(variable)
                 if not value:
                     raise ValueError(f"{variable} es obligatorio para el worker")
+                if variable == "NODE_IP":
+                    try:
+                        ipaddress.ip_address(value)
+                    except ValueError as error:
+                        raise ValueError("NODE_IP debe ser una dirección IPv4 o IPv6 válida") from error
         else:
             continue
         memory = service.get("mem_limit")
