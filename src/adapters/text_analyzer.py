@@ -1,14 +1,12 @@
-import hashlib
 import tomllib
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
+from src.adapters.hashing import sha256_de_archivo
 from src.application.analyze_text import TextModels, TextSettings, analyze_conversation
 from src.application.ports import ConversationParser
 from src.domain.finding import Finding
 from src.domain.severity import SeverityRules
-
-BLOQUE_LECTURA = 1 << 20
 
 
 class TextAnalyzer:
@@ -41,12 +39,4 @@ class TextAnalyzer:
         )
 
     def analyze(self, path: Path) -> list[Finding]:
-        return analyze_conversation(self.parser.parse(path), _sha256(path), self.models, self.ajustes)
-
-
-def _sha256(path: Path) -> str:
-    resumen = hashlib.sha256()
-    with open(path, "rb") as archivo:
-        while bloque := archivo.read(BLOQUE_LECTURA):
-            resumen.update(bloque)
-    return resumen.hexdigest()
+        return analyze_conversation(self.parser.parse(path), sha256_de_archivo(path), self.models, self.ajustes)

@@ -5,7 +5,6 @@ from typing import Any
 
 from src.domain.finding import Severity
 
-CATEGORIA_OBLIGATORIA = "amenaza"
 CAMPOS_DE_REGLA = ("categoria", "umbral", "nivel")
 
 
@@ -20,18 +19,19 @@ class SeverityRules:
     por_categoria: Mapping[str, SeverityRule]
 
     @classmethod
-    def from_dict(cls, datos: Mapping[str, Any]) -> "SeverityRules":
+    def from_dict(cls, datos: Mapping[str, Any], obligatoria: str = "amenaza") -> "SeverityRules":
         lista = datos.get("severidad", [])
         if not isinstance(lista, list):
             raise ValueError(f"severidad debe ser una lista de reglas: {lista!r}")
         reglas: dict[str, SeverityRule] = {}
         for regla in lista:
             categoria = _categoria(regla)
+            # Una regla repetida reemplazaría a la anterior y podría degradar en silencio una severidad alta.
             if categoria in reglas:
                 raise ValueError(f"regla de severidad duplicada para la categoría «{categoria}»")
             reglas[categoria] = _regla(regla)
-        if CATEGORIA_OBLIGATORIA not in reglas:
-            raise ValueError(f"falta una regla de severidad para la categoría «{CATEGORIA_OBLIGATORIA}» (SUP-07)")
+        if obligatoria not in reglas:
+            raise ValueError(f"falta una regla de severidad para la categoría «{obligatoria}» (SUP-07)")
         return cls(reglas)
 
     def severity_for(self, categoria: str, confianza: float) -> Severity:

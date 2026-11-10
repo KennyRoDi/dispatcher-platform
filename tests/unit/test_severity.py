@@ -147,3 +147,16 @@ def test_regla_que_no_es_tabla_se_rechaza(regla):
 def test_categoria_que_no_es_texto_se_rechaza(categoria):
     with pytest.raises(ValueError, match="categoria"):
         SeverityRules.from_dict({"severidad": [{"categoria": categoria, "umbral": 0.5, "nivel": "alta"}]})
+
+
+def test_categoria_obligatoria_parametrizada_exige_su_regla():
+    reglas = SeverityRules.from_dict({"severidad": [{"categoria": "arma", "umbral": 0.5, "nivel": "alta"}]}, obligatoria="arma")
+
+    assert reglas.severity_for("arma", 0.9) is Severity.ALTA
+    with pytest.raises(ValueError, match="arma"):
+        SeverityRules.from_dict(REGLAS, obligatoria="arma")
+
+
+def test_sin_parametro_la_categoria_obligatoria_sigue_siendo_amenaza():
+    with pytest.raises(ValueError, match="amenaza"):
+        SeverityRules.from_dict({"severidad": [{"categoria": "arma", "umbral": 0.5, "nivel": "alta"}]})
