@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-03-2-dataset-sintetico
 **Verificación IA:** tests 825284f
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -135,3 +135,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 2: APROBADO sin bloqueantes. Confirmé en el código que case.name sin validar (línea 58) y la falta de conversión a UTC en los renderizadores corresponden a los xfail ya aceptados. El cambio de regex FECHA_UNIX en la prueba se evaluó como legítimo. Árbol limpio, commit empujado. (10d3f1a) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_media_generator.py: error de colección por ModuleNotFoundError de src.adapters.media_generator (rojo por módulo ausente). Solo se añadió ese archivo de pruebas (18), src/ intacto, commit empujado. Confirmé que el repo no tiene archivo LICENSE: la licencia de los medios queda por decidir. La API (generate_media, MediaFile, ORIGIN, LICENSE_NAME) la fijó el developer. (825284f) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
