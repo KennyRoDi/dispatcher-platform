@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** verificacion d0c3846
+**Verificación IA:** documentacion 01f58b0
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -266,3 +266,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-09 | QA re-verificó solo lo nuevo y dio APROBADO. Probó 11 mutaciones sobre el idioma y los errores transitorios y todas se detectaron; contrastó por su cuenta los 100 códigos de idioma con faster-whisper v1.2.1 y son idénticos; agregó 5 pruebas en d0c3846, solo en tests/. Repetí yo 2 mutaciones (quitar isinstance falla 3 pruebas, quitar la relanzada de transitorios falla 10), las revertí y git status quedó limpio. pytest -q -m 'not integration and not acceptance': 1188 passed. Observación menor: ConnectionError y BrokenPipeError se reportan como audio ilegible, aceptable para rutas locales. Sin comprobar: PyAV y faster-whisper reales, que quedan para la parte 3. (d0c3846) |
 | verificacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de 01f58b0: README, AD-28 y SPEC describen lo implementado en f8b866d y 06df373. Los 7 hashes citados en el borrador de la segunda entrada de bitácora existen en git. El borrador reconoce mi afirmación imprecisa sobre MemoryError y la regresión del TypeError. No hay el carácter de puntos suspensivos en lo editado. No quedan cambios sin commit. (01f58b0) |
