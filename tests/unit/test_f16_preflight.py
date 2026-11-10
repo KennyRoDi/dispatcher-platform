@@ -1,9 +1,10 @@
+import subprocess
 from unittest.mock import Mock
 
 import pytest
 
 import scripts.start_worker as start_worker
-from scripts.preflight import validate_config
+from scripts.preflight import _node_memory_bytes, validate_config
 
 
 def _config(memory=4 * 1024**3, swap=4 * 1024**3):
@@ -73,3 +74,34 @@ def test_start_worker_no_invoca_compose_si_el_presupuesto_excede_ram(monkeypatch
 
     assert start_worker.main() == 1
     compose_run.assert_not_called()
+
+
+def test_memoria_del_nodo_se_lee_del_daemon_docker(monkeypatch):
+    run = Mock(return_value=subprocess.CompletedProcess([], 0, stdout="17179869184\n"))
+    monkeypatch.setattr("scripts.preflight.subprocess.run", run)
+
+    assert _node_memory_bytes() == 16 * 1024**3
+    run.assert_called_once_with(
+        ["docker", "info", "--format", "{{.MemTotal}}"],
+        cwd=start_worker.ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+@pytest.mark.parametrize("output", ["", "unknown", "-1", "0", "１２"])
+def test_memoria_del_daemon_rechaza_salida_ausente_o_invalida(monkeypatch, output):
+    run = Mock(return_value=subprocess.CompletedProcess([], 0, stdout=output))
+    monkeypatch.setattr("scripts.preflight.subprocess.run", run)
+
+    with pytest.raises(ValueError, match="MemTotal"):
+        _node_memory_bytes()
+
+
+def test_memoria_del_daemon_propaga_error_de_docker(monkeypatch):
+    run = Mock(side_effect=subprocess.CalledProcessError(1, ["docker", "info"]))
+    monkeypatch.setattr("scripts.preflight.subprocess.run", run)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        _node_memory_bytes()
