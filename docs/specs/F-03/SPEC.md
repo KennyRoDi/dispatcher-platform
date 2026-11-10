@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-03-3-dataset-sintetico
 **Verificación IA:** implementacion 4b6b32f
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -154,3 +154,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_heavy_case_generator.py: 1 error de colección por ModuleNotFoundError de src.adapters.heavy_case_generator (rojo por módulo ausente). Solo se añadió ese archivo de pruebas (10 funciones, 120 líneas), src/ intacto, commit empujado, árbol limpio. La API (generate_heavy_cases, LICENSE_NAME, ORIGIN, ValueError/FileNotFoundError) la fijó el developer porque el SPEC no la define. (b3418b0) (b3418b0) |
 | tests | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 798 passed, 3 skipped, 10 xfailed (los de antes). Pruebas intactas (git diff de tests/ desde la fase anterior vacío). Solo se añadió src/adapters/heavy_case_generator.py (62 líneas), capa adaptadores, árbol limpio, commit empujado. No generó documento: todo caso pesado es video; _produce propio duplica algo de media_generator. Sin ruff instalado; no verifiqué ffmpeg real (lo reporta el developer: 209,3 MiB). (4b6b32f) (4b6b32f) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
