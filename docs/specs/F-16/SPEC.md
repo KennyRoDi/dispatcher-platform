@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 94fc871
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -74,3 +74,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Codex | 2026-11-10 | Revision independiente del arquitecto: contraste de SPEC con US-16, RF-24, B.5 M1, AD-05 y contratos existentes; dos partes de hasta 400 lineas; git diff origin/main...HEAD --check correcto; solo tres documentos, sin campos pendientes ni codigo. Corregidos comprobador inexistente y registro ADD/SUP. Sin pruebas de producto ni mediciones fisicas en fase plan; coordinacion de deploy y RAM WSL2 pendientes antes de parte 2. (94fc871) |
