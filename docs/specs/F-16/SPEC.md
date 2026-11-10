@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 060aaaa
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -85,3 +85,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Revision independiente del documentador sobre d76552a: leidos cuatro documentos contra src/domain/node_budget.py, src/infrastructure/cgroup_resources.py, SPEC, QA y Anexos 2/3. Ficha con cinco secciones comprobadas por Select-String, sin mediciones SO inventadas y parte 2 pendiente. AD-29/SUP-23 reflejan aprobacion humana del plan existente. Bitacora borrador con tres consultas y dos errores reales de plan corregidos, sin publicacion hasta aprobacion humana. git diff 9c7d20e..HEAD --check correcto; solo docs, diff src/tests vacio, arbol limpio. Conteos de pruebas coinciden con QA; no se repitio suite al no cambiar producto. (d76552a) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Codex | 2026-11-10 | Revision independiente del revisor sobre 060aaaa: releido diff completo origin/main...HEAD contra SPEC y plan de parte 1, sin hallazgos. Leido REVISION-parte-1.md, pruebas focalizadas del revisor 66 passed. Comprobe 52 lineas de producto, contratos y capas conservados, tests sin cambios desde adbb225, tres entradas de bitacora en origin/estado, diff --check correcto y arbol limpio; ultimo commit solo informe. Main actualizado 691846cf y ancestro comun a96bbe29. No repeti suite sin cambios producto. Aprobacion IA solo parte 1; CLI, Compose y mediciones Docker/WSL2 quedan pendientes parte 2. (060aaaa) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
