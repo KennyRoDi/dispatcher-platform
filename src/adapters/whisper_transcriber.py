@@ -52,10 +52,25 @@ class WhisperTranscriber:
             )
             # El generador es perezoso: la decodificación puede fallar al recorrerlo, no solo al llamar.
             crudos = list(segmentos)
-        # PyAV da InvalidDataError, subclase de ValueError, ante un archivo que no es audio.
-        except (OSError, ValueError) as error:
+        except _errores_de_decodificacion() as error:
             raise ValueError(f"no es un audio legible: {path}") from error
-        return sorted((_segmento(crudo) for crudo in crudos), key=lambda segmento: segmento.inicio)
+        try:
+            convertidos = [_segmento(crudo) for crudo in crudos]
+        except ValueError as error:
+            raise ValueError(f"Whisper devolvió un segmento inválido para {path}: {error}") from error
+        return sorted(convertidos, key=lambda segmento: segmento.inicio)
+
+
+def _errores_de_decodificacion() -> tuple[type[BaseException], ...]:
+    # Según el código fuente de PyAV 19.0.2: InvalidDataError hereda de ValueError y los errores de errno de
+    # OSError; el resto de av.error.FFmpegError no hereda de ninguno de los dos. Un archivo sin pista de audio
+    # da IndexError en StreamContainer._get_streams al hacer container.decode(audio=0).
+    errores: tuple[type[BaseException], ...] = (OSError, ValueError, IndexError)
+    try:
+        from av.error import FFmpegError
+    except ImportError:
+        return errores
+    return (*errores, FFmpegError)
 
 
 def _segmento(crudo: Any) -> TranscriptSegment:
@@ -63,8 +78,12 @@ def _segmento(crudo: Any) -> TranscriptSegment:
 
 
 def _confianza(avg_logprob: Any) -> float:
+    logprob = float(avg_logprob)
+    # min(0.0, nan) da 0.0 porque toda comparación con NaN es falsa: sin esto, NaN saldría como confianza 1.0.
+    if math.isnan(logprob):
+        raise ValueError(f"avg_logprob no es un número: {avg_logprob!r}")
     # Acotar antes de exp evita el desbordamiento y deja la confianza en [0, 1].
-    return math.exp(min(0.0, float(avg_logprob)))
+    return math.exp(min(0.0, logprob))
 
 
 def cargar_config_de_audio(ruta: Path) -> ConfigWhisper:
