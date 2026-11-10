@@ -1,6 +1,6 @@
 # SPEC F-17: Control de admisión
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-16-2-limites-por-worker
 **Verificación IA:** revision 670a461
 **Historia:** US-17 · **Requisitos:** RF-25 · **Responsable:** J
