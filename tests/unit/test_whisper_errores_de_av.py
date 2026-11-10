@@ -143,3 +143,18 @@ def test_sin_av_un_error_ajeno_a_la_entrada_se_propaga_sin_convertirse(sin_av, n
 def test_sin_av_los_errores_de_entrada_siguen_dando_value_error(sin_av, nota, error):
     with pytest.raises(ValueError, match="nota.ogg"):
         transcribir(ModeloQueFalla(error), nota)
+
+
+@pytest.mark.parametrize(
+    "error",
+    [ConnectionResetError("reset"), BrokenPipeError("pipe"), IsADirectoryError("directorio"), NotADirectoryError("no")],
+    ids=["connection-reset", "broken-pipe", "es-directorio", "no-es-directorio"],
+)
+def test_otros_oserror_de_entrada_se_rechazan_con_value_error(sin_av, nota, error):
+    with pytest.raises(ValueError, match="nota.ogg"):
+        transcribir(ModeloQueFalla(error), nota)
+
+
+def test_memoryerror_real_sin_av_se_propaga(sin_av, nota):
+    with pytest.raises(MemoryError):
+        transcribir(ModeloQueFalla(MemoryError()), nota)
