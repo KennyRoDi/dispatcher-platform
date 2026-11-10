@@ -49,5 +49,5 @@ def test_analizador_real_compara_transcripcion_con_la_esperada_y_marca_la_amenaz
     # El WER se registra tal como salga, sin umbral; solo se exige que la amenaza se detecte.
     assert any(h.category == "amenaza" and h.severity is Severity.ALTA for r in con_amenaza for h in r.hallazgos)
     config = cargar_config_de_audio(CONFIG_AUDIO)
-    texto = generar_markdown("pytest -m acceptance", config, {"faster-whisper": "instalada"}, notas, resultados)
+    texto = generar_markdown("pytest -m acceptance", config, {"faster-whisper": "instalada", "ctranslate2": "instalada"}, notas, resultados)
     assert "## Límites" in texto
