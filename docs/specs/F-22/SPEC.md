@@ -98,9 +98,11 @@ por cada índice i (en cualquier orden):
     staging.put_chunk(id, i, dato)
 POST /uploads/{id}/complete
   dominio: faltantes(recibidos) → MissingChunks
-  hasher incremental: por i en orden, leer chunk del staging por bloques
-  si hash != sha_total → IntegrityMismatch (no se toca ObjectStore)
-  object_store.put(sha_total, flujo_ordenado, size); staging.discard(id)
+  object_store.put(sha_total, flujo_verificado, size)
+    flujo_verificado: por i en orden, lee cada chunk del staging una sola vez
+    y calcula el sha256 sobre los mismos bytes que entrega a put
+    si hash != sha_total → IntegrityMismatch antes del último byte (put aborta)
+  staging.discard(id)
 ```
 
 ### Capas y archivos
@@ -174,6 +176,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 5. **Ubicación del staging.** Un volumen del Compose del Nodo A (`deploy/` es de Kenni). Hay que coordinar con él la línea del volumen.
 6. **Doble escritura en disco** (staging y luego MinIO): puede bajar el throughput medido. Se reporta en la ficha; si pesa demasiado, se revisa AD-28.
 7. **Prueba entre nodos** depende de que F-38 (despliegue en tres nodos) esté disponible.
+8. **`put` aborta por excepción (desviación aceptada en verificación).** QA encontró que leer el staging dos veces, una para el hash y otra para el `put`, permitía que un chunk cambiado entre ambas pasadas llegara a `ObjectStore` bajo un SHA-256 ajeno (H1). Ahora el hash se calcula sobre el mismo flujo que lee `put`, y si no coincide la lectura lanza `IntegrityMismatch` antes del último byte. Por eso `put` sí se llama, pero termina en excepción. **Requisito para F-23 (MinIO) y F-28 (cifrado):** el adaptador de `ObjectStore` no debe confirmar el objeto si la lectura de `content` lanza una excepción. Falta llevarlo al contrato en `docs/CONTRATOS.md` y a `comprobar_object_store`, en una PR aparte según «Cambiar un contrato». Aprobado por Melany Vindas.
+9. **Carrera entre `receive` y `discard` (H2, baja).** Un `receive` concurrente que llega después de `discard` vuelve a crear la carpeta de la subida con un chunk y sin manifiesto. Se resuelve en la parte 2, junto con las subidas abandonadas de la pregunta 4.
 
 ## Aprobaciones
 
