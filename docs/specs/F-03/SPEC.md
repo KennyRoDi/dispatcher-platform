@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-03-2-dataset-sintetico
 **Verificación IA:** implementacion b846164
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Segunda ronda QA: APROBADO, B1 resuelto. Reejecuté pytest unitario: 785 passed, 3 skipped, 10 xfailed sin XPASS. QA generó el plan completo (450 archivos) dos veces con ffmpeg real y distinto PYTHONHASHSEED: los 450 sha256 coinciden; semilla distinta da contenido distinto. ffprobe: duraciones y códecs correctos tras bitexact. Sin hallazgos nuevos bloqueantes; observación: colisiones de imágenes por color en rango pequeño. src/ intacto, árbol limpio. (9e5e007) |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | Ampliar variación de color de imágenes: 160 png dan 102 hashes únicos y 140 jpg dan 92 (colisiones) |
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Variación de color verificada: pytest unitario 788 passed, 3 skipped, 10 xfailed sin XPASS; integración con ffmpeg real 2 passed. Con ffmpeg real y semilla 9 reproduje 160 de 160 png únicos y 140 de 140 jpg únicos. Cambios: prueba nueva en rojo (190e8a4) y fix en media_generator.py (b846164). Una línea de una prueba de QA existente se relajó (neutro con dispersión de canales <=16 en vez de gris puro); la revisé y es coherente con gris o similar. (b846164) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
