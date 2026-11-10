@@ -5,7 +5,7 @@
 |---|---|
 | F-01 | pendiente |
 | F-02 | pendiente |
-| F-03 | verificacion |
+| F-03 | documentacion |
 | F-04 | pendiente |
 | F-05 | pendiente |
 | F-06 | pendiente |
@@ -24,7 +24,7 @@
 | F-19 | pendiente |
 | F-20 | pendiente |
 | F-21 | pendiente |
-| F-22 | verificacion |
+| F-22 | documentacion |
 | F-23 | pendiente |
 | F-24 | pendiente |
 | F-25 | pendiente |
