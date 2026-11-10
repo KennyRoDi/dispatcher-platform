@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion d76552a
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -83,3 +83,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Codex | 2026-11-10 | Revision independiente de QA parte 1 sobre e5cb8cf: leido QA-parte-1.md y diff; sin cambios de src ni tests desde aprobacion implementacion, arbol limpio y diff --check correcto. Reproduje py -m pytest -q tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py tests/unit/test_arquitectura.py: 57 passed. Reproduje mutacion en memoria que acepta cualquier presupuesto: test_preflight_rechaza_suma_de_limites_mayor_a_ram falla como esperado, 1 failed y 26 deselected. QA documento suite 1138 passed, 2 skipped, 3 deselected y seis mutaciones detectadas. Sin hallazgos parte 1; no hubo mediciones SO, Docker/WSL2 y cableado corresponden a parte 2. (e5cb8cf) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | Codex | 2026-11-10 | Revision independiente del documentador sobre d76552a: leidos cuatro documentos contra src/domain/node_budget.py, src/infrastructure/cgroup_resources.py, SPEC, QA y Anexos 2/3. Ficha con cinco secciones comprobadas por Select-String, sin mediciones SO inventadas y parte 2 pendiente. AD-29/SUP-23 reflejan aprobacion humana del plan existente. Bitacora borrador con tres consultas y dos errores reales de plan corregidos, sin publicacion hasta aprobacion humana. git diff 9c7d20e..HEAD --check correcto; solo docs, diff src/tests vacio, arbol limpio. Conteos de pruebas coinciden con QA; no se repitio suite al no cambiar producto. (d76552a) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
