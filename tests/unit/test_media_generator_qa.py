@@ -106,7 +106,7 @@ def test_color_de_imagen_positiva_difiere_del_neutro(tmp_path):
         call = by_output[str(image.path)]
         colors[image.etiqueta].add(re.search(r"c=0x([0-9a-f]{6})", call[call.index("-i") + 1]).group(1))
 
-    assert all(c[0:2] == c[2:4] == c[4:6] for c in colors["neutro"])
+    assert all(max(int(c[i : i + 2], 16) for i in (0, 2, 4)) - min(int(c[i : i + 2], 16) for i in (0, 2, 4)) <= 16 for c in colors["neutro"])
     assert all(int(c[0:2], 16) >= 200 and int(c[4:6], 16) <= 90 for c in colors["positivo"])
 
 

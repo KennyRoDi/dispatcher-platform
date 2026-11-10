@@ -1,3 +1,4 @@
+import itertools
 import random
 import subprocess
 from collections.abc import Callable
@@ -20,6 +21,10 @@ AUDIO_SAMPLE_RATE = 44100
 TONE_RANGE_HZ = (220, 880)
 AUDIO_SOURCES = ("tono", "ruido")
 NOISE_SEED_LIMIT = 2**31
+COLOR_STEP = 8
+POSITIVE_RANGES = ((200, 255), (120, 200), (0, 90))
+NEUTRAL_RANGE = (48, 208)
+NEUTRAL_MAX_SPREAD = 16
 # Sin bitexact los muxers estampan datos no deterministas (p. ej. el serial aleatorio de ogg).
 BITEXACT = ["-fflags", "+bitexact", "-flags:a", "+bitexact"]
 
@@ -60,9 +65,9 @@ def generate_media(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg
     for case in plan.cases:
         case_dir = out_dir / case.name
         for index in range(case.images):
-            categoria, etiqueta = next(image_slots)
+            categoria, etiqueta, color = next(image_slots)
             path = case_dir / f"{case.name}-imagen-{index + 1:03d}.{IMAGE_FORMATS[index % len(IMAGE_FORMATS)]}"
-            _produce(runner, _image_args(rng, etiqueta, path), path)
+            _produce(runner, _image_args(color, path), path)
             files.append(_media(plan, case.name, "imagen", path, etiqueta, categoria=categoria))
         for index in range(case.audios):
             duration = next(durations)
@@ -77,11 +82,13 @@ def _media(plan, case, kind, path, etiqueta, categoria=None, duration=None) -> M
     return MediaFile(case, kind, path, etiqueta, categoria, duration, ORIGIN, LICENSE_NAME, plan.seed)
 
 
-def _image_slots(plan: DatasetPlan, rng: random.Random) -> list[tuple[str, str]]:
+def _image_slots(plan: DatasetPlan, rng: random.Random) -> list[tuple[str, str, str]]:
     total = sum(case.images for case in plan.cases)
     categories = [IMAGE_CATEGORIES[position % len(IMAGE_CATEGORIES)] for position in range(total)]
     labels = {category: _shuffled_labels(plan, rng, category, categories.count(category)) for category in IMAGE_CATEGORIES}
-    return [(category, labels[category].pop()) for category in categories]
+    slots = [(category, labels[category].pop()) for category in categories]
+    colors = {label: _distinct_colors(rng, label, sum(1 for _, other in slots if other == label)) for label in (POSITIVE, NEUTRAL)}
+    return [(category, label, colors[label].pop()) for category, label in slots]
 
 
 def _shuffled_labels(plan: DatasetPlan, rng: random.Random, category: str, count: int) -> list[str]:
@@ -91,17 +98,28 @@ def _shuffled_labels(plan: DatasetPlan, rng: random.Random, category: str, count
     return labels
 
 
-def _image_args(rng: random.Random, etiqueta: str, path: Path) -> list[str]:
-    source = f"color=c=0x{_color(rng, etiqueta)}:s={IMAGE_SIZE}"
+def _image_args(color: str, path: Path) -> list[str]:
+    source = f"color=c=0x{color}:s={IMAGE_SIZE}"
     return FFMPEG_BASE + ["-f", "lavfi", "-i", source, "-frames:v", "1", str(path)]
 
 
-def _color(rng: random.Random, etiqueta: str) -> str:
+def _distinct_colors(rng: random.Random, etiqueta: str, count: int) -> list[str]:
+    palette = _palette(etiqueta)
+    colors: list[str] = []
+    while len(colors) < count:
+        colors += rng.sample(palette, min(len(palette), count - len(colors)))
+    return colors
+
+
+# La paleta es una rejilla gruesa: dos colores contiguos pueden dar el mismo archivo tras la conversion YUV y la cuantizacion JPEG.
+def _palette(etiqueta: str) -> list[str]:
     if etiqueta == POSITIVE:
-        red, green, blue = rng.randint(200, 255), rng.randint(120, 200), rng.randint(0, 90)
+        channels = [range(low, high + 1, COLOR_STEP) for low, high in POSITIVE_RANGES]
+        triples = itertools.product(*channels)
     else:
-        red = green = blue = rng.randint(90, 170)
-    return f"{red:02x}{green:02x}{blue:02x}"
+        levels = range(NEUTRAL_RANGE[0], NEUTRAL_RANGE[1] + 1, COLOR_STEP)
+        triples = (t for t in itertools.product(levels, repeat=3) if max(t) - min(t) <= NEUTRAL_MAX_SPREAD)
+    return [f"{red:02x}{green:02x}{blue:02x}" for red, green, blue in triples]
 
 
 def _audio_args(rng: random.Random, duration: int, path: Path) -> tuple[str, list[str]]:
