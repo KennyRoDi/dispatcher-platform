@@ -222,6 +222,39 @@ def test_reensamblado_en_disco_de_extremo_a_extremo(tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
+class _StagingQueCambiaEntrePasadas(FakeChunkStaging):
+    """Simula un PUT concurrente del chunk 0 que llega entre el cálculo del hash y el `put`."""
+
+    def __init__(self):
+        super().__init__()
+        self.aperturas = 0
+        self.al_reabrir = None
+
+    def open_chunk(self, upload_id, index):
+        self.aperturas += 1
+        if index == 0 and self.aperturas > 1 and self.al_reabrir:
+            self.al_reabrir()
+            self.al_reabrir = None
+        return super().open_chunk(upload_id, index)
+
+
+def test_objeto_entregado_coincide_con_su_sha256_aunque_cambie_un_chunk_al_completar():
+    datos = b"abcdefgh"
+    staging = _StagingQueCambiaEntrePasadas()
+    almacen = FakeObjectStore()
+    caso = ChunkedUpload(staging, almacen, max_chunk_size=64)
+    upload_id, _ = iniciar(caso, datos)
+    for indice, parte in enumerate(partir(datos)):
+        caso.receive(upload_id, indice, parte, sha(parte))
+    staging.al_reabrir = lambda: caso.receive(upload_id, 0, b"ZZZZ", sha(b"ZZZZ"))
+    try:
+        caso.complete(upload_id)
+    except IntegrityMismatch:
+        pass
+    for clave, contenido in almacen.objetos.items():
+        assert sha(contenido) == clave
+
+
 def test_indice_igual_a_la_cantidad_de_chunks_se_rechaza_aunque_venga_vacio():
     caso, _ = subida()
     upload_id, cantidad = iniciar(caso, b"abcdefgh")
