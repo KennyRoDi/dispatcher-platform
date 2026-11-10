@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** revision afd7484
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -309,3 +309,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-10 | Revisé 29840c5, 1d4d103 y 14aaf95. La evidencia generada por el script quedó intacta: 0 líneas borradas, solo se agregó la sección de observaciones marcada como escrita a mano, con hechos medidos y la media 17.6 % declarada como cálculo manual. README y AD-28 reflejan la corrida real del 2026-11-10 y mantienen Medición pendiente solo para la huella de F-17. Tras detectar dos pendientes del SPEC que contradecían la evidencia, el documentador los marcó resueltos, y con git grep ya no quedan afirmaciones falsas de que el modelo no se ejecutó. Los 8 hashes del borrador de bitácora existen. No hay el carácter de puntos suspensivos. Solo cambió documentación desde la verificación aprobada, y no ejecuté pytest en esta ronda porque el código no cambió. Sin comprobar: Python 3.13. (14aaf95) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-10 | El revisor aprobó la re-revisión de la parte 3 sin bloqueantes ni importantes. Reprodujo la evidencia con el entorno real: la parte generada es idéntica a la de 29840c5. Recalculó a mano los 5 WER y la media 17.6 por ciento, y midió las duraciones decodificadas. Concluyó que la PR puede ir con --final. Observaciones menores: el SPEC dice 4 de las 5 notas bajo 5 s, pero decodificadas son las 5; los comandos de las pruebas sintéticas de QA no están en la evidencia; los comentarios de whisper_transcriber citan PyAV 19.0.2 aunque el pin es 18.1.0; la licencia CC BY 4.0 figura como hecho en README y evidencia pero sigue sin confirmar por José Andrés. Yo comprobé: unitarias 1261 passed, git status limpio. Sin comprobar: Python 3.13. (afd7484) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
