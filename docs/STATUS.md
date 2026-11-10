@@ -10,7 +10,7 @@
 | F-05 | pendiente |
 | F-06 | pendiente |
 | F-07 | en-pr |
-| F-08 | revision |
+| F-08 | en-pr |
 | F-09 | pendiente |
 | F-10 | pendiente |
 | F-11 | pendiente |
