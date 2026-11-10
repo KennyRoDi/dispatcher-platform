@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** revision
+**Fase:** tests
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** documentacion 9e9317e
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -298,3 +298,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-10 | Revisé el diff de 9e9317e. La documentación declara que el modelo real no se ejecutó, que no existe docs/evidencia/F-09_transcripcion_<fecha>.md y que no hay WER medido ni cifra inventada; US-09 figura como no cumplida. AD-28 mantiene Medición pendiente. El borrador de bitácora usa hashes que existen y reconoce mis errores: la prueba de WER que no detecté y el JSON con nombres viejos. No hay el carácter de puntos suspensivos y no quedan cambios sin commit. Sin comprobar: nada de lo documentado con modelo real. (9e9317e) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Revision y corrida real: la aceptacion lanza KeyError ctranslate2 (pasa solo la version de faster-whisper); la integracion exige duracion con holgura de 0.1 s pero el modelo real da fin 5.00 s para audio de 4.86 s |
