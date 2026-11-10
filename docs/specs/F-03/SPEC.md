@@ -18,7 +18,7 @@ El equipo obtiene un dataset reproducible que cumple el mínimo de [B.3 Dataset 
 - Casos pesados (≥ 200 MB) generados en local, en una ruta configurable, no versionados.
 - 10 casos heterogéneos: 5 livianos y 5 pesados; los otros 30 casos pueden ser de uno o pocos tipos.
 - Manifiesto con origen, licencia y conteos por tipo; validador de mínimos B.3.
-- `docs/dataset.md` con la procedencia («generado por el equipo», con la licencia del repo), qué casos cumplen cada condición, la salida real del validador, la limitación de los patrones sintéticos y cómo los integrantes obtienen los casos pesados.
+- `docs/dataset.md` con la procedencia («generado por el equipo», con la licencia «generado por el equipo, uso academico», provisional porque el repo no tiene `LICENSE`), qué casos cumplen cada condición, la salida real del validador, la limitación de los patrones sintéticos y cómo los integrantes obtienen los casos pesados.
 
 **No incluye:** comparador y fallo por licencia ausente (F-04); parsers y validación de formatos de ingesta (F-02); subir los casos a la API (F-01); análisis de los archivos (F-07 a F-09). Entrenar modelos [B.1]. Datasets públicos de terceros. Versionar el dataset pesado o los medios. Publicar el dataset en Google Drive: lo hace la persona, fuera del repo.
 
@@ -28,7 +28,7 @@ El equipo obtiene un dataset reproducible que cumple el mínimo de [B.3 Dataset 
 - **Cuando** se ejecuta
 - **Entonces** hay ≥ 40 casos, ≥ 10 heterogéneos (5 livianos y 5 pesados), ≥ 20 000 mensajes, ≥ 300 imágenes, ≥ 150 audios y ≥ 5 casos con archivos ≥ 200 MB
 
-Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (mismos nombres, conteos y hashes de contenido); el manifiesto declara la proporción de contenido positivo por categoría de imagen (RF-20) y duraciones distintas de audio (RF-21); todos los archivos tienen origen `sintetico` y la licencia del repo (RNF-04); cada caso pesado es heterogéneo.
+Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (mismos nombres, conteos y hashes de contenido); el manifiesto declara la proporción de contenido positivo por categoría de imagen (RF-20) y duraciones distintas de audio (RF-21); todos los archivos tienen origen `sintetico` y la licencia `generado por el equipo, uso academico` (RNF-04; provisional, el repo no tiene `LICENSE`); cada caso pesado es heterogéneo.
 
 ## Diseño
 
@@ -42,15 +42,15 @@ Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (
 
 **Decisiones.**
 - **AD-25 aprobada por la persona:** generador nuevo y determinista en vez de ampliar `scripts/build_dataset.py`, que solo cubre video y audio, no tiene texto ni imágenes y su manifiesto trae `generated_at` (no reproducible). Alternativa: extender el heredado. Criterio: RF-18 a RF-22 exigen texto e imágenes y reproducibilidad. El arquitecto no toca `docs/ARQUITECTURA.md` en esta fase: registrar AD-25 en §8 es tarea de la fase documentación (parte 6).
-- Dataset totalmente sintético, decisión de la persona: sin datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) para evitar consideraciones legales y de licencia. Procedencia declarada en `docs/dataset.md`: «generado por el equipo», con la licencia del repo. Si se usa IA para redactar plantillas, se declara en `docs/BITACORA_IA.md`.
+- Dataset totalmente sintético, decisión de la persona: sin datasets públicos (Kaggle, Hugging Face, Roboflow, LibriSpeech, ESC-50) para evitar consideraciones legales y de licencia. Procedencia declarada en `docs/dataset.md`: «generado por el equipo», con la licencia «generado por el equipo, uso academico», provisional porque el repo no tiene `LICENSE`. Si se usa IA para redactar plantillas, se declara en `docs/BITACORA_IA.md`.
 - Ruta de salida: parámetro `--out`. Ubicación de desarrollo decidida por la persona: `~/scratch/dataset`, fuera del repo (hay 106 GB libres y no depende de `/scratch`, que no existe). Debe ser disco, no `tmpfs`, que cuenta en el cgroup (`docs/ARQUITECTURA.md` §4). `dataset/media/` ya está en `.gitignore`. Solo se versionan el manifiesto y `docs/dataset.md`.
 - Distribución: el repo es público, así que los casos pesados no se versionan. Se generan en local; la persona los sube a Google Drive y los demás integrantes los descargan y los usan en local. El enlace, el procedimiento y la verificación por `sha256` del manifiesto se documentan en `docs/dataset.md`, sin llaves ni credenciales en el repo.
 - Mensajes de chat: plantillas con vocabulario neutro y un subconjunto con frases de amenaza ficticias para F-07, aprobadas por la persona; sin personas ni datos reales.
-- Imágenes: patrones sintéticos generados con `ffmpeg` (`lavfi`) o equivalente, con proporción positiva conocida por categoría y etiqueta (positivo/negativo) asignada por el generador. Audios: tonos o ruido con duraciones distintas y etiqueta del generador, reutilizando las constantes `AUDIO_*` de `scripts/build_dataset.py`.
+- Imágenes: patrones sintéticos generados con `ffmpeg` (`lavfi`) o equivalente, con proporción positiva conocida por categoría y etiqueta (`positivo` o `neutro`) asignada por el generador. Audios: tonos o ruido con duraciones distintas y etiqueta del generador, reutilizando las constantes `AUDIO_*` de `scripts/build_dataset.py`.
 - Limitación a documentar en `docs/dataset.md`: F-08 medirá la detección sobre patrones sintéticos, no sobre fotos reales; sus resultados no se extrapolan a imágenes reales.
 - Heterogéneos (opción A): 10 casos, 5 livianos (texto, imagen, audio y documento) y 5 pesados (≥ 200 MB; texto, imagen, audio y video o documento). Los 5 pesados son parte de los 10 y de los ≥ 5 pesados de B.3. Los otros 30 casos pueden ser de uno o pocos tipos.
 - Casos pesados: el archivo grande es video sintético con bitrate fijo hasta superar 200 MiB (o documento grande); el generador falla si el archivo queda por debajo. El resto de sus archivos (texto, imagen, audio) sale de los mismos generadores.
-- Manifiesto (`manifest.json`) con campos `case`, `kind` (`texto|imagen|audio|video|documento`), `path`, `bytes`, `sha256`, `origen` (siempre `sintetico`), `licencia` (la del repo), `semilla`, `etiqueta` (verdad asignada por el generador, en imágenes y audio) y `heterogeneo` (`liviano|pesado|no`). Sin marca de tiempo. F-04 lo extiende; no se renombran campos.
+- Manifiesto (`manifest.json`) con campos `case`, `kind` (`texto|imagen|audio|video|documento`), `path`, `bytes`, `sha256`, `origen` (siempre `sintetico`), `licencia` (`generado por el equipo, uso academico`, provisional), `semilla`, `etiqueta` (verdad asignada por el generador, en imágenes y audio) y `heterogeneo` (`liviano|pesado|no`). Sin marca de tiempo. F-04 lo extiende; no se renombran campos.
 
 **Reutiliza del I Proyecto:** `ffmpeg_args` y constantes de duración de `scripts/build_dataset.py`, sin copiar historial. Se copia solo lo necesario, con cita en comentario.
 
@@ -64,7 +64,7 @@ Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (
 | Unitaria | `test_plan_bajo_el_minimo_se_reporta` | `check_minimums` nombra cada mínimo incumplido |
 | Unitaria | `test_plan_declara_proporcion_positiva_y_duraciones_distintas` | Cada categoría de imagen tiene proporción positiva declarada y los audios tienen duraciones distintas (RF-20, RF-21) |
 | Unitaria | `test_exportacion_whatsapp_se_parsea_con_timestamp_y_remitente` | Formato realista, UTF-8, con el parser existente o su doble |
-| Unitaria | `test_medios_llevan_etiqueta_y_origen_sintetico` | Con ejecutor falso: cada imagen y audio sale con etiqueta del generador, origen `sintetico` y licencia del repo |
+| Unitaria | `test_medios_llevan_etiqueta_y_origen_sintetico` | Con ejecutor falso: cada imagen y audio sale con etiqueta del generador, origen `sintetico` y licencia `generado por el equipo, uso academico` |
 | Unitaria | `test_caso_pesado_falla_si_no_alcanza_200_mib` | Con ejecutor falso; sin `ffmpeg` real ni red |
 | Integración | `test_generacion_reducida_escribe_manifiesto` | Parámetros reducidos con `ffmpeg` real en `tmp_path`: archivos y manifiesto coherentes |
 | Aceptación | `test_validador_sobre_dataset_completo` | Marcada `acceptance`: el validador sobre la ruta de `--out` cumple B.3; su salida va a `docs/dataset.md` |
