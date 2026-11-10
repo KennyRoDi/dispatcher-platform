@@ -1,5 +1,8 @@
+from unittest.mock import Mock
+
 import pytest
 
+import scripts.start_worker as start_worker
 from scripts.preflight import validate_config
 
 
@@ -60,3 +63,13 @@ def test_preflight_suma_limites_de_todos_los_workers():
     }
     with pytest.raises(ValueError, match="excede"):
         validate_config(config, node_memory=8 * 1024**3)
+
+
+def test_start_worker_no_invoca_compose_si_el_presupuesto_excede_ram(monkeypatch):
+    compose_run = Mock()
+    monkeypatch.setattr(start_worker, "_compose_config", lambda files: _config())
+    monkeypatch.setattr(start_worker, "_node_memory_bytes", lambda: 4 * 1024**3)
+    monkeypatch.setattr(start_worker.subprocess, "run", compose_run)
+
+    assert start_worker.main() == 1
+    compose_run.assert_not_called()
