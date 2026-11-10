@@ -20,7 +20,7 @@ from src.adapters.chat_export_generator import (
     render_whatsapp,
 )
 from src.domain.chat_message import ChatMessage
-from src.domain.dataset_plan import DatasetParams, plan_dataset
+from src.domain.dataset_plan import CasePlan, DatasetParams, DatasetPlan, plan_dataset
 
 CABECERA_WHATSAPP = re.compile(
     r"^(\d{1,2})/(\d{1,2})/(\d{2}), (\d{2}):(\d{2}) - ([^:\n]+): (.*)$"
@@ -308,3 +308,47 @@ def test_la_exportacion_crea_el_destino_si_no_existe(tmp_path):
 
     assert archivos
     assert all(ruta.is_file() for ruta in archivos.values())
+
+
+def test_la_semilla_del_plan_cambia_el_contenido_con_la_misma_estructura(tmp_path):
+    plan = plan_dataset(21, _params_pequenos())
+    otra_semilla = replace(plan, seed=plan.seed + 1)
+
+    a = export_plan_chats(plan, tmp_path / "a")
+    b = export_plan_chats(otra_semilla, tmp_path / "b")
+
+    assert a.keys() == b.keys()
+    assert all(_sha256(a[nombre]) != _sha256(b[nombre]) for nombre in a)
+
+
+def test_whatsapp_termina_cada_mensaje_con_salto_de_linea():
+    exportado = render_whatsapp(generate_chat(seed=8, count=30))
+
+    assert exportado.endswith("\n")
+    assert not exportado.endswith("\n\n")
+
+
+@pytest.mark.xfail(strict=True, reason="hallazgo QA (menor): los renderizadores no convierten a UTC un mensaje con otra zona")
+def test_los_renderizadores_normalizan_a_utc_un_mensaje_con_otra_zona():
+    costa_rica = timezone(timedelta(hours=-6))
+    mensaje = ChatMessage(datetime(2025, 1, 6, 23, 30, tzinfo=costa_rica), "Alma Sintética", "hola", "x-1")
+
+    whatsapp = render_whatsapp([mensaje])
+    telegram = json.loads(render_telegram([mensaje]))["messages"][0]
+
+    assert whatsapp.startswith("7/1/25, 05:30 - ")
+    assert telegram["date"] == "2025-01-07T05:30:00"
+
+
+@pytest.mark.xfail(strict=True, reason="hallazgo QA (menor): un nombre de caso con ../ escribe fuera del destino")
+def test_un_nombre_de_caso_no_escribe_fuera_del_destino(tmp_path):
+    destino = tmp_path / "salida"
+    caso = CasePlan("../escape", "no", ("texto",), 5, 0, 0, 0)
+    plan = DatasetPlan(1, (caso,), {}, ())
+
+    try:
+        export_plan_chats(plan, destino)
+    except ValueError:
+        pass
+
+    assert not (tmp_path / "escape-chat.txt").exists()
