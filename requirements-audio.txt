@@ -1,0 +1,7 @@
+# Dependencias del analizador de audio (F-09). Aparte de requirements-dev.txt para que CI no instale torch.
+# El audio también usa los modelos de texto de F-07; torch solo CPU, antes que el resto:
+#   pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-audio.txt
+-r requirements-texto.txt
+# faster-whisper de SYSTRAN, licencia MIT (https://github.com/SYSTRAN/faster-whisper).
+faster-whisper==1.2.1
