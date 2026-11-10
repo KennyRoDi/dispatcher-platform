@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** documentacion 5e58d31
+**Verificación IA:** revision 8e262c2
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -258,3 +258,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de documentacion | Claude Code (Opus 5.5), subagente documentador | 2026-11-09 | Revisé el diff de 5e58d31. El README del audio coincide con requirements-audio.txt y config/audio.toml. R14 tiene la revisión que comprobé en Hugging Face. AD-28 describe lo implementado en b1ec7d7. CONTRATOS suma los 3 archivos de la parte 2. En el SPEC, los pendientes de la parte 1 quedan resueltos y se agregan los de la parte 3; también marca como resuelto el riesgo de F-07 y F-08 en main, que confirmé antes. El borrador de bitácora usa hashes reales y declara que la re-verificación no fue independiente. Queda desactualizado el esbozo de audio.toml en la línea 115 del SPEC; es menor. (5e58d31) |
 | documentacion | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de revision | Claude Code (Opus 5.5), subagente revisor | 2026-11-09 | El revisor dio APROBADO con 2 hallazgos importantes y 3 menores, todos pendientes de que José Andrés decida. Comprobé los importantes en el código fuente. En faster-whisper 1.2.1, tokenizer.py lanza ValueError ante un idioma inválido, así que ese error se reporta como audio ilegible. En PyAV 19.0.2, av/error.py:213-230 hace que ENOMEM, ETIMEDOUT, EAGAIN y EACCES hereden de MemoryError, TimeoutError, BlockingIOError y PermissionError, y quedan capturados como audio ilegible; la frase de mi verificación anterior sobre MemoryError era imprecisa. Releí el diff completo de la parte 2: 158 líneas fuera de tests y docs. pytest: 1148 passed. git status limpio. (8e262c2) |
