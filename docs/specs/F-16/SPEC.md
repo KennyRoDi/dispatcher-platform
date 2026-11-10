@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests adbb225
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -77,3 +77,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Codex | 2026-11-10 | Revision independiente del arquitecto: contraste de SPEC con US-16, RF-24, B.5 M1, AD-05 y contratos existentes; dos partes de hasta 400 lineas; git diff origin/main...HEAD --check correcto; solo tres documentos, sin campos pendientes ni codigo. Corregidos comprobador inexistente y registro ADD/SUP. Sin pruebas de producto ni mediciones fisicas en fase plan; coordinacion de deploy y RAM WSL2 pendientes antes de parte 2. (94fc871) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Codex | 2026-11-10 | Revision independiente del developer: diff 995914d..HEAD solo agrega pruebas y comprobador en tests; git diff --check correcto. py -m pytest -q tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py --tb=short: 50 failed por ausencia de src.domain.node_budget y src.infrastructure.cgroup_resources, 3 passed del doble, sin errores de coleccion. py -m pytest -q tests/unit/test_contratos.py: 9 passed. Baseline antes de cambios: 1085 passed, 2 skipped, 3 deselected. Revisados presupuesto, reserva, replicas, valores invalidos, lectura temporal y conformidad; sin implementacion ni mediciones fisicas, parte 2 fuera de esta fase. (adbb225) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
