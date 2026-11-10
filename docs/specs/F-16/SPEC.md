@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** implementacion 7fef365
+**Verificación IA:** implementacion a980c3c
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -91,3 +91,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-10 | Revision independiente parte2 implementacion sobre 7fef365: inspeccionadas Compose, preflight, wrapper, SUP-24 y SPEC; WORKER_MEM_LIMIT obligatorio sin valor medido, Compose GPU hereda worker, sin --scale; start_worker valida antes de compose up. git diff --check correcto, arbol limpio. Suite completa py -m pytest -q -m not integration and not acceptance: 1147 passed, 2 skipped, 3 deselected, una advertencia Starlette, 42.54s. Focalizadas CPU/GPU, preflight y parte1: 62 passed. No ejecutar Docker ni hacer mediciones de nodos; límites medidos y M1 pendientes hasta carga pesada B/C/D. Código/tests añadidos dentro scope, no pruebas debilitadas. commit 7fef365 publicado. (7fef365) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | QA encontró que NODE_IP no valida formato IP; agregar prueba y rechazar valor inválido |
+| verificación IA de implementacion | Codex | 2026-11-10 | QA parte2 revisado independientemente tras fix f8bd884: informe a980c3c verifica fallo inicial NODE_IP y correccion ipaddress. git diff --check y arbol limpio. Orquestador reprodujo tras fix 11 pruebas focalizadas y suite completa 1149 passed,2 skipped,3 deselected. Leido codigo y pruebas; preflight valida Compose antes de up, reserva SUP-24 sigue supuesto, WORKER_MEM_LIMIT obligatorio sin default. No hay Docker/Compose real ni nodos B/C/D, por tanto evidencia física pendiente y explícita en QA-parte-2.md. No se repitieron pruebas sin cambios posteriores al run 1149. (a980c3c) |
