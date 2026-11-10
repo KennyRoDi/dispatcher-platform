@@ -36,6 +36,18 @@ def _reserve_bytes(node_memory: int) -> int:
     return max(GIB, fifteen_percent_ceil)
 
 
+def _memory_limit_bytes(value: object, service_name: str, variable: str) -> int:
+    if isinstance(value, int) and not isinstance(value, bool):
+        limit = value
+    elif isinstance(value, str) and value.isascii() and value.isdigit():
+        limit = int(value)
+    else:
+        raise ValueError(f"Servicio {service_name} no tiene {variable} válido")
+    if limit <= 0:
+        raise ValueError(f"Servicio {service_name} no tiene {variable} válido")
+    return limit
+
+
 def _compose_config(compose_files: list[str]) -> dict:
     command = ["docker", "compose", "--env-file", ".env"]
     for compose_file in compose_files:
@@ -74,10 +86,8 @@ def validate_config(config: dict, node_memory: int) -> None:
                         raise ValueError("NODE_IP debe ser una dirección IPv4 o IPv6 válida") from error
         else:
             continue
-        memory = service.get("mem_limit")
-        swap = service.get("memswap_limit")
-        if not isinstance(memory, int) or memory <= 0:
-            raise ValueError(f"Servicio {name} no tiene mem_limit válido")
+        memory = _memory_limit_bytes(service.get("mem_limit"), name, "mem_limit")
+        swap = _memory_limit_bytes(service.get("memswap_limit"), name, "memswap_limit")
         if memory != swap:
             raise ValueError(f"Servicio {name} permite swap o tiene límites distintos")
         limits.append(memory)
