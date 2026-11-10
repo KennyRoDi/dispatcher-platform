@@ -103,7 +103,7 @@ pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-audio.txt
 ```
 
-Transcribe con faster-whisper 1.2.1 (SYSTRAN, MIT) en CPU, con los pesos de Whisper (OpenAI, MIT) convertidos a CTranslate2 en `Systran/faster-whisper-base`. La revisión de esos pesos queda fijada en `config/audio.toml`. Los pesos no van en el repositorio: se descargan a la caché de Hugging Face en la primera carga, que necesita red. La prueba de integración toma la nota de voz de `F09_NOTA`, que debe ser propia o con licencia [B.3], y se salta si faster-whisper no está instalado. Desde la raíz del repositorio:
+Transcribe con faster-whisper 1.2.1 (SYSTRAN, MIT) en CPU, con los pesos de Whisper (OpenAI, MIT) convertidos a CTranslate2 en `Systran/faster-whisper-base`. La revisión de esos pesos queda fijada en `config/audio.toml`, donde `idioma` debe ser un código de idioma de Whisper (por ejemplo `es`) y cualquier otro valor falla al cargar. Los pesos no van en el repositorio: se descargan a la caché de Hugging Face en la primera carga, que necesita red. La prueba de integración toma la nota de voz de `F09_NOTA`, que debe ser propia o con licencia [B.3], y se salta si faster-whisper no está instalado. Desde la raíz del repositorio:
 
 ```bash
 F09_NOTA=<ruta> pytest -m integration tests/integration/test_whisper_transcriber_real.py

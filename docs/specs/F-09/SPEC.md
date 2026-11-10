@@ -112,14 +112,14 @@ Los timestamps son segundos desde el inicio del audio, con dos decimales. Ejempl
 ```toml
 [modelo]
 nombre = "base"
-revision = "se fija en la parte 2 con el commit del repositorio de pesos"
+revision = "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66"
 idioma = "es"
 compute_type = "int8"
 beam_size = 5
 hilos = 0
 ```
 
-Un idioma vacío, un `compute_type` desconocido o un `beam_size` menor que 1 hacen fallar la carga con `ValueError`.
+Un `idioma` que no sea un código de Whisper (100 códigos, sin espacios ni mayúsculas), un `compute_type` desconocido o un `beam_size` menor que 1 hacen fallar la carga con `ValueError`.
 
 ### Decisiones
 
@@ -219,7 +219,9 @@ Observaciones menores del QA de la parte 1. Los tiempos infinitos se corrigieron
 Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 3. H1 (NaN en `avg_logprob`) y H2 (excepciones de PyAV sin capturar) se corrigieron en la parte 2 (pruebas en 4f1dc5f y corrección en b1ec7d7).
 
 - Confirmar con PyAV y faster-whisper reales qué excepción se lanza ante un audio ilegible y ante un archivo sin pista de audio; lo capturado se dedujo del código fuente de PyAV 19.0.2, sin ejecutarlo.
-- `BugError` de FFmpeg hereda de `RuntimeError` y se reporta como «no es un audio legible», aunque sea un fallo interno de FFmpeg.
+- `BugError` de PyAV hereda de `FFmpegError` y de `RuntimeError` y se reporta como «no es un audio legible», aunque sea un fallo interno de FFmpeg. ENOMEM, ETIMEDOUT, EAGAIN y EACCES ya no: se propagan (f8b866d).
+- `ConnectionError` y `BrokenPipeError` se reportan como audio ilegible; es aceptable en rutas locales.
+- Los 100 códigos de `IDIOMAS_DE_WHISPER` son una copia estática de faster-whisper v1.2.1: revisarlos al subir de versión.
 - Los segmentos solapados no se corrigen: el adaptador solo los ordena por inicio.
 - No se ha comprobado con Python 3.13, que fija AD-22; el equipo de desarrollo usa Python 3.14.
 - Las claves extra de `[modelo]` en `config/audio.toml` se ignoran sin aviso.
