@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 9e5b2b4
+**Verificación IA:** verificacion c121d8e
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -194,3 +194,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Melany Vindas | 2026-11-10 | QA: H1, complete relee el staging y un chunk cambiado entre pasadas llega a ObjectStore con sha256 ajeno (test e7273fe en rojo) |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-10 | Devuelta por H1 de QA. Developer (subagente) cambio complete a una sola pasada que verifica el sha256 sobre el flujo entregado a ObjectStore. pytest: test_chunks 32/32, suite 1074 verde; mutante sin verificacion detectado; tests sin debilitar; 268 lineas. Desviacion: put se llama y aborta por excepcion si el hash no coincide; requiere que ObjectStore no confirme ante excepcion (F-23/F-28). H2 abierto para parte 2. Verificacion independiente. (9e5b2b4) |
 | implementacion | Melany Vindas | 2026-11-10 |  |
+| verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-10 | QA (subagente) re-verifico parte 1 tras arreglo de H1: APROBADO. Ataque con 14 lectores, chunks alterados en disco y concurrencia con hilos: ningun objeto con contenido distinto a su clave. 12 pruebas nuevas en verde que matan 3 mutantes. Orquestador: test_chunks 44/44, suite 1086 verde, mutante >= por == detectado, solo tests tocados. Sin mediciones en esta parte (M3 en parte 3). Riesgo 8 y H2 aceptados. Verificacion independiente. (c121d8e) |
