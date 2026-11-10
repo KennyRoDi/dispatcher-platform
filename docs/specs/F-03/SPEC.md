@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests 8e0a036
+**Verificación IA:** implementacion ec1e2fd
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -164,3 +164,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en los 3 archivos nuevos: 3 errores de colección por ModuleNotFoundError de scripts.dataset_sintetico (rojo por módulo ausente). Solo se añadieron pruebas (27 unitarias, 1 integración, 1 aceptación), src/ y scripts/ intactos, commit empujado, árbol limpio. Las pruebas nunca corrieron en verde: sus supuestos sobre FakeRunner y filas no están contrastados. API fijada por el developer (build_manifest, validate_manifest, main). No verifiqué la cobertura de cada criterio línea a línea. (09f76b6) |
 | verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Segunda ronda tras decisión de la persona. Reejecuté pytest en los 4 archivos de la parte 5: errores de colección por ModuleNotFoundError (scripts.dataset_sintetico, src.adapters.document_generator), rojo por módulo ausente. Diff desde 09f76b6: solo pruebas (test_document_generator nuevo, test_dataset_sintetico ajustado, integración) y SPEC; src/ y scripts/ intactos; árbol limpio, commit empujado. Pruebas nunca corrieron en verde. No revisé línea a línea la cobertura. (8e0a036) |
 | tests | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 1486 passed, 7 skipped, 14 xfailed; integración con ffmpeg real: 1 passed. git diff de tests/ desde la fase anterior vacío (pruebas intactas). Se añadieron document_generator.py (51 líneas) y scripts/dataset_sintetico.py (156), 207 en total, bajo 400; árbol limpio, commits empujados. Un solo comentario, de caso borde; imports solo adaptadores y dominio. No ejecuté el dataset completo (aceptación omitida) ni leí el código línea a línea. (ec1e2fd) |
