@@ -1,6 +1,6 @@
 # SPEC F-09: Worker de audio
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-09-2-worker-de-audio
 **Verificación IA:** verificacion 3c1bcc1
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
@@ -304,3 +304,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé los commits 089815b y bc24008: 7 líneas añadidas en 2 archivos. generar_markdown da ValueError con el nombre de la biblioteca si falta una versión, y requirements-audio.txt fija av==18.1.0 con el dato medido. Las pruebas no se tocaron desde 0b4bec3. Con el entorno real ejecuté las 6 pruebas de integración y aceptación: 6 passed. Resolví requirements-audio.txt con pip install --dry-run en el venv: sin conflictos con av==18.1.0. Suite unitaria: 1261 passed. Sin comprobar: Python 3.13. (bc24008) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code (Opus 5.5), subagente qa-tester | 2026-11-10 | QA verificó la parte 3 con el entorno real y dio APROBADO. Ejecutó las 6 pruebas de integración y aceptación: 6 passed. Recalculó a mano el WER de las 5 notas sin usar el script y coinciden: 15.4, 9.1, 36.4, 27.3 y 0.0 por ciento. Comprobó determinismo en 2 transcripciones por nota, ValueError con un .ogg de 0 bytes y con un mp4 sin audio, y que una nota de 165 s se transcribe en 23 s. Hallazgo H-Q1: un tono sostenido de 35 s produce un segmento inventado de puntos suspensivos que pasa como transcripción válida; silencio y ruido blanco dan lista vacía. Se documenta en los límites de la evidencia y no bloquea. Yo comprobé: unitarias 1261 passed y git status limpio. Sin comprobar: Python 3.13. (3c1bcc1) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
