@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-09-1-worker-de-audio
-**Verificación IA:** tests bc67928
+**Verificación IA:** implementacion c1e58fc
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -238,3 +238,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | José Andrés Loría Herrera | 2026-11-09 |  |
 | verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el diff de bc67928: solo toca tests/ (3 archivos nuevos, TERCEROS_PROHIBIDOS con faster_whisper, ctranslate2 y av, y 2 pruebas agregadas a test_transcription sin tocar las existentes). Ejecuté pytest: test_whisper_config y test_whisper_transcriber fallan al recolectar por ModuleNotFoundError de src.adapters.whisper_transcriber; los 5 casos de test_transcription (bool y tiempo fuera de rango) fallan por DID NOT RAISE u OverflowError. El resto da 1085 passed y la integración se salta sin faster-whisper. numpy llega a CI de forma transitiva por pandas, como en F-08. Sin comprobar: qué excepción da PyAV, que es una suposición del developer. (bc67928) |
 | tests | José Andrés Loría Herrera | 2026-11-09 |  |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-09 | Revisé el diff 3a8ac21..c1e58fc: 139 líneas fuera de tests y docs. git diff bc67928..HEAD -- tests/ sale vacío, así que las pruebas no se debilitaron. faster_whisper se importa solo dentro de from_config, en adaptadores. La validación de segmentos queda fuera del try, de modo que no se confunde con un error de decodificación. Confirmé por mi cuenta que el campo sha de huggingface.co/api/models/Systran/faster-whisper-base es ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66 y que faster-whisper 1.2.1 existe en PyPI con licencia MIT. pytest -q -m 'not integration and not acceptance': 1139 passed. La integración se salta porque faster-whisper no está instalado. Sin comprobar: que PyAV lance InvalidDataError subclase de ValueError; el comentario del código lo afirma sin haberlo medido. (c1e58fc) |
