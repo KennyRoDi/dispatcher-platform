@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** implementacion a980c3c
+**Verificación IA:** verificacion 60d66a5
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -93,3 +93,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | José Andrés Loría Herrera | 2026-11-10 | QA encontró que NODE_IP no valida formato IP; agregar prueba y rechazar valor inválido |
 | verificación IA de implementacion | Codex | 2026-11-10 | QA parte2 revisado independientemente tras fix f8bd884: informe a980c3c verifica fallo inicial NODE_IP y correccion ipaddress. git diff --check y arbol limpio. Orquestador reprodujo tras fix 11 pruebas focalizadas y suite completa 1149 passed,2 skipped,3 deselected. Leido codigo y pruebas; preflight valida Compose antes de up, reserva SUP-24 sigue supuesto, WORKER_MEM_LIMIT obligatorio sin default. No hay Docker/Compose real ni nodos B/C/D, por tanto evidencia física pendiente y explícita en QA-parte-2.md. No se repitieron pruebas sin cambios posteriores al run 1149. (a980c3c) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | Codex | 2026-11-10 | QA de F-16 parte 2 tras fix de NODE_IP; 11 focalizadas y suite completa 1149 passed, 2 skipped, 3 deselected; informe a980c3c; sin Docker ni mediciones físicas, pendientes y documentadas. (60d66a5) |
