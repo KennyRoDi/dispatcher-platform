@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-03-2-dataset-sintetico
 **Verificación IA:** documentacion 555c21d
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -148,3 +148,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Ronda final QA: APROBADO. Reejecuté pytest unitario: 788 passed, 3 skipped, 10 xfailed sin XPASS; src y tests sin cambios desde b846164, árbol limpio. QA: paletas positiva y neutra disjuntas (dispersión mínima 112 contra máxima 16), tres corridas con ffmpeg real y distinto PYTHONHASHSEED con sha256 idénticos en los 450 archivos, imágenes únicas por semilla, bordes y proporción por categoría correctos. Limitación: una corrida completa con semilla 2 murió en segundo plano; la unicidad de imágenes no depende de los audios. (8989d75) |
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador solo ajustó el SPEC en 5 líneas: etiqueta neutro en vez de negativo y licencia provisional generado por el equipo, uso academico. Revisé el diff: cambios mínimos, sin tocar aprobaciones ni fase, sin campos pendientes. README, ARQUITECTURA y CONTRATOS no mencionan el generador. Borrador de bitácora con hechos del historial: error B1 de bytes no reproducibles, colisiones de imágenes y xfail abiertos. (555c21d) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
