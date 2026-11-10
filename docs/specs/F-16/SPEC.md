@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** documentacion 229e43f
+**Verificación IA:** tests de02cc2
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -98,3 +98,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Revision independiente de documentacion F-16 parte 2: contrastados README, ficha M1, SPEC y borrador Anexo 3 con scripts/preflight.py, scripts/start_worker.py, Compose y QA-parte-2.md. Los comandos CPU/GPU y limites descritos existen; WORKER_MEM_LIMIT sigue sin valor asignado y no se presentan mediciones B/C/D ni cgroups inexistentes como evidencia. Bitacora borrador registra el hallazgo real de NODE_IP y su correccion, cifras QA atribuidas al informe y ausencia de ejecucion Docker. git diff HEAD~2..HEAD --check sin errores; arbol limpio. Mediciones fisicas y revision final pendientes. (229e43f) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Agregar prueba que confirme que start_worker rechaza presupuesto excesivo sin invocar docker compose up, conforme al criterio de aceptación del SPEC y hallazgo del revisor |
+| verificación IA de tests | Codex | 2026-11-10 | Verificacion independiente de tests tras devolucion del revisor: el commit de02cc2 agrega solo una prueba de arranque; diff revisado y git diff --check limpio. Reproduje py -m pytest -q tests/unit/test_f16_preflight.py --tb=short: 10 passed. La prueba confirma que presupuesto excesivo devuelve 1 y no invoca subprocess.run/Compose. No queda roja contra el codigo actual porque start_worker ya rechaza el exceso; no se introdujo una regresion artificial. Para avanzar se requiere aprobacion humana de excepcion a la exigencia de rojo, motivada por cobertura faltante descubierta en revision. (de02cc2) |
