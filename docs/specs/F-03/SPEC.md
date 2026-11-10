@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 1a2f964
+**Verificación IA:** verificacion d5231b9
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -168,3 +168,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 1486 passed, 7 skipped, 14 xfailed; integración con ffmpeg real: 1 passed. git diff de tests/ desde la fase anterior vacío (pruebas intactas). Se añadieron document_generator.py (51 líneas) y scripts/dataset_sintetico.py (156), 207 en total, bajo 400; árbol limpio, commits empujados. Un solo comentario, de caso borde; imports solo adaptadores y dominio. No ejecuté el dataset completo (aceptación omitida) ni leí el código línea a línea. (ec1e2fd) |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5) | 2026-11-10 | Reverificación tras añadir la parte 7 (fix de defectos menores) a la pila del SPEC por decisión de la persona. Solo cambió el SPEC (1 fila); código y pruebas intactos desde ec1e2fd (1486 passed, 7 skipped, 14 xfailed, integración 1 passed verificados antes). Árbol limpio, commit empujado. (1a2f964) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 1486 passed, 7 skipped, 20 xfailed. src/ y scripts/ intactos desde ec1e2fd; solo se añadió tests/unit/test_dataset_sintetico_qa.py (d5231b9), árbol limpio. Reproduje el hallazgo 5: --params con messages=-5 e images=-3 sale con código 0 y genera archivos. QA: APROBADO sin bloqueantes; generación completa real con semilla 1 (490 archivos, 147,5 s, 1,8 GiB, --validar sale 0); 5 hallazgos menores en xfail estricto. No reproduje yo los otros 4 hallazgos ni la generación completa. (d5231b9) |
