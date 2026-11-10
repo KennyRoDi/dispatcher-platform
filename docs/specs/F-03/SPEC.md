@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-03-1-dataset-sintetico
 **Verificación IA:** tests aa33e8c
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -125,3 +125,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 1: APROBADO sin bloqueantes. Comprobé en el código las observaciones de dataset_plan.py (mínimos fijos en check_minimums, exigencia solo de 10 heterogéneos en total, nombre HEAVY_KINDS). Árbol limpio, commit empujado, pruebas en verde en la fase anterior. (8a01b29) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en tests/unit/test_chat_export_generator.py: 1 error de colección por ModuleNotFoundError de src.adapters.chat_export_generator (rojo por módulo ausente, no por sintaxis). Solo se añadió ese archivo de pruebas (27 funciones), src/ intacto, commit empujado, árbol limpio. La API (generate_chat, render_whatsapp, render_telegram, export_plan_chats) la fijó el developer porque el SPEC no la define. (aa33e8c) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
