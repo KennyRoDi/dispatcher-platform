@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-03-3-dataset-sintetico
 **Verificación IA:** documentacion ab55439
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -158,3 +158,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest: 806 passed, 3 skipped, 14 xfailed. src/ intacto, solo pruebas QA nuevas (77faa7c) empujadas, árbol limpio. Reproduje con ffmpeg real un caso pesado: 219512832 B = 209,34 MiB, sha256 783cde6b... idéntico al de QA. 4 hallazgos no bloqueantes dejados como xfail estricto. (77faa7c) |
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador no cambió archivos: README y ARQUITECTURA mencionan el dataset solo de forma genérica (comprobé las líneas), docs/reutilizacion.md no existe, docs/dataset.md y AD-25 son de la parte 6. Árbol limpio, sin commits nuevos. Borrador de bitácora contrastado con el diff: _produce duplicado (heavy_case_generator.py) y API fijada por el developer son reales; hallazgos de QA coinciden con las pruebas xfail. (ab55439) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
