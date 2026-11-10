@@ -4,6 +4,11 @@ from datetime import datetime, timezone
 
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import QueueFull
+from src.domain.text_analysis import MessageAnalysis
+
+ANALISIS_NEUTRAL = MessageAnalysis(
+    lemmas=("hola",), sentiment_label="neutral", sentiment_score=0.8, offense_score=0.0, threat_patterns=()
+)
 
 
 class FakeClock:
@@ -31,6 +36,16 @@ class FakeConversationParser:
 
     def parse(self, path):
         return list(self.mensajes)
+
+
+class FakeTextModels:
+    def __init__(self, por_texto=None):
+        self.por_texto = por_texto or {}
+        self.llamadas = []
+
+    def analyze_messages(self, texts):
+        self.llamadas.append(list(texts))
+        return [self.por_texto.get(texto, ANALISIS_NEUTRAL) for texto in texts]
 
 
 class FakeObjectStore:
