@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-09-2-worker-de-audio
-**Verificación IA:** tests 0b4bec3
+**Verificación IA:** implementacion bc24008
 **Historia:** US-09 · **Requisitos:** RF-08, RNF-25; RF-06 (análisis reutilizado); RF-14 (segmento de audio con timestamp); RNF-04, RNF-05; SUP-07, SUP-11, SUP-15; [B.4 Workers de análisis], [B.4 Reporte consolidado], [B.1], [B.3], [B.7 Audio] · **Responsable:** J
 
 ## Objetivo
@@ -301,3 +301,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Revision y corrida real: la aceptacion lanza KeyError ctranslate2 (pasa solo la version de faster-whisper); la integracion exige duracion con holgura de 0.1 s pero el modelo real da fin 5.00 s para audio de 4.86 s |
 | verificación IA de tests | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé el diff de 0b4bec3: solo tests/, 20 líneas añadidas y 3 borradas. La aceptación pasa ahora las dos versiones. La holgura de la integración sube a 0.5 s, justificada por el dato medido. Agrega test_comparar_transcripcion_versiones.py, con 2 pruebas rojas esperadas: generar_markdown debe dar ValueError, no KeyError, si falta una versión, y se corrige en implementación. Ejecuté con el entorno real, faster-whisper 1.2.1, av 18.1.0 y los modelos reales, las 6 pruebas de integración y aceptación: 6 passed, incluida la aceptación que antes fallaba. Suite unitaria: 1259 passed y 2 failed, las rojas esperadas. Sin comprobar: Python 3.13. (0b4bec3) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | El script scripts/comparar_transcripcion.py ya existia (582581b): la fase se devolvio desde revision por errores de las pruebas de aceptacion e integracion hallados en la corrida real; la persona autorizo la excepcion |
+| verificación IA de implementacion | Claude Code (Opus 5.5), subagente developer | 2026-11-10 | Revisé los commits 089815b y bc24008: 7 líneas añadidas en 2 archivos. generar_markdown da ValueError con el nombre de la biblioteca si falta una versión, y requirements-audio.txt fija av==18.1.0 con el dato medido. Las pruebas no se tocaron desde 0b4bec3. Con el entorno real ejecuté las 6 pruebas de integración y aceptación: 6 passed. Resolví requirements-audio.txt con pip install --dry-run en el venv: sin conflictos con av==18.1.0. Suite unitaria: 1261 passed. Sin comprobar: Python 3.13. (bc24008) |
