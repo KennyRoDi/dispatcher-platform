@@ -166,7 +166,7 @@ python -m scripts.comparar_transcripcion --muestra tests/datos/audio --esperadas
 pytest -m acceptance tests/acceptance/test_audio_transcripcion.py
 ```
 
-La versión de torch se toma de F-07 y se confirma en la parte 2.
+La parte 2 fijó `faster-whisper==1.2.1` en `requirements-audio.txt`, que incluye `requirements-texto.txt` con `torch==2.15.0` CPU de F-07, y la revisión `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66` de `Systran/faster-whisper-base` en `config/audio.toml`. Los pesos se descargan a la caché de Hugging Face en la primera carga; la prueba de integración toma la nota de `F09_NOTA` y se salta si faster-whisper no está instalado.
 
 ## Mediciones
 
@@ -197,7 +197,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 **Riesgos:**
 
-- **Las partes 2 y 3 de F-07 y F-08 no están en `main`.** Las PR #29, #30, #32 y #33 figuran como fusionadas, pero sus bases eran las ramas de la parte anterior, no `main`: `origin/main` no tiene `requirements-texto.txt`, `src/adapters/spacy_hf_text_models.py` ni `src/adapters/yolo_detector.py` (comprobado con `git ls-tree origin/main`). La parte 1 de F-09 no los necesita; la parte 2 necesita `requirements-texto.txt` y la 3 los modelos reales de texto. Hay que llevar ese código a `main` antes de la parte 2 de F-09.
+- **Las partes 2 y 3 de F-07 y F-08 no están en `main`.** Las PR #29, #30, #32 y #33 figuran como fusionadas, pero sus bases eran las ramas de la parte anterior, no `main`: `origin/main` no tiene `requirements-texto.txt`, `src/adapters/spacy_hf_text_models.py` ni `src/adapters/yolo_detector.py` (comprobado con `git ls-tree origin/main`). La parte 1 de F-09 no los necesita; la parte 2 necesita `requirements-texto.txt` y la 3 los modelos reales de texto. Hay que llevar ese código a `main` antes de la parte 2 de F-09. Resuelto: 43416f1 lo llevó a `main` y la parte 2 parte de esa base (0a6d31c); `git ls-tree origin/main` ya muestra los tres archivos.
 - **Calidad.** Whisper `base` comete errores en español con ruido o habla rápida, y puede inventar texto en silencios largos. Una muestra de 5 notas no es representativa; se declara su tamaño. Un error de transcripción puede ocultar una amenaza: es un límite que se declara.
 - **Descarga de pesos.** El modelo se descarga de Hugging Face en la primera carga y necesita red; se fija su revisión para que la evidencia sea reproducible. Nunca en las unitarias.
 - **Dependencias.** faster-whisper trae CTranslate2 y PyAV. Puede no haber *wheels* para Python 3.14; AD-22 fija 3.13 en los workers. La imagen del worker de audio también lleva torch por los modelos de texto. Sin comprobar.
@@ -207,12 +207,23 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 ### Pendientes para la parte 2
 
-Observaciones menores del QA de la parte 1 sin corregir. Los tiempos infinitos se corrigieron en la parte 1 durante la verificación (f0ce6dc).
+Observaciones menores del QA de la parte 1. Los tiempos infinitos se corrigieron en la parte 1 durante la verificación (f0ce6dc). Las cuatro se resolvieron en la parte 2 (388af7d y c1e58fc).
 
-- Un timestamp de 1e12 s o más da `OverflowError` en `segmentos_como_mensajes` (`src/domain/transcription.py`), en vez de `ValueError`.
-- `TranscriptSegment` acepta `bool` como tiempo de inicio o fin.
-- Con segmentos desordenados o solapados, `SegmentPositions.rango` da un rango invertido o más corto que el lote. La integración con el transcriptor real debe garantizar el orden.
-- `TranscriptSegment` rechaza `numpy.float32` como confianza: el transcriptor real debe convertir a `float` nativo.
+- Resuelto: un timestamp de 1e12 s o más ya no da `OverflowError` en `segmentos_como_mensajes`: `TranscriptSegment` rechaza con `ValueError` tiempos mayores que `TIEMPO_MAXIMO_S` (`src/domain/transcription.py`).
+- Resuelto: `TranscriptSegment` rechaza `bool` como tiempo de inicio o fin.
+- Resuelto: `WhisperTranscriber` ordena los segmentos por inicio antes de devolverlos.
+- Resuelto: `WhisperTranscriber` convierte a `float` nativo los tiempos y la confianza, incluido `numpy.float32`.
+
+### Pendientes para la parte 3
+
+Observaciones de la parte 2 que José Andrés decide si se corrigen en la parte 3. H1 (NaN en `avg_logprob`) y H2 (excepciones de PyAV sin capturar) se corrigieron en la parte 2 (pruebas en 4f1dc5f y corrección en b1ec7d7).
+
+- Confirmar con PyAV y faster-whisper reales qué excepción se lanza ante un audio ilegible y ante un archivo sin pista de audio; lo capturado se dedujo del código fuente de PyAV 19.0.2, sin ejecutarlo.
+- `BugError` de FFmpeg hereda de `RuntimeError` y se reporta como «no es un audio legible», aunque sea un fallo interno de FFmpeg.
+- Los segmentos solapados no se corrigen: el adaptador solo los ordena por inicio.
+- No se ha comprobado con Python 3.13, que fija AD-22; el equipo de desarrollo usa Python 3.14.
+- Las claves extra de `[modelo]` en `config/audio.toml` se ignoran sin aviso.
+- La prueba de integración `tests/integration/test_whisper_transcriber_real.py` nunca se ha ejecutado, porque faster-whisper no está instalado en el equipo de desarrollo.
 
 ## Aprobaciones
 
