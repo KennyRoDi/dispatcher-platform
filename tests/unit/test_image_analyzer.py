@@ -201,3 +201,31 @@ def test_from_config_rechaza_categoria_con_espacios_al_borde(tmp_path):
 
     with pytest.raises(ValueError, match="knife"):
         ImageAnalyzer.from_config(FakeObjectDetector([]), config)
+
+
+def test_mutar_el_mapa_original_no_cambia_los_ajustes(imagen):
+    mapa = {"knife": "arma"}
+    ajustes = ImageSettings(mapa=mapa, umbral_minimo=0.25, reglas=SeverityRules.from_dict(REGLAS, obligatoria="arma"))
+    mapa["scissors"] = "arma"
+    mapa["knife"] = "otra"
+    detector = FakeObjectDetector([Detection("scissors", 0.9, (0, 0, 1, 1)), Detection("knife", 0.8, (2, 2, 3, 3))])
+
+    [hallazgo] = ImageAnalyzer(detector, ajustes).analyze(imagen)
+
+    assert (hallazgo.category, hallazgo.detail) == ("arma", "knife ×1")
+
+
+@pytest.mark.parametrize(
+    "contenido",
+    [
+        "umbral_minimo = 0.25\n\n" + REGLA_ARMA,
+        '[clases]\nknife = "arma"\n\n' + REGLA_ARMA,
+    ],
+    ids=["sin-clases", "sin-umbral-minimo"],
+)
+def test_from_config_sin_clases_o_sin_umbral_minimo_falla_en_vez_de_usar_un_valor_por_defecto(tmp_path, contenido):
+    config = tmp_path / "imagen.toml"
+    config.write_text(contenido, encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        ImageAnalyzer.from_config(FakeObjectDetector([]), config)
