@@ -45,9 +45,9 @@ Se aplican AD-01 (reutilizar Compose y contratos), AD-05 (cgroups v2, sin swap),
 
 ## Mediciones
 
-En cada nodo B/C/D real, con su archivo de entorno local, obtener la configuración con `docker compose --env-file .env -f deploy/docker-compose.worker.yml config --format json`; en el nodo GPU agregar `-f deploy/docker-compose.worker-gpu.yml` antes de `config`. Registrar comando, nodo, fecha UTC, RAM efectiva de WSL2, reserva y límites explícitos. Las fuentes y comandos de lectura de RAM se concretarán al coordinar el arranque de la parte 2; no se declarará medido ningún valor recibido por configuración.
+En cada nodo B/C/D real, leer `MemTotal` de `/proc/meminfo` dentro del entorno Linux donde Docker aplica los límites (VM WSL2); no usar la RAM física de Windows. `scripts/preflight.py` obtiene la configuración mediante `docker compose config --format json`; acepta `--gpu` para combinar el override GPU. `scripts/start_worker.py [--gpu]` valida de nuevo antes de ejecutar `compose up`. Registrar comando, nodo, fecha UTC, RAM efectiva de WSL2, reserva SUP-24 (supuesto provisional) y límites configurados explícitamente. `WORKER_MEM_LIMIT` es obligatorio, pero su valor debe medirse y decidirse por nodo; no se asigna valor en esta parte.
 
-Por cada contenedor worker iniciado, ejecutar `docker exec <id> cat /sys/fs/cgroup/cgroup.controllers`, `docker exec <id> cat /sys/fs/cgroup/memory.max` y `docker exec <id> cat /sys/fs/cgroup/memory.swap.max`; guardar los comandos resueltos con sus identificadores y salidas crudas en `docs/evidencia/F-16/`. Repetir la lectura en tres arranques por nodo, registrando fallos y comparando bytes con Compose efectivo. No se necesita ráfaga ni OOM para verificar este límite.
+Por cada contenedor worker iniciado, ejecutar `docker exec <id> cat /sys/fs/cgroup/cgroup.controllers`, `docker exec <id> cat /sys/fs/cgroup/memory.max` y `docker exec <id> cat /sys/fs/cgroup/memory.swap.max`; guardar los comandos resueltos con sus identificadores y salidas crudas en `docs/evidencia/F-16/`. Repetir el arranque y lectura tres veces por nodo, registrando fallos y comparando bytes con Compose efectivo. No se necesita ráfaga ni OOM para verificar este límite. La QA de parte 2 no tuvo acceso a nodos reales; Docker/Compose y estas mediciones siguen pendientes.
 
 Crear la ficha `docs/modulo-M1-memoria.md` con los cinco elementos del Anexo 2, tabla de valores configurados/observados y referencia al kernel Linux (R4 de ARQUITECTURA). Declarar que se mide la VM WSL2; dejar pendientes, identificados por feature, los productos de M1 correspondientes a F-17/F-18/F-19. Si no hay nodos disponibles, registrar la limitación y solicitar decisión humana en la fase de medición; nunca sustituir datos reales por estimaciones.
 
@@ -63,7 +63,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 ## Riesgos y preguntas abiertas
 
 - Se acordó para la parte 2 `scripts/preflight.py`, `scripts/start_worker.py`, `WORKER_MEM_LIMIT`, la comprobación de `NODE_NAME`/`NODE_IP` y la omisión de `--scale` por AD-23.
-- Confirmar la disponibilidad de nodos B/C/D y cgroups v2 de Docker Desktop/WSL2 para verificar y medir la parte 2. Este plan no afirma haberlos comprobado.
+- Confirmar la disponibilidad de nodos B/C/D y cgroups v2 de Docker Desktop/WSL2 para verificar y medir. Siguen sin comprobarse en esta rama.
 - El valor de `WORKER_MEM_LIMIT` y la reserva requieren medición; SUP-24 fija solo un margen provisional para el preflight. La RAM se lee desde `/proc/meminfo` del entorno Linux que aplica los cgroups.
 - El preflight es una comprobación de presupuesto al arranque, no una garantía de memoria libre futura ni reemplazo de F-17.
 - La parte 1 es independiente de F-09; la parte 2 no debe sobrescribir los cambios de despliegue que entren entretanto.
