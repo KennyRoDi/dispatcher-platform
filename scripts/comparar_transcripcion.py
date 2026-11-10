@@ -196,6 +196,15 @@ def _versiones_instaladas() -> dict[str, str]:
         raise ValueError(f"falta instalar {error}; instale requirements-audio.txt") from error
 
 
+def _modelos_de_texto(config: Path) -> TextModels:
+    try:
+        from src.adapters.spacy_hf_text_models import SpacyHfTextModels
+
+        return SpacyHfTextModels.from_config(config)
+    except ImportError as error:
+        raise ValueError(f"falta una biblioteca de texto ({error}); instale requirements-audio.txt") from error
+
+
 def _transcriptor_de_whisper(config: Path) -> Transcriber:
     try:
         return WhisperTranscriber.from_config(config)
@@ -236,9 +245,7 @@ def _ejecutar(
     notas = leer_esperadas(args.esperadas, args.muestra)
     versiones = versiones or _versiones_instaladas()
     if modelos is None:
-        from src.adapters.spacy_hf_text_models import SpacyHfTextModels
-
-        modelos = SpacyHfTextModels.from_config(args.config_texto)
+        modelos = _modelos_de_texto(args.config_texto)
     transcriptor = transcriptor or _transcriptor_de_whisper(args.config)
     resultados = evaluar(transcriptor, modelos, args.config_texto, args.muestra, notas)
     texto = generar_markdown(comando, config, versiones, notas, resultados)
