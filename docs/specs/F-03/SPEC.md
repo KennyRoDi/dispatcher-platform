@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** revision 397158d
+**Verificación IA:** tests 09f76b6
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -161,3 +161,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 4: APROBADO sin bloqueantes. Comprobé en el código el timeout de 300 s (media_generator.py:15) y la pregunta abierta del SPEC (línea 99). Árbol limpio, pruebas en verde en la fase anterior (806 passed, 14 xfailed). (2172591) |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5) | 2026-11-10 | Revisión APROBADA por el revisor (subagente). Tras ella solo cambió el SPEC: se cerró la pregunta abierta del formato (todo caso pesado es video, decisión de la persona). Árbol limpio, commit empujado, sin cambios de código. (397158d) (397158d) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest en los 3 archivos nuevos: 3 errores de colección por ModuleNotFoundError de scripts.dataset_sintetico (rojo por módulo ausente). Solo se añadieron pruebas (27 unitarias, 1 integración, 1 aceptación), src/ y scripts/ intactos, commit empujado, árbol limpio. Las pruebas nunca corrieron en verde: sus supuestos sobre FakeRunner y filas no están contrastados. API fijada por el developer (build_manifest, validate_manifest, main). No verifiqué la cobertura de cada criterio línea a línea. (09f76b6) |
