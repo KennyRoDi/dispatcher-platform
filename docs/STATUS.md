@@ -31,7 +31,7 @@
 | F-26 | en-pr |
 | F-27 | en-pr |
 | F-28 | en-pr |
-| F-29 | verificacion |
+| F-29 | documentacion |
 | F-30 | en-pr |
 | F-31 | en-pr |
 | F-32 | en-pr |
