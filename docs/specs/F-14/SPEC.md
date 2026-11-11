@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-14-2-alertas
 **Verificación IA:** revision d9439e3
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
