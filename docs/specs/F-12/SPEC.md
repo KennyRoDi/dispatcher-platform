@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 2151127
+**Verificación IA:** verificacion 66d5f1e
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -65,3 +65,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de implementacion | pytest | 2026-11-10 | pytest tests/unit/test_process_supervisor.py y test_arquitectura: 10 passed, 4 skipped (reales POSIX, sin WSL con Python). Diff de tests/ revisado: solo SIGKILL portable en Windows, sin debilitar. Verificación NO independiente (sin subagente). (2151127) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), sin subagentes: NO independiente | 2026-11-10 | pytest tests/unit/test_process_supervisor.py y test_arquitectura.py: 10 pasan, 4 POSIX reales omitidos (win32, sin WSL con python). SPEC sin mediciones. Prueba manual: cancel(pid) repetido o con pid desconocido lanza KeyError (hallazgo, fuera del SPEC). Diff 356 lineas. (66d5f1e) |
