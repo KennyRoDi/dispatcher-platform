@@ -1,6 +1,6 @@
 # SPEC F-40: Matriz, historial y bitácora
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 693cf26
 **Historia:** US-40 · **Requisitos:** RNF-17, RNF-18, RNF-19, RNF-20; [Parte I §3, §4, §8], [Anexos 1 y 3], [B.9], [B.10] · **Responsable:** K
