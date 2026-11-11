@@ -135,6 +135,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 9. **Captura real.** Requiere `sudo` y los tres nodos; la ejecuta la persona. Hasta entonces no hay resultado de M4 de TLS y el módulo no pasa de 2 [Parte I §5].
 10. **Costo en M1 a M3.** TLS puede bajar el throughput de M3: repetir esa medición (`docs/IMPLEMENTACION.md` §7) y reportar la diferencia.
 
+## Límites declarados de la parte 1
+
+- `requests_session` no impone TLS 1.3 como mínimo: verifica CA y hostname, pero `requests` no expone la versión mínima sin un adaptador propio.
+- `redis_kwargs` lleva `ssl=True`, por lo que no sirve con `Redis.from_url("rediss://...")` (parámetro duplicado). La parte 2 debe construir el cliente con `host`, `port` y `ssl=True`. Decisión: queda declarado con 2 `xfail`.
+- Una URL con `?ssl_cert_reqs=none` pasada directo a `Redis.from_url` no pasa por `exigir_cifrado` y no se rechaza (`xfail`); la parte 2 debe llamar a `exigir_cifrado` antes de crear el cliente.
+- Las pruebas de Redis tardan unos 4,5 s por los reintentos del cliente.
+- Las pruebas `test_repo_sin_llaves_ni_certificados`, `test_gitignore_cubre_certs` y la del script `generar_certs.sh` van en la parte 3, cuando existan el script y el `.gitignore`.
+- Con TLS activo por defecto, los workers de José, el coordinador de Nahúm y el dashboard de Melany fallan hasta tener `ca.pem` y URLs `https`: coordinar antes de fusionar la parte 3.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
