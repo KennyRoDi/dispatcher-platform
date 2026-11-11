@@ -25,7 +25,7 @@
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
-| F-23 | implementacion |
+| F-23 | verificacion |
 | F-24 | pendiente |
 | F-25 | pendiente |
 | F-26 | hecha |
