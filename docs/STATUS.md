@@ -5,7 +5,7 @@
 |---|---|
 | F-01 | pendiente |
 | F-02 | pendiente |
-| F-03 | en-pr |
+| F-03 | tests |
 | F-04 | pendiente |
 | F-05 | pendiente |
 | F-06 | pendiente |
