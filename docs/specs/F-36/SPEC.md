@@ -1,6 +1,6 @@
 # SPEC F-36: Cancelación en curso
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** documentacion f34bbae
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
@@ -92,3 +92,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | Criterios OK. Docker Linux: 1731 passed. Intentos de romper: doble cancel, hijo que ignora SIGTERM con nieto (SIGKILL tras gracia, sin sobrevivientes), cancel tras terminar: sin fallos. Hallazgo menor: modo supervisado pierde stderr de FFmpeg (respaldo NVENC->CPU no se activa). (5843974) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; el límite de 400 líneas se mide contra la rama F-38 sin fusionar (3814 líneas); contra main el código son ~100 líneas |
 | verificación IA de documentacion | Claude Code Sonnet 5.5 (no independiente) | 2026-11-10 | diff --stat: ARQUITECTURA AD-31 y reutilizacion; sin datos inventados, medicion real pendiente (f34bbae) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
