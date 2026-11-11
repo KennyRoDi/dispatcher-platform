@@ -1,10 +1,12 @@
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import BinaryIO, Protocol, runtime_checkable
 
 from src.domain.chat_message import ChatMessage
 from src.domain.finding import Finding
+from src.domain.rbac import Role
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import Subtask
 
@@ -73,3 +75,18 @@ class ProcessRunner(Protocol):
     def signal_group(self, pid: int, sig: int) -> None: ...
 
     def reap(self, pid: int, block: bool = False) -> bool: ...
+
+
+class InvalidToken(Exception):
+    pass
+
+
+@dataclass(frozen=True)
+class Identity:
+    subject: str
+    role: Role | str
+
+
+@runtime_checkable
+class TokenVerifier(Protocol):
+    def verify(self, token: str) -> Identity: ...
