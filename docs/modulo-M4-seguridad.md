@@ -78,6 +78,10 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 - Con TLS activo, una URL `http://` o `redis://`, o `MINIO_SECURE=false`, se rechaza al arrancar, sin degradar a texto claro.
 - Salidas reales de un arranque con TLS y de un rechazo: pendiente (sin captura ni ejecución medida).
 
+### F-29 Cadena de custodia
+
+Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. El log JSONL en disco, el verificador con evidencia y linaje y la CLI llegan en partes posteriores.
+
 ## 2. Concepto de Sistemas Operativos
 
 ### F-30 Workers sin privilegios
@@ -101,6 +105,14 @@ Conceptos que respalda el diseño, sin datos medidos:
 ### F-27 TLS entre nodos
 
 TLS protege el canal entre procesos de distintos nodos: cifra, comprueba la integridad y autentica al servidor con una cadena de confianza. El módulo `ssl` de Python delega en OpenSSL; el cliente decide con qué CA confía y qué versión mínima acepta. JWT (F-26) identifica a quien llama; no protege el canal. Tailscale tampoco sustituye a TLS: la captura debe mostrar el handshake (`docs/ARQUITECTURA.md` §6).
+
+### F-29 Cadena de custodia
+
+Conceptos que respalda el diseño, sin datos medidos:
+
+- **Integridad con hash encadenado:** cada eslabón sella la evidencia y el hash del eslabón previo; alterar, borrar, insertar o reordenar una entrada rompe el enlace en esa posición.
+- **HMAC en vez de SHA-256 solo:** sin llave, quien altera el log puede recalcular toda la cadena; con HMAC-SHA-256 necesita la llave, que vive fuera del repositorio [B.5 M4].
+- **Ancla del último eslabón:** el archivo de ancla delata el truncamiento, que el encadenamiento por sí solo no ve.
 
 ## 3. Método de medición
 
@@ -152,6 +164,10 @@ tshark -r m4.pcap -Y tls.handshake.type==1
 strings m4.pcap | grep -c <marcador_sintetico>
 ```
 
+### F-29 Cadena de custodia
+
+No aplica como medición de SO M1 a M5: F-29 aporta evidencia de ejecución. El comando previsto, que se ejecuta en la demo con un log y una evidencia sintéticos, antes y después de manipularlos, es `PYTHONPATH=. python -m scripts.verify_custody --log <log.jsonl> --anchor <log.jsonl.head> [--store <dir>]`, con la llave en `CUSTODY_KEY_FILE` (32 bytes aleatorios, fuera del repositorio, distinta de la KEK de F-28). Pendiente: la CLI llega en una parte posterior de la pila.
+
 ## 4. Resultados
 
 ### F-30 Workers sin privilegios
@@ -186,6 +202,17 @@ Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de l
 | Cliente sin la CA rechazado en los servicios reales | pendiente |
 | Costo de TLS sobre el throughput de M3 | pendiente |
 
+### F-29 Cadena de custodia
+
+Pendiente: sin salida del verificador antes y después de manipular un log y una evidencia.
+
+| Prueba | Esperado | Salida medida |
+|---|---|---|
+| Verificador sobre cadena íntegra | sin violaciones, código de salida 0 | pendiente |
+| Verificador tras alterar una entrada | falla e indica la posición | pendiente |
+| Verificador tras truncar el log | falla por ancla | pendiente |
+| Verificador tras alterar una evidencia | falla e indica la entrada | pendiente |
+
 ## 5. Interpretación
 
 ### F-30 Workers sin privilegios
@@ -199,3 +226,7 @@ Pendiente. Las pruebas unitarias respaldan el formato y la detección de alterac
 ### F-27 TLS entre nodos
 
 Pendiente. Sin captura real no hay resultado de TLS y el módulo no pasa de 2 [Parte I §5]. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+
+### F-29 Cadena de custodia
+
+Pendiente. Las pruebas unitarias respaldan la lógica de sellado y detección, no la demostración con manipulación real. Límites declarados (SUP-31): quien posea la llave puede forjar la cadena (HMAC simétrico) y un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta mientras el ancla viva en el mismo disco. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
