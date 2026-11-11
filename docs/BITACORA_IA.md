@@ -1298,3 +1298,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | pytest focalizadas: 115 passed; integración MinIO real: 4 passed; conformidad: 0. |
 | Cómo se validó | El cifrado se aplica siempre; no se usa almacenamiento plaintext. Medición queda pendiente hasta dataset multimedia y coordinador/MinIO. |
 | Error de la IA | La primera ficha M3 no tenía encabezados requeridos por conformidad; se corrigió a las secciones oficiales antes del commit final. |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-10 (`feat/F-10-1-estados-y-cierre`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-10 |
+| Propósito | Plan, pruebas, dominio y QA de F-10 parte 1 (estados y barrier) |
+| Consulta resumida | Implementar CaseState, transition, final_state y Barrier según SPEC F-10 |
+| Resultado obtenido | src/domain/case_state.py con 75 pruebas verdes; AD-43 y SUP-39 registrados |
+| Validado / corregido / descartado | Persona revisa cada fase; pruebas unitarias y casos borde de QA |
+| Cómo se validó | Revisión de código y pytest; verificación no independiente |
+| Error de la IA | Sin error real de la IA detectado en esta parte; Barrier(0) cierra de inmediato y final_state(0,0)=completed, comportamiento de borde documentado, no un defecto |
