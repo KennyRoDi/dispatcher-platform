@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion bddb8f1
+**Verificación IA:** verificacion 7cf5d06
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -172,3 +172,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | Resolver los 5 hallazgos de QA de la parte 5 (validador: rutas duplicadas, tipos por heterogeneo, pesado no heterogeneo, manifiesto corrupto sin traza; CLI: parametros negativos) y quitar sus xfail; luego regenerar el dataset |
 | verificación IA de implementacion | Claude Code (subagente developer, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Corrección de los 5 hallazgos de QA verificada: pytest -m 'not integration and not acceptance' 1517 passed, 7 skipped, 14 xfailed (los de partes 1-4); integración con ffmpeg real 1 passed. Diff de tests/ desde d5231b9: solo se quitaron los 5 marcadores xfail (sin tocar aserciones) y se añadió test_dataset_sintetico_robustez.py. scripts/dataset_sintetico.py +104/-17 (253 líneas); código de la parte 5 ~304 líneas, bajo 400. Árbol limpio, commit empujado (bddb8f1). No reproduje manualmente cada hallazgo. (bddb8f1) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (subagente qa-tester, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Reejecuté pytest -m 'not integration and not acceptance': 1521 passed, 7 skipped, 22 xfailed. src/ y scripts/ intactos desde bddb8f1; solo se añadió tests/unit/test_dataset_sintetico_qa2.py (7cf5d06), árbol limpio. Comprobé el dataset de QA en ~/scratch/dataset: --validar sale 0 ('cumple los minimos de B.3'), 491 archivos, 1,8G, sha256 de manifest.json 4a6aad92...b47d, igual al del informe. QA: APROBADO, 5 hallazgos de ronda 1 corregidos, 6 defectos menores nuevos en xfail estricto. No reproduje yo los 6 hallazgos nuevos ni regeneré el dataset para comprobar reproducibilidad del manifiesto. (7cf5d06) |
