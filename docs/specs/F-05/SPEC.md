@@ -1,6 +1,6 @@
 # SPEC F-05: Descomponer y enrutar
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 29cda02
 **Historia:** US-05 · **Requisitos:** RF-04, RF-05 · **Responsable:** N
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Claude Sonnet 5.5), subagente arquitecto independiente | 2026-11-11 | Leí el SPEC completo y comprobé con grep y sed: sin marcadores pendientes; criterio de US-05 copiado de docs/backlog/cola-workers.md; RF-04 y RF-05 en REQUERIMIENTOS.md; cita de B.4 en ENUNCIADO.md línea 301; tipos y puertos existentes (ContentKind sin video, QueueFull en src/domain/subtask.py:14, WorkQueue, FakeWorkQueue, comprobar_work_queue, Priority.from_name, RoutingTable exige regla por ContentKind). Hallé 2 defectos (AD-18 mal citado: es routing por clase de nodo de F-32; extensiones no alineadas con router.py:35-40) y los devolví al subagente; verifiqué el diff 572fb48..836a12e: AD-18 fuera, AD-04 como diseño objetivo con la desviación declarada, extensiones completas. Solo cambia docs/specs/F-05/SPEC.md. No ejecuté pruebas: la fase no tiene código. (836a12e) |
 | verificación IA de plan | Claude Code (Claude Sonnet 5.5), subagente arquitecto independiente | 2026-11-11 | Releí el SPEC completo y comprobé con grep y sed: sin marcadores pendientes; criterio de US-05 copiado de docs/backlog/cola-workers.md; RF-04 y RF-05 en REQUERIMIENTOS.md; cita de B.4 en ENUNCIADO.md línea 301; tipos y puertos existentes (ContentKind sin video, QueueFull en src/domain/subtask.py:14, WorkQueue, FakeWorkQueue, comprobar_work_queue, Priority.from_name, RoutingTable exige regla por ContentKind). Hallé 2 defectos (AD-18 mal citado, es routing por clase de nodo de F-32; extensiones no alineadas con router.py:35-40), los devolví al subagente y verifiqué el diff 572fb48..836a12e. Solo cambia docs/specs/F-05/SPEC.md. Sin pruebas: la fase no tiene código. (29cda02) |
+| plan | Kenni Rodriguez | 2026-11-11 |  |
