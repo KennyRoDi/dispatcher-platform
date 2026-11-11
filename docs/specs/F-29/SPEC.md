@@ -108,6 +108,18 @@ No aplica. F-29 aporta evidencia de ejecución a la ficha M4, no mediciones de S
 - Rendimiento (dato del QA, no medición de SO): 100000 entradas en 4,8 s con `tracemalloc`.
 - Evidencia alterada y linaje se prueban en la parte 3.
 
+## Límites declarados de la parte 2
+
+- La llave entra como `key: bytes` de 32 bytes. `FileKeyProvider` y `CUSTODY_KEY_FILE` se cablean en la parte 3, cuando F-28 (en PR aparte) esté fusionada o disponible.
+- `record` verifica solo las últimas 2 líneas y el ancla (`verify_tail`). Una línea intermedia manipulada solo la detecta el verificador completo.
+- Motivo del cambio (dato del QA sobre la primera implementación, que verificaba todo el log en cada `record`; no es medición de SO): costo cuadrático, 1000 entradas 7,5 s y 4000 entradas 121,4 s acumulado. No se volvió a medir tras la corrección (pendiente).
+- A9: un ingreso con `result_sha256 != evidence_sha256` se acepta (xfail estricto; las pruebas existentes lo usan). Decisión pendiente.
+- Un reloj sin zona se trata como UTC.
+- Archivos con modo 0600. `flock` sobre archivo local (no NFS).
+- Un log de 1 entrada sin ancla se tolera (cambio en el dominio: `verify_tail` y `_check_anchor`).
+- Antes de anexar se reintenta el ancla atrasada (`_catch_up_anchor`); si falla la escritura o el `fsync` del anexo, se hace `ftruncate` al tamaño previo.
+- Sin tope de tamaño de campo (QA: un `actor` de 50 MiB tarda 0,36 s por `record`; dato del QA).
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
