@@ -8,7 +8,7 @@ class LoadingConfig:
 
     def __post_init__(self) -> None:
         if not isinstance(self.strategy, str) or self.strategy not in (
-            "por_proceso", "fork_compartido"
+            "por_proceso", "workers_compartidos"
         ):
             raise ValueError("estrategia de carga inválida")
         if type(self.processes) is not int or self.processes <= 0:
