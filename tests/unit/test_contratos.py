@@ -5,6 +5,8 @@ import pytest
 from src.application.ports import Analyzer, Clock
 from src.domain.finding import EvidenceRef, Finding, Severity
 from src.domain.priority import Priority
+from tests.contratos import comprobar_analyzer
+from tests.dobles import FakeAnalyzer
 
 
 def test_las_cuatro_prioridades_del_enunciado_estan_ordenadas():
@@ -46,3 +48,7 @@ def test_un_analizador_y_un_reloj_falsos_cumplen_los_puertos():
 
     assert isinstance(AnalizadorFalso(), Analyzer)
     assert isinstance(RelojFijo(), Clock)
+
+
+def test_el_analizador_falso_pasa_la_conformidad_de_analyzer(tmp_path):
+    comprobar_analyzer(FakeAnalyzer([hallazgo()]), tmp_path / "chat.txt")

@@ -1,0 +1,34 @@
+{
+  "notas": [
+    {
+      "archivo": "amenaza_01.ogg",
+      "texto_esperado": "Si no me pagas la deuda hoy, vas a ver lo que pasa.",
+      "procedencia": "Voz propia de José Andrés leyendo un guion sintético y ficticio, redactado con IA (Claude Code) para F-09; sin personas ni mensajes reales [B.3]",
+      "licencia": "CC BY 4.0"
+    },
+    {
+      "archivo": "amenaza_02.ogg",
+      "texto_esperado": "Te lo advierto, si no devuelves el dinero, vas a ver.",
+      "procedencia": "Voz propia de José Andrés leyendo un guion sintético y ficticio, redactado con IA (Claude Code) para F-09; sin personas ni mensajes reales [B.3]",
+      "licencia": "CC BY 4.0"
+    },
+    {
+      "archivo": "WhatsApp Ptt 2026-11-10 at 1.18.31 PM.ogg",
+      "texto_esperado": "Nos vemos en la plaza a las cinco, trae el café.",
+      "procedencia": "Voz propia de José Andrés leyendo un guion sintético y ficticio, redactado con IA (Claude Code) para F-09; sin personas ni mensajes reales [B.3]. Se asignó el guion por orden de grabación; la transcripción real lo confirma",
+      "licencia": "CC BY 4.0"
+    },
+    {
+      "archivo": "WhatsApp Ptt 2026-11-10 at 1.18.39 PM.ogg",
+      "texto_esperado": "Voy a ver la película con mi hermana, después te escribo.",
+      "procedencia": "Voz propia de José Andrés leyendo un guion sintético y ficticio, redactado con IA (Claude Code) para F-09; sin personas ni mensajes reales [B.3]. Se asignó el guion por orden de grabación; la transcripción real lo confirma",
+      "licencia": "CC BY 4.0"
+    },
+    {
+      "archivo": "WhatsApp Ptt 2026-11-10 at 1.18.45 PM.ogg",
+      "texto_esperado": "Ya reservé la mesa para el sábado a la hora de siempre.",
+      "procedencia": "Voz propia de José Andrés leyendo un guion sintético y ficticio, redactado con IA (Claude Code) para F-09; sin personas ni mensajes reales [B.3]. Se asignó el guion por orden de grabación; la transcripción real lo confirma",
+      "licencia": "CC BY 4.0"
+    }
+  ]
+}

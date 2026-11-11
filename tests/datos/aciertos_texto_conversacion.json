@@ -1,0 +1,205 @@
+{
+  "origen": "Conversación sintética y ficticia, redactada con IA (Claude Code, Opus 5.5) para F-07; la revisa José Andrés antes de usarla como evidencia. No contiene personas ni mensajes reales [B.3]. Declarada en docs/BITACORA_IA.md.",
+  "mensajes": [
+    {
+      "timestamp": "2026-11-01T20:00:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Beto, ya pasó un mes y todavía no me pagás la deuda."
+    },
+    {
+      "timestamp": "2026-11-01T20:02:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Ya te dije que no tengo el dinero ahora."
+    },
+    {
+      "timestamp": "2026-11-01T20:04:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Siempre decís lo mismo, estoy harta de esperar."
+    },
+    {
+      "timestamp": "2026-11-01T20:06:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "No me presiones, te pago cuando pueda."
+    },
+    {
+      "timestamp": "2026-11-01T20:08:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Me prometiste pagar en octubre y no cumpliste."
+    },
+    {
+      "timestamp": "2026-11-01T20:10:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Dejá de molestar con esa deuda."
+    },
+    {
+      "timestamp": "2026-11-01T20:12:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Si no me devolvés el dinero esta semana, vas a ver lo que te pasa."
+    },
+    {
+      "timestamp": "2026-11-01T20:14:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "¿Me estás amenazando?"
+    },
+    {
+      "timestamp": "2026-11-01T20:16:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Tomalo como quieras, pero quiero mi dinero."
+    },
+    {
+      "timestamp": "2026-11-01T20:18:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Esto se está poniendo muy feo."
+    },
+    {
+      "timestamp": "2026-11-01T21:00:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Sos una tacaña, todo el día hablando de dinero."
+    },
+    {
+      "timestamp": "2026-11-01T21:02:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Y vos sos un idiota que no paga lo que debe."
+    },
+    {
+      "timestamp": "2026-11-01T21:04:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Callate, inútil, nadie te soporta."
+    },
+    {
+      "timestamp": "2026-11-01T21:06:00Z",
+      "autor": "Ana Sintética",
+      "texto": "El único inútil aquí sos vos, estúpido."
+    },
+    {
+      "timestamp": "2026-11-01T21:08:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Qué asco de persona sos."
+    },
+    {
+      "timestamp": "2026-11-01T21:10:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Mentiroso, me debés plata y lo sabés."
+    },
+    {
+      "timestamp": "2026-11-01T21:12:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Sos una pesada insoportable."
+    },
+    {
+      "timestamp": "2026-11-01T21:14:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Payaso, pagá la deuda de una vez."
+    },
+    {
+      "timestamp": "2026-11-01T21:16:00Z",
+      "autor": "Beto Ficticio",
+      "texto": "Imbécil, ya te dije que no tengo."
+    },
+    {
+      "timestamp": "2026-11-01T21:18:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Qué tipo tan idiota."
+    },
+    {
+      "timestamp": "2026-11-02T15:00:00Z",
+      "autor": "Carla Sintética",
+      "texto": "¡Hola Ana! ¿Nos vemos mañana para un café?"
+    },
+    {
+      "timestamp": "2026-11-02T15:02:00Z",
+      "autor": "Ana Sintética",
+      "texto": "¡Me encanta la idea! ¿En la plaza central?"
+    },
+    {
+      "timestamp": "2026-11-02T15:04:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Perfecto, la cafetería de la plaza es preciosa."
+    },
+    {
+      "timestamp": "2026-11-02T15:06:00Z",
+      "autor": "Ana Sintética",
+      "texto": "¿A qué hora te queda bien?"
+    },
+    {
+      "timestamp": "2026-11-02T15:08:00Z",
+      "autor": "Carla Sintética",
+      "texto": "A las diez de la mañana sería ideal."
+    },
+    {
+      "timestamp": "2026-11-02T15:10:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Genial, a esa hora estoy libre."
+    },
+    {
+      "timestamp": "2026-11-02T15:12:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Qué alegría, hace mucho que no charlamos."
+    },
+    {
+      "timestamp": "2026-11-02T15:14:00Z",
+      "autor": "Ana Sintética",
+      "texto": "Sí, te extrañaba mucho. Va a ser una reunión muy linda."
+    },
+    {
+      "timestamp": "2026-11-02T15:16:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Llevo unas galletas para compartir con el café."
+    },
+    {
+      "timestamp": "2026-11-02T15:18:00Z",
+      "autor": "Ana Sintética",
+      "texto": "¡Qué amable! Nos vemos mañana, un abrazo."
+    },
+    {
+      "timestamp": "2026-11-03T16:00:00Z",
+      "autor": "Dani Ficticio",
+      "texto": "Carla, ¿ya enviaste el informe de la tarea de química?"
+    },
+    {
+      "timestamp": "2026-11-03T16:02:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Todavía no, lo termino esta noche."
+    },
+    {
+      "timestamp": "2026-11-03T16:04:00Z",
+      "autor": "Dani Ficticio",
+      "texto": "El profesor pidió que fuera en formato PDF."
+    },
+    {
+      "timestamp": "2026-11-03T16:06:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Entendido, lo convierto antes de enviarlo."
+    },
+    {
+      "timestamp": "2026-11-03T16:08:00Z",
+      "autor": "Dani Ficticio",
+      "texto": "¿Cuántas páginas tiene el tuyo?"
+    },
+    {
+      "timestamp": "2026-11-03T16:10:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Unas seis páginas, con las tablas incluidas."
+    },
+    {
+      "timestamp": "2026-11-03T16:12:00Z",
+      "autor": "Dani Ficticio",
+      "texto": "El mío tiene cinco. También incluí las referencias."
+    },
+    {
+      "timestamp": "2026-11-03T16:14:00Z",
+      "autor": "Carla Sintética",
+      "texto": "Bien, yo las pongo al final del documento."
+    },
+    {
+      "timestamp": "2026-11-03T16:16:00Z",
+      "autor": "Dani Ficticio",
+      "texto": "La entrega es el lunes a mediodía."
+    },
+    {
+      "timestamp": "2026-11-03T16:18:00Z",
+      "autor": "Carla Sintética",
+      "texto": "De acuerdo, lo subo a la plataforma el domingo."
+    }
+  ]
+}

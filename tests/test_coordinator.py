@@ -400,3 +400,25 @@ def test_hardware_empty_list_when_redis_down(client, fake, monkeypatch):
     _redis_down(fake, monkeypatch)
     r = client.get("/hardware")
     assert r.status_code == 200 and r.json() == []
+
+
+def test_cancel_deja_la_clave_y_publica_el_aviso_para_los_workers(client, fake):
+    cid = create(client).json()["case_id"]
+    canal = fake.pubsub()
+    canal.subscribe(f"cancel:{cid}")
+    canal.get_message(timeout=1)
+
+    client.post(f"/cases/{cid}/cancel")
+
+    assert fake.exists(f"cancel:{cid}") == 1
+    aviso = canal.get_message(timeout=1)
+    assert aviso["type"] == "message" and aviso["data"] == cid
+
+
+def test_cancel_rechazado_no_publica_aviso(client, fake):
+    cid = create(client).json()["case_id"]
+    client.post(f"/cases/{cid}/cancel")
+    fake.delete(f"cancel:{cid}")
+
+    assert client.post(f"/cases/{cid}/cancel").status_code == 409
+    assert fake.exists(f"cancel:{cid}") == 0

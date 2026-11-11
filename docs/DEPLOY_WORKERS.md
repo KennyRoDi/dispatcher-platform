@@ -92,6 +92,7 @@ Cada máquina tiene su propio `.env` en la raíz del repositorio. **Nunca se ver
 |---|---|---|
 | `NODE_NAME` | Salida de `hostname` de esa máquina. Único entre nodos | No |
 | `NODE_IP` | Salida de `tailscale ip -4` de esa máquina | No |
+| `WORKER_MEM_LIMIT` | Límite de memoria medido para ese worker, en formato admitido por Compose | No |
 | `REDIS_HOST` | `<IP_TAILSCALE_NODO_A>` | Sí |
 | `COORDINATOR_URL` | `http://<IP_TAILSCALE_NODO_A>:8000` | Sí |
 | `MINIO_ENDPOINT` | `<IP_TAILSCALE_NODO_A>:9000` | Sí |
@@ -176,7 +177,7 @@ $LASTEXITCODE
 Exige salida `0`, con `[OK]` en `redis`, `coordinator`, `minio` y `work_dir`. `ffmpeg` solo avisa si falta, pero la imagen lo incluye. Si el bucket aún no existe, `minio` sale en `[OK]` y lo indica: el worker lo crea al iniciar. `--create-buckets` lo crea desde esta comprobación. Si falla, ve a §7 antes de seguir.
 
 ```powershell
-docker compose --env-file .env -f deploy/docker-compose.worker.yml up -d --build
+python scripts/start_worker.py
 docker compose --env-file .env -f deploy/docker-compose.worker.yml ps
 docker compose --env-file .env -f deploy/docker-compose.worker.yml logs -f
 ```

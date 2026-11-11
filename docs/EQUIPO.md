@@ -7,4 +7,4 @@ Asocia cada usuario de GitHub con su letra de responsable en `docs/backlog/`. Id
 | KennyRoDi | K | Kenni Rodriguez | M4 |
 | nahum0804 | N | Nahúm Murillo | M2 |
 | joselhcr | J | José Andrés Loría Herrera | M1, M5 |
-| por-confirmar | V | Melany Vindas | M3 |
+| Mel28Vinso | V | Melany Vindas | M3 |
