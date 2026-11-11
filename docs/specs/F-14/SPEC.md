@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-14-1-alertas
-**Verificación IA:** verificacion 2353fd7
+**Verificación IA:** documentacion c053c76
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -140,3 +140,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA 6 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (2353fd7) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-39, curl de GET /alerts en DEMO.md, bitacora en estado; sin cambios de codigo (c053c76) |
