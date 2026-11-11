@@ -141,7 +141,7 @@ Hallazgos de QA de la parte 1 (sin defectos en `rbac.py`; rutas no cubiertas por
 
 Límites declarados de la parte 2 (QA y correcciones):
 
-- **JSON roto o muy grande sin token (abierto).** Con cuerpo inválido, FastAPI responde 422 y parsea el cuerpo antes de autenticar. Arreglo propuesto: middleware ASGI que compruebe `Authorization` antes de leer el cuerpo. Queda como `xfail` en `tests/unit/test_seguridad_qa.py`; decidir en la parte 3.
+- **JSON roto o muy grande sin token (resuelto en la parte 3).** Con cuerpo inválido, FastAPI respondía 422 y parseaba el cuerpo antes de autenticar. El middleware ASGI `AutenticacionPrevia` (`src/coordinator/seguridad.py`) comprueba `Authorization` antes de leer el cuerpo, de modo que ya no queda como `xfail`.
 - **Corregidos:** `exp` e `iat` no finitos o fuera de año 9999 se rechazan; `sub` vacío o de espacios se rechaza; `JWT_SECRET_FILE` se lee en binario con tope de 4096 bytes, exige archivo regular (`O_NONBLOCK`, `S_ISREG`) y un archivo no UTF-8 no filtra bytes al registro.
 - **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave mientras siga en la caché; una clave desalojada vuelve a registrarlo. `src/adapters/jwt_tokens.py` falta en «Quién toca qué» de `docs/CONTRATOS.md`: se agrega en la parte 3.
 - **Sin prueba:** varias cabeceras `Authorization` (gana la primera), `JWT_SECRET` sin medir entropía, BOM en el secreto, y los códigos 404/405/307/401 distinguen rutas existentes de inexistentes.

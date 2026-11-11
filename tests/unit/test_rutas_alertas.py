@@ -12,6 +12,10 @@ from src.application.ports import AlertPublisher
 from src.coordinator import conexion, rutas_alertas
 from tests.dobles import FakeAlertPublisher, FakeAlertReader, FakeClock
 
+
+pytestmark = pytest.mark.usefixtures("sin_autorizacion")
+
+
 INICIO = datetime(2026, 11, 3, 8, 0, tzinfo=timezone.utc)
 CLAVES = ["alert_id", "kind", "case_id", "detail", "emitted_at"]
 DETALLE = '{"categoria": "amenaza", "confianza": 0.9, "sha256": "aaaa", "posicion": "mensajes 3"}'
