@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 3614d68
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 8 hallazgos QA en custody_chain.py (146 lineas); diff de tests solo quita marcadores xfail (comprobado). Suite completa tras 3ee2eac: 1879 passed, 8 skipped, 5 xfailed. (3ee2eac) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA 985cf5a: 16 xfail, 8 corregidos y desmarcados; quedan QA-6 (llave vacia o corta aceptada en dominio, 2 xfail; el adaptador exigira 32 bytes) y 3 previos. Rendimiento segun QA: 100000 entradas en 4,8 s con tracemalloc (no reproducido por mi). Lectores deben leer por \n, no splitlines. (3614d68) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
