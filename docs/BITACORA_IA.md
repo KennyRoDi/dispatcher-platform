@@ -698,3 +698,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador ejecuto procedencia sobre el manifiesto real y el caso negativo y cotejo el texto. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por delegacion de la persona; la verificacion fue del orquestador sin QA independiente. |
 | Cómo se validó | Sin revision por un segundo agente en esta parte. La tabla de aciertos y SUP-27 siguen pendientes de la persona. |
 | Error de la IA | Ninguno nuevo en esta parte; los errores de F-04 estan en las entradas de las partes 1 a 3. |
+
+## 2026-11-10 · Kenni Rodriguez · F-26 (`feat/F-26-1-autenticacion-y-roles`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5) con subagentes arquitecto, developer, QA y documentador (general-purpose) |
+| Componente | F-26 |
+| Propósito | F-26 parte 1: SPEC, pruebas en rojo y verdes y verificacion de la matriz de permisos por rol (src/domain/rbac.py, 42 lineas), mas registro de AD-33, SUP-28 y SUP-29. |
+| Consulta resumida | Instrucciones por rol del ciclo de AGENTS.md sobre F-26: matriz rol-accion, rol servicio, JWT HS256. |
+| Resultado obtenido | rbac.py con Role, Action, PERMISOS y can (falla cerrado ante tipos ajenos). test_rbac + test_arquitectura: 81 passed. QA sin defectos en rbac.py; hallo rutas sin cubrir en el SPEC (/cases/ con barra, /docs, /openapi.json, scripts sin token), anotadas en el SPEC. |
+| Validado / corregido / descartado | El orquestador ejecuto test_rbac y test_arquitectura y conformidad.py. Los mutantes de QA no se reprodujeron. La matriz es interpretacion del arquitecto, no verificada contra el enunciado (SUP-28 provisional). Las fases se aprobaron con --excepcion por delegacion de la persona; falta revision humana. |
+| Cómo se validó | Verificacion del orquestador por fase sobre el commit exacto, sin fiarse de los informes de subagentes. |
+| Error de la IA | El SPEC de F-26 no cubria la ruta /cases/ con barra final ni las rutas de documentacion de FastAPI (/docs, /openapi.json, /redoc); lo detecto QA y se anoto en las notas de las partes 2 y 3. |
