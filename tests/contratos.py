@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from src.application.ports import AlertPublisher, ResourceReader
+from src.application.ports import AlertPublisher, KeyUnavailable, ResourceReader
 from src.domain.alert_policy import StoredAlert
 from src.domain.finding import EvidenceRef, Finding, Severity
 from src.domain.priority import Priority
@@ -69,6 +69,21 @@ def comprobar_resource_reader(lector, esperado):
     assert type(uso.memory_current) is int and uso.memory_current >= 0
     assert type(uso.memory_max) is int and uso.memory_max > 0
     assert uso.memory_available == max(uso.memory_max - uso.memory_current, 0)
+
+
+def comprobar_key_provider(proveedor, kek):
+    """`proveedor` tiene `kek` disponible: la devuelve como 32 bytes, igual en cada llamada."""
+    obtenida = proveedor.kek()
+    assert isinstance(obtenida, bytes)
+    assert len(obtenida) == 32
+    assert obtenida == kek
+    assert proveedor.kek() == obtenida
+
+
+def comprobar_key_provider_sin_kek(proveedor):
+    """`proveedor` no tiene `kek`: falla cerrado con `KeyUnavailable`, nunca con otro valor."""
+    with pytest.raises(KeyUnavailable):
+        proveedor.kek()
 
 
 def comprobar_alert_publisher(publicador):

@@ -1,8 +1,8 @@
 # SPEC F-28: Cifrado en reposo
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 96b0f6b
+**Base:** feat/F-28-1-cifrado-en-reposo
+**Verificación IA:** revision 23a5f4a
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -126,6 +126,14 @@ Hallazgos de QA que se aceptan y se declaran:
 - `kek` y `dek` son variables locales: Sentry con `include_local_variables` las mostraría; no activar esa opción.
 - Cifrar no oculta el tamaño del objeto (AD-11 ya revela objetos iguales).
 
+## Límites declarados de la parte 2
+
+- La KEK queda en las variables locales de la traza (Sentry `include_local_variables`, `pytest --showlocals`). No activar esas opciones.
+- Los 3 xfail `test_la_traza_no_conserva_la_kek_*` son defectuosos: el marco del propio test conserva la KEK. Pendiente reescribirlos o aceptar el límite.
+- Decisiones del developer no fijadas antes en el SPEC: sigue enlaces simbólicos y valida el destino; la variable `KEK` es base64; valores vacíos equivalen a no definidos; sin caché. Además: el modo aceptado es exactamente `0400` o `0600` (0500, 0700 y bits especiales se rechazan; el SPEC decía solo `0400`); `from_env` aplica `.strip()` a `KEK_FILE` y `KEK`; el archivo se abre con `O_NONBLOCK`, por lo que un FIFO se rechaza; rutas con NUL o sustituto unicode dan `KeyUnavailable`.
+- Prueba inestable de la suite completa, 1 vez en 4, sin identificar. Hipótesis sin confirmar: las pruebas que recorren el historial git.
+- La parte 2 no cablea el proveedor al almacén; es la parte 3.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
@@ -146,4 +154,17 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff 86fcb73..f3df7a2 solo docs (ARQUITECTURA AD-34, REQUERIMIENTOS SUP-30, modulo-M4 borrador, SPEC). Numeros presentes (grep). Sin pytest: no cambio codigo. Bitacora en estado segun el subagente (no la verifique). Cita NIST §8.3 no verificada por mi. (f3df7a2) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: diseño=codigo, AD-34 y limites reflejan desviaciones, sin llaves fijas, capas verdes, numeracion libre; pytest segun revisor 1825 passed/6 xfailed. Menor 1 corregido por mi en el SPEC. Cita NIST no verificada. (96b0f6b) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo tests (test_file_key_provider.py, dobles.py, contratos.py); src intacto. Ejecute: test_file_key_provider error de coleccion ModuleNotFoundError (rojo); arquitectura y contratos verdes. Decisiones del developer no fijadas en SPEC: sigue symlinks, rechaza bits de grupo/otros, KEK_FILE gana sobre KEK, KEK base64, sin cache. Exige *.kek y kek* en .gitignore. (c01f1cf) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests; src: file_key_provider.py (64 lineas) y .gitignore. Suite completa tras 6618671: 3 de 4 corridas 1890 passed/8 skipped/6 xfailed; 1 corrida dio 1 failed no identificado (no lo capture), no reproducido: posible prueba inestable (candidata: FIFO con hilo y timeout). Desviaciones: patron de jwt_tokens copiado (no existe en esta rama), KEK en closure. (6618671) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: fuga de fd si KEK_FILE es directorio (media); KEK en locales de traza; ValueError con NUL o surrogate en vez de KeyUnavailable; modos 0500/0700/4400/1400 aceptados |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 3 de 4 hallazgos QA en file_key_provider.py; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa tras b2aef68: 1928 passed, 8 skipped, 9 xfailed (1 sola corrida). Queda abierto: KEK en locales de la traza; los 3 tests xfail son defectuosos (el marco del propio test conserva la KEK): declarar como limite. (b2aef68) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA a93526b: 12 xfail; 5 corregidos y desmarcados; 4 sin cerrar (KEK en locales, 3 tests, defecto del test) y 3 pre-existentes. Prueba inestable de la suite no identificada ni reproducida (70 corridas verdes); hipotesis: pruebas que dependen del estado de git. Sin fuga de KEK por repr/str/cause/context. (8eb8ed0) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs (modulo-M4 y SPEC). Mediciones pendientes, sin datos inventados. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (4663be7) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: FileKeyProvider cumple SPEC, sin llaves fijas, capas verdes, limites coinciden con xfail; pytest segun revisor 1928 passed/9 xfailed. Menores 1 y 2 (modo 0600, strip, O_NONBLOCK) corregidos por mi en el SPEC. Prueba inestable declarada. (23a5f4a) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |

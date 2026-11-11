@@ -31,6 +31,17 @@ Nonce de chunk: prefijo de 4 B más contador de 8 B. AAD de chunk: cabecera fija
 
 **Límites:** cifrar no oculta el tamaño del objeto; `decrypt` entrega los chunks ya autenticados antes de fallar en uno alterado. Detalle en `docs/specs/F-28/SPEC.md`.
 
+**Proveedor de la KEK (F-28 parte 2).**
+
+Implementado en el proveedor de archivo (`FileKeyProvider`):
+
+- `KEK_FILE`: ruta a un archivo regular de 32 bytes binarios, con modo exactamente 0400 o 0600, fuera del repositorio. Generación: `openssl rand -out <ruta> 32` y luego `chmod 0400 <ruta>`.
+- `KEK`: base64 de 32 bytes, solo para desarrollo.
+- `KEK_FILE` gana sobre `KEK`. Un valor vacío cuenta como no definido.
+- Falla cerrado: sin KEK válida lanza `KeyUnavailable`. Un modo distinto de 0400/0600 o un archivo no regular también la lanza.
+- Relee la fuente en cada llamada; no hay caché.
+- `.gitignore` excluye `*.kek` y `kek*`.
+
 ## 2. Concepto de Sistemas Operativos
 
 ### F-30 Workers sin privilegios
@@ -49,6 +60,7 @@ Conceptos que respalda el diseño, sin datos medidos:
 - **Cifrado de sobre:** cada objeto tiene su propia llave de datos (DEK, 32 bytes de `os.urandom`) envuelta con la llave maestra del nodo (KEK); la KEK no se escribe en el repositorio ni en el historial [B.5 M4].
 - **Memoria:** el objeto se procesa por chunks, de modo que la memoria usada queda acotada a un chunk (4 MiB por defecto, tope de 64 MiB) y no al tamaño del archivo.
 - **Integridad:** AES-256-GCM autentica cada chunk; reordenar, duplicar o truncar chunks hace fallar el descifrado.
+- **Permisos de archivo:** el proveedor `FileKeyProvider` exige que el archivo de la KEK sea regular y de modo 0400 o 0600, para que otros usuarios del sistema no puedan leerlo.
 
 ## 3. Método de medición
 
@@ -75,6 +87,12 @@ docker inspect --format '{{.HostConfig.SecurityOpt}}' <worker>
 
 Pendiente: costo de CPU y tamaño de chunk óptimo se miden con los comandos de `docs/IMPLEMENTACION.md` §5 (busca `F-28`); este documento no los reproduce y no contiene salidas medidas.
 
+Búsqueda de llaves en el historial (la automatiza `test_historial_sin_llaves`):
+
+```bash
+git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'
+```
+
 ## 4. Resultados
 
 ### F-30 Workers sin privilegios
@@ -94,7 +112,7 @@ Nodos: José, Nahúm y Melany; cada uno captura sus salidas.
 
 ### F-28 Cifrado en reposo
 
-Pendiente: sin datos medidos de costo de CPU ni de tamaño de chunk.
+Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk ni de costo de leer la KEK en cada llamada.
 
 ## 5. Interpretación
 
