@@ -155,3 +155,10 @@ def test_publicador_del_coordinador_no_propaga_con_redis_caido(servidor, caplog)
     with caplog.at_level(logging.ERROR):
         rutas_alertas.obtener_publicador_alertas().publish("caso_finalizado", "c1", "{}")
     assert caplog.records
+
+
+def test_lector_y_publicador_comparten_el_flujo_del_coordinador(servidor):
+    flujo = rutas_alertas.crear_flujo_alertas()
+    assert isinstance(flujo, RedisAlertStream)
+    flujo.publish("caso_finalizado", "c1", "{}")
+    assert [a.case_id for a in rutas_alertas.obtener_lector_alertas().recent(10)] == ["c1"]
