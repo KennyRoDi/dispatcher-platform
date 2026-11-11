@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision b7e0d357
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -117,3 +117,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: SPEC actualizado al diseno con Lua (alcance, diseno, pruebas, decisiones) y riesgos H4 y H5 de QA. Sin ficha: la medicion es la parte 3. Bitacora con 3 errores reales de la IA. (067568fe) |
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) APROBADO: cumple el SPEC parte 1 sin faltantes ni agregados; Lua revisa todas las colas antes de escribir y respeta el borde; cambio en rutas_casos limitado a envolver los comandos existentes (paridad confirmada); capas, comentarios y commits correctos; ~214 lineas. Suite 3778 verde, integracion Redis real 4 pasan y 1 xfail documentado, conformidad 0. SPEC ajustado con sus sugerencias. (b7e0d357) |
+| revision | Melany Vindas | 2026-11-11 |  |
