@@ -28,11 +28,11 @@
 | F-23 | documentacion |
 | F-24 | pendiente |
 | F-25 | pendiente |
-| F-26 | en-pr |
-| F-27 | en-pr |
-| F-28 | en-pr |
+| F-26 | hecha |
+| F-27 | hecha |
+| F-28 | hecha |
 | F-29 | hecha |
-| F-30 | en-pr |
+| F-30 | hecha |
 | F-31 | en-pr |
 | F-32 | en-pr |
 | F-33 | pendiente |
@@ -40,7 +40,7 @@
 | F-35 | pendiente |
 | F-36 | en-pr |
 | F-37 | tests |
-| F-38 | en-pr |
+| F-38 | hecha |
 | F-39 | pendiente |
 | F-40 | hecha |
 | F-41 | pendiente |
