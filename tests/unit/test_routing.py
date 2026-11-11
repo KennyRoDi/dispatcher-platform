@@ -130,3 +130,10 @@ def test_config_del_repositorio_es_valida():
     t = adaptador().cargar_tabla(adaptador().RUTA_POR_DEFECTO)
     for kind in ContentKind:
         assert t.route(subtarea(kind), ["cpu", "gpu"]) in {"cpu", "gpu"}
+
+
+def test_ruta_como_cadena_se_rechaza():
+    reglas = {kind: ["cpu"] for kind in ContentKind}
+    reglas[ContentKind.AUDIO] = "cpu"
+    with pytest.raises(ValueError):
+        RoutingTable(reglas)

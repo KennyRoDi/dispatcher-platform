@@ -11,7 +11,10 @@ class RoutingTable:
     def __init__(self, rules: Mapping[ContentKind, Sequence[str]]) -> None:
         validated: dict[ContentKind, tuple[str, ...]] = {}
         for kind in ContentKind:
-            classes = tuple(rules.get(kind, ()))
+            raw = rules.get(kind, ())
+            if isinstance(raw, str):
+                raise ValueError(f"ruta invalida para {kind.value}: debe ser lista de clases")
+            classes = tuple(raw)
             if not classes or any(not name for name in classes) or len(set(classes)) != len(classes):
                 raise ValueError(f"ruta invalida para {kind.value}: {classes}")
             validated[kind] = classes
