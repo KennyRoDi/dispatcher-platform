@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** documentacion e737bb4
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -111,3 +111,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Codex | 2026-11-10 | QA revisado independientemente en 845ce39: reproduje 76 pruebas focalizadas, pasaron; configuración Compose CPU/GPU resolvió mem_limit y memswap_limit iguales a 4 GiB. Con Docker Desktop local confirmé preflight y tres contenedores efímeros CPU con memory.max=1073741824, memory.swap.max=0, uid 1000; el reporte no atribuye el host a B/C/D. Suite completa del código: 1161 passed, 2 skipped, 3 deselected, 1 warning Starlette. Contextos Docker configurados: default, desktop-linux, docker-desktop; ninguno remoto. Tailscale no instalado y falta .env B/C/D; evidencia de tres arranques reales por cada nodo y GPU runtime siguen pendientes. git diff --check limpio y árbol limpio. (b5281e4) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | Autorización humana: dejar pendientes las mediciones de B/C/D por falta de acceso remoto a equipos de compañeros y continuar con la evidencia local claramente separada; no afirmar aceptación física completa ni sustituir cargas reales. |
 | verificación IA de documentacion | Codex | 2026-11-10 | Verificación independiente de documentación tras extensión de evidencia local: revisé ficha M1 y borrador de bitácora contra QA 845ce39, Docker outputs y scripts. Los tres IDs y cgroups coinciden; host desktop-linux no se atribuye a B/C/D, WORKER_MEM_LIMIT 1g se declara sintético, sin carga B.3, y la ficha mantiene B/C/D, calibración y GPU runtime pendientes. Bitácora registra ambos errores de IA y fixes reales. Cambios solo docs; git show --check limpio y árbol limpio. No repetí pruebas de producto sin cambios en código. (e737bb4) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
