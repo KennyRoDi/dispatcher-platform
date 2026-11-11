@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** revision
+**Fase:** tests
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** documentacion e737bb4
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | Autorización humana: dejar pendientes las mediciones de B/C/D por falta de acceso remoto a equipos de compañeros y continuar con la evidencia local claramente separada; no afirmar aceptación física completa ni sustituir cargas reales. |
 | verificación IA de documentacion | Codex | 2026-11-10 | Verificación independiente de documentación tras extensión de evidencia local: revisé ficha M1 y borrador de bitácora contra QA 845ce39, Docker outputs y scripts. Los tres IDs y cgroups coinciden; host desktop-linux no se atribuye a B/C/D, WORKER_MEM_LIMIT 1g se declara sintético, sin carga B.3, y la ficha mantiene B/C/D, calibración y GPU runtime pendientes. Bitácora registra ambos errores de IA y fixes reales. Cambios solo docs; git show --check limpio y árbol limpio. No repetí pruebas de producto sin cambios en código. (e737bb4) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Revisión final detectó que validate_config no compara service.hostname con environment.NODE_NAME; Compose puede arrancar con identidad divergente si PowerShell sobrescribe el .env. Añadir prueba roja y validar la igualdad en preflight. |
