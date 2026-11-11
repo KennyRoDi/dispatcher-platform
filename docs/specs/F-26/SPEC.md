@@ -1,8 +1,8 @@
 # SPEC F-26: Autenticación y roles
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision a146eec
+**Base:** feat/F-26-1-autenticacion-y-roles
+**Verificación IA:** revision 06103eb
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -47,9 +47,9 @@ Solo acciones de rutas que existen hoy en `src/coordinator/`.
 | Acción | Ruta | analista | supervisor | administrador | servicio |
 |---|---|---|---|---|---|
 | `crear_caso` | `POST /cases` | sí | no | sí | no |
-| `consultar_caso` | `GET /cases`, `/cases/{id}`, `/cases/{id}/report`, `/subtasks/{id}` | sí | sí | sí | no |
+| `consultar_caso` | `GET /cases`, `/cases/{id}`, `/cases/{id}/report`, `/cases/{id}/consolidated-report` (F-13), `/subtasks/{id}` | sí | sí | sí | no |
 | `cancelar_caso` | `POST /cases/{id}/cancel` | no | sí | sí | no |
-| `ver_monitoreo` | `GET /workers`, `/stats`, `/hardware` | no | sí | sí | no |
+| `ver_monitoreo` | `GET /workers`, `/stats`, `/hardware`, `/alerts` (F-14) | no | sí | sí | no |
 | `reportar_subtarea` | `POST /subtasks/report` | no | no | no | sí |
 | (pública) | `GET /health` | sin token | sin token | sin token | sin token |
 
@@ -64,7 +64,7 @@ Solo acciones de rutas que existen hoy en `src/coordinator/`.
 | Capa | Archivo | Contenido |
 |---|---|---|
 | Dominio | `src/domain/rbac.py` | `Role` y `Action` (`Enum`, no `str`), `PERMISOS` (`MappingProxyType` de `frozenset` de `Action` por `Role`) y `can(role, action) -> bool`, que falla cerrado (`False`) ante cualquier valor que no sea `Role`/`Action`. Sin FastAPI ni JWT. |
-| Aplicación | `src/application/ports.py` (una línea añadida) | Puerto `TokenVerifier.verify(token) -> Identity`, con `Identity(subject, role)` y `InvalidToken`. |
+| Aplicación | `src/application/ports.py` (17 líneas añadidas) | Puerto `TokenVerifier.verify(token) -> Identity`, con `Identity(subject, role)` y `InvalidToken`. |
 | Adaptador | `src/adapters/jwt_tokens.py` | `JwtTokenVerifier` con PyJWT; `issue_token(...)` usado solo por el script y las pruebas. |
 | Adaptador (HTTP) | `src/coordinator/seguridad.py` | `autorizar`: dependencia FastAPI que lee `Authorization`, llama al puerto, busca la acción de la ruta, aplica `can` y responde 401 o 403; contiene el mapa ruta-acción. |
 | Composición | `src/coordinator/main.py` | `include_router(..., dependencies=[Depends(autorizar)])` en cada router. |
@@ -117,7 +117,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
 | 1 | `feat(F-26): matriz de permisos por rol en el dominio` | `src/domain/rbac.py` (`Role`, `Action`, `can`); registro de AD-33, SUP-28 y SUP-29 en `docs/ARQUITECTURA.md` y `docs/REQUERIMIENTOS.md`. Aprox. 60 líneas de código. |
-| 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas. |
+| 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas estimadas; reales 224 sin pruebas. |
 | 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas. |
 
 ## Riesgos y preguntas abiertas
@@ -139,6 +139,13 @@ Hallazgos de QA de la parte 1 (sin defectos en `rbac.py`; rutas no cubiertas por
 - **Scripts sin token:** `scripts/submit_case.py` y `scripts/run_load.py` no envían `Authorization`; se romperán al activar la autenticación (parte 3) y hay que darles el token.
 - **Dashboard:** llama a `/tasks/workers`, ruta que no existe (previo a F-26); no se resuelve aquí, se avisa a su dueña.
 
+Límites declarados de la parte 2 (QA y correcciones):
+
+- **JSON roto o muy grande sin token (abierto).** Con cuerpo inválido, FastAPI responde 422 y parsea el cuerpo antes de autenticar. Arreglo propuesto: middleware ASGI que compruebe `Authorization` antes de leer el cuerpo. Queda como `xfail` en `tests/unit/test_seguridad_qa.py`; decidir en la parte 3.
+- **Corregidos:** `exp` e `iat` no finitos o fuera de año 9999 se rechazan; `sub` vacío o de espacios se rechaza; `JWT_SECRET_FILE` se lee en binario con tope de 4096 bytes, exige archivo regular (`O_NONBLOCK`, `S_ISREG`) y un archivo no UTF-8 no filtra bytes al registro.
+- **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave mientras siga en la caché; una clave desalojada vuelve a registrarlo. `src/adapters/jwt_tokens.py` falta en «Quién toca qué» de `docs/CONTRATOS.md`: se agrega en la parte 3.
+- **Sin prueba:** varias cabeceras `Authorization` (gana la primera), `JWT_SECRET` sin medir entropía, BOM en el secreto, y los códigos 404/405/307/401 distinguen rutas existentes de inexistentes.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
@@ -157,3 +164,17 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: matriz celda por celda, capas, numeracion libre en todas las ramas, notas coherentes con rutas reales; ejecuto pytest 1799 passed y conformidad 0. Sin commits nuevos desde la documentacion (comprobado). (a146eec) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests (4 archivos nuevos, dobles y contratos, y 'jwt' añadido a TERCEROS_PROHIBIDOS en test_arquitectura); src, scripts y requirements intactos. pytest: errores de coleccion ModuleNotFoundError jwt_tokens (rojo por falta de modulos). PyJWT 2.15.1 instalado solo en el venv. Decision /docs publicas o deshabilitadas: pendiente, la prueba admite ambas. (2d114a5) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff: requirements (pyjwt==2.15.1), ports.py, jwt_tokens.py, seguridad.py; tests intactos (diff de tests vacio). Ejecute la suite completa tras el ultimo commit: 1941 passed, 7 skipped, 3 xfailed. Sin comentarios nuevos ni secretos fijos (grep). 198 lineas de codigo (<400). Desviaciones aceptadas: ClosedVerifier ante configuracion invalida; /docs publicas; sin cache del verificador. (f85b3d9) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA sin bypass de autenticacion ni escalada; 8 xfail estrictos nuevos en test_seguridad_qa.py; src intacto. Suite unitaria segun QA 1941 passed/11 xfailed. Devuelvo a implementacion los hallazgos 2-5 (NaN, sub vacio, secreto no UTF-8, cache/FIFO); 1 (JSON antes de auth) queda abierto. (9cb7813) |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA parte 2: corregir NaN/inf en exp e iat, sub vacio, lectura del secreto no UTF-8 sin filtrar bytes al log, y cache del verificador con lectura acotada del archivo (FIFO, tamaño); el hallazgo 1 queda abierto |
+| verificación IA de implementacion | orquestador: git diff 03bc4b2, pytest 1947 passed 5 xfailed, conformidad 0 | 2026-11-10 | correcciones QA hallazgos 2 a 5 verificadas en codigo (03bc4b2) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | orquestador: QA previo (9cb7813) + correcciones 03bc4b2 verificadas, pytest 1947 passed 5 xfailed | 2026-11-10 | QA parte 2 completo; hallazgo 1 (parseo antes de auth) abierto como xfail y limite declarado; sin segundo QA para ahorrar cuota (6c47dd8) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | orquestador (sin subagente documentador, verificación no independiente) | 2026-11-10 | SPEC con limites declarados y entrada de bitacora publicada (c6271f6) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de revision | orquestador + revisor (subagente APROBADO, 3 menores corregidos) | 2026-11-10 | orden de imports y precisiones del SPEC aplicadas (06103eb) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |

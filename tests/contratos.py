@@ -108,3 +108,15 @@ def comprobar_case_catalog(crear):
     catalogo = crear(caso)
     assert catalogo.case("c1") == caso
     assert catalogo.case("inexistente") is None
+
+
+def comprobar_token_verifier(verificador, token_valido, identidad, tokens_invalidos):
+    from src.application.ports import Identity, InvalidToken, TokenVerifier
+
+    assert isinstance(verificador, TokenVerifier)
+    obtenida = verificador.verify(token_valido)
+    assert isinstance(obtenida, Identity)
+    assert obtenida == identidad
+    for token in (*tokens_invalidos, ""):
+        with pytest.raises(InvalidToken):
+            verificador.verify(token)

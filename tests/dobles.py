@@ -147,6 +147,7 @@ class FakeAlertReader:
         ]
         return list(reversed(alertas))[:limit]
 
+
 class FakeCaseCatalog:
     def __init__(self, casos=()):
         self.casos = {caso.case_id: caso for caso in casos}
@@ -156,3 +157,15 @@ class FakeCaseCatalog:
 
     def case(self, case_id):
         return self.casos.get(case_id)
+
+
+class FakeTokenVerifier:
+    def __init__(self, identidades=None):
+        self.identidades = dict(identidades or {})
+
+    def verify(self, token):
+        from src.application.ports import InvalidToken
+
+        if token not in self.identidades:
+            raise InvalidToken("token desconocido")
+        return self.identidades[token]
