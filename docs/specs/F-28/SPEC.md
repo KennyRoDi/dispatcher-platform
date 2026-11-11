@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-28-1-cifrado-en-reposo
-**Verificación IA:** tests c01f1cf
+**Verificación IA:** implementacion 6618671
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -149,3 +149,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo tests (test_file_key_provider.py, dobles.py, contratos.py); src intacto. Ejecute: test_file_key_provider error de coleccion ModuleNotFoundError (rojo); arquitectura y contratos verdes. Decisiones del developer no fijadas en SPEC: sigue symlinks, rechaza bits de grupo/otros, KEK_FILE gana sobre KEK, KEK base64, sin cache. Exige *.kek y kek* en .gitignore. (c01f1cf) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests; src: file_key_provider.py (64 lineas) y .gitignore. Suite completa tras 6618671: 3 de 4 corridas 1890 passed/8 skipped/6 xfailed; 1 corrida dio 1 failed no identificado (no lo capture), no reproducido: posible prueba inestable (candidata: FIFO con hilo y timeout). Desviaciones: patron de jwt_tokens copiado (no existe en esta rama), KEK en closure. (6618671) |
