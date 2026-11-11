@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-28-2-cifrado-en-reposo
 **Verificación IA:** revision 5e3900e
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -193,3 +193,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs (modulo-M4 y SPEC); push comprobado (rama alineada con origen). Prueba I y busqueda marcadas pendientes, sin datos inventados. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (27d7c87) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: decorador cumple SPEC, sin datos tras error, sin llaves fijas, capas, limites coinciden con 6 xfail; pytest segun revisor 1974 passed/15 xfailed. Menor 1 corregido por mi en modulo-M4. Menor 2: src 114 lineas vs 70 estimadas (anotar en PR). Prueba I no ejecutada; cableado F-23 pendiente. (5e3900e) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
