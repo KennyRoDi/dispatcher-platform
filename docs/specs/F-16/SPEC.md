@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** verificacion b5281e4
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -109,3 +109,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-10 | Revisión independiente QA-parte-2.md commit 845ce39: pruebas focalizadas reproducidas, 76 passed; suite completa en código 1161 passed, 2 skipped, 3 deselected, 1 warning Starlette. Confirmé en Docker local desktop-linux con preflight sintético y tres contenedores Compose: memory.max=1073741824, memory.swap.max=0, uid 1000; MemTotal local 16728616960 bytes. git diff --check base...HEAD limpio y árbol limpio. Host DESKTOP-796L2A2 no confirmado B/C/D; Tailscale no instalado y falta .env. Mediciones cgroups reales B/C/D y override GPU pendientes; no se declara aceptación completa de integración. (845ce39) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Codex | 2026-11-10 | QA revisado independientemente en 845ce39: reproduje 76 pruebas focalizadas, pasaron; configuración Compose CPU/GPU resolvió mem_limit y memswap_limit iguales a 4 GiB. Con Docker Desktop local confirmé preflight y tres contenedores efímeros CPU con memory.max=1073741824, memory.swap.max=0, uid 1000; el reporte no atribuye el host a B/C/D. Suite completa del código: 1161 passed, 2 skipped, 3 deselected, 1 warning Starlette. Contextos Docker configurados: default, desktop-linux, docker-desktop; ninguno remoto. Tailscale no instalado y falta .env B/C/D; evidencia de tres arranques reales por cada nodo y GPU runtime siguen pendientes. git diff --check limpio y árbol limpio. (b5281e4) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | Autorización humana: dejar pendientes las mediciones de B/C/D por falta de acceso remoto a equipos de compañeros y continuar con la evidencia local claramente separada; no afirmar aceptación física completa ni sustituir cargas reales. |
