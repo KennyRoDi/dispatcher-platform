@@ -41,10 +41,28 @@ El módulo no lanza la corrida real: planifica, muestrea y evalúa. La corrida l
 - La prueba de aceptación no se ejecutó: requiere la salida JSON de una corrida real.
 - El umbral de 3 heartbeats es provisional (SUP-37).
 
-## Mediciones en nodos reales: Medición pendiente (depende de F-38)
+## Qué está medido y qué no
 
-- Integración Linux: Medición pendiente.
-- Aceptación sobre JSON de corrida real: Medición pendiente.
-- Medición M1 y B.6 de saturación en tres nodos worker: Medición pendiente (depende de F-38).
+| Elemento | Estado |
+|---|---|
+| Lógica del escenario (`planificar_carga`, `huecos_heartbeat`, `evaluar`) con muestras sintéticas | Medido: 22 unitarias pasan en Windows (más `test_arquitectura`, 26 verdes en total) |
+| Integración Linux con worker real | Medición pendiente |
+| Aceptación sobre JSON de corrida real | Medición pendiente |
+| Corrida M1 y B.6 en tres nodos WSL2 (F-38) | Medición pendiente |
+| Gráfico de `memory.current` y sub-tareas admitidas | Medición pendiente (se genera del JSON de la corrida) |
+| Comparación sin admisión | Medición pendiente; «no realizada» si la persona no confirma SUP-38 |
+
+## Corrida pendiente en los nodos (a cargo de la persona)
+
+Con la huella y el límite medidos de `docs/modulo-M1-memoria.md`, en cada nodo worker WSL2:
+
+```
+py -m scenarios.memory_saturation --memory-max-mib <MiB> --margen-mib <MiB> --huella-mib <MiB> --salida docs/evidencia/F-37_<fecha>.json
+MEMORY_SATURATION_JSON=docs/evidencia/F-37_<fecha>.json pytest tests/acceptance/test_memory_saturation_aceptacion.py -q
+```
+
+Reglas (SPEC F-37, Mediciones): tres repeticiones, se reporta cada una; gráfico con los datos del JSON; resultados en esta ficha y en `docs/modulo-M1-memoria.md`.
+
+**Confirmación de la persona (SUP-38):** la comparación sin admisión se corre una sola vez, y solo si la persona confirma que el worker de prueba está aislado y que un OOM no afecta a otro nodo. Sin esa confirmación se declara «no realizada».
 
 No hay en esta ficha valores medidos de memoria, heartbeats ni estados finales de sub-tareas.
