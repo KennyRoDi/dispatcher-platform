@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** revision d9cd5b0
+**Verificación IA:** tests 17ed894
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -106,3 +106,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Codex | 2026-11-10 | Revision independiente de d9cd5b0 y diff completo contra SPEC: subagente revisor informa APROBADO sin hallazgos para parte1; inspeccione informe, capas, commits, limite 83/150 lineas y limites de evidencia. Conformidad repo 0 problemas; diff check limpio; arbol limpio y HEAD igual upstream. QA focal 56 passed y mutaciones 6/6 verificados antes. Sin mediciones SO, cuya ejecucion corresponde a partes 2/3. (d9cd5b0) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | Codex | 2026-11-10 | Pruebas parte2 escritas y ejecutadas en Docker Linux python:3.13-slim: 4 failed exclusivamente por ModuleNotFoundError src.infrastructure.fork_runtime ausente; runtime aun no existe. Solo se agrego tests/integration/test_fork_runtime.py, sin implementacion. Casos POSIX de resultado, rechazo spawn, excepcion hija y timeout/terminacion/recoleccion. (17ed894) |
