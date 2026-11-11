@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-36-1-cancelacion-en-curso
-**Verificación IA:** implementacion d993579
+**Verificación IA:** verificacion 2859a2c
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
 
 ## Objetivo
@@ -100,3 +100,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Verificación no independiente: tests/unit 1278 passed en Docker Linux; integración cancelación en curso 2 passed; test_cancel_heavy 14 en verde; scenarios/cancel_heavy.py ~80 líneas. (288ab50) |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Verificación no independiente: unit 1278 en verde en Docker Linux; integración 2 passed; test de aceptación renombrado por basename duplicado. (d993579) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code Sonnet 5.5, no independiente | 2026-11-11 | Criterios OK: 14 unitarias de cancel_heavy en verde; escenario 79 lineas (<400); integracion/aceptacion POSIX omitidas en Windows; medicion B.6 en nodos reales: Medicion pendiente, sin datos inventados (2859a2c) |
