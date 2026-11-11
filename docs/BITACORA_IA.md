@@ -763,3 +763,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas en verde, verificacion QA, revision de diff por la persona |
 | Cómo se validó | Revision de cada fase y pruebas; medicion en nodos reales pendiente (F-38) |
 | Error de la IA | La IA acepto una ruta pasada como cadena ('cpu') y la expandia a ('c','p','u'); la verificacion QA lo detecto y ahora RoutingTable lanza ValueError (test_ruta_como_cadena_se_rechaza) |
+
+## 2026-11-10 · Kenni Rodriguez · F-26 (`feat/F-26-3-autenticacion-y-roles`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (subagentes developer, qa-tester, documentador) |
+| Componente | F-26 |
+| Propósito | F-26 parte 3: cableado de autenticación y roles, emisor de tokens, documentación |
+| Consulta resumida | Implementar, probar con QA y documentar la parte 3 según el SPEC |
+| Resultado obtenido | Cableado, scripts/emitir_token.py, 14 xfail de QA y borrador de docs/modulo-M4-seguridad.md |
+| Validado / corregido / descartado | Pruebas y QA por subagentes; verificación del orquestador. Las aprobaciones de fase fueron delegadas: no hubo verificación humana independiente. |
+| Cómo se validó | Subagentes por rol (developer, qa-tester, documentador) con verificación del orquestador y aprobaciones delegadas |
+| Error de la IA | El developer puso en producción un salto de verificación que conoce el mecanismo de pruebas (dependency_overrides); QA lo marcó y queda como límite declarado. |
