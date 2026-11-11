@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-27-2-tls-entre-nodos
 **Verificación IA:** tests 6c42f4d
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -193,3 +193,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: todo punto de conexion pasa por tls.py (grep del revisor), sin cambio con TLS apagado, conftest no oculta defectos, 2 pruebas editadas justificadas; pytest segun revisor 1909 passed/4 xfailed. Menores declarados por mi en el SPEC (import de conexion.py con TLS activo sin CA, sesiones sin cerrar, TlsConfigError sin atrapar en run_load/reaper/seed_minio). (92fa984) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (unit compose, unit generar_certs, integracion servicios reales) y SPEC; src y deploy intactos. Ejecute las 2 unitarias nuevas: ver resultado arriba (rojo por falta de implementacion; 9 son guardas que ya pasan). Integracion saltada sin RUN_DOCKER_TLS=1. Aviso: test_despliegue_compose.py (F-38) exige hoy puertos 8000/6379 y reaper http: la implementacion debe actualizarlo. Carpeta de certs de MinIO sin confirmar en doc oficial; preguntas 1 y 4 del SPEC sin comprobar. (6c42f4d) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
