@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 1fc59eb
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -153,3 +153,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Documentación F-19 parte 3 revisada: QA registra el nombre nuevo de integración POSIX y el fallo de colisión resuelto; la bitácora de esta rama está publicada con los errores reales. Los resultados y límites M1 concuerdan con la evidencia JSON. Verificación documental según control mínimo, no independiente. (42ecc34) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de revision | Codex | 2026-11-10 | Revisión final F-19 parte 3 contra SPEC tras fixes de cierre: ambos modos están implementados y medidos, equivalencia validada, datos crudos y tabla M1 trazables; límites Docker/WSL2 y no generalización constan en QA/M1/AD-07. Colisión pytest corregida con basename único. Código ≤400 líneas; pruebas focales 9/9 pasadas y medición 20/20. git diff --check limpio. Revisión del mismo agente, no independiente. (1fc59eb) |
+| revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
