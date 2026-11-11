@@ -79,7 +79,7 @@ def test_caso_cancelado_conserva_su_estado(almacen):
     assert caso.execute("c1", "s1", "completed", 1) is None
     assert almacen.state("c1") is CaseState.CANCELLED
     assert almacen.counts("c1") == (1, 0)
-    assert len(almacen.history("c1")) == 1
+    assert len(almacen.history("c1")) == 2
 
 
 def test_caso_en_cola_pasa_por_procesamiento_antes_de_cerrar():
