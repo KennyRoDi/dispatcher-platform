@@ -77,6 +77,14 @@ services:
       retries: 10
     restart: unless-stopped
 
+  staging-init:
+    image: busybox:1.36
+    user: "0:0"
+    command: ["sh", "-c", "chown 10001:10001 /staging && chmod 700 /staging"]
+    volumes:
+      - coordinator-staging:/staging
+    restart: "no"
+
   coordinator:
     build:
       context: ..
@@ -84,6 +92,7 @@ services:
     command: ["python", "-m", "uvicorn", "src.coordinator.main:app", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       TLS_ENABLED: "false"
+      AUTH_ENABLED: ${AUTH_ENABLED:-true}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-localdev}
@@ -91,8 +100,15 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       JWT_SECRET: ${JWT_SECRET:?define JWT_SECRET en .env (python -m scripts.generar_credenciales)}
+      MINIO_SECURE: ${MINIO_SECURE:-false}
+      OBJECTS_BUCKET: ${OBJECTS_BUCKET:-objetos}
+      STAGING_DIR: /var/lib/dispatcher/staging
+      KEK_FILE: ${KEK_FILE:-}
+      KEK: ${KEK:-}
     ports:
       - "8000:8000"
+    volumes:
+      - coordinator-staging:/var/lib/dispatcher/staging
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/openapi.json', timeout=2)"]
       interval: 5s
@@ -103,6 +119,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      staging-init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   reaper:
@@ -142,3 +160,4 @@ volumes:
   scratch-1:
   scratch-2:
   scratch-3:
+  coordinator-staging:

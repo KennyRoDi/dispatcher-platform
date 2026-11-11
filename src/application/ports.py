@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import BinaryIO, Protocol, runtime_checkable
 
 from src.domain.alert_policy import StoredAlert
+from src.domain.case_state import CaseState
 from src.domain.chat_message import ChatMessage
 from src.domain.consolidated_report import CaseInfo
 from src.domain.finding import Finding
@@ -16,6 +17,19 @@ from src.domain.subtask import Subtask
 @runtime_checkable
 class Clock(Protocol):
     def now(self) -> datetime: ...
+
+
+@runtime_checkable
+class CaseStateStore(Protocol):
+    def mark_reported(self, case_id: str, subtask_id: str, outcome: str) -> bool: ...
+
+    def counts(self, case_id: str) -> tuple[int, int]: ...
+
+    def state(self, case_id: str) -> CaseState | None: ...
+
+    def set_state(self, case_id: str, nuevo: CaseState, at: datetime) -> bool | None: ...
+
+    def history(self, case_id: str) -> list[tuple[CaseState, datetime]]: ...
 
 
 @runtime_checkable

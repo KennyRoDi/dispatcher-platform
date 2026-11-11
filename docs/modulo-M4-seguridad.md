@@ -264,29 +264,47 @@ No aplica como medición de SO M1 a M5: F-29 aporta evidencia de ejecución. El 
 
 ### F-30 Workers sin privilegios
 
-Pendiente: sin evidencia medida en tres nodos reales. Las salidas esperadas y su estado:
+Medido en **una sola máquina**, no en tres nodos reales: la demo local de `deploy/docker-compose.demo.yml` sobre Docker Desktop 29.9.3 (Windows 10, WSL2, `linux/amd64`), el 2026-11-11 a las 20:57 UTC, contra el contenedor `deploy-worker-1-1`. La columna de nodos reales sigue pendiente y esta salida no la sustituye.
 
-| Comando | Esperado | Salida medida |
-|---|---|---|
-| `id -u` | distinto de 0 | pendiente: se mide en los tres nodos reales |
-| `touch /x` | falla (sistema de archivos de solo lectura) | pendiente: se mide en los tres nodos reales |
-| `.Config.User` | `10001:10001` | pendiente: se mide en los tres nodos reales |
-| `ReadonlyRootfs` | `true` | pendiente: se mide en los tres nodos reales |
-| `CapDrop` | contiene `ALL` | pendiente: se mide en los tres nodos reales |
-| `SecurityOpt` | contiene `no-new-privileges:true` | pendiente: se mide en los tres nodos reales |
+| Comando | Esperado | Salida medida (demo local) | Nodos reales |
+|---|---|---|---|
+| `id -u` | distinto de 0 | `10001` | pendiente |
+| `touch /x` | falla (sistema de archivos de solo lectura) | `touch: cannot touch '/x': Read-only file system`, código de salida 1 | pendiente |
+| `.Config.User` | `10001:10001` | `10001:10001` | pendiente |
+| `ReadonlyRootfs` | `true` | `true` | pendiente |
+| `CapDrop` | contiene `ALL` | `[ALL]` | pendiente |
+| `SecurityOpt` | contiene `no-new-privileges:true` | `[no-new-privileges:true]` | pendiente |
+
+Las cuatro pruebas de `tests/integration/test_workers_sin_privilegios_docker.py` también pasaron contra ese contenedor (`WORKER_CONTAINER=deploy-worker-1-1`, 4 passed). Hecho en Git Bash sobre Windows: `docker exec ... touch /x` necesita `MSYS_NO_PATHCONV=1`, porque Git Bash convierte `/x` en una ruta de Windows y el mensaje de error sale distinto.
 
 Nodos: José, Nahúm y Melany; cada uno captura sus salidas.
 
 ### F-26 Autenticación y roles
 
-Pendiente: sin ejecución en la demo.
+Medido el 2026-11-11 (20:57 UTC) en la demo local, **una sola máquina**, contra el coordinador de `deploy/docker-compose.demo.yml` en `http://localhost:8000` con TLS desactivado. La demo usó los cambios de la PR #112 (`WORKER_TOKEN`, `JWT_SECRET` en el Compose y `scripts/generar_credenciales.py`): sin ellos la demo no autentica, el coordinador rechaza todo con 401. El secreto y los tokens se generaron para la prueba, con vigencia de 30 minutos, y no se guardan. Cada celda es el código HTTP de una petición.
 
-| Caso | Código esperado | Resultado |
-|---|---|---|
-| Sin token o token inválido/vencido | 401 | pendiente: se mide en la demo |
-| Rol sin permiso (analista en `/stats`, supervisor en `POST /cases`) | 403 | pendiente: se mide en la demo |
-| Rol con permiso | 2xx | pendiente: se mide en la demo |
-| `GET /health` sin token | 200 (ruta pública) | pendiente: se mide en la demo |
+Tokens ausentes o inválidos (la columna `GET /health` es ruta pública):
+
+| Token | GET /health | GET /cases | POST /cases | GET /cases/{id} | POST /cases/{id}/cancel | GET /stats | GET /workers | POST /subtasks/report |
+|---|---|---|---|---|---|---|---|---|
+| sin token | 200 | 401 | 401 | 401 | 401 | 401 | 401 | 401 |
+| basura (`abc`) | 200 | 401 | 401 | 401 | 401 | 401 | 401 | 401 |
+| firma alterada | 200 | 401 | 401 | 401 | 401 | 401 | 401 | 401 |
+| vencido (emitido hace 2 h con 1 minuto de vigencia) | 200 | 401 | 401 | 401 | 401 | 401 | 401 | 401 |
+| `alg: none` | 200 | 401 | 401 | 401 | 401 | 401 | 401 | 401 |
+
+Roles válidos:
+
+| Rol | GET /health | GET /cases | POST /cases | GET /cases/{id} | POST /cases/{id}/cancel | GET /stats | GET /workers | POST /subtasks/report |
+|---|---|---|---|---|---|---|---|---|
+| analista | 200 | 200 | 201 | 200 | 403 | 403 | 403 | 403 |
+| supervisor | 200 | 200 | 403 | 200 | 409 | 200 | 200 | 403 |
+| administrador | 200 | 200 | 201 | 200 | 409 | 200 | 200 | 403 |
+| servicio | 200 | 403 | 403 | 403 | 403 | 403 | 403 | 200 |
+
+Todos los códigos coinciden con la matriz de la sección F-26. Las dos celdas `409` son de un rol con permiso para cancelar: la autorización pasó y el caso ya no admitía la cancelación. El caso de la prueba se creó con un archivo inexistente (`medicion/prueba.mp4`) y, al pedir la cancelación, ya estaba en estado terminal: en una repetición con otro caso, la respuesta fue `409` con el texto «ya está en estado terminal: 'failed'», tanto de inmediato como 8 segundos después. No se averiguó qué componente lo marcó `failed`. `POST /subtasks/report` con el rol `servicio` devolvió 200 con un informe `failed` sobre una sub-tarea de la prueba.
+
+Límites: es una sola máquina, sin TLS, con datos sintéticos, y cada petición se hizo una vez. No se midió el cuerpo de las respuestas ni la cabecera `WWW-Authenticate`; los 429 y la expiración por reloj del servidor no se probaron.
 
 ### F-28 Cifrado en reposo
 

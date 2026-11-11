@@ -146,6 +146,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-36 | **Provisional:** «carga superior a la memoria disponible» es una huella total de las sub-tareas encoladas ≥ 2 × (`memory.max` × (1 − margen)). El factor 2 es configurable y criterio propio; Medición pendiente. | [B.5 M1] y US-37 piden carga superior a la memoria sin definir cuánto; ver AD-41. |
 | SUP-37 | **Provisional:** «heartbeats no se interrumpen» es que ningún intervalo entre heartbeats consecutivos supera 3 × `HEARTBEAT_INTERVAL` durante la saturación. «Admite solo lo que cabe» es que en ninguna muestra `memory.current` supera `memory.max` ni hay `OOMKilled`. «Terminan» es que todas las sub-tareas llegan a estado terminal antes del plazo de la corrida. El 3 es criterio propio; Medición pendiente. | US-37 no define «interrumpen», «solo lo que cabe» ni «terminan»; ver AD-41. |
 | SUP-38 | La comparación sin control de admisión se hace solo si la persona confirma que el worker de prueba está aislado y que un OOM no afecta a otro nodo; si no, se declara «no realizada». | Provocar un OOM puede afectar el nodo; el enunciado no autoriza hacerlo sin aislamiento; ver AD-41. |
+| SUP-39 | **Provisional:** se asume que `retrying→processing` y `queued→cancelled` son transiciones válidas; `completed`, `partially_completed`, `failed` y `cancelled` son terminales. | US-10 no define la tabla completa de transiciones; ver AD-43. |
 
 ## 4. Discrepancias detectadas al contrastar con el documento
 

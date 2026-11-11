@@ -56,6 +56,17 @@ def test_iniciar_devuelve_id_y_cantidad_de_chunks(api):
     assert isinstance(cuerpo["upload_id"], str) and cuerpo["upload_id"]
 
 
+def test_iniciar_objeto_existente_responde_200_sin_staging(api):
+    cliente, almacen = api
+    datos = b"contenido ya guardado"
+    clave = sha(datos)
+    almacen.objetos[clave] = datos
+    respuesta = cliente.post("/uploads", json={"sha256": clave, "size": len(datos), "chunk_size": 4})
+    assert respuesta.status_code == 200
+    assert respuesta.json() == {"stored": True, "sha256": clave, "size": len(datos)}
+    assert cliente.get("/uploads/no-creada").status_code == 404
+
+
 @pytest.mark.parametrize("cuerpo", [
     {"sha256": "no-es-hex", "size": 10, "chunk_size": 4},
     {"sha256": "a" * 64, "size": 0, "chunk_size": 4},
