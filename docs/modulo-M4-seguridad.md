@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30 y de F-28 (parte 1). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30 y de F-28 (partes 1 a 3). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
@@ -41,6 +41,18 @@ Implementado en el proveedor de archivo (`FileKeyProvider`):
 - Falla cerrado: sin KEK válida lanza `KeyUnavailable`. Un modo distinto de 0400/0600 o un archivo no regular también la lanza.
 - Relee la fuente en cada llamada; no hay caché.
 - `.gitignore` excluye `*.kek` y `kek*`.
+
+**Decorador de almacén cifrado (F-28 parte 3).**
+
+Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`), decorador de `ObjectStore`.
+
+- `put` cifra el flujo con `EnvelopeCipher` antes de entregarlo al almacén interno; `open` descifra al leer. La clave sigue siendo el SHA-256 del claro (AD-11), por eso `exists` se delega sin cambios.
+- Cifra el contenido del objeto (cabecera, DEK envuelta y chunks con etiqueta). No cifra la clave ni oculta el tamaño.
+- Al almacén interno se le informa el tamaño del objeto cifrado: cabecera + claro + una etiqueta por chunk.
+- `open` descifra el primer chunk al abrir: un objeto corrupto o una KEK errónea fallan en `open`, no en la primera lectura.
+- **El cableado al adaptador MinIO no está hecho.** Ese adaptador es de F-23 (Melany); hoy `src/workers/storage.py` usa el cliente directo. Este decorador aún no se usa en el flujo real.
+
+**Justificación (AD-16, AD-34):** AES-256-GCM en la aplicación protege también contra quien lee MinIO, lo que SSE del lado del servidor no cubre. Una DEK por objeto envuelta por una KEK de archivo `0400` evita reutilizar nonces. Se eligió sobre MinIO SSE, LUKS y Vault por costo operativo con el tiempo disponible. Detalle en `docs/ARQUITECTURA.md` §8.
 
 ## 2. Concepto de Sistemas Operativos
 
@@ -87,7 +99,16 @@ docker inspect --format '{{.HostConfig.SecurityOpt}}' <worker>
 
 Pendiente: costo de CPU y tamaño de chunk óptimo se miden con los comandos de `docs/IMPLEMENTACION.md` §5 (busca `F-28`); este documento no los reproduce y no contiene salidas medidas.
 
-Búsqueda de llaves en el historial (la automatiza `test_historial_sin_llaves`):
+Prueba I contra MinIO real.
+
+Archivo: `tests/integration/test_encrypted_object_store_minio.py`. Usa un adaptador mínimo solo de prueba. Sin las variables, se salta.
+
+```bash
+export MINIO_ENDPOINT=<host:puerto> MINIO_ACCESS_KEY=<usuario> MINIO_SECRET_KEY=<clave>
+pytest -q -m integration tests/integration/test_encrypted_object_store_minio.py
+```
+
+Búsqueda de llaves en el historial (la automatiza `tests/unit/test_historial_sin_llaves.py`):
 
 ```bash
 git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'
@@ -112,7 +133,11 @@ Nodos: José, Nahúm y Melany; cada uno captura sus salidas.
 
 ### F-28 Cifrado en reposo
 
-Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk ni de costo de leer la KEK en cada llamada.
+Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de leer la KEK en cada llamada ni de costo de CPU del decorador.
+
+**Salida de la prueba I:** ejecutada una vez, de forma local (una máquina, MinIO efímero en Docker, sin TLS ni red entre nodos): 2 pruebas pasadas; el objeto crudo en MinIO no contiene el marcador en claro y un bit alterado lanza `DecryptionError`. Salida completa en [docs/evidencia/F-28_prueba_I_minio_local_2026-11-11.md](evidencia/F-28_prueba_I_minio_local_2026-11-11.md). No es evidencia en los tres nodos ni mide costo de CPU.
+
+**Salida de la búsqueda en el historial:** pendiente: la búsqueda manual en el historial no se ha registrado aquí. La prueba automática `tests/unit/test_historial_sin_llaves.py` sí corre en la suite y pasa.
 
 ## 5. Interpretación
 
