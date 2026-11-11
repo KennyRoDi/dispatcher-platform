@@ -28,26 +28,22 @@ def _formas(kek: bytes) -> list[bytes]:
     return [kek, base64.b64encode(kek), kek.hex().encode()]
 
 
-@pytest.mark.xfail(strict=True, reason="QA: ValueError por ruta con NUL se escapa; debe ser KeyUnavailable")
 @pytest.mark.parametrize("ruta", ["a\0b", "\0"])
 def test_ruta_con_nul_falla_con_key_unavailable(ruta):
     with pytest.raises(KeyUnavailable):
         FileKeyProvider(ruta).kek()
 
 
-@pytest.mark.xfail(strict=True, reason="QA: KEK_FILE con NUL en el entorno da ValueError, no KeyUnavailable")
 def test_kek_file_con_nul_en_el_entorno_falla_con_key_unavailable():
     with pytest.raises(KeyUnavailable):
         FileKeyProvider.from_env({"KEK_FILE": "a\0b"}).kek()
 
 
-@pytest.mark.xfail(strict=True, reason="QA: UnicodeEncodeError (ValueError) con sustituto aislado en la ruta")
 def test_ruta_con_sustituto_unicode_falla_con_key_unavailable():
     with pytest.raises(KeyUnavailable):
         FileKeyProvider("\ud800").kek()
 
 
-@pytest.mark.xfail(strict=True, reason="QA: os.fdopen falla con un directorio y el descriptor de os.open no se cierra")
 def test_un_directorio_no_filtra_descriptores(tmp_path):
     carpeta = tmp_path / "carpeta.kek"
     carpeta.mkdir(mode=0o700)
@@ -113,7 +109,6 @@ def test_archivo_sin_lectura_para_el_propietario_falla_cerrado(tmp_path, modo):
         FileKeyProvider(ruta).kek()
 
 
-@pytest.mark.xfail(strict=True, reason="QA: el SPEC pide 0400/0600 pero 0500, 0700, 4400 y 1400 se aceptan (solo se mira grupo y otros)")
 @pytest.mark.parametrize("modo", [0o500, 0o700, 0o4400, 0o1400])
 def test_solo_se_aceptan_los_modos_0400_y_0600(tmp_path, modo):
     ruta = tmp_path / "k.kek"

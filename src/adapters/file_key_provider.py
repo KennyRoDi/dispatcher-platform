@@ -8,6 +8,7 @@ from pathlib import Path
 from src.application.ports import KeyUnavailable
 
 KEK_SIZE = 32
+PERMITTED_MODES = (0o400, 0o600)
 
 
 class FileKeyProvider:
@@ -16,7 +17,7 @@ class FileKeyProvider:
     La fuente se guarda como función para que ni `repr` ni `vars` muestren la llave.
     """
 
-    def __init__(self, path: str | Path | None = None, *, _source: Callable[[], bytes] | None = None):
+    def __init__(self, path: str | Path | None = None, *, _source: Callable[[], bytes | None] | None = None):
         self._source = _source or (lambda: _read_file(path))
 
     @classmethod
@@ -30,35 +31,36 @@ class FileKeyProvider:
         return cls(_source=_missing)
 
     def kek(self) -> bytes:
-        return _checked(self._source())
+        kek = self._source()
+        if kek is not None and len(kek) == KEK_SIZE:
+            return kek
+        # Sin la variable, la llave de largo incorrecto no queda en los locales de la traza.
+        del kek
+        raise KeyUnavailable(f"la KEK debe ser de {KEK_SIZE} bytes y estar bien codificada")
 
 
 def _missing() -> bytes:
     raise KeyUnavailable("falta KEK_FILE o KEK")
 
 
-def _checked(kek: bytes) -> bytes:
-    if len(kek) != KEK_SIZE:
-        raise KeyUnavailable(f"la KEK debe tener {KEK_SIZE} bytes")
-    return kek
-
-
-def _decode_base64(encoded: str) -> bytes:
+def _decode_base64(encoded: str) -> bytes | None:
     try:
         return base64.b64decode(encoded, validate=True)
     except (binascii.Error, ValueError):
-        raise KeyUnavailable("KEK no es base64 valido") from None
+        return None
 
 
 def _read_file(path: str | Path | None) -> bytes:
     try:
         descriptor = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
-        with os.fdopen(descriptor, "rb") as handle:
-            info = os.fstat(handle.fileno())
+        try:
+            info = os.fstat(descriptor)
             if not stat.S_ISREG(info.st_mode):
                 raise KeyUnavailable("KEK_FILE debe ser un archivo regular")
-            if info.st_mode & (stat.S_IRWXG | stat.S_IRWXO):
-                raise KeyUnavailable("KEK_FILE no debe tener permisos para grupo ni otros")
-            return handle.read(KEK_SIZE + 1)
-    except (OSError, TypeError):
+            if stat.S_IMODE(info.st_mode) not in PERMITTED_MODES:
+                raise KeyUnavailable("KEK_FILE debe tener permisos 0400 o 0600")
+            return os.read(descriptor, KEK_SIZE + 1)
+        finally:
+            os.close(descriptor)
+    except (OSError, ValueError, TypeError):
         raise KeyUnavailable("KEK_FILE no se pudo leer") from None
