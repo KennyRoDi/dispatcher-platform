@@ -1034,3 +1034,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Si |
 | Cómo se validó | Aprobaciones delegadas por la persona (modo autonomo); verificacion del orquestador, pytest y revision del diff contra el SPEC |
 | Error de la IA | el QA halló que un generador pasado a add se agotaba y no alertaba, que un publicador sin SafeAlertPublisher perdía alertas tras guardar y 3 defectos menores (TypeError con estado no hashable, inyección de líneas en el log, publicador async perdido) |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`feat/F-14-2-alertas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-14 |
+| Propósito | Documentar F-14 parte 2 (Stream Redis, AlertReader, GET /alerts) |
+| Consulta resumida | Limites de la parte 2 en AD-39 y fila de GET /alerts en DEMO |
+| Resultado obtenido | AD-39 y DEMO.md actualizados |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
+| Cómo se validó | Revision del diff contra el SPEC |
+| Error de la IA | el QA halló que el 503 de /alerts filtraba host y puerto de Redis, que una entrada con bytes no UTF-8 tiraba toda la ruta, que ResponseError daba 500 y 3 defectos menores (emitted_at sin zona, recent(0), maxlen no positivo) |
