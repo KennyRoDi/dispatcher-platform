@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido
 **Verificación IA:** implementacion 7dd2322
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. MinioObjectStore: exists con stat_object (NoSuchKey falso, otros errores se propagan), put deduplica si ya existe y entrega el flujo con length sin leerlo antes, open envuelve la respuesta y libera la conexion al cerrar, claves inseguras con ValueError. Unitarias 14/14, suite 3446 verde en Linux (3 fallos preexistentes de main), integracion 4/4 contra moto; falta MinIO real (Kenni). Conformidad 0. (7657962) |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente): APROBADO. Criterios de la parte 2 cumplidos; 7/7 mutantes detectados (M5 sobrevivia, ahora cubierto). Contrato sobre EncryptedObjectStore(MinioObjectStore) en verde; put que falla en la segunda parte de 15 MiB no deja objeto ni multipart. H3 (release_conn si close falla) arreglado con try/finally. Suite 3455 verde en Linux. Integracion solo contra moto, no MinIO real. (d401cf1) |
 | verificación IA de implementacion | Codex, sin subagente independiente | 2026-11-11 | Se movio la prueba MinIO real a la ruta del SPEC, se renombro su homonima unitaria y se ajustaron imports QA. Verificado: pytest -q -m integration tests/integration/test_minio_object_store.py (4 passed); pytest -q tests/unit/test_minio_object_store_unit.py tests/unit/test_minio_object_store_qa.py (23 passed); diff --check limpio. La suite completa se ejecuto en Linux: 3387 passed, 29 failed y 11 errores por referencias .git del worktree Windows en el contenedor y pruebas historicas/artefactos ajenos a F-23; ejecucion Windows falla por fcntl/geteuid y colision ya corregida. (7dd2322) |
+| implementacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar de forma autónoma las fases sin aprobación humana; verificación de IA registrada en 7dd2322. |
