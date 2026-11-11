@@ -42,6 +42,6 @@
 | F-37 | pendiente |
 | F-38 | en-pr |
 | F-39 | pendiente |
-| F-40 | implementacion |
+| F-40 | verificacion |
 | F-41 | pendiente |
 | F-42 | pendiente |
