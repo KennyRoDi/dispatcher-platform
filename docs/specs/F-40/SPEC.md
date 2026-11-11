@@ -1,6 +1,6 @@
 # SPEC F-40: Matriz, historial y bitácora
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 693cf26
 **Historia:** US-40 · **Requisitos:** RNF-17, RNF-18, RNF-19, RNF-20; [Parte I §3, §4, §8], [Anexos 1 y 3], [B.9], [B.10] · **Responsable:** K
@@ -128,3 +128,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca docs/responsabilidades.md y SPEC. Ejecute conformidad.py: 0 problemas. Recontado: git shortlog -sn origin/main (Jose 395, Kenni 262, krd 24, Nahum 17), bitacora en estado 45 entradas; SUP-23 y SUP-24 ya existen en REQUERIMIENTOS:129 y ARQUITECTURA:240, corregido el SPEC. No re-ejecute pytest (solo docs). (98c774e) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor DEVUELTO con 2 hallazgos (colaboradores en SPEC:101, deriva de recuentos); reproduje gh api collaborators (KennyRoDi, Mel28Vinso, joselhcr) y corregi ambos; conformidad 0 problemas. Resto verificado por el revisor (shortlog, rutas, bitacora, pytest 1637). (693cf26) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
