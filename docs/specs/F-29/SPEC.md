@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** implementacion c6e5b6a
+**Verificación IA:** implementacion d8c75a7
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -155,3 +155,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: src/adapters/jsonl_custody_log.py (125 lineas), .gitignore, SPEC; tests intactos. Suite completa tras c6e5b6a: 1923 passed, 8 skipped, 5 xfailed. Desviacion declarada: verifica el log completo en cada record (O(n), costo total cuadratico; el SPEC decia leer solo el ultimo eslabon). (c6e5b6a) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: A1-A9 (ancla fallida bloquea el log, caida tras 1er anexo, write parcial sin rollback, O_TRUNC sigue symlink, symlink de log, reemplazo durante flock, reloj naive, hashes sin validar, result!=evidence) y costo cuadratico: 4000 entradas 121 s |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de A1-A8 y rendimiento; diff de tests solo quita marcadores xfail (comprobado). Suite completa tras d8c75a7: 1943 passed, 8 skipped, 6 xfailed. Dominio tocado (verify_tail, _check_anchor): tests de custody_chain verdes. A9 no implementado (SPEC exige result==evidence solo en ingreso; helpers de pruebas lo violan): queda xfail y limite. record ya no verifica el log completo: manipulacion de linea intermedia solo la detecta el verificador (parte 3). Warnings ResourceWarning son de src/workers/storage.py (previo). (d8c75a7) |
