@@ -1,7 +1,7 @@
 # SPEC F-36: Cancelación en curso
 
 **Fase:** pr
-**Base:** feat/F-38-1-despliegue-en-tres-nodos
+**Base:** main
 **Verificación IA:** revision 44c6c61
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
 
