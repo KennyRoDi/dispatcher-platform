@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-19-1-estrategias-de-carga
 **Verificación IA:** implementacion 5034bb8
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La prueba real de Whisper y ForkProcessRuntime requieren POSIX; marcar la integración real como skip en Windows para evitar fallo de colección/ejecución local. |
 | verificación IA de implementacion | Codex | 2026-11-10 | Hallazgo revisión: test integración real omitido en Windows vía skipif POSIX. Verificado en Windows: pytest tests/integration/test_fork_runtime.py -q → 5 skipped (0.15 s); en Docker Linux sigue válido el resultado previo de 5 passed. git diff --check limpio. No independiente. (5034bb8) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
