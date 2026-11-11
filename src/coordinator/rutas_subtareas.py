@@ -115,7 +115,7 @@ def report_subtask(
         try:
             notify_case_closed(publicador, case_id, final_status)
         except Exception:
-            logger.exception("Alerta de cierre del caso %s no publicada", case_id)
+            logger.exception("Alerta de cierre del caso %r no publicada", case_id)
 
     return {
         "message": "Reporte procesado correctamente",

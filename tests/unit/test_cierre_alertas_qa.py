@@ -132,10 +132,6 @@ def test_cancelado_con_subtareas_en_vuelo_no_alerta_aunque_pending_llegue_a_cero
     assert publicador.alertas == []
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="rutas_subtareas.py:118 formatea case_id con %s (el cliente lo controla): inyecta lineas en el log; usar %r como SafeAlertPublisher",
-)
 def test_log_del_fallo_de_alerta_no_inyecta_lineas_con_case_id_hostil(client, fake, caplog):
     main.app.dependency_overrides[rutas_alertas.obtener_publicador_alertas] = lambda: publicar_con(RuntimeError("x"))
     _, (subtarea,) = crear_caso(client)
@@ -148,7 +144,7 @@ def test_log_del_fallo_de_alerta_no_inyecta_lineas_con_case_id_hostil(client, fa
 
 @pytest.mark.xfail(
     strict=True,
-    reason="el reporte no valida que case_id sea el caso de la sub-tarea (previo a F-14): cierra y alerta un caso ajeno sin que termine",
+    reason="el reporte no valida que case_id sea el caso de la sub-tarea (previo a F-14): cierra y alerta un caso ajeno sin que termine; previo a F-14, código de Nahúm; pendiente fuera de F-14",
 )
 def test_reporte_con_case_id_ajeno_no_cierra_ni_alerta_otro_caso(client, publicador, fake):
     caso_a, (a1, _a2) = crear_caso(client, 2)
@@ -160,7 +156,7 @@ def test_reporte_con_case_id_ajeno_no_cierra_ni_alerta_otro_caso(client, publica
 
 @pytest.mark.xfail(
     strict=True,
-    reason="case_id inexistente crea un caso fantasma y publica caso_finalizado (el reporte no valida el caso)",
+    reason="case_id inexistente crea un caso fantasma y publica caso_finalizado (el reporte no valida el caso); previo a F-14, código de Nahúm; pendiente fuera de F-14",
 )
 def test_reporte_con_case_id_inexistente_no_publica_alerta(client, publicador, fake):
     _, (subtarea,) = crear_caso(client)
@@ -171,7 +167,7 @@ def test_reporte_con_case_id_inexistente_no_publica_alerta(client, publicador, f
 
 @pytest.mark.xfail(
     strict=True,
-    reason="cancelar entre el HGET de estado y el HSET terminal es sobrescrito: el caso cancelado pasa a completed y alerta (carrera previa a F-14)",
+    reason="cancelar entre el HGET de estado y el HSET terminal es sobrescrito: el caso cancelado pasa a completed y alerta (carrera previa a F-14); previo a F-14, código de Nahúm; pendiente fuera de F-14",
 )
 def test_cancelacion_durante_el_cierre_no_se_sobrescribe(client, publicador, fake, monkeypatch):
     case_id, (subtarea,) = crear_caso(client)
