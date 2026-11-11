@@ -1,6 +1,6 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 1f343ad
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
@@ -223,3 +223,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | orquestador | 2026-11-11 | Sin cambios de codigo en src (diff solo docs/evidencia) (40e1a3e) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código |
 | verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte de evidencia; hallazgo real de la guia (variables F-17 omitidas) pasa a documentacion; captura real y Tailscale pendientes (1f343ad) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
