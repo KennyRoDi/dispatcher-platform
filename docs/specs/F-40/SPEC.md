@@ -104,9 +104,9 @@ Riesgos, comprobados con los comandos de la sección Verificación al 10/nov/26:
 Preguntas para la persona que aprueba (decisión pendiente, no resuelta aquí):
 
 1. ¿Se actualiza `SUP-01` (usuarios de GitHub ya registrados) y quién lo hace? Aquí solo se avisa.
-2. **SUP-23 propuesto:** ¿quién es el apoyo de cada módulo? Hoy «Por definir». Sin dato del equipo, queda «Por definir» y se declara. ¿O se asigna ahora?
+2. **SUP-nuevo (apoyo; SUP-23 ya lo usa F-16) propuesto:** ¿quién es el apoyo de cada módulo? Hoy «Por definir». Sin dato del equipo, queda «Por definir» y se declara. ¿O se asigna ahora?
 3. ¿Qué filas no-módulo entran en la matriz: pipeline (F-01 a F-15), dataset (F-03, F-04), carga y fallos (F-33 a F-37), entrega (F-38 a F-42)? ¿Con el responsable de cada US del backlog o con una fila por área?
-4. **SUP-24 propuesto:** Nahúm Murillo no tiene commits ni entradas de bitácora del II Proyecto. ¿Se declara así en `docs/responsabilidades.md` («incumplido a la fecha»), o hay trabajo suyo no registrado? No se inventa ni se atribuyen commits ajenos.
+4. **SUP-nuevo (Nahúm; SUP-24 ya lo usa el preflight) propuesto:** Nahúm Murillo no tiene commits ni entradas de bitácora del II Proyecto. ¿Se declara así en `docs/responsabilidades.md` («incumplido a la fecha»), o hay trabajo suyo no registrado? No se inventa ni se atribuyen commits ajenos.
 5. ¿Se presenta el historial del I Proyecto como evidencia de proceso, o solo desde el 03/nov/26 (primer commit del II Proyecto en `main`, 03/nov/26)? Afecta cuántos commits «propios» muestra cada integrante.
 6. ¿Se agrega `.mailmap` para unir `krd` con Kenni Rodriguez? Cambia la salida de `shortlog` sin tocar historial; `Auditoria` no tiene persona asociada y requiere decisión del equipo. Prohibido reescribir historia.
 7. ¿Los módulos sin entrada de bitácora (M2, M4, M5) llevan declaración «no se usó IA», o los responsables la registrarán con el uso real antes de entregar? La hora de entrega del 10/nov/26 sigue sin definir (SUP-03).
