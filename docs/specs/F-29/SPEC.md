@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan a0ca31b
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-29 sin campos pendientes (grep 0); diff contra main solo el SPEC. AD-35 y SUP-31 libres segun arquitecto (no re-verifique; el log previo dice max AD-34/SUP-30). Diseño (HMAC por eslabon, ancla con MAC, llave distinta de la KEK) es propuesta del arquitecto. 8 preguntas abiertas; decision provisional: aceptar, parte 1 sin dependencias, parte 2 apilada sobre la rama de F-28 (FileKeyProvider) solo cuando llegue. (a0ca31b) |
+| plan | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
