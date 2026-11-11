@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-19-1-estrategias-de-carga
 **Verificación IA:** verificacion 33f5121
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex GPT-6 Luna | 2026-11-10 | 51 unitarias model_loading/model_loader y QA pasaron en Windows; 5 integraciones incl. Whisper real pasaron en Docker Linux Python 3.13, faster-whisper 1.2.1/CTranslate2 4.9.0; git diff --check limpio. Verificación en misma sesión, no independiente. ADD/SPEC actualizadas por fork incompatible. (3e97344) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de verificacion | Codex GPT-6 Luna | 2026-11-10 | QA parte 2: 51 unitarias y 5 integraciones ya aprobadas; caso Whisper real valida igualdad de 2 salidas entre ambas estrategias en Docker Linux. Fork precargado falla por timeout y se documenta sin ocultarlo. Verificación misma sesión, no independiente; sin repetir pruebas pasadas. (33f5121) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
