@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-04-1-verdad-de-referencia-y-procedencia
-**Verificación IA:** verificacion 99b0f6f
+**Verificación IA:** documentacion abcaf2a
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -158,3 +158,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 11 casos xfail estrictos en test_provenance_qa.py; src intacto. Ejecute test_provenance y _qa: pasan/xfail segun lo esperado. Hallazgos (no str, espacios interiores, U+200B) a pendientes y SPEC; la parte 3 debe rechazar no str. No reproduje las observaciones sin xfail. (99b0f6f) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca el SPEC; limites de la parte 2 presentes (grep); conformidad 0 problemas (ejecutado por mi). SUP-27 sigue provisional. Sin pytest nuevo (solo docs). (abcaf2a) |
