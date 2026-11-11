@@ -1,6 +1,6 @@
 # SPEC F-36: Cancelación en curso
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-36-1-cancelacion-en-curso
 **Verificación IA:** revision bf38e59
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J

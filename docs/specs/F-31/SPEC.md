@@ -1,6 +1,6 @@
 # SPEC F-31: Benchmark de inferencia
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision d9bd9c5
 **Historia:** US-31 · **Requisitos:** RF-40 (B.5 M5) · **Responsable:** J
