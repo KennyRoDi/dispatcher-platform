@@ -6,7 +6,7 @@
 | F-01 | pendiente |
 | F-02 | pendiente |
 | F-03 | hecha |
-| F-04 | en-pr |
+| F-04 | hecha |
 | F-05 | pendiente |
 | F-06 | pendiente |
 | F-07 | hecha |
