@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-14-2-alertas
 **Verificación IA:** implementacion 7bea224
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -147,3 +147,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y ayudas (b952465); src intacto; test_cierre_alertas: 11 fallan por asercion (no se publica alerta aun) y 5 de regresion pasan; aceptacion A con reloj sintetico, evidencia solo con F14_EJEMPLO_JSON (b952465) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Llamada protegida de cierre en rutas_subtareas.py (7bea224, +12/-2); suite verde; sin ediciones a pruebas; toca archivo de Nahum (7bea224) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
