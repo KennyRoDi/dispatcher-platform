@@ -27,6 +27,7 @@ Cada módulo se desarrolla de principio a fin sin esperar a otro. Los módulos s
 | `RoutingPolicy` | José Andrés, F-32 | Scheduler (M2) |
 | `ResourceReader`, `ResourceUsage` | José Andrés, F-16 | Admisión (M1), dashboard (F-15) |
 | `AlertPublisher` | Kenni, F-14 | Coordinador, workers |
+| `AlertReader` | Kenni, F-14 | Dashboard (F-15) |
 | `Clock` | Infraestructura de quien lo necesite | Todos |
 
 ## Quién toca qué

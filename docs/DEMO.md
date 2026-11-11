@@ -71,6 +71,13 @@ estados, formas de respuesta): `docs/WORKER_CONTRACT.md`.
 | `GET /workers` | Workers y su heartbeat, con el campo `alive` |
 | `GET /stats` | Largo de las 10 colas, casos por estado, workers vivos y sub-tareas activas |
 | `POST /cases/{id}/cancel` | Cancela un caso (409 si ya es terminal) |
+| `GET /alerts?limit=` | Alertas recientes del Stream `alerts`, mas nuevas primero (`limit` de 1 a 200, 50 por defecto; 503 si Redis no responde) |
+
+Alertas recientes (incidencias altas y cierre de caso):
+
+```bash
+curl "http://localhost:8000/alerts?limit=10"
+```
 
 Casos y sub-tareas (los valores de `GET /cases` y `GET /cases/{id}` vienen como strings de Redis;
 `metadata` es un JSON en string, y en `GET /subtasks/{id}` y en el reporte ya es un objeto):

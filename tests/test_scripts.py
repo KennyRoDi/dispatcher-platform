@@ -721,10 +721,11 @@ def test_root_compose_has_redis_minio_reaper():
     assert "version" not in compose
 
 
-def test_local_compose_worker_has_replicas_3():
-    compose = _load_compose("deploy/docker-compose.local.yml")
-    worker = compose["services"]["worker"]
-    assert worker["deploy"]["replicas"] == 3
+def test_local_compose_has_three_workers_with_own_scratch():
+    services = _load_compose("deploy/docker-compose.local.yml")["services"]
+    workers = {name: s for name, s in services.items() if name.startswith("worker-")}
+    assert len(workers) == 3
+    assert len({tuple(s["volumes"]) for s in workers.values()}) == 3
 
 
 def test_worker_compose_has_stop_grace_period():
