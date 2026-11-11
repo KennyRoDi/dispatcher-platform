@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** plan 62abaae
+**Verificación IA:** plan 722c524
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -91,3 +91,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | SPEC F-10 completo sin campos pendientes, 3 partes, criterios copiados del backlog (62abaae) |
+| verificación IA de plan | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | SPEC F-10 completo, 3 partes, criterios copiados del backlog (722c524) |
