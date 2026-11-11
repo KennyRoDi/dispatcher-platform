@@ -183,20 +183,58 @@ def test_params_en_cero_producen_conteos_cero_y_se_reportan():
     assert len(check_minimums(plan)) == 3
 
 
-@pytest.mark.xfail(strict=True, reason="hallazgo QA: los casos del layout superan params.cases")
 def test_casos_del_plan_igualan_el_parametro_cases():
     assert len(_plan(cases=3).cases) == 3
 
 
-@pytest.mark.xfail(strict=True, reason="hallazgo QA: sin casos que admitan el tipo, el total se pierde en silencio")
 def test_total_de_audios_se_conserva_con_pocos_casos_sin_heterogeneos():
     plan = _plan(cases=1, light_heterogeneous=0, heavy_heterogeneous=0)
 
     assert sum(caso.audios for caso in plan.cases) == 150
 
 
-@pytest.mark.xfail(strict=True, reason="hallazgo QA: parametros negativos no se validan")
 @pytest.mark.parametrize("cambios", [{"messages": -5}, {"images": -1}, {"audios": -1}, {"heavy_bytes": -1}])
 def test_parametros_negativos_se_rechazan(cambios):
     with pytest.raises(ValueError):
         _plan(**cambios)
+
+
+@pytest.mark.parametrize("nombre", ["MIN_CASES", "MIN_MESSAGES", "MIN_IMAGES", "MIN_AUDIOS"])
+def test_el_dominio_expone_los_minimos_de_b3_como_constantes(nombre):
+    from src.domain import dataset_plan
+
+    assert isinstance(getattr(dataset_plan, nombre, None), int)
+
+
+def test_los_valores_por_defecto_de_params_son_los_minimos_compartidos():
+    from src.domain import dataset_plan
+
+    por_defecto = DatasetParams()
+
+    assert por_defecto.cases == dataset_plan.MIN_CASES
+    assert por_defecto.messages == dataset_plan.MIN_MESSAGES
+    assert por_defecto.images == dataset_plan.MIN_IMAGES
+    assert por_defecto.audios == dataset_plan.MIN_AUDIOS
+    assert por_defecto.heavy_bytes == dataset_plan.MIN_HEAVY_BYTES
+
+
+@pytest.mark.parametrize(
+    "nombre,etiqueta",
+    [("MIN_CASES", "casos"), ("MIN_MESSAGES", "mensajes"), ("MIN_IMAGES", "imagenes"), ("MIN_AUDIOS", "audios")],
+)
+def test_check_minimums_usa_las_constantes_compartidas(monkeypatch, nombre, etiqueta):
+    from src.domain import dataset_plan
+
+    monkeypatch.setattr(dataset_plan, nombre, 10**9)
+
+    problemas = check_minimums(_plan())
+
+    assert any(p.startswith(f"{etiqueta}: ") and str(10**9) in p for p in problemas)
+
+
+def test_el_script_del_dataset_reutiliza_los_minimos_del_dominio():
+    from scripts import dataset_sintetico
+    from src.domain import dataset_plan
+
+    for nombre in ("MIN_CASES", "MIN_MESSAGES", "MIN_IMAGES", "MIN_AUDIOS"):
+        assert getattr(dataset_sintetico, nombre) == getattr(dataset_plan, nombre)

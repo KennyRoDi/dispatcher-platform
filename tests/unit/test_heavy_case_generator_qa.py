@@ -102,7 +102,6 @@ def test_dos_semillas_dan_semillas_de_ruido_distintas(tmp_path):
     assert noise(first) != noise(second)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un nombre de caso con '..' escribe fuera del directorio de salida")
 def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path):
     out_dir = tmp_path / "salida"
     plan = _plan_with_heavy_name("../escape")
@@ -115,7 +114,6 @@ def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path):
     assert not (tmp_path / "escape").exists()
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un nombre de caso absoluto escribe fuera del directorio de salida")
 def test_un_nombre_de_caso_absoluto_no_escribe_fuera_del_destino(tmp_path):
     outside = tmp_path / "fuera"
     plan = _plan_with_heavy_name(str(outside))
@@ -128,7 +126,6 @@ def test_un_nombre_de_caso_absoluto_no_escribe_fuera_del_destino(tmp_path):
     assert not [f for f in tmp_path.rglob("*") if f.is_file() and (tmp_path / "salida") not in f.parents]
 
 
-@pytest.mark.xfail(strict=True, reason="QA: si falla un caso queda su directorio vacio")
 def test_si_falla_no_queda_el_directorio_vacio_del_caso(tmp_path):
     with pytest.raises(ValueError):
         generate_heavy_cases(plan_dataset(7, PARAMS), tmp_path, SparseRunner(size=MIN_BYTES - 1))
@@ -136,7 +133,6 @@ def test_si_falla_no_queda_el_directorio_vacio_del_caso(tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.xfail(strict=True, reason="QA: str(CalledProcessError) no incluye el stderr de ffmpeg")
 def test_el_error_de_ffmpeg_expone_su_stderr(monkeypatch):
     def fake_run(args, **kwargs):
         raise subprocess.CalledProcessError(1, args, stderr=b"Unknown encoder 'mpeg2video'")

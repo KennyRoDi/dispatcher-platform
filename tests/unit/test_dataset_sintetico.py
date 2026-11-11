@@ -26,7 +26,7 @@ FIELDS = {
     "positivo",
     "duracion_s",
 }
-LICENCIA = "generado por el equipo, uso academico"
+LICENCIA = "MIT"
 KINDS = {"texto", "imagen", "audio", "video", "documento"}
 ETIQUETAS = {"imagen": {"positivo", "neutro"}, "audio": {"tono", "ruido"}}
 REDUCED = {
@@ -369,7 +369,7 @@ def test_validar_detecta_un_archivo_ausente(reduced):
     assert any(fila["path"] in p and "no existe" in p for p in problemas)
 
 
-@pytest.mark.parametrize("campo,valor", [("origen", "kaggle"), ("licencia", "MIT")])
+@pytest.mark.parametrize("campo,valor", [("origen", "kaggle"), ("licencia", "GPL")])
 def test_validar_rechaza_origen_o_licencia_distintos(reduced, campo, valor):
     rows = _rows(reduced)
     rows[0][campo] = valor

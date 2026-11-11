@@ -60,17 +60,18 @@ def test_los_casos_no_pesados_no_producen_archivo(plan, tmp_path):
     assert not any((tmp_path / name).exists() for name in light)
 
 
-def test_el_tipo_es_video_o_documento(plan, tmp_path):
+def test_el_tipo_es_video(plan, tmp_path):
     files = generate_heavy_cases(plan, tmp_path, SparseRunner())
 
-    assert {f.kind for f in files} <= {"video", "documento"}
+    assert files
+    assert {f.kind for f in files} == {"video"}
 
 
 def test_cada_registro_declara_origen_licencia_y_semilla(plan, tmp_path):
     files = generate_heavy_cases(plan, tmp_path, SparseRunner())
 
     assert ORIGIN == "sintetico"
-    assert LICENSE_NAME == "generado por el equipo, uso academico"
+    assert LICENSE_NAME == "MIT"
     assert all(f.origen == ORIGIN and f.licencia == LICENSE_NAME and f.semilla == plan.seed for f in files)
 
 
