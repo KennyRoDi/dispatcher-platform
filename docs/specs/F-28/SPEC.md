@@ -126,6 +126,14 @@ Hallazgos de QA que se aceptan y se declaran:
 - `kek` y `dek` son variables locales: Sentry con `include_local_variables` las mostraría; no activar esa opción.
 - Cifrar no oculta el tamaño del objeto (AD-11 ya revela objetos iguales).
 
+## Límites declarados de la parte 2
+
+- La KEK queda en las variables locales de la traza (Sentry `include_local_variables`, `pytest --showlocals`). No activar esas opciones.
+- Los 3 xfail `test_la_traza_no_conserva_la_kek_*` son defectuosos: el marco del propio test conserva la KEK. Pendiente reescribirlos o aceptar el límite.
+- Decisiones del developer no fijadas antes en el SPEC: sigue enlaces simbólicos y valida el destino; la variable `KEK` es base64; valores vacíos equivalen a no definidos; sin caché.
+- Prueba inestable de la suite completa, 1 vez en 4, sin identificar. Hipótesis sin confirmar: las pruebas que recorren el historial git.
+- La parte 2 no cablea el proveedor al almacén; es la parte 3.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
