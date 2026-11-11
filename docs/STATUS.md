@@ -21,14 +21,14 @@
 | F-16 | hecha |
 | F-17 | hecha |
 | F-18 | hecha |
-| F-19 | revision |
+| F-19 | en-pr |
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
 | F-23 | pendiente |
 | F-24 | pendiente |
 | F-25 | pendiente |
-| F-26 | implementacion |
+| F-26 | verificacion |
 | F-27 | pendiente |
 | F-28 | pendiente |
 | F-29 | pendiente |
