@@ -189,7 +189,7 @@ Pasos completos, probados desde un nodo Windows real (`PC-KEVIN`) contra el Nodo
 3. `REDIS_PASSWORD`, `MINIO_ACCESS_KEY` y `MINIO_SECRET_KEY`, que están en el `.env` del Nodo A.
 4. La huella SHA-256 de la CA, por un canal distinto al del archivo. En el Nodo A: `openssl x509 -in ~/.ms-certs/ca.pem -noout -fingerprint -sha256`. Sin ese segundo canal, la comprobación del paso 3 solo prueba que el archivo está íntegro, no que sea el correcto.
 
-**Paso 1. Instalar y activar (una sola vez).** Docker Desktop con el motor WSL2, Tailscale con sesión en la misma red que el Nodo A, y Git (comandos de §2). Después:
+**Paso 1. Instalar y activar (una sola vez).** Docker Desktop con el motor WSL2, Tailscale con sesión en la misma red que el Nodo A, y Git (comandos de §2). En una ventana de PowerShell como administrador, antes de instalar Docker Desktop, ejecuta `wsl --install --no-distribution` y reinicia Windows: sin WSL2 activo, Docker Desktop no arranca. Probado en una sola máquina, no en todas. Después:
 
 ```powershell
 git clone https://github.com/KennyRoDi/dispatcher-platform.git
@@ -266,7 +266,7 @@ WORKER_MEM_LIMIT=2g
 - `WORKER_ID` va **vacío** (ver «Tres errores que rompen la identidad»).
 - `TLS_CA_FILE` es la ruta de Windows; el Compose la monta en `/certs/ca.pem` dentro del contenedor.
 - `WORKER_MEM_LIMIT` es obligatorio: sin él Compose falla con `define WORKER_MEM_LIMIT en .env`. **`2g` es un marcador para esta prueba de conexión: no está medido y no vale como dato.** Hay que medirlo antes de arrancar el worker real.
-- `ADMISSION_MARGIN_BYTES` y las cinco `FOOTPRINT_*_BYTES` se dejan vacías: `check_connectivity` no las exige (comprobado en un nodo Windows real). El worker sí las necesita para arrancar, y sin la medición M1 §4.1 no se inventan.
+- **No añadas** `ADMISSION_MARGIN_BYTES` ni `FOOTPRINT_*_BYTES`: `check_connectivity` no las lee, y un valor inventado (por ejemplo `1`) haría que el worker admitiera todo sin límite cuando se arranque. Se definen solo con valores medidos (M1 §4.1), justo antes de arrancar el worker real.
 - No escribas el `.env` con `>` ni con `Out-File`, y no lo subas a git (`.gitignore` ya lo excluye).
 - `NODE_NAME` y `NODE_IP` no deben estar definidos en el shell con otro valor: `Get-ChildItem Env:NODE_NAME, Env:NODE_IP -ErrorAction SilentlyContinue` no debe imprimir nada.
 
@@ -290,7 +290,7 @@ Esperado: ambos códigos `0` y, en el segundo comando:
 [OK] work_dir: WORK_DIR escribible: /scratch
 ```
 
-El aviso del bucket `dataset` es normal: el worker lo crea al iniciar. Aquí termina la prueba de conexión. **No ejecutes `python scripts/start_worker.py` todavía.** Antes hacen falta las huellas de admisión y el `WORKER_MEM_LIMIT` medidos y, con la autenticación de F-26 (PR #112), `WORKER_TOKEN` y el `JWT_SECRET` en el Nodo A; con ellos el Nodo A debe recrearse. Mientras tanto, un worker sin token recibiría 401 del coordinador.
+El aviso del bucket `dataset` es normal: el worker lo crea al iniciar. Aquí termina la prueba de conexión. **No ejecutes `python scripts/start_worker.py` todavía.** Antes hay que medir `WORKER_MEM_LIMIT`, `ADMISSION_MARGIN_BYTES` y las cinco `FOOTPRINT_*_BYTES` (M1 §4.1) y, con la autenticación de F-26 (PR #112), tener `WORKER_TOKEN` en el worker y `JWT_SECRET` en el Nodo A (que debe recrearse). Mientras tanto, un worker sin token recibiría 401 del coordinador.
 
 **Operador del Nodo A: comprobación previa.** Antes de que nadie pruebe, en el Nodo A:
 
@@ -444,8 +444,8 @@ Ninguna fila se ha reproducido sobre nodos reales. «Sin comprobar» marca lo qu
 |---|---|---|
 | `check_connectivity` falla en el contenedor, pero en el host `Test-NetConnection <IP_TAILSCALE_NODO_A> -Port 6380` responde | **Sin comprobar.** Un contenedor de Docker Desktop en WSL2 no alcanza la red Tailscale del host. Es la base de esta topología | **La Parte 2 se detiene** y se devuelve a `plan`: `python scripts/flujo.py devolver plan "motivo"`. No improvises otra red |
 | `curl: (60)` o error de revocación en Windows con `curl.exe` | Schannel no puede comprobar la revocación de una CA propia. Reproducido en un nodo Windows real | Añade `--ssl-no-revoke` al `curl.exe` y conserva `--cacert` (ver «Conectarse al Nodo A desde Windows», paso 4) |
-| `define WORKER_MEM_LIMIT en .env` | Falta `WORKER_MEM_LIMIT` en `.env` | Defínelo; para la prueba de conexión sirve `2g` (no medido) |
-| `ADMISSION_MARGIN_BYTES es obligatoria y debe ser un entero en bytes` (o `FOOTPRINT_*`) | Al arrancar el worker (no en `check_connectivity`): faltan en `.env` | Mídelas según M1 §4.1; no las inventes |
+| `define WORKER_MEM_LIMIT en .env` | Falta `WORKER_MEM_LIMIT` en `.env` o está vacía | Defínelo; para la prueba de conexión sirve `2g` (no medido) |
+| `ADMISSION_MARGIN_BYTES es obligatoria...` durante la prueba de conexión | No debería salir: algo arrancó el worker en vez de `check_connectivity` | Revisa el comando del paso 6. Al arrancar el worker real sí se exigen: mídelas (M1 §4.1), no las inventes |
 | `check_connectivity` falla con TLS aunque `.env` y red estén bien | Imagen `deploy-worker` antigua, anterior a F-27. Ocurrió en un nodo Windows real | `docker compose --env-file .env -f deploy/docker-compose.worker.yml build worker` y repite |
 | `Test-NetConnection` tampoco responde | Tailscale inactivo en alguna máquina, o el Nodo A sin levantar | `tailscale status`, `tailscale ping <IP_TAILSCALE_NODO_A>` y, en el Nodo A, `docker compose ps` |
 | `docker compose up` falla al publicar puertos en el Nodo A | **Sin comprobar.** Tailscale inactivo o `NODE_IP` distinto de `tailscale ip -4`. También podría ocurrir tras reiniciar, si Docker arranca antes que Tailscale | Activa Tailscale, corrige `NODE_IP` y repite `docker compose up -d` |
