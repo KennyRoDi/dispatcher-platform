@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** revision a5a3aa6
+**Verificación IA:** tests 430e8db
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de revision | Codex | 2026-11-10 | APROBADO F-19 parte 2. Revisión final del diff 11 archivos vs SPEC: API factory num_workers, procesos y threads compatibles; cleanup ante error/timeout; test real POSIX omitido en Windows; ADD y resultados honestos. Hallazgo previo de Windows y precisión de hilos/intra-op corregidos. Verificación misma sesión, no independiente. (a5a3aa6) |
 | revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de tests | Codex | 2026-11-10 | Pruebas TDD rojas en Windows: test_model_memory.py y test_comparar_carga.py fallan al importar los módulos de producción aún no creados (2 errores de colección; ninguna implementación). git diff --check limpio; verificación same-session, no independiente. (430e8db) |
