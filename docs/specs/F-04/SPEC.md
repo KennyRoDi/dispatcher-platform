@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-04-3-verdad-de-referencia-y-procedencia
 **Verificación IA:** revision 29b8271
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -199,3 +199,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs/dataset.md (+42) y fila 4 del SPEC. Texto cotejado con la salida real que ejecute (490 fuentes rc 0; caso negativo rc 1). Tabla de aciertos marcada pendiente, sin datos inventados. conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). (2dc0c29) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin hallazgos; reprodujo procedencia (490 fuentes, rc 0), recuento por tipo, conformidad 0 y diff sin cambios en src/scripts/tests. No reprodujo el caso negativo (lo ejecute yo en verificacion, salida guardada). (29b8271) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
