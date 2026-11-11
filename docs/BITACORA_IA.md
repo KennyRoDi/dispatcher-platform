@@ -531,3 +531,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas deterministas en verde; los 4 tests POSIX reales no se ejecutaron en Windows, pendientes en WSL2/Linux |
 | Cómo se validó | Revisión humana de cada fase |
 | Error de la IA | cancel(pid, scratch=None) no coincidía con los tests; se cambió a cancel(pid) guardando el scratch por pid |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 (`feat/F-03-7-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagentes developer, QA tester y documentador, general-purpose) |
+| Componente | F-03 |
+| Propósito | F-03 parte 7: cerrar los 9 xfail de QA de la parte 6 y 2 menores del revisor (validador, DatasetParams, limpieza de _generate, API publica produce), mas 3 hallazgos de la QA de la propia parte 7. |
+| Consulta resumida | Pruebas en rojo (0638cef, 16 fallaban), implementacion (c6a400b), QA con 6 xfail (153e182), fase devuelta, correcciones (3cbe56f) y QA breve sin defectos nuevos. |
+| Resultado obtenido | pytest unitarias 1591 passed, 7 skipped, 3 xfailed; integracion 3 passed. Quedan 3 pendientes aceptados con xfail estricto declarados en el SPEC (--out con .., mkdir a mitad de cadena, symlink ajeno a casos) y DatasetParams sin tope superior. |
+| Validado / corregido / descartado | El orquestador reejecuto pytest en cada fase; la reproduccion con ffmpeg real (seed 7, diff -r identico) es dato del QA. La persona aprobo cada fase. |
+| Cómo se validó | No se verifico el manejo de SIGTERM (fuera de alcance, declarado en el SPEC). |
+| Error de la IA | La primera implementacion (c6a400b) dejo 6 casos borde sin resolver en _generate y _check_row (QA 153e182); se corrigieron 3 tras devolver la fase (3cbe56f) y 3 quedan como pendientes aceptados. |
