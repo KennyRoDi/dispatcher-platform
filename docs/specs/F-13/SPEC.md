@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-13-1-reporte-consolidado
-**Verificación IA:** revision 131a892
+**Verificación IA:** tests 51cfecb
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -126,3 +126,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 1: dominio 329 lineas src, capas puras, SPEC cumplido, AD-38 y SUP-34 presentes; menores no bloqueantes (f-strings largas, tipos de retorno) (131a892) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y dobles (51cfecb); src intacto; test_build_report.py falla en coleccion con ModuleNotFoundError src.application.build_report (rojo); API asumida declarada (51cfecb) |
