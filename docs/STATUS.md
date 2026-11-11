@@ -21,7 +21,7 @@
 | F-16 | hecha |
 | F-17 | hecha |
 | F-18 | hecha |
-| F-19 | revision |
+| F-19 | documentacion |
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
@@ -33,7 +33,7 @@
 | F-28 | pendiente |
 | F-29 | pendiente |
 | F-30 | pendiente |
-| F-31 | verificacion |
+| F-31 | documentacion |
 | F-32 | pendiente |
 | F-33 | pendiente |
 | F-34 | pendiente |
