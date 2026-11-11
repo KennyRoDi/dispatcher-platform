@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-36-1-cancelacion-en-curso
-**Verificación IA:** verificacion 2859a2c
+**Verificación IA:** documentacion 3d9175d
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
 
 ## Objetivo
@@ -102,3 +102,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code Sonnet 5.5, no independiente | 2026-11-11 | Criterios OK: 14 unitarias de cancel_heavy en verde; escenario 79 lineas (<400); integracion/aceptacion POSIX omitidas en Windows; medicion B.6 en nodos reales: Medicion pendiente, sin datos inventados (2859a2c) |
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; integración POSIX omitida en Windows, medición B.6 pendiente de nodos reales |
+| verificación IA de documentacion | Claude Code Sonnet 5.5, no independiente | 2026-11-11 | Ficha docs/evidencia/F-36_cancelacion_en_curso.md; bitacora publicada en estado; medicion B.6 en nodos reales: Medicion pendiente, sin datos inventados (3d9175d) |
