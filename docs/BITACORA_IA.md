@@ -969,3 +969,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Sección con comandos, variables y resultados pendientes; sin datos medidos |
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin QA independiente (parte sin código); la prueba de aceptación solo se verificó con skip |
 | Cómo se validó | Revisión del orquestador contra SPEC e IMPLEMENTACION §5 |
+
+## 2026-11-11 · Kenni Rodriguez · F-38 (`feat/F-38-2-evidencia-tres-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-38 |
+| Propósito | Documentar evidencia de simulacion local de tres nodos (F-38 parte 2) |
+| Consulta resumida | Aprobaciones delegadas por la persona; sin QA independiente; simulacion local autorizada por la persona (no acredita B.2 ni Tailscale) |
+| Resultado obtenido | Evidencia de simulacion local y guia de despliegue corregida con las variables de admision |
+| Validado / corregido / descartado | Aprobaciones delegadas; verificacion no independiente |
+| Cómo se validó | Orquestador con subagentes; ejecucion en contenedores locales |
+| Error de la IA | la guía de despliegue omitía ADMISSION_MARGIN_BYTES y FOOTPRINT_<OP>_BYTES; los workers reiniciaban en bucle y /workers devolvía []; lo reveló la simulación local |
