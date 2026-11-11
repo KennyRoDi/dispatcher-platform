@@ -1,7 +1,7 @@
 # SPEC F-26: Autenticación y roles
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-26-1-autenticacion-y-roles
 **Verificación IA:** revision a146eec
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
