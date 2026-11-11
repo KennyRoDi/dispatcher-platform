@@ -53,6 +53,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
+    # Lee server.key 0600: corre con el UID de quien genero los certificados, como redis y minio.
+    user: "${CERTS_UID:?define CERTS_UID en .env}:${CERTS_GID:?define CERTS_GID en .env}"
     command: ["python", "-m", "uvicorn", "src.coordinator.main:app", "--host", "0.0.0.0", "--port", "8443",
       "--ssl-certfile", "/certs/server.pem", "--ssl-keyfile", "/certs/server.key"]
     environment:

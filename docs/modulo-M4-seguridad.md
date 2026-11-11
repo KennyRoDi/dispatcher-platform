@@ -28,7 +28,7 @@ Borrador de la parte 1 de F-27. Otras ramas (F-26, F-28 a F-30) añaden sus secc
 ### Límites declarados
 
 - Redis y MinIO reales no se han probado con TLS: sin salida medida.
-- Con `CERTS_UID`/`CERTS_GID`, `redis-data` y `minio-data` pueden requerir un `chown` único.
+- `coordinator`, `redis` y `minio` del Nodo A corren con `user: CERTS_UID:CERTS_GID` para leer `server.key` (0600). No se probó con las imágenes reales; el coordinador no escribe en disco (se revisó el código de `src/coordinator`), pero Redis y MinIO pueden requerir un `chown` único de `redis-data` y `minio-data`.
 - Con `TLS_ENABLED=false` el worker igual exige `TLS_CA_FILE`.
 - Pendientes de otros dueños: `dashboard/app.py:23` y `scripts/generate_dataset.py:18,291` aún apuntan a `http` y 8000.
 - Sin evidencia medida, M4 máximo 2.

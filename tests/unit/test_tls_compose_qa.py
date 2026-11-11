@@ -229,12 +229,10 @@ def test_gitignore_ignora_los_artefactos_de_certificados(ruta):
     assert resultado.returncode == 0, ruta
 
 
-@pytest.mark.parametrize("servicio", ["redis", "minio"])
+@pytest.mark.parametrize("servicio", ["redis", "minio", "coordinator"])
 def test_los_servidores_pueden_leer_la_llave_montada(servicio):
     definicion = _servicios("docker-compose.yml")[servicio]
-    script = SCRIPT.read_text(encoding="utf-8")
-    llave_abierta = not re.search(r"chmod 600[^\n]*(server\.key|private\.key)", script)
-    assert "user" in definicion or llave_abierta, f"{servicio} monta una llave 0600 sin fijar el UID"
+    assert "user" in definicion, f"{servicio} monta una llave 0600 sin fijar el UID"
 
 
 def test_el_feeder_de_la_demo_apaga_tls_como_el_resto_del_compose_local():

@@ -158,7 +158,7 @@ Tailscale debe estar activo antes de `docker compose up`, porque los puertos se 
 NODE_IP=$(tailscale ip -4) NODE_NAME=$(hostname) CERTS_DIR=$HOME/.ms-certs bash deploy/tls/generar_certs.sh
 ```
 
-En el `.env` del Nodo A: `CERTS_DIR` (la misma ruta), `CERTS_UID=$(id -u)` y `CERTS_GID=$(id -g)`. A cada worker copia **solo** `ca.pem` (nunca `ca.key` ni `server.key`) y fija `TLS_CA_FILE` con su ruta en su `.env`.
+En el `.env` del Nodo A: `CERTS_DIR` (la misma ruta), `CERTS_UID=$(id -u)` y `CERTS_GID=$(id -g)`. Con ellos `coordinator`, `redis` y `minio` corren con ese UID para leer `server.key` (0600); no se probó con las imágenes reales. A cada worker copia **solo** `ca.pem` (nunca `ca.key` ni `server.key`) y fija `TLS_CA_FILE` con su ruta en su `.env`.
 
 ```bash
 tailscale ip -4    # debe coincidir con NODE_IP
