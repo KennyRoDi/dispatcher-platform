@@ -26,7 +26,7 @@
 | F-21 | pendiente |
 | F-22 | en-pr |
 | F-23 | verificacion |
-| F-24 | en-pr |
+| F-24 | tests |
 | F-25 | pendiente |
 | F-26 | hecha |
 | F-27 | hecha |
