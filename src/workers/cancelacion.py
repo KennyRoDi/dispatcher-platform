@@ -51,6 +51,9 @@ class _SupervisorDeSubtarea:
         self._registro._registrar(self._case_id, pid)
         return pid
 
+    def poll(self, pid: int) -> int | None:
+        return self._registro._supervisor.poll(pid)
+
     def cancel(self, pid: int) -> None:
         self._registro._supervisor.cancel(pid)
 
