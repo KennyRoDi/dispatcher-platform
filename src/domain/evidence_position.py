@@ -4,13 +4,16 @@ from datetime import datetime, timezone
 
 from src.domain.finding import Finding
 
-_INDICES = r"\d+(?:,\d+)*"
-_TRAMO = r"\d+(?:\.\d+)?-\d+(?:\.\d+)?s"
-_MENSAJES = re.compile(rf"mensajes ({_INDICES})")
-_SEGMENTO = re.compile(rf"segmento (\d+) t=({_TRAMO})")
-_SEGMENTOS = re.compile(rf"segmentos ({_INDICES}) t=({_TRAMO}(?:,{_TRAMO})*)")
-_CAJA = re.compile(r"caja (\d+),(\d+),(\d+),(\d+)")
-_LOTE = re.compile(r"(?:mensajes \d+-\d+|segmentos \d+-\d+ t=.+)")
+# re.ASCII y topes de dígitos: \d de Unicode acepta «٣» y un índice de miles de dígitos hace fallar int().
+_ENTERO = r"\d{1,9}"
+_INDICES = rf"{_ENTERO}(?:,{_ENTERO})*"
+_TRAMO = rf"{_ENTERO}(?:\.{_ENTERO})?-{_ENTERO}(?:\.{_ENTERO})?s"
+_MENSAJES = re.compile(rf"mensajes ({_INDICES})", re.ASCII)
+_SEGMENTO = re.compile(rf"segmento ({_ENTERO}) t=({_TRAMO})", re.ASCII)
+_SEGMENTOS = re.compile(rf"segmentos ({_INDICES}) t=({_TRAMO}(?:,{_TRAMO})*)", re.ASCII)
+_CAJA = re.compile(rf"caja ({_ENTERO}),({_ENTERO}),({_ENTERO}),({_ENTERO})", re.ASCII)
+_LOTE = re.compile(r"(?:mensajes \d+-\d+|segmentos \d+-\d+ t=.+)", re.ASCII)
+_ENTRADA_DE_DETALLE = re.compile(rf"({_ENTERO}) (\S+) (.*)", re.ASCII)
 
 
 @dataclass(frozen=True)
@@ -47,18 +50,38 @@ def parse_position(finding: Finding) -> tuple[Locator, ...]:
     posicion = finding.evidence.position
     if _LOTE.fullmatch(posicion):
         return ()
-    if coincidencia := _MENSAJES.fullmatch(posicion):
-        return _mensajes(_enteros(coincidencia[1]), finding.detail)
+    locadores = _mensajes(posicion, finding.detail) or _segmentos(posicion) or _caja(posicion)
+    return locadores or (UnknownLocator(posicion),)
+
+
+def _mensajes(posicion: str, detalle: str) -> tuple[MessageLocator, ...]:
+    coincidencia = _MENSAJES.fullmatch(posicion)
+    if not coincidencia:
+        return ()
+    marcas = _marcas_del_detalle(detalle)
+    return tuple(MessageLocator(indice, *marcas.get(indice, (None, None))) for indice in _enteros(coincidencia[1]))
+
+
+def _segmentos(posicion: str) -> tuple[SegmentLocator, ...]:
     if coincidencia := _SEGMENTO.fullmatch(posicion):
-        return (_segmento(int(coincidencia[1]), coincidencia[2]),)
-    if coincidencia := _SEGMENTOS.fullmatch(posicion):
+        indices, tramos = [int(coincidencia[1])], [coincidencia[2]]
+    elif coincidencia := _SEGMENTOS.fullmatch(posicion):
         indices, tramos = _enteros(coincidencia[1]), coincidencia[2].split(",")
-        # Un tramo por índice: si no cuadran, la posición no es de este formato.
-        if len(indices) == len(tramos):
-            return tuple(_segmento(indice, tramo) for indice, tramo in zip(indices, tramos))
-    if coincidencia := _CAJA.fullmatch(posicion):
-        return (BoxLocator(*map(int, coincidencia.groups())),)
-    return (UnknownLocator(posicion),)
+    else:
+        return ()
+    # Un tramo por índice, y ninguno invertido: si no, la posición no es de un analizador.
+    if len(indices) != len(tramos):
+        return ()
+    locadores = tuple(_segmento(indice, tramo) for indice, tramo in zip(indices, tramos))
+    return locadores if all(loc.start_s <= loc.end_s for loc in locadores) else ()
+
+
+def _caja(posicion: str) -> tuple[BoxLocator, ...]:
+    coincidencia = _CAJA.fullmatch(posicion)
+    if not coincidencia:
+        return ()
+    x1, y1, x2, y2 = (int(valor) for valor in coincidencia.groups())
+    return (BoxLocator(x1, y1, x2, y2),) if x1 <= x2 and y1 <= y2 else ()
 
 
 def _enteros(texto: str) -> list[int]:
@@ -70,20 +93,28 @@ def _segmento(indice: int, tramo: str) -> SegmentLocator:
     return SegmentLocator(indice, float(inicio), float(fin))
 
 
-def _mensajes(indices: list[int], detalle: str) -> tuple[MessageLocator, ...]:
-    marcas = _marcas_del_detalle(detalle)
-    return tuple(MessageLocator(indice, *marcas.get(indice, (None, None))) for indice in indices)
-
-
 def _marcas_del_detalle(detalle: str) -> dict[int, tuple[datetime, str]]:
     marcas: dict[int, tuple[datetime, str]] = {}
+    ambiguos: set[int] = set()
     for entrada in detalle.split("; "):
-        partes = entrada.split(" ", 2)
-        if len(partes) == 3 and partes[0].isdigit():
-            try:
-                instante = datetime.fromisoformat(partes[1])
-            except ValueError:
-                continue
-            if instante.tzinfo is not None:
-                marcas[int(partes[0])] = (instante.astimezone(timezone.utc), partes[2])
+        coincidencia = _ENTRADA_DE_DETALLE.fullmatch(entrada)
+        if not coincidencia:
+            continue
+        indice = int(coincidencia[1])
+        # El source_ref lo controla quien exportó el chat: un índice repetido podría falsear la marca real.
+        if indice in marcas or indice in ambiguos:
+            marcas.pop(indice, None)
+            ambiguos.add(indice)
+            continue
+        instante = _instante_utc(coincidencia[2])
+        if instante is not None:
+            marcas[indice] = (instante, coincidencia[3])
     return marcas
+
+
+def _instante_utc(texto: str) -> datetime | None:
+    try:
+        instante = datetime.fromisoformat(texto)
+        return instante.astimezone(timezone.utc) if instante.tzinfo is not None else None
+    except (ValueError, OverflowError):
+        return None

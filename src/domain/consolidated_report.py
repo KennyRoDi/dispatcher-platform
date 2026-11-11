@@ -1,7 +1,8 @@
+import math
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 from src.domain.evidence_position import BoxLocator, Locator, MessageLocator, SegmentLocator, UnknownLocator
 from src.domain.finding import Finding, Severity
@@ -55,6 +56,16 @@ class Fragment:
     span_s: tuple[float, float] | None = None
     excerpt: str = ""
     in_store: bool = True
+
+    def __post_init__(self) -> None:
+        if self.timestamp_utc is None:
+            return
+        if self.timestamp_utc.tzinfo is None:
+            raise ValueError("la marca del fragmento exige zona horaria")
+        try:
+            object.__setattr__(self, "timestamp_utc", self.timestamp_utc.astimezone(timezone.utc))
+        except OverflowError as error:
+            raise ValueError("la marca del fragmento no cabe en UTC") from error
 
 
 @dataclass(frozen=True)
@@ -131,14 +142,20 @@ def build_timeline(reported: Sequence[ReportedFinding]) -> Timeline:
 
 def _clave_con_hora(evento: TimelineEvent) -> tuple:
     fragmento = evento.fragment
-    return fragmento.timestamp_utc, fragmento.sha256, _clave_de_posicion(fragmento.locator)
+    return (fragmento.timestamp_utc, fragmento.sha256, _clave_de_posicion(fragmento.locator), *_desempate(evento))
 
 
 def _clave_sin_hora(evento: TimelineEvent) -> tuple:
     fragmento = evento.fragment
     ruta = fragmento.source.file_path if fragmento.source else ""
     inicio = fragmento.locator.start_s if isinstance(fragmento.locator, SegmentLocator) else 0.0
-    return ruta, inicio, fragmento.sha256, _clave_de_posicion(fragmento.locator)
+    # NaN no es comparable: sin esta separación sorted daría un orden que depende de la entrada.
+    inicio_ordenable = (math.isnan(inicio), 0.0 if math.isnan(inicio) else inicio)
+    return (ruta, inicio_ordenable, fragmento.sha256, _clave_de_posicion(fragmento.locator), *_desempate(evento))
+
+
+def _desempate(evento: TimelineEvent) -> tuple:
+    return evento.category, _RANGO_DE_SEVERIDAD[evento.severity], repr(evento.fragment)
 
 
 def _clave_de_posicion(locador: Locator) -> tuple:
@@ -160,7 +177,7 @@ def _del_hallazgo(item: ReportedFinding) -> list[Incident]:
     sha, categoria = finding.evidence.object_sha256, finding.category
     incidencias = []
     if finding.severity is Severity.ALTA:
-        incidencias.append(Incident(SEVERIDAD_ALTA, f"hallazgo de severidad alta: {categoria}", sha, categoria))
+        incidencias.append(Incident(SEVERIDAD_ALTA, f"hallazgo de severidad alta: {categoria} en {finding.evidence.position}", sha, categoria))
     for fragmento in item.fragments:
         incidencias.extend(_del_fragmento(fragmento, categoria))
     return incidencias
