@@ -1,6 +1,6 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-13-1-reporte-consolidado
 **Verificación IA:** revision 3067dd4
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
@@ -138,3 +138,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-38 (solo docs/ARQUITECTURA.md); bitacora en estado; sin cambios de codigo (e207627) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: 181 lineas src, capas ok, CaseCatalog con contrato y doble, limites AD-38 coinciden; 4 menores no bloqueantes anotados en CLAUDE.md local (3067dd4) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
