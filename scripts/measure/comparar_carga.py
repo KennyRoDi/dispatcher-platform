@@ -166,7 +166,7 @@ def _child(connection, factory, path, strategy, workers):
             with ThreadPoolExecutor(max_workers=workers) as pool:
                 results = list(pool.map(model.transcribe, [path] * workers))
         else:
-            results = [model.transcribe(path)]
+            results = model.transcribe(path)
         connection.send(("inferred", results))
         connection.recv()
     except BaseException as error:
