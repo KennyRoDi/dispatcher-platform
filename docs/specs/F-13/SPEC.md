@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-13-1-reporte-consolidado
-**Verificación IA:** implementacion 7a18d66
+**Verificación IA:** implementacion 1ad0b7f
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Aplicacion implementada (7a18d66, ~135 lineas src, sin ediciones a pruebas); suite verde (7a18d66) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: exists que lanza tumba el reporte, extracto de audio erroneo, sin tope, sin UTC, sha vacio enlaza, surrogate, N+1 exists |
+| verificación IA de implementacion | orquestador | 2026-11-11 | 7 hallazgos QA corregidos en 1ad0b7f; suite verde; solo se quitaron decoradores xfail; limite: almacen caido sale como objeto_inexistente (1ad0b7f) |
