@@ -3,37 +3,62 @@
 **Fase:** plan
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** pendiente
-**Historia:** US-36 · **Requisitos:** … · **Responsable:** J
+**Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
 
 ## Objetivo
 
-… Qué cambia para quién y por qué, citando el enunciado.
+Demostrar con datos medidos que cancelar un caso pesado (archivo de al menos 200 MB) a mitad de procesamiento detiene las sub-tareas y libera procesos, memoria y temporales [B.6 Cancelación en curso]. F-12 dejó el mecanismo (`ProcessSupervisor`, `cancel:{caso}`), pero en producción es inerte: `multimedia_processor.process` no recibe el supervisor y `main()` no lo construye, de modo que FFmpeg se lanza con `subprocess.Popen` fuera de su control. F-36 cierra esa brecha y mide el antes y después.
 
 ## Alcance
 
-**Incluye:** …
+**Incluye:**
+- `multimedia_processor.process` y `_run` aceptan `supervisor` opcional y lanzan FFmpeg por él (grupo propio, scratch del supervisor); sin supervisor conservan el comportamiento actual.
+- `Worker.main()` construye `ProcessSupervisor` con `PosixProcessRunner` y lo pasa al `Worker` (solo en POSIX).
+- `ProcessSupervisor.cancel` idempotente: una segunda cancelación o un pid ya recogido no lanza `KeyError`.
+- Escenario `scenarios/cancel_heavy.py`: genera un archivo sintético de 200 MB o más, lanza el caso, cancela a mitad y registra `ps`, `ls /scratch`, `memory.current` antes y después y el tiempo de liberación.
+- Ficha de medición con datos reales en `docs/`.
 
-**No incluye:** …
+**No incluye:** nuevos estados o transiciones del caso (F-10); cambios en `deploy/` (dueño K; `stop_grace_period` se declara, no se edita); despliegue en tres nodos (F-38); saturación de memoria (F-37).
 
 ## Criterios de aceptación
 
-… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
+- **Dado** un caso pesado, con un archivo de al menos 200 MB, en procesamiento
+- **Cuando** se cancela a mitad de procesamiento
+- **Entonces** se detienen sus sub-tareas
+- **Y** no quedan procesos ni archivos temporales de esas sub-tareas
+- **Y** la memoria del worker disminuye
+- **Y** el caso queda `cancelled`
 
 ## Diseño
 
-… Contratos de `docs/CONTRATOS.md` que implementa y que usa. Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+- **Contratos:** `docs/CONTRATOS.md` sin cambios; usa la clave y canal `cancel:{caso}` de F-12 y el puerto `ProcessRunner`.
+- **Decisiones:** AD-09 y AD-31 (supervisor, `SIGTERM`, gracia de 10 s, `SIGKILL`, `waitpid`). Sin decisión nueva.
+- **Capas y archivos:** `src/workers/multimedia_processor.py` (`process`, `_run`: obtiene el pid por `supervisor.start`, lee su progreso y espera con el supervisor); `src/workers/worker_node.py` (`main()`); `src/application/process_supervisor.py` (idempotencia de `cancel`); `scenarios/cancel_heavy.py` (script, sin lógica de dominio).
+- **Reutiliza:** `SubprocesosPorCaso` y `escuchar_cancelaciones` (`src/workers/cancelacion.py`), `CgroupResourceReader`, `scripts/run_load.py` para lanzar el caso.
+- **Gracia frente a `stop_grace_period`:** `grace_seconds` (10 s) es mucho menor que los 31 min de `deploy/docker-compose.worker.yml`; se verifica por prueba de configuración, sin cambiar el compose.
+- **Puntos abiertos de F-12 que cierra:** supervisor sin uso en producción, `main()` sin cablear y `KeyError` en segunda cancelación.
+- **Riesgo de diseño:** `_run` lee el stdout de FFmpeg para el progreso; el runner POSIX debe exponer ese pipe o `_run` debe leer un archivo de progreso. El Arquitecto de la parte 1 elige la forma mínima y la anota aquí.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | … | … |
-| Integración | … | … |
-| Aceptación | … | … |
+| Unitaria | `test_cancel_dos_veces_no_lanza`, `test_cancel_pid_desconocido_no_lanza` | Cancelación idempotente |
+| Unitaria | `test_run_usa_supervisor_si_se_provee`, `test_run_sin_supervisor_igual_que_antes` | `_run` lanza por el supervisor y no rompe el modo actual |
+| Unitaria | `test_main_construye_supervisor_en_posix` | Cableado de producción |
+| Unitaria | `test_gracia_menor_que_stop_grace_period` | La gracia cabe en el apagado del contenedor |
+| Integración | Worker real con FFmpeg en Linux (WSL2 o contenedor): cancelar y comprobar sin procesos ni scratch | Sin hijos ni temporales tras cancelar |
+| Aceptación | `scenarios/cancel_heavy.py` con archivo de 200 MB o más | Caso `cancelled`, recursos liberados y evidencia de B.6 |
 
 ## Mediciones
 
-… Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
+Escenario B.6, ficha `docs/escenario-B6-cancelacion.md`. Comandos exactos, en el worker, antes de cancelar, 1 s después y al estabilizarse; 5 repeticiones:
+- `docker exec <w> ps -eo pid,ppid,stat,rss,cmd`
+- `docker exec <w> ls -la /scratch`
+- `docker exec <w> cat /sys/fs/cgroup/memory.current`
+- tiempo entre `POST /cases/{id}/cancel` y el último proceso ausente.
+
+**Medición pendiente:** requiere los nodos reales (contenedores de F-38). Hasta medirla, la ficha declara «sin dato medido» y el módulo queda con máximo 2 [Parte I §5].
 
 ## Plan de pila
 
@@ -41,11 +66,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-36): …` | … |
+| 1 | `feat(F-36): cablear el supervisor en el worker` | `process`/`_run` con supervisor, `main()`, `cancel` idempotente y pruebas unitarias |
+| 2 | `feat(F-36): escenario de cancelación en curso` | `scenarios/cancel_heavy.py`, integración en Linux y ficha B.6 (con «Medición pendiente» si faltan nodos) |
 
 ## Riesgos y preguntas abiertas
 
-… Lo que la persona que aprueba debe decidir.
+- El adaptador es POSIX: en Windows las pruebas con procesos reales se omiten; se corren en Docker o WSL2.
+- La lectura de progreso por stdout puede obligar a ampliar el puerto `ProcessRunner` (`src/application/ports.py`); se decide en la parte 1.
+- La medición real depende de F-38 (nodos de K) y de 200 MB sintéticos; no se usan datos reales de terceros.
+- La parte 2 no sigue TDD (escenario); la parte 1 sí.
 
 ## Aprobaciones
 
