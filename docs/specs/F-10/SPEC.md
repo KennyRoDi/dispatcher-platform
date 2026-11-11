@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-10-1-estados-y-cierre
 **Verificación IA:** verificacion 8f34bb6
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -108,3 +108,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: puerto CaseStateStore y ReportSubtask; 17 pruebas verdes (reporte + arquitectura). Corregida aserción de historial en test_caso_cancelado (el fixture ya añade PROCESSING: error de la prueba, no del código). (f93eb46) |
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; suite completa falla solo en 3 pruebas TLS ajenas de Windows (test_tls_cableado*) |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: QA de CaseStateStore y ReportSubtask contra el SPEC; 5 pruebas borde nuevas (terminales no se reabren, aislamiento entre casos, sin estado previo, resultado desconocido no consume id, reporte contrario tras cierre); 24 pruebas verdes con arquitectura, sin imports de adaptadores. Hallazgo: reporte tardío tras el cierre se cuenta pero no cambia el estado final. (8f34bb6) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
