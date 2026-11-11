@@ -1,6 +1,6 @@
 # SPEC F-30: Workers sin privilegios
 
-**Fase:** plan
+**Fase:** tests
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** plan 4f7548d
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
@@ -92,3 +92,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-11 | SPEC F-30 sin campos pendientes (grep 0); diff contra main solo el SPEC. Hallazgo del arquitecto (Dockerfile.worker ya tiene USER) comprobado con grep. AD-36/SUP-32 libres segun arquitecto (no re-verifique). Pila de 1 parte. 5 preguntas abiertas; decision provisional: aceptar, endurecer tambien el compose local, UID 10001, /scratch con volumen nombrado. (4f7548d) |
+| plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
