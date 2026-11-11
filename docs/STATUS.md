@@ -12,7 +12,7 @@
 | F-07 | hecha |
 | F-08 | hecha |
 | F-09 | hecha |
-| F-10 | documentacion |
+| F-10 | revision |
 | F-11 | pendiente |
 | F-12 | hecha |
 | F-13 | hecha |
