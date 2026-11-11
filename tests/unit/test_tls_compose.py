@@ -274,3 +274,30 @@ def test_repo_sin_llaves_ni_certificados():
         if archivo.is_file() and PEM_CON_CUERPO.search(archivo.read_text(encoding="utf-8", errors="ignore")):
             con_llave.append(ruta)
     assert con_llave == [], f"llave privada en el historial de trabajo: {con_llave}"
+
+
+def test_worker_no_exige_tls_ca_file_para_arrancar_sin_tls(worker):
+    origenes = [origen for origen, destino, _ in _volumenes(worker) if destino == _entorno(worker)["TLS_CA_FILE"]]
+    assert origenes and all("TLS_CA_FILE:?" not in origen for origen in origenes), origenes
+    assert all("TLS_CA_FILE:-" in origen for origen in origenes), origenes
+
+
+def test_redis_con_uid_propio_recibe_un_volumen_de_datos_escribible(nodo_a):
+    redis = _servicio(nodo_a, "redis")
+    iniciadores = [
+        nombre for nombre, condicion in (redis.get("depends_on") or {}).items()
+        if condicion.get("condition") == "service_completed_successfully"
+    ]
+    assert iniciadores, "redis corre con CERTS_UID y la imagen deja /data de otro usuario: nadie lo ajusta"
+    for nombre in iniciadores:
+        iniciador = _servicio(nodo_a, nombre)
+        assert str(iniciador.get("user")) == "0"
+        assert ("redis-data", "/data", False) in _volumenes(iniciador)
+        comando = _comando(iniciador)
+        assert "chown" in comando and "${CERTS_UID" in comando and "${CERTS_GID" in comando, comando
+
+
+def test_minio_healthcheck_apunta_el_alias_a_https_y_usa_un_config_escribible(nodo_a):
+    prueba = _prueba_salud(_servicio(nodo_a, "minio"))
+    assert "MC_HOST_local=https://localhost:9000" in prueba, "el alias local de mc es http: nunca ve el servidor TLS"
+    assert "--config-dir /tmp/" in prueba, "con UID propio mc no puede crear /.mc"

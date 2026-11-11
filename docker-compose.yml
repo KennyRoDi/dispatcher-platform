@@ -4,6 +4,15 @@
 #   docker compose up -d --build
 
 services:
+  redis-data-init:
+    image: redis:7-alpine
+    # El volumen nuevo queda de root o del usuario de la imagen; redis corre con CERTS_UID y necesita escribir en /data.
+    user: "0"
+    command: ["chown", "-R", "${CERTS_UID:?define CERTS_UID en .env (id -u)}:${CERTS_GID:?define CERTS_GID en .env (id -g)}", "/data"]
+    volumes:
+      - redis-data:/data
+    restart: "no"
+
   redis:
     image: redis:7-alpine
     container_name: redis-server
@@ -21,6 +30,9 @@ services:
       - ${CERTS_DIR:?define CERTS_DIR en .env}/server.pem:/certs/server.pem:ro
       - ${CERTS_DIR:?define CERTS_DIR en .env}/server.key:/certs/server.key:ro
       - ${CERTS_DIR:?define CERTS_DIR en .env}/ca.pem:/certs/ca.pem:ro
+    depends_on:
+      redis-data-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "redis-cli --tls --cacert /certs/ca.pem -h localhost -p 6380 ping | grep -q PONG"]
       interval: 5s
@@ -43,7 +55,7 @@ services:
       - minio-data:/data
       - ${CERTS_DIR:?define CERTS_DIR en .env}/minio:/certs:ro
     healthcheck:
-      test: ["CMD", "mc", "ready", "local", "--insecure"]
+      test: ["CMD-SHELL", "MC_HOST_local=https://localhost:9000 mc --config-dir /tmp/.mc ready local --insecure"]
       interval: 5s
       timeout: 3s
       retries: 10

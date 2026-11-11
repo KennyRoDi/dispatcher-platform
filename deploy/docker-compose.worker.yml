@@ -20,8 +20,10 @@ services:
       TLS_ENABLED: ${TLS_ENABLED:-true}
       TLS_CA_FILE: /certs/ca.pem
     # Solo la CA publica: TLS_CA_FILE del .env es la ruta de ca.pem en esta maquina. Nunca llaves.
+    # Con TLS_ENABLED=false no hace falta: monta /dev/null y el worker no lee la CA. Con TLS activo
+    # y sin TLS_CA_FILE el worker se detiene con «TLS_CA_FILE no apunta a un archivo existente».
     volumes:
-      - ${TLS_CA_FILE:?define TLS_CA_FILE en .env con la ruta de ca.pem}:/certs/ca.pem:ro
+      - ${TLS_CA_FILE:-/dev/null}:/certs/ca.pem:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
