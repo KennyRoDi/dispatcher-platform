@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-10-1-estados-y-cierre
 **Verificación IA:** revision d8ad108
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: bitácora publicada; sin cambios de contratos ni AD/SUP (no hay decisión nueva). Verificación previa aprobada con --excepcion sin necesidad, por error del agente. (11c78ae) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 2: diff (puerto CaseStateStore, ReportSubtask, doble, contrato) cubre el plan de pila; capas respetadas, 24 pruebas verdes; bitácora veraz con errores de IA. Nota: SPEC describe mark_reported sin outcome, la implementación lo añade (declarado en verificación de tests) (d8ad108) |
+| revision | José Andrés Loría Herrera | 2026-11-11 |  |
