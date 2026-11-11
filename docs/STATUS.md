@@ -21,7 +21,7 @@
 | F-16 | hecha |
 | F-17 | hecha |
 | F-18 | hecha |
-| F-19 | revision |
+| F-19 | implementacion |
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
