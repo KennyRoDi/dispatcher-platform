@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan f769b4c
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -108,3 +108,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: el orquestador escribio el SPEC, verificacion no independiente. Sin campos pendientes; conformidad 0. Comprobado en codigo: FakeObjectStore y EncryptedObjectStore ya cumplen el contrato nuevo (put fallido no confirma, open inexistente lanza KeyError); minio-py 7.2.20 aborta el multipart ante error de lectura; CaseSource ya referencia por sha256; AD-41 libre (ultima AD-40). Pila de 4 partes: contrato, adaptador MinIO, dedup antes de transferir, medicion. (f769b4c) |
+| plan | Melany Vindas | 2026-11-11 |  |
