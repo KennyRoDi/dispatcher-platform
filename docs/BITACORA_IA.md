@@ -1133,3 +1133,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Ficha docs/evidencia/F-36_cancelacion_en_curso.md con medición B.6 marcada como pendiente |
 | Validado / corregido / descartado | Revisión humana y contraste con scenarios/cancel_heavy.py y sus pruebas |
 | Cómo se validó | Lectura del código y ejecución de las 14 pruebas unitarias |
+
+## 2026-11-11 · Melany Vindas · F-22 (`feat/F-22-2-recibir-archivos-por-chunks-en-la-api`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) |
+| Componente | F-22 |
+| Propósito | Implementar la parte 2 de F-22: rutas HTTP de subida por chunks, cliente y cierre de H2 |
+| Consulta resumida | Escribir pruebas en rojo, implementar rutas /uploads y scripts/subir_por_chunks.py, y verificar con QA independiente |
+| Resultado obtenido | Rutas con 201/204/409/413/422/404/503, cliente con reenvio de faltantes, H2 cerrado; prueba de 200 MiB con uvicorn real |
+| Validado / corregido / descartado | Corregido: QA devolvio dos veces (H3-H6) y se arreglo antes de aprobar |
+| Cómo se validó | pytest en la maquina de Melany (1110 verde), integracion repetida, sondas de memoria y 7 mutantes detectados por QA |
+| Error de la IA | 1) El primer arreglo de H2 dejaba 88/200 carpetas huerfanas con put y discard concurrentes: se cambio a renombrado atomico con prueba de estres. 2) El PUT leia el cuerpo entero en RAM (H3) y luego copiaba 2 chunks (H6), incumpliendo B.5 M3: se paso a un buffer unico reservado. 3) No acoto size (H4) ni la carrera entre dos complete (H5). 4) La IA afirmo sin ResourceWarning, pero hay avisos sqlite ajenos a F-22. |
