@@ -1,6 +1,6 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 6185728
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
@@ -66,3 +66,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code | 2026-11-10 | 44 pruebas en verde (oom, cgroup, arquitectura); verificación no independiente (d20fcae) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code | 2026-11-10 | QA: 44 pruebas en verde; casos borde (-9 sin delta, 137, max_requeues=0) correctos; M1 real pendiente de nodos; no independiente (6185728) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
