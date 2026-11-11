@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-27-2-tls-entre-nodos
-**Verificación IA:** implementacion c54de78
+**Verificación IA:** implementacion 81e0d56
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -197,3 +197,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: generar_certs.sh (40 lineas), docker-compose.yml, 2 compose, .env.example, .gitignore; sin llaves/certs versionados (git ls-files). Suite completa tras c54de78: 1965 passed, 9 skipped, 4 xfailed. Ediciones a tests existentes (comprobadas por diff): test_tls_compose (1 linea, regex de split) y test_despliegue_compose de F-38 (puertos 8000->8443, 6379->6380, http->https, 10 lineas). docker compose config -q valido segun developer (no repeti). SIN PROBAR con servicios reales: flags --tls de redis:7-alpine, --certs-dir de MinIO Chainguard, lectura de llaves 0600 por UID de cada imagen, healthcheck https del coordinador. (c54de78) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: defectos 1-4 (UID de llaves en redis/MinIO, feeder sin TLS_ENABLED=false, validacion de NODE_IP, pathlen y CA por vencer) |
+| verificación IA de implementacion | pytest + revision manual | 2026-11-11 | Corregidos 16 hallazgos QA (commit 81e0d56); suite 2013 passed, 9 skipped, 4 xfailed; user: con CERTS_UID/CERTS_GID sin probar con imagenes reales (81e0d56) |
