@@ -31,7 +31,7 @@ Limitar el daño de un worker comprometido [B.5 M4]: el proceso corre con UID di
 
 **Capas:** solo infraestructura (`deploy/`, `Dockerfile.worker`) y `scripts/`. `docs/IMPLEMENTACION.md` §4 declara que F-30 no lleva TDD de lógica; las pruebas unitarias verifican la configuración, no el comportamiento del SO.
 
-**Archivos:** `Dockerfile.worker`, `deploy/docker-compose.worker.yml`, `deploy/docker-compose.local.yml`, `scripts/verificar_workers.py`, `tests/unit/test_workers_sin_privilegios.py`, `tests/integration/test_workers_sin_privilegios.py`, `docs/modulo-M4-seguridad.md`.
+**Archivos:** `Dockerfile.worker`, `deploy/docker-compose.worker.yml`, `deploy/docker-compose.local.yml`, `scripts/verificar_workers.py`, `tests/unit/test_workers_sin_privilegios.py`, `tests/integration/test_workers_sin_privilegios_docker.py`, `docs/modulo-M4-seguridad.md`.
 
 **Configuración objetivo por servicio worker:**
 ```yaml
@@ -57,7 +57,7 @@ tmpfs: ["/tmp:size=64m,mode=1777"]
 |---|---|---|
 | Unitaria | `tests/unit/test_workers_sin_privilegios.py`: verificador sobre cada servicio worker de los compose (`read_only` es `true`, `cap_drop` contiene `ALL` y no hay `cap_add`, `no-new-privileges` presente, `user` numérico distinto de 0) | La configuración cumple, sin Docker |
 | Unitaria | Mismo archivo: `Dockerfile.worker` tiene `USER` no root, `WORK_DIR` bajo un volumen declarado, y todo servicio worker monta `/scratch`; compose de ejemplo incumplidor produce un mensaje por incumplimiento | El verificador detecta regresiones |
-| Integración | `tests/integration/test_workers_sin_privilegios.py`, marca `integration`: `docker exec <w> id -u` distinto de 0; `touch /x` falla; `docker inspect` da `ReadonlyRootfs=true`, `CapDrop=[ALL]` y `no-new-privileges`. Se salta sin Docker o sin contenedor | Prueba I del backlog |
+| Integración | `tests/integration/test_workers_sin_privilegios_docker.py`, marca `integration`: `docker exec <w> id -u` distinto de 0; `touch /x` falla; `docker inspect` da `ReadonlyRootfs=true`, `CapDrop=[ALL]` y `no-new-privileges`. Se salta sin Docker o sin contenedor | Prueba I del backlog |
 | Aceptación | Una sub-tarea completa (imagen y video) con el worker endurecido, contra nodos reales. Se salta sin variables | Procesa normalmente (prueba A) |
 
 ## Mediciones
