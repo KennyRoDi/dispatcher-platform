@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 14f7513
+**Verificación IA:** documentacion 42ecc34
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -150,3 +150,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Codex | 2026-11-10 | Reverificación tras refactor y cierre: 	ests/unit/test_comparar_carga.py pasó 9/9; el CLI conserva equivalencia y resumen; el diff de producto quedó bajo 400 líneas. El cierre detectó colisión de nombres entre pruebas unitarias y POSIX; la integración se renombró a 	est_comparar_carga_posix.py, sin alterar sus casos. La medición M1 real permanece intacta. git diff --check limpio. Verificación propia, no independiente. (59a3c23) |
 | verificación IA de verificacion | Codex | 2026-11-10 | Verificación F-19 parte 3 en rama limpia: test_comparar_carga unitario 9/9 tras refactor; colisión de import pytest resuelta al renombrar integración POSIX. Código de producto bajo 400 líneas; JSON de 20 ejecuciones M1 y límites/alcance documentados. Sin repetir la medición ni tests ya pasados. git diff --check limpio. Misma sesión, no independiente. (14f7513) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | Codex | 2026-11-10 | Documentación F-19 parte 3 revisada: QA registra el nombre nuevo de integración POSIX y el fallo de colisión resuelto; la bitácora de esta rama está publicada con los errores reales. Los resultados y límites M1 concuerdan con la evidencia JSON. Verificación documental según control mínimo, no independiente. (42ecc34) |
