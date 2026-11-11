@@ -1,6 +1,6 @@
 # SPEC F-31: Benchmark de inferencia
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 1a0036a
 **Historia:** US-31 · **Requisitos:** RF-40 (B.5 M5) · **Responsable:** J
@@ -74,3 +74,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | domain/benchmark.py y scripts/measure/m5_bench.py; 15 unitarias en verde; integración omitida (faster_whisper no instalado local) (43efd15) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | 15 unitarias en verde, arquitectura ok, bordes (vacía, tiempo 0) rechazados; 167 líneas de código; integración omitida (faster_whisper ausente); medición real pendiente (1a0036a) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; medición real pendiente |
