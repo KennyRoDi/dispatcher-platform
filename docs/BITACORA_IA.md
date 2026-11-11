@@ -1008,3 +1008,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas en verde y revisión del orquestador |
 | Cómo se validó | Aprobaciones delegadas |
 | Error de la IA | el QA halló que un ObjectStore.exists que lanza tumbaba todo el reporte, que el extracto de audio copiaba el metadato completo del segmento y 5 defectos menores (sin tope de extracto, sin UTC, sha vacío enlazaba, surrogates, N+1 exists) |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`feat/F-13-3-reporte-consolidado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-13 |
+| Propósito | Documentar la parte 3 de F-13 (adaptadores Redis, ruta, JSON de ejemplo) |
+| Consulta resumida | Redactar límites, nota del ejemplo y guía de consulta del reporte |
+| Resultado obtenido | Límites en AD-38, nota del ejemplo, consulta en DEMO.md; la parte 3 editó build_report.py de la parte 2 |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificación no independiente en documentación |
+| Cómo se validó | Revisión del diff contra el SPEC |
+| Error de la IA | El QA halló que Redis caído daba 500, que un hallazgo corrupto tumbaba el reporte completo y que la fuente unida por file_path salía con sha256 vacío, más 3 defectos menores (fechas malformadas, bytes no UTF-8, case_id que colisiona con claves) |
