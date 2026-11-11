@@ -1,6 +1,6 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 1dae42e
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
@@ -130,3 +130,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5) | 2026-11-11 | AD-41 y SUP-36..38 registrados; sin datos inventados; verificacion no independiente (d02861f) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5) | 2026-11-11 | Diff contra main coincide con SPEC parte 1; AD-41 y SUP-36 a SUP-38 presentes y citados; 22 unitarias verdes. Revision no independiente. (1dae42e) |
+| revision | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
