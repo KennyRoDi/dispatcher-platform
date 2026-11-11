@@ -931,3 +931,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente de las fases. Verificación IA del orquestador sobre el commit exacto con flujo.py verificar |
 | Cómo se validó | Subagentes developer, qa-tester y documentador; el orquestador comprobó diffs y ejecutó las pruebas de TLS |
 | Error de la IA | La primera versión de requests_session aceptaba un servidor de otra CA si existía REQUESTS_CA_BUNDLE y seguía redirecciones de https a http; el QA lo detectó y se corrigió con trust_env=False, verify fijo y bloqueo de redirección a esquemas en claro |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-2-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (subagentes developer, qa-tester, documentador) |
+| Componente | F-27 |
+| Propósito | Cablear TLS entre nodos en workers, coordinador y scripts (F-27 parte 2) |
+| Consulta resumida | Cableado de tls.py en clientes y scripts, y pruebas de rechazo de http |
+| Resultado obtenido | Cableado con pruebas; QA halló fallos corregidos; Redis y MinIO reales sin probar |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente |
+| Cómo se validó | Subagentes por fase, verificados por el orquestador |
+| Error de la IA | La primera versión del cableado dejaba submit_case, cancel_case, fetch_report y poll_case enviando en claro con TLS activo y tres scripts fuera de tls.py; el QA lo detectó y se corrigió |
