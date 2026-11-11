@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 SRC = Path(__file__).resolve().parents[2] / "src"
-TERCEROS_PROHIBIDOS = {"redis", "fastapi", "minio", "requests", "psutil", "streamlit", "spacy", "transformers", "torch", "ultralytics", "cv2", "faster_whisper", "ctranslate2", "av"}
+TERCEROS_PROHIBIDOS = {"redis", "fastapi", "minio", "requests", "psutil", "streamlit", "spacy", "transformers", "torch", "ultralytics", "cv2", "faster_whisper", "ctranslate2", "av", "jwt", "cryptography"}
 CAPAS_EXTERNAS = {
     "domain": {"src.application", "src.adapters", "src.infrastructure"},
     "application": {"src.adapters", "src.infrastructure"},

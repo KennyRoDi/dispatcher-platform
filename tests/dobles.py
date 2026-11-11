@@ -1,8 +1,11 @@
 import io
+import os
 from collections import defaultdict
 from datetime import datetime, timezone
 
+from src.application.ports import KeyUnavailable
 from src.domain.alert_policy import StoredAlert
+from src.domain.custody_chain import GENESIS_HASH, make_anchor, seal
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import QueueFull
 from src.domain.text_analysis import MessageAnalysis
@@ -63,6 +66,16 @@ class FakeObjectStore:
         return io.BytesIO(self.objetos[sha256])
 
 
+class FakeKeyProvider:
+    def __init__(self, kek=None):
+        self._kek = kek
+
+    def kek(self):
+        if self._kek is None:
+            raise KeyUnavailable("sin KEK")
+        return self._kek
+
+
 class FakeWorkQueue:
     def __init__(self, capacidad=100):
         self.capacidad = capacidad
@@ -103,11 +116,27 @@ class FakeFindingStore:
 
 
 class FakeCustodyLog:
-    def __init__(self):
+    def __init__(self, key=None, clock=None):
+        self.key = key if key is not None else os.urandom(32)
+        self.clock = clock or FakeClock()
         self.entradas = []
 
     def record(self, evidence_sha256, operation, result_sha256, actor):
-        self.entradas.append((evidence_sha256, operation, result_sha256, actor))
+        previo = self.entradas[-1].entry_hash if self.entradas else GENESIS_HASH
+        campos = {
+            "ts": self.clock.now().isoformat(),
+            "evidence_sha256": evidence_sha256,
+            "operation": operation,
+            "result_sha256": result_sha256,
+            "actor": actor,
+        }
+        self.entradas.append(seal(self.key, previo, len(self.entradas), campos))
+
+    def leer(self):
+        if not self.entradas:
+            return [], None
+        ultima = self.entradas[-1]
+        return [e.line() for e in self.entradas], make_anchor(self.key, ultima.seq, ultima.entry_hash)
 
 
 class FakeRoutingPolicy:
@@ -146,3 +175,26 @@ class FakeAlertReader:
             for numero, ((kind, case_id, detail), marca) in enumerate(zip(self._publicador.alertas, self._publicador.marcas), 1)
         ]
         return list(reversed(alertas))[:limit]
+
+
+class FakeCaseCatalog:
+    def __init__(self, casos=()):
+        self.casos = {caso.case_id: caso for caso in casos}
+
+    def add(self, caso):
+        self.casos[caso.case_id] = caso
+
+    def case(self, case_id):
+        return self.casos.get(case_id)
+
+
+class FakeTokenVerifier:
+    def __init__(self, identidades=None):
+        self.identidades = dict(identidades or {})
+
+    def verify(self, token):
+        from src.application.ports import InvalidToken
+
+        if token not in self.identidades:
+            raise InvalidToken("token desconocido")
+        return self.identidades[token]
