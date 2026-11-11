@@ -1,6 +1,6 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 14adff5
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
@@ -117,3 +117,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | SPEC sin campos pendientes; reutiliza admission, cgroup_resources, oom_policy y cancel_heavy; pila de 2 partes; ejecutado en la misma sesion (14adff5) |
+| plan | José Andrés Loría Herrera | 2026-11-11 |  |
