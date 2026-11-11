@@ -1208,3 +1208,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Se preservó la cláusula contractual de put fallido y la fila ChunkStaging al integrar main; pruebas de contrato y cifrado: 53 passed, 6 xfailed |
 | Validado / corregido / descartado | pytest -q tests/unit/test_contratos.py tests/unit/test_encrypted_object_store.py tests/unit/test_encrypted_object_store_qa.py; scripts.conformidad repo: 0 problemas |
 | Cómo se validó | Orquestador; verificación en la misma sesión |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-31/F-32 mediciones M5 (`docs/medicion-m5`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-31/F-32 mediciones M5 |
+| Propósito | Ejecutar el benchmark M5 real y registrar resultados |
+| Consulta resumida | Correr m5_bench.py en Docker Desktop y documentar |
+| Resultado obtenido | Tabla CPU float32/int8 con 1/2/4 hilos medida en un host; GPU y nodos reales siguen pendientes |
+| Validado / corregido / descartado | Salida cruda y JSON guardados en docs/evidencia; cifras copiadas de la salida |
+| Cómo se validó | Comparé la tabla del documento con la salida del script |
+| Error de la IA | Primer intento falló: PyAV 19 sin pin rompe faster-whisper (ya documentado en requirements-audio.txt); la IA no lo aplicó al inicio y se corrigió con av==18.1.0. También un config con BOM de PowerShell rompió tomllib. |
