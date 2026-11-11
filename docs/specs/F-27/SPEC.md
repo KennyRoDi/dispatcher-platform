@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** revision
+**Fase:** implementacion
 **Base:** feat/F-27-2-tls-entre-nodos
 **Verificación IA:** documentacion 7fd75b5
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -203,3 +203,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | Docs de TLS en DEPLOY_WORKERS, DEMO y modulo-M4 revisados contra codigo; bitacora en estado; sin cambios de codigo, no se repite pytest (7fd75b5) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de revision | Kenni Rodriguez | 2026-11-11 | Revisor: coordinator monta server.key 0600 sin user:; añadir user CERTS_UID:CERTS_GID y cubrirlo en prueba |
