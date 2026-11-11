@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-14-1-alertas
 **Verificación IA:** implementacion c0fa551
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -137,3 +137,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: 503 filtra host y puerto, bytes no UTF-8 tiran la ruta, ResponseError da 500, emitted_at sin zona, recent(0) DataError, maxlen no positivo |
 | verificación IA de implementacion | orquestador | 2026-11-11 | 6 hallazgos QA corregidos en c0fa551; suite verde; integracion pasa con redis:7-alpine; limite: relectura en crudo ante bytes no UTF-8 solo probada con fakeredis (c0fa551) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
