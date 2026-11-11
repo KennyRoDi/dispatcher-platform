@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from src.application.alerting import notify_case_closed
+from src.application.ports import AlertPublisher
 from src.coordinator import conexion
 from src.coordinator.apoyo import (
     final_case_status,
@@ -14,13 +16,17 @@ from src.coordinator.apoyo import (
     str_or_empty,
 )
 from src.coordinator.modelos import SubtaskReport
+from src.coordinator.rutas_alertas import obtener_publicador_alertas
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
 @router.post("/subtasks/report", status_code=200, response_model=dict, tags=["Subtasks"])
-def report_subtask(report: SubtaskReport) -> dict:
+def report_subtask(
+    report: SubtaskReport,
+    publicador: AlertPublisher = Depends(obtener_publicador_alertas),
+) -> dict:
     """
     Receive a worker result report for a sub-task.
 
@@ -106,6 +112,10 @@ def report_subtask(report: SubtaskReport) -> dict:
         logger.info(
             "Caso %s finalizado → %s (pending=%d)", case_id, final_status, remaining
         )
+        try:
+            notify_case_closed(publicador, case_id, final_status)
+        except Exception:
+            logger.exception("Alerta de cierre del caso %s no publicada", case_id)
 
     return {
         "message": "Reporte procesado correctamente",
