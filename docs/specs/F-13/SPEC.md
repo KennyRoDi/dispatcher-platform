@@ -1,6 +1,6 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 811c1a5
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | orquestador | 2026-11-11 | SPEC F-13 completo (grep … = 0), diff contra main solo el SPEC, Base main; AD-38 y SUP-34 libres segun arquitecto; pila de 3 partes; 10 preguntas abiertas con decision provisional: aceptar (811c1a5) |
+| plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
