@@ -154,7 +154,7 @@ Hechos del historial a la fecha de captura. Se declaran tal cual; no se corrigen
 
 ## Bitácora de IA
 
-La bitácora vigente está en la rama `estado` (`git show origin/estado:docs/BITACORA_IA.md`); su enlace en `main` es [BITACORA_IA.md](BITACORA_IA.md), cuya copia está atrasada (353 líneas y 27 entradas frente a 584 líneas y 45 entradas en `estado` al 2026-11-11). Subirla a `main` es una PR aparte, `chore/`, y se repite antes de entregar.
+La bitácora vigente está en la rama `estado` (`git show origin/estado:docs/BITACORA_IA.md`); los recuentos de esta sección y de «Verificación» son de la captura y derivan con cada commit o entrada nueva (p. ej. la entrada de F-40 misma); su enlace en `main` es [BITACORA_IA.md](BITACORA_IA.md), cuya copia está atrasada (353 líneas y 27 entradas frente a 584 líneas y 45 entradas en `estado` al 2026-11-11). Subirla a `main` es una PR aparte, `chore/`, y se repite antes de entregar.
 
 Recuento sobre `estado` (comandos: `grep -c '^## '` y `grep -c 'Error de la IA'`):
 
