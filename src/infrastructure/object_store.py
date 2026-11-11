@@ -28,6 +28,8 @@ def crear_subidas(env: Mapping[str, str] | None = None) -> ChunkedUpload:
     exigir_cifrado(tls, minio_secure=secure)
     cliente = minio.Minio(endpoint, access_key=access_key, secret_key=secret_key,
                           secure=secure, http_client=minio_http_client(tls))
+    if not cliente.bucket_exists(bucket):
+        cliente.make_bucket(bucket)
     objetos = EncryptedObjectStore(
         MinioObjectStore(cliente, bucket),
         EnvelopeCipher(FileKeyProvider.from_env(env)),
