@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-28-1-cifrado-en-reposo
-**Verificación IA:** implementacion 6618671
+**Verificación IA:** implementacion b2aef68
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -152,3 +152,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests; src: file_key_provider.py (64 lineas) y .gitignore. Suite completa tras 6618671: 3 de 4 corridas 1890 passed/8 skipped/6 xfailed; 1 corrida dio 1 failed no identificado (no lo capture), no reproducido: posible prueba inestable (candidata: FIFO con hilo y timeout). Desviaciones: patron de jwt_tokens copiado (no existe en esta rama), KEK en closure. (6618671) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: fuga de fd si KEK_FILE es directorio (media); KEK en locales de traza; ValueError con NUL o surrogate en vez de KeyUnavailable; modos 0500/0700/4400/1400 aceptados |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 3 de 4 hallazgos QA en file_key_provider.py; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa tras b2aef68: 1928 passed, 8 skipped, 9 xfailed (1 sola corrida). Queda abierto: KEK en locales de la traza; los 3 tests xfail son defectuosos (el marco del propio test conserva la KEK): declarar como limite. (b2aef68) |
