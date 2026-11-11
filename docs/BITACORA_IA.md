@@ -802,3 +802,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | pytest focal 16/16 y 8/8; WhisperTranscriber 42/42; integración POSIX 3 skipped en Windows; docker info y WSL fallaron por daemon/acceso. |
 | Cómo se validó | TDD de parser RSS/PSS/cgroup y equivalencia/CLI; QA-parte-3.md registra comandos M1 pendientes. La fase 4 no se aprobó. |
 | Error de la IA | Escribí inicialmente un literal bytes con carácter no ASCII en un test; corregido a bytes ASCII y las pruebas del módulo pasaron. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-3-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Verificar estrategia de carga y medición M1 en Docker Linux/WSL2; actualizar QA, ficha M1 y AD-07. |
+| Consulta resumida | Completar lectura PSS/RSS/cgroup con Whisper CPU, N=1/2 y cinco repeticiones por estrategia; documentar límites y errores observados. |
+| Resultado obtenido | Preflight válido y 20 corridas completadas; a N=2 workers_compartidos tuvo PSS y memory.current medios menores. JSON crudos en docs/evidencia/F-19; solo representa este contenedor y carga. |
+| Validado / corregido / descartado | pytest tests/unit/test_comparar_carga.py -q: 9 passed; pytest tests/unit/test_model_memory.py -q: 8 passed; pytest tests/unit/test_whisper_transcriber.py -q: 42 passed; integración POSIX omitida en Windows (3 skipped); git diff --check limpio; verificación no independiente. |
+| Cómo se validó | Diseño y código existentes; análisis de resultados medidos, evidencia JSON, actualización de QA-parte-3, ficha M1 y AD-07. |
+| Error de la IA | Primer preflight reveló TypeError por resultados anidados en modo por proceso; corregido en 8eecde5. Primera medición no inició: pip usó /.local no escribible; reintentada con HOME=/tmp y dependencias en /tmp. En trabajo previo, literal bytes con caracteres no ASCII impedía compilar; corregido antes de esta medición. |
