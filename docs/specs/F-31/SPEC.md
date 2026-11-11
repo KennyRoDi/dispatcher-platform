@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 1a0036a
+**Verificación IA:** documentacion 3180897
 **Historia:** US-31 · **Requisitos:** RF-40 (B.5 M5) · **Responsable:** J
 
 ## Objetivo
@@ -75,3 +75,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | 15 unitarias en verde, arquitectura ok, bordes (vacía, tiempo 0) rechazados; 167 líneas de código; integración omitida (faster_whisper ausente); medición real pendiente (1a0036a) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; medición real pendiente |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | ficha docs/modulo-M5-computo.md con resultados Medición pendiente, sin cifras inventadas (3180897) |
