@@ -659,3 +659,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas unitarias; casos borde -9 sin delta, 137 y max_requeues=0 revisados a mano |
 | Cómo se validó | TDD en fases; subagente haiku para documentación |
 | Error de la IA | Primer intento de editar el SPEC con python en bash falló en silencio (no existía el intérprete) y se detectó al contar los campos pendientes; se repitió con py |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-3-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5) con subagentes developer, qa-tester y documentador (general-purpose) |
+| Componente | F-04 |
+| Propósito | F-04 parte 3: pruebas rojas, implementacion de los lectores (src/adapters/dataset_truth_files.py) y la CLI de procedencia y comparacion (scripts/dataset_verdad.py), verificacion de QA y documentacion de limites. |
+| Consulta resumida | Delegacion por fase con el SPEC; las pruebas fijaron la API (read_*, sample_from_manifest, render_*, main). |
+| Resultado obtenido | dataset_truth_files.py (131 lineas) y dataset_verdad.py (79); 2 pruebas unitarias y 1 de aceptacion; 4 xfail estrictos de QA. Suite: 1800 passed, 7 skipped, 16 xfailed; aceptacion 2 passed. Dato de QA no repetido: procedencia sobre dataset/sintetico (490 fuentes) cumplida. |
+| Validado / corregido / descartado | El orquestador ejecuto la suite completa y la aceptacion tras la implementacion y conformidad.py en documentacion. Las fases se aprobaron con --excepcion por delegacion de la persona, sin lectura humana por fase. |
+| Cómo se validó | Desviacion aceptada: el developer no reutilizo dataset_sintetico (privado) y duplico ~4 lineas de validacion de ruta, declarado en el SPEC. Hallazgos de QA no corregidos: quedan como limites declarados. |
+| Error de la IA | QA detecto en la implementacion 4 defectos (xfail f80a91b): --salida sobrescribe la muestra o las salidas, RecursionError con JSON muy anidado sin atrapar y render_markdown sin escapar / ni saltos de linea. Ademas, por mutacion, QA hallo pruebas debiles que no fijan el formato numerico ni el separador markdown. Ademas, la edicion del documentador con un script de Python corrompio el SPEC (261 mil lineas); se revirtio con git checkout antes de hacer commit. |
