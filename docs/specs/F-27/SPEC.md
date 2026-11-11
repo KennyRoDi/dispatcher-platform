@@ -144,6 +144,18 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - Las pruebas `test_repo_sin_llaves_ni_certificados`, `test_gitignore_cubre_certs` y la del script `generar_certs.sh` van en la parte 3, cuando existan el script y el `.gitignore`.
 - Con TLS activo por defecto, los workers de José, el coordinador de Nahúm y el dashboard de Melany fallan hasta tener `ca.pem` y URLs `https`: coordinar antes de fusionar la parte 3.
 
+## Límites declarados de la parte 2
+
+- `Storage` con cliente inyectado no comprueba TLS (`xfail`). `Reporter` rechaza `http` aunque se inyecte una sesión.
+- El alcance se amplió a `fetch_results`, `demo_feeder` y `generate_dataset`. `generate_dataset` solo se ejecuta con `python -m scripts.generate_dataset` y rechaza `http` después de `--dry-run`.
+- `dashboard/ui.py:56` (Melany) sigue en claro: necesita `REQUESTS_CA_BUNDLE` o un cambio propio.
+- El healthcheck `http://localhost:8000` de `deploy/docker-compose.local.yml` queda para la parte 3.
+- Archivos de otros dueños tocados, avisar antes de fusionar: `config.py`, `reporter.py` y `storage.py` (José); `conexion.py` (Nahúm); los scripts `submit_case`, `run_load`, `check_connectivity`, `fetch_results`, `demo_feeder` y `generate_dataset`.
+- `tests/conftest.py` (`TLS_ENABLED=false` autouse) también lo crea la rama de F-26 parte 3: habrá conflicto al fusionar.
+- Se editaron dos pruebas existentes de la parte 1 (`test_tls_cableado`, `test_tls_qa`) por los hallazgos 3 y 5.
+- Redis y MinIO reales no se probaron: solo handshake contra un servidor TLS stub de stdlib (dato del QA).
+- Las URLs del coordinador con `usuario:clave` se rechazan.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
