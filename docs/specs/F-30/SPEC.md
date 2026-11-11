@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
-**Verificación IA:** implementacion 82f685d
+**Verificación IA:** implementacion b9ef1a8
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
 
 ## Objetivo
@@ -98,3 +98,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: Dockerfile.worker, 2 compose, scripts/verificar_workers.py (114 lineas), un test de aceptacion renombrado (sin cambio de contenido); tests unitarios intactos. Ejecute: python -m scripts.verificar_workers rc=0; suite completa tras el commit: 1812 passed, 8 skipped, 3 xfailed. docker compose config valido segun developer (no lo repeti). Pendiente: el worker real con raiz de solo lectura NO se ejecuto; compose local con replicas:3 comparte un volumen scratch. (82f685d) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: replicas comparten scratch y _borrar_temporales_huerfanos borra subtareas ajenas (media); verificador con falsos negativos: privileged, user 10001:0, security_opt str, ENV WORK_DIR redefinido, multi-stage sin USER, useradd en comentario |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de hallazgos QA. Suite completa tras el commit: 1827 passed, 8 skipped, 3 xfailed. Desviacion a revisar: el developer edito un test EXISTENTE (tests/test_scripts.py: test_local_compose_worker_has_replicas_3 -> test_local_compose_has_three_workers_with_own_scratch) porque el compose local pasa de replicas:3 a worker-1..3 con volumen propio; el cambio es de un compose que ya se tocaba en F-30; sin referencias rotas a 'worker' en demo.yml (grep). No toca src/. (b9ef1a8) |
