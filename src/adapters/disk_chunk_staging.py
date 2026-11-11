@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 import tempfile
+import uuid
 from pathlib import Path
 from typing import BinaryIO
 
@@ -45,7 +46,17 @@ class DiskChunkStaging:
             raise KeyError((upload_id, index)) from None
 
     def discard(self, upload_id: str) -> None:
-        shutil.rmtree(self._carpeta(upload_id), ignore_errors=True)
+        # Renombrar primero saca la carpeta de la ruta del id de forma atómica: un put_chunk
+        # concurrente ya no puede dejar archivos que impidan borrarla ni recrearla.
+        carpeta = self._carpeta(upload_id)
+        papelera = self._root / f".descartado-{uuid.uuid4().hex}"
+        try:
+            carpeta.rename(papelera)
+        except FileNotFoundError:
+            return
+        except OSError:
+            papelera = carpeta
+        shutil.rmtree(papelera, ignore_errors=True)
 
     def _carpeta(self, upload_id: str) -> Path:
         # El id llega desde la URL: un separador o «..» permitiría escribir fuera del staging.
