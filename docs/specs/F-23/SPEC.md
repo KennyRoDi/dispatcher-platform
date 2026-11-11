@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 872ab48
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -118,3 +118,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: fila de ObjectStore en CONTRATOS.md con ambas reglas; sin ficha (no hay mediciones en esta parte); bitacora publicada con un error real de la IA. (df42621) |
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: diff de 30 lineas en tests/contratos.py y CONTRATOS.md, cumple el SPEC parte 1 sin agregados; cambio aditivo; sin llaves ni datos reales; commit en Conventional Commits. (872ab48) |
+| revision | Melany Vindas | 2026-11-11 |  |
