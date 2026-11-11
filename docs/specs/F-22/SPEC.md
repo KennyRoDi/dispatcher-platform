@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-22-1-chunks-verificados
-**Verificación IA:** implementacion 06ceb32
+**Verificación IA:** verificacion 3810af4
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -207,3 +207,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Melany Vindas | 2026-11-11 | QA: H3 PUT lee el cuerpo entero en RAM (B.5 M3), H4 size sin tope agota memoria, H5 complete concurrente da 500 |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Arreglo de devuelta QA, sin subagente (no independiente). H3: PUT consulta el tamano esperado y lee el cuerpo por partes, corta con 413 al excederlo (B.5 M3). H4: start rechaza mas de 100000 chunks con 422. H5: complete traduce la carrera con otro complete a UploadNotFound. Pruebas de QA en verde, suite 1133 verde sin ResourceWarning, integracion 4/4 en 5 corridas incluida subida de 200 MiB y complete concurrente. 28 lineas. (06ceb32) |
 | implementacion | Melany Vindas | 2026-11-11 |  |
+| verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) re-verifico: H3, H4 y H5 cerrados con sondas en uvicorn real (1 GiB sin Content-Length o mentiroso: 413, RAM +6 MiB; 100000 chunks 201, 100001 422; 50 rondas de complete y PUT concurrentes sin 500). Hallazgo H6: copia final dejaba 2 chunks en RAM; arreglado con un buffer reservado sin copia (B.5 M3). 8 pruebas de QA matan 4 mutantes vivos. Suite 1141 verde, integracion 4/4 en 3 corridas. (3810af4) |
