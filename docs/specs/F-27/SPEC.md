@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-27-2-tls-entre-nodos
-**Verificación IA:** documentacion 7fd75b5
+**Verificación IA:** implementacion 39d0aac
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -204,3 +204,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Docs de TLS en DEPLOY_WORKERS, DEMO y modulo-M4 revisados contra codigo; bitacora en estado; sin cambios de codigo, no se repite pytest (7fd75b5) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de revision | Kenni Rodriguez | 2026-11-11 | Revisor: coordinator monta server.key 0600 sin user:; añadir user CERTS_UID:CERTS_GID y cubrirlo en prueba |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Hallazgo del revisor corregido en 39d0aac: coordinator con user CERTS_UID:CERTS_GID; prueba vista en rojo y luego verde; suite 2014 passed, 9 skipped, 4 xfailed (39d0aac) |
