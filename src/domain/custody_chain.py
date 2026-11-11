@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass
 
 GENESIS_HASH = "0" * 64
@@ -59,7 +59,32 @@ def verify_chain(lines: Sequence[str], key: bytes, anchor: Anchor | None) -> lis
             return [Violation(position, *broken)]
         previous_hash = entry["entry_hash"]
         hashes.append(previous_hash)
-    return _check_anchor(key, hashes, anchor)
+    return _check_anchor(key, len(hashes), hashes.__getitem__, anchor)
+
+
+def verify_tail(key: bytes, tail: Sequence[str], anchor: Anchor | None) -> list[Violation]:
+    entries: list[dict] = []
+    for line in tail:
+        entry = _parse(line)
+        if entry is None:
+            return [Violation(0, *_invalid_entry())]
+        broken = _broken_link(key, entry, *_expected_link(entries, entry))
+        if broken:
+            return [Violation(entry["seq"] + 1, *broken)]
+        entries.append(entry)
+    if not entries:
+        return _check_anchor(key, 0, {}.__getitem__, anchor)
+    last = entries[-1]
+    hashes = {last["seq"] - 1: last["prev_hash"], **{entry["seq"]: entry["entry_hash"] for entry in entries}}
+    return _check_anchor(key, last["seq"] + 1, hashes.__getitem__, anchor)
+
+
+def _expected_link(entries: list[dict], entry: dict) -> tuple[int, str]:
+    if entries:
+        return entries[-1]["seq"] + 1, entries[-1]["entry_hash"]
+    if entry["seq"] == 0:
+        return 0, GENESIS_HASH
+    return entry["seq"], entry["prev_hash"]
 
 
 def _invalid_entry() -> tuple[str, str]:
@@ -110,19 +135,19 @@ def _is_text(value: object) -> bool:
     return True
 
 
-def _check_anchor(key: bytes, hashes: list[str], anchor: Anchor | None) -> list[Violation]:
+def _check_anchor(key: bytes, total: int, hash_at: Callable[[int], str], anchor: Anchor | None) -> list[Violation]:
     if anchor is None:
-        return [Violation(len(hashes), "ancla", "falta el ancla del último eslabón")] if hashes else []
+        return [Violation(total, "ancla", "falta el ancla del último eslabón")] if total > 1 else []
     if not (_is_seq(anchor.seq) and _is_text(anchor.entry_hash) and _is_text(anchor.mac)):
-        return [Violation(max(len(hashes), 1), "ancla", "el ancla está mal formada")]
+        return [Violation(max(total, 1), "ancla", "el ancla está mal formada")]
     position = anchor.seq + 1
     if not _same(anchor.mac, _anchor_mac(key, anchor.seq, anchor.entry_hash)):
         return [Violation(position, "ancla", "el sello del ancla no coincide")]
-    if anchor.seq >= len(hashes):
+    if anchor.seq >= total:
         return [Violation(position, "truncado", "el log termina antes del último eslabón anclado")]
-    if anchor.seq < len(hashes) - 2:
+    if anchor.seq < total - 2:
         return [Violation(position, "ancla", "el ancla está atrasada más de una entrada")]
-    if not _same(hashes[anchor.seq], anchor.entry_hash):
+    if not _same(hash_at(anchor.seq), anchor.entry_hash):
         return [Violation(position, "ancla", "el ancla no coincide con el eslabón de su posición")]
     return []
 

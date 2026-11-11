@@ -178,7 +178,6 @@ def test_un_directorio_sin_permiso_de_escritura_falla_sin_dejar_archivos(tmp_pat
         directorio.chmod(0o700)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A1 (media): anexa y luego falla el ancla; con 2 fallos seguidos el log queda atrasado 2 y se bloquea")
 def test_un_ancla_que_no_se_puede_escribir_no_deja_el_log_fuera_de_tolerancia(ruta, llave):
     log = abrir(ruta, llave)
     registrar(log, 1)
@@ -192,7 +191,6 @@ def test_un_ancla_que_no_se_puede_escribir_no_deja_el_log_fuera_de_tolerancia(ru
     registrar(abrir(ruta, llave), 1, desde=3)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A2 (media): una caida tras el primer anexo deja 1 entrada sin ancla y el log no se recupera nunca")
 def test_una_caida_tras_la_primera_entrada_antes_del_ancla_se_recupera(ruta, llave, monkeypatch):
     def caer(self, ancla):
         raise OSError(errno.EIO, "caida simulada")
@@ -206,7 +204,6 @@ def test_una_caida_tras_la_primera_entrada_antes_del_ancla_se_recupera(ruta, lla
     assert verifica(ruta, llave)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A3 (media): un write parcial (ENOSPC) deja una cola sin salto de linea; el log queda inservible")
 def test_un_write_parcial_no_deja_el_log_inservible(ruta, llave, monkeypatch):
     log = abrir(ruta, llave)
     registrar(log, 1)
@@ -228,7 +225,6 @@ def test_un_write_parcial_no_deja_el_log_inservible(ruta, llave, monkeypatch):
     assert verifica(ruta, llave)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A4 (media): el temporal del ancla se abre con O_TRUNC siguiendo enlaces: sobrescribe y cambia el modo de un archivo ajeno")
 def test_un_temporal_del_ancla_que_es_enlace_no_toca_el_destino(ruta, llave, tmp_path):
     victima = tmp_path / "victima.txt"
     victima.write_text("PRECIOSO")
@@ -242,7 +238,6 @@ def test_un_temporal_del_ancla_que_es_enlace_no_toca_el_destino(ruta, llave, tmp
     assert stat.S_IMODE(victima.stat().st_mode) == 0o644
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A5 (baja): un log que es enlace simbolico se sigue y se le hace chmod 0600 al destino")
 def test_un_log_que_es_enlace_simbolico_no_se_sigue(ruta, llave, tmp_path):
     destino = tmp_path / "fuera.jsonl"
     destino.write_bytes(b"")
@@ -256,7 +251,6 @@ def test_un_log_que_es_enlace_simbolico_no_se_sigue(ruta, llave, tmp_path):
     assert stat.S_IMODE(destino.stat().st_mode) == 0o644
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A6 (baja): si el log se reemplaza mientras se espera el flock, el anexo va al inodo viejo y record() responde exito")
 def test_un_log_reemplazado_mientras_se_espera_el_candado_no_pierde_el_registro(ruta, llave, monkeypatch):
     registrar(abrir(ruta, llave), 1)
     original = modulo.fcntl.flock
@@ -277,7 +271,6 @@ def test_un_log_reemplazado_mientras_se_espera_el_candado_no_pierde_el_registro(
     assert ruta.stat().st_size > 0, "record() respondio exito pero el registro quedo en un inodo huerfano"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A7 (baja): un reloj sin zona se interpreta como hora local del proceso, no como UTC")
 def test_un_reloj_sin_zona_no_da_una_fecha_segun_la_zona_del_proceso(ruta, llave, monkeypatch):
     class RelojIngenuo:
         def now(self):
@@ -296,7 +289,6 @@ def test_un_reloj_sin_zona_no_da_una_fecha_segun_la_zona_del_proceso(ruta, llave
         time.tzset()
 
 
-@pytest.mark.xfail(strict=True, reason="QA-A8 (media): record() no valida el formato de los hashes ni la operacion vacia")
 @pytest.mark.parametrize(
     "argumentos",
     [
