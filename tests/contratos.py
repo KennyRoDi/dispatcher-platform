@@ -68,3 +68,15 @@ def comprobar_resource_reader(lector, esperado):
     assert type(uso.memory_current) is int and uso.memory_current >= 0
     assert type(uso.memory_max) is int and uso.memory_max > 0
     assert uso.memory_available == max(uso.memory_max - uso.memory_current, 0)
+
+
+def comprobar_token_verifier(verificador, token_valido, identidad, tokens_invalidos):
+    from src.application.ports import Identity, InvalidToken, TokenVerifier
+
+    assert isinstance(verificador, TokenVerifier)
+    obtenida = verificador.verify(token_valido)
+    assert isinstance(obtenida, Identity)
+    assert obtenida == identidad
+    for token in (*tokens_invalidos, ""):
+        with pytest.raises(InvalidToken):
+            verificador.verify(token)

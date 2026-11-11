@@ -128,3 +128,15 @@ class FakeAlertPublisher:
 
     def publish(self, kind, case_id, detail):
         self.alertas.append((kind, case_id, detail))
+
+
+class FakeTokenVerifier:
+    def __init__(self, identidades=None):
+        self.identidades = dict(identidades or {})
+
+    def verify(self, token):
+        from src.application.ports import InvalidToken
+
+        if token not in self.identidades:
+            raise InvalidToken("token desconocido")
+        return self.identidades[token]
