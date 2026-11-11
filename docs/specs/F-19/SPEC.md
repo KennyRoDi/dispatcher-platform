@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** documentacion 10d4b01
+**Verificación IA:** implementacion 5034bb8
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -120,3 +120,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Documentación parte 2: resumen y enlace al QA Linux en SPEC; QA-parte-2.md conserva timeout real de fork, prueba completa workers_compartidos y límites. Bitácora IA publicada por flujo.py; error real de edición en worktree incorrecto registrado y revertido. Sin pruebas repetidas; verificación documental según flujo y no independiente. (10d4b01) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La prueba real de Whisper y ForkProcessRuntime requieren POSIX; marcar la integración real como skip en Windows para evitar fallo de colección/ejecución local. |
+| verificación IA de implementacion | Codex | 2026-11-10 | Hallazgo revisión: test integración real omitido en Windows vía skipif POSIX. Verificado en Windows: pytest tests/integration/test_fork_runtime.py -q → 5 skipped (0.15 s); en Docker Linux sigue válido el resultado previo de 5 passed. git diff --check limpio. No independiente. (5034bb8) |
