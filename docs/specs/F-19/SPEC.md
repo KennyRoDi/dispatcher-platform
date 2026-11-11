@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** verificacion 59a3c23
+**Verificación IA:** verificacion 14f7513
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -148,3 +148,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Codex | 2026-11-10 | Revisión F-19 parte 3 contra criterios SPEC: selección de ambas estrategias, resultados equivalentes, instrumentación PSS/RSS/cgroup y comparación real con 5 repeticiones por configuración; evidencia y límites están documentados. Hallazgo anterior de texto obsoleto en riesgos fue corregido y fase documental repetida/verificada. Pruebas focales ya pasaron y medición Linux concluyó; no repetí. git diff --check limpio. Revisión propia, no independiente. (8c12578) |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Se revierte explícitamente la aprobación de revisión que quedó obsoleta tras el refactor; reabrimos verificación antes del cierre. |
 | verificación IA de verificacion | Codex | 2026-11-10 | Reverificación tras refactor y cierre: 	ests/unit/test_comparar_carga.py pasó 9/9; el CLI conserva equivalencia y resumen; el diff de producto quedó bajo 400 líneas. El cierre detectó colisión de nombres entre pruebas unitarias y POSIX; la integración se renombró a 	est_comparar_carga_posix.py, sin alterar sus casos. La medición M1 real permanece intacta. git diff --check limpio. Verificación propia, no independiente. (59a3c23) |
+| verificación IA de verificacion | Codex | 2026-11-10 | Verificación F-19 parte 3 en rama limpia: test_comparar_carga unitario 9/9 tras refactor; colisión de import pytest resuelta al renombrar integración POSIX. Código de producto bajo 400 líneas; JSON de 20 ejecuciones M1 y límites/alcance documentados. Sin repetir la medición ni tests ya pasados. git diff --check limpio. Misma sesión, no independiente. (14f7513) |
