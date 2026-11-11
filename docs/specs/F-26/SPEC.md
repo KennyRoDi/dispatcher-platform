@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-26-1-autenticacion-y-roles
-**Verificación IA:** implementacion 03bc4b2
+**Verificación IA:** verificacion 6c47dd8
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -165,3 +165,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA parte 2: corregir NaN/inf en exp e iat, sub vacio, lectura del secreto no UTF-8 sin filtrar bytes al log, y cache del verificador con lectura acotada del archivo (FIFO, tamaño); el hallazgo 1 queda abierto |
 | verificación IA de implementacion | orquestador: git diff 03bc4b2, pytest 1947 passed 5 xfailed, conformidad 0 | 2026-11-10 | correcciones QA hallazgos 2 a 5 verificadas en codigo (03bc4b2) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | orquestador: QA previo (9cb7813) + correcciones 03bc4b2 verificadas, pytest 1947 passed 5 xfailed | 2026-11-10 | QA parte 2 completo; hallazgo 1 (parseo antes de auth) abierto como xfail y limite declarado; sin segundo QA para ahorrar cuota (6c47dd8) |
