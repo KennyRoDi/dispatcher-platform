@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-26-1-autenticacion-y-roles
-**Verificación IA:** implementacion f85b3d9
+**Verificación IA:** verificacion 9cb7813
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -161,3 +161,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff: requirements (pyjwt==2.15.1), ports.py, jwt_tokens.py, seguridad.py; tests intactos (diff de tests vacio). Ejecute la suite completa tras el ultimo commit: 1941 passed, 7 skipped, 3 xfailed. Sin comentarios nuevos ni secretos fijos (grep). 198 lineas de codigo (<400). Desviaciones aceptadas: ClosedVerifier ante configuracion invalida; /docs publicas; sin cache del verificador. (f85b3d9) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA sin bypass de autenticacion ni escalada; 8 xfail estrictos nuevos en test_seguridad_qa.py; src intacto. Suite unitaria segun QA 1941 passed/11 xfailed. Devuelvo a implementacion los hallazgos 2-5 (NaN, sub vacio, secreto no UTF-8, cache/FIFO); 1 (JSON antes de auth) queda abierto. (9cb7813) |
