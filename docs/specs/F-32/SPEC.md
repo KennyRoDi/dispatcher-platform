@@ -1,6 +1,6 @@
 # SPEC F-32: Routing por tipo de nodo
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 8fe6903
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J
@@ -72,3 +72,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-32 completo sin campos pendientes, plan de 1 PR, medición pendiente anotada (8d1fabe) |
 | verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-32 completo, plan de 1 PR, medición pendiente anotada (8fe6903) |
+| plan | José Andrés Loría Herrera | 2026-11-10 |  |
