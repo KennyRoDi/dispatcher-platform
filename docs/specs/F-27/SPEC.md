@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** implementacion df15443
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -147,3 +147,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: src/infrastructure/tls.py (~90 lineas) y SPEC; tests intactos. Ejecute test_tls y la integracion local de TLS (resultados arriba). Suite completa segun developer 1813 passed/3 xfailed (no la repeti). Limite: requests_session no impone TLS 1.3 minimo (verifica CA y hostname). (df15443) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: requests_session ignora CA propia con REQUESTS_CA_BUNDLE (alta); proxies/netrc; redirect https->http; redis_kwargs ssl duplicado; exigir_cifrado acepta ssl_cert_reqs=none; hosts vacios; minio_secure 0/false; CA no validada |
