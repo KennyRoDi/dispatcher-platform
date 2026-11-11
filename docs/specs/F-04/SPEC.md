@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
-**Verificación IA:** tests c43864a
+**Verificación IA:** implementacion 3c5208b
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -164,3 +164,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo 3 archivos de pruebas nuevos (2 unitarios, 1 aceptacion) y log del SPEC; src y scripts intactos. pytest: 3 errores de coleccion por ModuleNotFoundError (rojo por falta de modulos). API asumida fijada por las pruebas (read_*, sample_from_manifest, render_*, main). Acceptance usa dobles declarados. (c43864a) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo src/adapters/dataset_truth_files.py (131) y scripts/dataset_verdad.py (79); tests intactos. Ejecute suite completa y acceptance (resultados en la terminal de esta fase). Desviacion aceptada: no importa dataset_sintetico (privado); validacion de ruta duplicada de ~4 lineas. Declarado que la validacion de ruta esta duplicada con F-03. (3c5208b) |
