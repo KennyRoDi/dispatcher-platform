@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan fb53d33
 **Historia:** US-40 · **Requisitos:** RNF-17, RNF-18, RNF-19, RNF-20; [Parte I §3, §4, §8], [Anexos 1 y 3], [B.9], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -117,3 +117,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-40 sin campos pendientes (grep), solo toca el SPEC, commit empujado. Recontado: git shortlog -sn --all coincide con el informe (Jose 595, Kenni 364, Melany 37, krd 24, Auditoria 20, Nahum 17); bitacora en estado con 45 entradas. No verifique fechas por autor ni errores de IA individuales. (fb53d33) |
