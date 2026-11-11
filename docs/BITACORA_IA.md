@@ -505,3 +505,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El revisor detectó el hueco; se agregó prueba roja, se implementó la comprobación y QA la reprodujo. B/C/D siguen pendientes por decisión humana; pruebas locales no se presentan como medición de esos nodos. |
 | Cómo se validó | py -m pytest -q tests/unit/test_f16_preflight.py -k node_name_distinto: 1 failed esperado antes del fix; suite completa tras fix: 1162 passed, 2 skipped, 3 deselected. QA-parte-2 actualizado; git diff --check limpio. |
 | Error de la IA | El revisor encontró que la IA no comparó service.hostname con service.environment.NODE_NAME; PowerShell podía hacer divergir la identidad efectiva. Se corrigió exigiendo igualdad y se añadió prueba que falló antes del fix. |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 parte 6, fix(F-03): corregir defectos menores, licencia MIT y limpieza de huerfanos (`feat/F-03-6-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagentes developer, QA y documentador, general-purpose) |
+| Componente | F-03 parte 6, fix(F-03): corregir defectos menores, licencia MIT y limpieza de huerfanos |
+| Propósito | Cerrar los xfail estrictos y defectos menores de las partes 1 a 5 (recorte de casos, validacion de parametros, constantes MIN_*, UTC en chats, validacion de case.name y threat_ratio, _produce unificado, reparto de formatos, stderr de ffmpeg, validador robusto), añadir la licencia MIT y la limpieza de huerfanos (opcion C). |
+| Consulta resumida | Fila 6 del plan de pila del SPEC. Fases con subagentes: pruebas rojas (42e68c1, 4278f03, d4cef31), implementacion (5 commits fix), QA (91debbf), documentacion (b2f65c2). |
+| Resultado obtenido | La IA escribio las pruebas, el codigo de 5 commits fix, el LICENSE (MIT, 2026, Grupo 3) y los textos del SPEC y README. QA añadio 6 hallazgos menores como xfail estrictos en tests/unit/test_dataset_parte6_qa.py. Desviacion del SPEC no pedida: run_ffmpeg lanza RuntimeError en vez de CalledProcessError. |
+| Validado / corregido / descartado | pytest unitarias 1576 passed, 7 skipped, 9 xfailed; integracion con ffmpeg real 3 passed; codigo 144+/64- (<400); la persona aprobo cada fase. |
+| Cómo se validó | No se verifico linea por linea el script ni la opcion C ante señal fatal (declarado en el SPEC). |
+| Error de la IA | Prueba heredada test_validar_rechaza_origen_o_licencia_distintos[licencia-MIT] quedo invalida al pasar a MIT; la corrigio el orquestador a GPL (40ab507). El commit 9fc5937 cambio LICENSE_NAME a MIT sin mencionarlo en su mensaje. |
