@@ -107,9 +107,6 @@ def test_staging_en_disco_no_guarda_chunk_en_carpeta_sin_manifiesto(tmp_path):
     assert list((tmp_path / "u1").iterdir()) == []
 
 
-# --- Re-verificación (fase 4) tras el arreglo de H3, H4 y H5 ---
-
-
 def put_asgi(app, ruta, piezas, cabeceras):
     """Como `put_por_asgi`, pero con piezas arbitrarias; devuelve (código, piezas pedidas)."""
     pedidos = 0
@@ -234,3 +231,45 @@ def test_put_no_retiene_mas_de_un_chunk_en_memoria():
         tracemalloc.stop()
     assert codigo == 204
     assert pico <= tamano * 1.25, f"pico de {pico / MIB:.1f} MiB para un chunk de {tamano / MIB:.0f} MiB"
+
+
+def test_put_procesa_el_chunk_fuera_del_event_loop():
+    # El hash y la escritura de hasta 64 MiB no deben frenar al resto del coordinador.
+    app, subidas = app_con(FakeChunkStaging())
+    upload_id, _ = subidas.start(sha(b"abcd"), 4, CHUNK)
+    con_loop = []
+    original = subidas.receive
+
+    def receive_que_registra(*args):
+        try:
+            asyncio.get_running_loop()
+            con_loop.append(True)
+        except RuntimeError:
+            con_loop.append(False)
+        return original(*args)
+
+    subidas.receive = receive_que_registra
+    respuesta = TestClient(app).put(f"/uploads/{upload_id}/chunks/0", content=b"abcd", headers={"X-Chunk-SHA256": sha(b"abcd")})
+    assert respuesta.status_code == 204
+    assert con_loop == [False]
+
+
+class AlmacenQueFallaConKeyError(FakeObjectStore):
+    def put(self, sha256, content, size):
+        raise KeyError("fallo interno del almacén")
+
+
+def test_keyerror_del_almacen_no_se_disfraza_de_subida_inexistente():
+    subidas = ChunkedUpload(FakeChunkStaging(), AlmacenQueFallaConKeyError(), max_chunk_size=MAXIMO)
+    upload_id, _ = subidas.start(sha(b"abcd"), 4, CHUNK)
+    subidas.receive(upload_id, 0, b"abcd", sha(b"abcd"))
+    with pytest.raises(KeyError):
+        subidas.complete(upload_id)
+
+
+def test_el_413_informa_el_tamano_real_del_chunk():
+    app, subidas = app_con(FakeChunkStaging())
+    upload_id, _ = subidas.start(sha(b"abcdefgh"), 8, CHUNK)
+    respuesta = TestClient(app).put(f"/uploads/{upload_id}/chunks/0", content=b"abcdefgh", headers={"X-Chunk-SHA256": sha(b"abcd")})
+    assert respuesta.status_code == 413
+    assert f"{CHUNK} bytes" in respuesta.json()["detail"]
