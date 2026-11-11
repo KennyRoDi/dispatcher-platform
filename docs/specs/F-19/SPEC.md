@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 1ada1d3
+**Verificación IA:** documentacion 7ab4c82
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -142,3 +142,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Codex | 2026-11-10 | PENDIENTE: unitarias focales ya verdes; integración POSIX requiere Linux. Docker npipe no existe y WSL devuelve E_ACCESSDENIED; no hay nodo Linux/cgroup v2 limitado. No se ejecutaron preflight ni repeticiones M1; QA-parte-3 documenta comandos y recurso faltante. No aprobar hasta lecturas reales PSS/memory.current. (0ca579a) |
 | verificación IA de verificacion | Codex | 2026-11-10 | Verificación de F-19 parte 3: preflight POSIX y 20 ejecuciones M1 reales en Docker Linux/WSL2 (N=1/2, dos estrategias, cinco repeticiones), cgroup v2 4 GiB sin swap y usuario no-root; PSS y memory.current están en JSON crudos y resumidos en QA-parte-3. Unitarias focales previamente verdes; 3 integraciones omitidas en Windows por POSIX. git diff --check limpio. Alcance limitado a Whisper CPU y este contenedor; la verificación la hizo el mismo agente, no independiente. (1ada1d3) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | Codex subagente documental | 2026-11-10 | Revisé QA-parte-3, resultados de parte 3 en SPEC, ficha M1 y AD-07 contra los JSON de medición y entorno reportado; no hallé contradicciones factuales actuales. Historial de bloqueo en registro anterior del SPEC corresponde al estado de entonces. Bitácora registrada por flujo.py y publicada en estado. Verificación documental acotada a estas rutas; no edité ni avancé fase. (7ab4c82) |
