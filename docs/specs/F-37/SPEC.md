@@ -1,6 +1,6 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 52dee88
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | SPEC sin campos pendientes; reutiliza admission, cgroup_resources, oom_policy y cancel_heavy; pila de 2 partes; ejecutado en la misma sesion (14adff5) |
 | plan | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-11 | 22 pruebas unitarias nuevas fallan por ModuleNotFoundError de scenarios.memory_saturation; sin código de producción (52dee88) |
+| tests | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
