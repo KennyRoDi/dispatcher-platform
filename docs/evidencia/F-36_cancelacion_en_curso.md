@@ -37,6 +37,26 @@ El módulo no lanza la corrida real: solo genera la carga, toma las instantánea
 - Total en Windows: 14 pasan (unitarias) y 4 se omiten (integración y aceptación).
 - Las pruebas unitarias usan datos simulados; no prueban el comportamiento real del sistema operativo.
 
-## Medición B.6 en nodos reales: Medición pendiente (depende de F-38)
+## Medición real en un contenedor Docker (2026-11-11)
 
-La medición de cancelación en curso sobre tres nodos worker reales queda pendiente hasta que F-38 (despliegue en tres nodos) esté disponible. Hasta entonces no hay datos medidos en esta ficha: no hay valores de memoria, tiempos de liberación ni resultados de la corrida real.
+**Entorno:** un único host Docker Desktop (Linux, WSL2 kernel 6.18.33.2, 16 CPUs, 15,6 GB), cgroup v2, contenedor con `--memory=2g`, Python 3.13.18, FFmpeg 7.1.5, usuario no root (10001), commit base `63f6b62`. **No son tres nodos**: la medición en tres nodos worker sigue como **Medición pendiente** (requiere los nodos de F-38).
+
+**Qué se hizo:** `docs/evidencia/mediciones-f36-f37/medir_f36.py` genera un caso de 316 MB (video sin comprimir, ≥ 200 MB), lanza `multimedia_processor.process("transcode_video", ...)` con `ProcessSupervisor` y `PosixProcessRunner` reales, toma la instantánea `antes` a los 3 s (FFmpeg en curso), cancela con `supervisor.cancel`, muestrea `ps` cada 0,1 s y toma `despues`. Evalúa con `scenarios.cancel_heavy.evaluar`.
+
+```
+docker build -f docs/evidencia/mediciones-f36-f37/Dockerfile.medicion -t medicion-f36-f37 .
+docker run --rm --memory=2g --memory-swap=2g -v "<repo>:/app:ro" -w /app -e PYTHONPATH=/app medicion-f36-f37 python docs/evidencia/mediciones-f36-f37/medir_f36.py
+```
+
+Salida cruda: [`mediciones-f36-f37/F-36_corrida_2026-11-11.json`](mediciones-f36-f37/F-36_corrida_2026-11-11.json). Una repetición.
+
+| Dato | Antes de cancelar | Después |
+|---|---|---|
+| Procesos `ffmpeg` | 1 (PID 76) | 0 |
+| Entradas en `/scratch` | 1 (`ffmpeg-<id>`) | 0 |
+| `memory.current` | 1 051 451 392 B | 354 623 488 B |
+| Tiempo hasta no haber procesos | | 0,1 s (primer muestreo) |
+
+Veredicto de `evaluar`: `cumple = true`, sin problemas. La prueba de aceptación `test_cancel_heavy_aceptacion.py` con este JSON: 1 pasa.
+
+**Límites:** `estado_caso = cancelled` lo decide el arnés (el hilo terminó y no quedan procesos); no hay coordinador ni cola, así que no se comprobó el estado del caso en el sistema completo. `process` terminó con `CorruptInputError` por la cancelación. `memory.current` incluye caché de página del archivo de entrada, que explica que no baje a cero. Una sola repetición y un host: no hay variabilidad medida.
