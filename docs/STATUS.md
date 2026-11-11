@@ -30,7 +30,7 @@
 | F-25 | pendiente |
 | F-26 | en-pr |
 | F-27 | pendiente |
-| F-28 | implementacion |
+| F-28 | verificacion |
 | F-29 | pendiente |
 | F-30 | pendiente |
 | F-31 | en-pr |
