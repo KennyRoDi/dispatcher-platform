@@ -1171,3 +1171,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | docs/evidencia/F-37_saturacion_de_memoria.md con qué cubre, comandos, pruebas unitarias y límites; mediciones marcadas Medición pendiente |
 | Validado / corregido / descartado | Validado |
 | Cómo se validó | Pruebas unitarias ejecutadas: 22 pasan (el enunciado de la tarea decía 26; se documenta el número medido) |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-37 (`feat/F-37-1-saturacion-de-memoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-37 |
+| Propósito | Registrar AD-41 y SUP-36 a SUP-38 exigidos por el SPEC de F-37 |
+| Consulta resumida | Redacta la decisión y los supuestos del SPEC en ARQUITECTURA §8 y REQUERIMIENTOS |
+| Resultado obtenido | AD-41 y SUP-36 a SUP-38 agregados, números libres en main |
+| Validado / corregido / descartado | Revisado contra el SPEC; sin datos medidos inventados; umbrales marcados Medición pendiente |
+| Cómo se validó | Lectura del diff y flujo.py verificar |
+| Error de la IA | La parte 1 llegó a revisión sin el AD-41 ni los SUP-36 a SUP-38 que el SPEC exigía; la revisión lo detectó y se devolvió a documentación |
