@@ -685,3 +685,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Suite completa 1720 en verde; OOM real en contenedor pendiente de nodos |
 | Cómo se validó | TDD en fases; subagente haiku para documentación |
 | Error de la IA | Mi prueba en rojo olvidaba vaciar la cola sembrada y duplicaba el id; la implementación estaba bien y se corrigió la prueba |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-4-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) |
+| Componente | F-04 |
+| Propósito | F-04 parte 4: documentar en docs/dataset.md la procedencia y licencia por fuente y la verdad de referencia. |
+| Consulta resumida | Redaccion de dos secciones de docs/dataset.md con el recuento y la salida de procedencia ejecutados por el orquestador, y marca de la fila 4 del SPEC. |
+| Resultado obtenido | Secciones añadidas (+42 lineas) y SPEC actualizado (commit 2dc0c29); conformidad 0 problemas. Salida real: 490 fuentes cumplen la procedencia (rc 0); caso negativo sin licencia rc 1. La tabla de aciertos queda pendiente: no hay salidas reales de analisis sobre la muestra. |
+| Validado / corregido / descartado | El orquestador ejecuto procedencia sobre el manifiesto real y el caso negativo y cotejo el texto. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por delegacion de la persona; la verificacion fue del orquestador sin QA independiente. |
+| Cómo se validó | Sin revision por un segundo agente en esta parte. La tabla de aciertos y SUP-27 siguen pendientes de la persona. |
+| Error de la IA | Ninguno nuevo en esta parte; los errores de F-04 estan en las entradas de las partes 1 a 3. |
