@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** implementacion df15443
+**Verificación IA:** implementacion ece11d8
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -148,3 +148,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: src/infrastructure/tls.py (~90 lineas) y SPEC; tests intactos. Ejecute test_tls y la integracion local de TLS (resultados arriba). Suite completa segun developer 1813 passed/3 xfailed (no la repeti). Limite: requests_session no impone TLS 1.3 minimo (verifica CA y hostname). (df15443) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: requests_session ignora CA propia con REQUESTS_CA_BUNDLE (alta); proxies/netrc; redirect https->http; redis_kwargs ssl duplicado; exigir_cifrado acepta ssl_cert_reqs=none; hosts vacios; minio_secure 0/false; CA no validada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de hallazgos QA en tls.py; diff de tests solo quita marcadores xfail (comprobado). Suite completa tras ece11d8: 1864 passed, 8 skipped, 3 xfailed. Integracion segun developer: 25 passed, 3 xfailed. Quedan 3 xfail: redis_kwargs lleva ssl=True y rompe Redis.from_url (decision: la parte 2 usa host/port con ssl=True; limite), ?ssl_cert_reqs=none via from_url directo, TLS 1.3 minimo en requests. (ece11d8) |
