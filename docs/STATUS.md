@@ -34,7 +34,7 @@
 | F-29 | pendiente |
 | F-30 | pendiente |
 | F-31 | en-pr |
-| F-32 | tests |
+| F-32 | implementacion |
 | F-33 | pendiente |
 | F-34 | pendiente |
 | F-35 | pendiente |
