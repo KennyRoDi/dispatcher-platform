@@ -853,3 +853,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Corrección documental; pruebas focales ya verificadas, no repetidas. La bitácora se publica mediante flujo.py. |
 | Cómo se validó | Revisión documental y actualización mínima de QA-parte-3. |
 | Error de la IA | El primer preflight reveló TypeError por resultados anidados en modo por proceso; corregido en 8eecde5. La medición inicial no instaló por HOME del contenedor no escribible; corregido usando /tmp. Pytest encontró colisión entre tests/unit/test_comparar_carga.py y tests/integration/test_comparar_carga.py; resuelta al renombrar la prueba POSIX a test_comparar_carga_posix.py. |
+
+## 2026-11-10 · Kenni Rodriguez · F-28 (`feat/F-28-3-cifrado-en-reposo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5), subagentes developer, qa-tester y documentador |
+| Componente | F-28 |
+| Propósito | F-28 parte 3: decorador EncryptedObjectStore, prueba I y búsqueda de llaves en el historial |
+| Consulta resumida | Se pidió a subagentes escribir pruebas, implementar el decorador, verificarlo y documentarlo, con aprobaciones delegadas por la persona |
+| Resultado obtenido | Decorador con 1974 passed y 15 xfail declarados; prueba I no ejecutada contra MinIO real |
+| Validado / corregido / descartado | Aprobaciones delegadas, sin verificación humana independiente |
+| Cómo se validó | El orquestador revisó diffs y ejecutó la suite; los subagentes no son verificación humana |
+| Error de la IA | El lector del decorador devolvía como válido el claro ya descifrado tras un DecryptionError y su read(n) era cuadrático; QA lo detectó y se corrigió |
