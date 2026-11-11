@@ -38,7 +38,7 @@
 | F-33 | pendiente |
 | F-34 | pendiente |
 | F-35 | pendiente |
-| F-36 | en-pr |
+| F-36 | tests |
 | F-37 | pendiente |
 | F-38 | en-pr |
 | F-39 | pendiente |
