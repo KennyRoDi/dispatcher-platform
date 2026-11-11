@@ -1,7 +1,7 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-28-1-cifrado-en-reposo
 **Verificación IA:** revision 96b0f6b
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
