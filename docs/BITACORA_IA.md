@@ -1159,3 +1159,9 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado |
 | Cómo se validó | Contrato en verde con el doble y EncryptedObjectStore; dos mutantes detectados |
 | Error de la IA | La IA propuso AD-35 en el SPEC, que ya existia (la ultima era AD-40); se detecto al verificar y se corrigio a AD-41. |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-37 (`feat/F-37-1-saturacion-de-memoria`)
+
+| Campo | Contenido |
+|---|---|
+| Uso de IA | No se usó IA en F-37. |
