@@ -18,8 +18,8 @@
 | F-13 | pendiente |
 | F-14 | pendiente |
 | F-15 | pendiente |
-| F-16 | en-pr |
-| F-17 | en-pr |
+| F-16 | hecha |
+| F-17 | hecha |
 | F-18 | pendiente |
 | F-19 | pendiente |
 | F-20 | pendiente |
