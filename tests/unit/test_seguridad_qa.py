@@ -41,7 +41,6 @@ def reloj():
     return FakeClock()
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-26: NaN hace falsas las comparaciones y el token nunca expira")
 @pytest.mark.parametrize("campo", ["exp", "iat"])
 def test_exp_o_iat_nan_se_rechazan(secreto, reloj, campo):
     token = token_firmado(secreto, payload(reloj, **{campo: float("nan")}))
@@ -49,7 +48,6 @@ def test_exp_o_iat_nan_se_rechazan(secreto, reloj, campo):
         JwtTokenVerifier(secreto, reloj).verify(token)
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-26: sub vacio produce una identidad sin sujeto")
 @pytest.mark.parametrize("sujeto", ["", " "])
 def test_sub_vacio_se_rechaza(secreto, reloj, sujeto):
     token = token_firmado(secreto, payload(reloj, sub=sujeto))
@@ -57,7 +55,6 @@ def test_sub_vacio_se_rechaza(secreto, reloj, sujeto):
         JwtTokenVerifier(secreto, reloj).verify(token)
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-26: el UnicodeDecodeError filtra un byte del secreto al log")
 def test_archivo_de_secreto_no_utf8_no_filtra_bytes_al_log(tmp_path, monkeypatch, caplog):
     ruta = tmp_path / "llave"
     ruta.write_bytes(b"\xa7" + secrets.token_bytes(40))
@@ -69,7 +66,6 @@ def test_archivo_de_secreto_no_utf8_no_filtra_bytes_al_log(tmp_path, monkeypatch
     assert "0xa7" not in caplog.text
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-26: cada peticion sin token relee el secreto y registra un ERROR")
 def test_configuracion_invalida_no_inunda_el_log_por_peticion(monkeypatch, caplog):
     monkeypatch.delenv("JWT_SECRET_FILE", raising=False)
     monkeypatch.setenv("JWT_SECRET", "corto")

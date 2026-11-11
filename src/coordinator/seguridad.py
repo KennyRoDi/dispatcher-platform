@@ -1,5 +1,6 @@
 import logging
 import os
+from functools import lru_cache
 from datetime import datetime, timezone
 from types import MappingProxyType
 
@@ -44,12 +45,18 @@ class _UtcClock:
         return datetime.now(timezone.utc)
 
 
-def obtener_verificador() -> TokenVerifier:
+@lru_cache(maxsize=4)
+def _verificador_para(archivo: str | None, secreto: str | None) -> TokenVerifier:
+    entorno = {"JWT_SECRET_FILE": archivo or "", "JWT_SECRET": secreto or ""}
     try:
-        return verificador_desde_entorno(os.environ, _UtcClock())
+        return verificador_desde_entorno(entorno, _UtcClock())
     except ValueError as error:
         log.error("autenticacion cerrada por configuracion de secreto invalida: %s", error)
         return ClosedVerifier()
+
+
+def obtener_verificador() -> TokenVerifier:
+    return _verificador_para(os.environ.get("JWT_SECRET_FILE"), os.environ.get("JWT_SECRET"))
 
 
 def _unauthorized() -> HTTPException:

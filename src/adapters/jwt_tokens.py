@@ -1,3 +1,4 @@
+import math
 import os
 import stat
 from collections.abc import Mapping
@@ -11,6 +12,8 @@ from src.domain.rbac import Role
 
 ALGORITHM = "HS256"
 MIN_SECRET_BYTES = 32
+MAX_SECRET_FILE_BYTES = 4096
+MAX_TIMESTAMP = 253_402_300_799
 DEFAULT_MINUTES = 60
 REQUIRED_CLAIMS = ("sub", "role", "iat", "exp")
 
@@ -22,7 +25,12 @@ def _checked_secret(secret: str | bytes | None) -> str | bytes:
 
 
 def _is_number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+        and abs(value) <= MAX_TIMESTAMP
+    )
 
 
 class JwtTokenVerifier:
@@ -47,6 +55,8 @@ class JwtTokenVerifier:
         subject, role = claims["sub"], claims["role"]
         if not (isinstance(subject, str) and isinstance(role, str)):
             raise InvalidToken("reclamos con tipo invalido")
+        if not subject.strip():
+            raise InvalidToken("sub vacio")
         self._check_validity_window(claims["iat"], claims["exp"])
         try:
             return Identity(subject, Role(role))
@@ -86,13 +96,22 @@ def issue_token(
 
 def _secret_from_file(path: str) -> str:
     try:
-        with Path(path).open() as handle:
-            mode = os.fstat(handle.fileno()).st_mode
-            if mode & (stat.S_IRWXG | stat.S_IRWXO):
+        descriptor = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        with os.fdopen(descriptor, "rb") as handle:
+            info = os.fstat(handle.fileno())
+            if not stat.S_ISREG(info.st_mode):
+                raise ValueError("JWT_SECRET_FILE debe ser un archivo regular")
+            if info.st_mode & (stat.S_IRWXG | stat.S_IRWXO):
                 raise ValueError("JWT_SECRET_FILE no debe tener permisos para grupo ni otros")
-            return handle.read().rstrip("\r\n")
+            content = handle.read(MAX_SECRET_FILE_BYTES + 1)
     except OSError:
         raise ValueError("JWT_SECRET_FILE no se pudo leer") from None
+    if len(content) > MAX_SECRET_FILE_BYTES:
+        raise ValueError("JWT_SECRET_FILE excede el tamano maximo")
+    try:
+        return content.decode().rstrip("\r\n")
+    except UnicodeDecodeError:
+        raise ValueError("JWT_SECRET_FILE no es UTF-8 valido") from None
 
 
 def verificador_desde_entorno(env: Mapping[str, str], clock: Clock) -> TokenVerifier:
