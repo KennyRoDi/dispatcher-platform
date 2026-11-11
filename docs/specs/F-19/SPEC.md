@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 6f4f4be
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de documentacion | Codex subagente documental | 2026-11-10 | Revisé QA-parte-3, resultados de parte 3 en SPEC, ficha M1 y AD-07 contra los JSON de medición y entorno reportado; no hallé contradicciones factuales actuales. Historial de bloqueo en registro anterior del SPEC corresponde al estado de entonces. Bitácora registrada por flujo.py y publicada en estado. Verificación documental acotada a estas rutas; no edité ni avancé fase. (7ab4c82) |
 | verificación IA de documentacion | Codex | 2026-11-10 | Verificación documental propia: revisé diff stat de documentación de F-19 parte 3; el agente documentador comprobó consistencia entre QA-parte-3, SPEC, ficha M1, AD-07 y los JSON medidos, y flujo.py registró la bitácora con incidencias reales. Sin cambios locales pendientes. (6f4f4be) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
