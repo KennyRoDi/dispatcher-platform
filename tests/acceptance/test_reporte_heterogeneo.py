@@ -12,7 +12,7 @@ from src.domain.consolidated_report import CaseInfo, CaseSource
 from src.domain.finding import EvidenceRef, Finding, Severity
 from tests.dobles import FakeCaseCatalog, FakeClock, FakeFindingStore, FakeObjectStore
 
-pytestmark = pytest.mark.acceptance
+pytestmark = [pytest.mark.acceptance, pytest.mark.usefixtures("sin_autorizacion")]
 
 SHA_TEXTO = "1" * 64
 SHA_IMAGEN = "2" * 64

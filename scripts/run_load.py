@@ -20,8 +20,7 @@ from pathlib import Path
 
 import requests
 
-from scripts.submit_case import FINISHED_STATUSES, build_case_payload
-from scripts.submit_case import resolve_session
+from scripts.submit_case import FINISHED_STATUSES, build_case_payload, resolve_session
 from src.workers.config import Settings, make_redis
 from src.workers.storage import Storage, StorageError
 
