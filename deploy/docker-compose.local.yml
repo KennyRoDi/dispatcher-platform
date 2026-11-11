@@ -22,12 +22,6 @@ x-worker: &worker
     MINIO_ENDPOINT: minio:9000
     MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
     MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
-        MINIO_SECURE: ${MINIO_SECURE:-false}
-        OBJECTS_BUCKET: ${OBJECTS_BUCKET:-objetos}
-        STAGING_DIR: /var/lib/dispatcher/staging
-        KEK_FILE: ${KEK_FILE:-}
-      volumes:
-        - coordinator-staging:/var/lib/dispatcher/staging
     WORK_DIR: /scratch
     WORKER_CONCURRENCY: 1
     HEARTBEAT_INTERVAL: 5
@@ -84,8 +78,15 @@ services:
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_SECURE: ${MINIO_SECURE:-false}
+      OBJECTS_BUCKET: ${OBJECTS_BUCKET:-objetos}
+      STAGING_DIR: /var/lib/dispatcher/staging
+      KEK_FILE: ${KEK_FILE:-}
+      KEK: ${KEK:-}
     ports:
       - "8000:8000"
+    volumes:
+      - coordinator-staging:/var/lib/dispatcher/staging
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/openapi.json', timeout=2)"]
       interval: 5s
