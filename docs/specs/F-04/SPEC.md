@@ -1,7 +1,7 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** pr
-**Base:** feat/F-04-1-verdad-de-referencia-y-procedencia
+**Fase:** tests
+**Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
 **Verificación IA:** revision 725a9d2
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
