@@ -13,6 +13,8 @@ from src.domain.chunks import (
 )
 
 MAX_CHUNK_SIZE = 64 * 1024 * 1024
+# Acota la lista de faltantes y el conjunto de índices que se materializan en status y complete.
+MAX_CHUNKS = 100_000
 BLOQUE_LECTURA = 1 << 20
 
 
@@ -26,13 +28,21 @@ class ChunkedUpload:
         manifest = UploadManifest(sha256, size, chunk_size)
         if manifest.chunk_size > self._max_chunk_size:
             raise ValueError(f"chunk_size {chunk_size} excede el máximo {self._max_chunk_size}")
+        if manifest.chunk_count > MAX_CHUNKS:
+            raise ValueError(f"{manifest.chunk_count} chunks exceden el máximo {MAX_CHUNKS}; usa un chunk_size mayor")
         upload_id = uuid.uuid4().hex
         self._staging.save_manifest(upload_id, manifest.to_dict())
         return upload_id, manifest.chunk_count
 
+    def expected_size(self, upload_id: str, index: int) -> int:
+        return self._manifest(upload_id).expected_size(index)
+
     def receive(self, upload_id: str, index: int, data: bytes, sha256: str) -> None:
         verify_chunk(self._manifest(upload_id), index, data, sha256)
-        self._staging.put_chunk(upload_id, index, data)
+        try:
+            self._staging.put_chunk(upload_id, index, data)
+        except KeyError:
+            raise UploadNotFound(upload_id) from None
 
     def status(self, upload_id: str) -> tuple[list[int], list[int]]:
         manifest = self._manifest(upload_id)
@@ -43,6 +53,8 @@ class ChunkedUpload:
         manifest = self._manifest(upload_id)
         faltantes = missing_chunks(manifest, self._staging.received(upload_id))
         if faltantes:
+            # Otro complete pudo descartar la subida entre leer el manifiesto y listar los chunks.
+            self._manifest(upload_id)
             raise MissingChunks(faltantes)
         with self._flujo(upload_id, manifest) as flujo:
             self._object_store.put(manifest.sha256, flujo, manifest.size)
@@ -51,9 +63,10 @@ class ChunkedUpload:
 
     def _manifest(self, upload_id: str) -> UploadManifest:
         try:
-            return UploadManifest.from_dict(self._staging.load_manifest(upload_id))
-        except KeyError:
+            datos = self._staging.load_manifest(upload_id)
+        except (KeyError, ValueError):
             raise UploadNotFound(upload_id) from None
+        return UploadManifest.from_dict(datos)
 
     def _flujo(self, upload_id: str, manifest: UploadManifest) -> io.BufferedReader:
         return io.BufferedReader(_ChunksVerificados(self._staging, upload_id, manifest), BLOQUE_LECTURA)
@@ -95,7 +108,11 @@ class _ChunksVerificados(io.RawIOBase):
     def _leer_en(self, buffer) -> int:
         while True:
             if self._actual is None:
-                self._actual = next(self._pendientes, None)
+                try:
+                    self._actual = next(self._pendientes, None)
+                except KeyError:
+                    # Otro complete concurrente ya descartó la subida.
+                    raise UploadNotFound(self._upload_id) from None
                 if self._actual is None:
                     return 0
             leidos = self._actual.readinto(buffer)

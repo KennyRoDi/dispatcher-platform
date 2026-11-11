@@ -73,10 +73,14 @@ def comprobar_chunk_staging(staging):
     staging.put_chunk("u1", 0, b"abc")
     staging.put_chunk("u1", 0, b"abc")
     assert staging.received("u1") == {0, 1}
-    assert staging.open_chunk("u1", 1).read() == b"def"
+    with staging.open_chunk("u1", 1) as chunk:
+        assert chunk.read() == b"def"
     staging.discard("u1")
     with pytest.raises(KeyError):
         staging.load_manifest("u1")
+    with pytest.raises(KeyError):
+        staging.put_chunk("u1", 0, b"abc")
+    assert staging.received("u1") == set()
 
 def comprobar_resource_reader(lector, esperado):
     assert isinstance(lector, ResourceReader)

@@ -1,8 +1,8 @@
 # SPEC F-22: Chunks verificados
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 2f2f6c0
+**Base:** feat/F-22-1-chunks-verificados
+**Verificación IA:** revision a7c8e59
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -80,12 +80,14 @@ Se agrega su doble `FakeChunkStaging` a `tests/dobles.py` y `comprobar_chunk_sta
 
 | Método y ruta | Cuerpo | Respuesta |
 |---|---|---|
-| `POST /uploads` | JSON `{sha256, size, chunk_size}` | 201 `{upload_id, chunk_count}`; 422 si `chunk_size` excede el máximo o los datos no son válidos |
-| `PUT /uploads/{id}/chunks/{index}` | Bytes del chunk; cabecera `X-Chunk-SHA256` | 204; 422 si el hash no coincide o el tamaño no corresponde al índice; 404 si la subida no existe |
-| `GET /uploads/{id}` | — | 200 `{received, missing}`, para que el cliente reenvíe |
-| `POST /uploads/{id}/complete` | — | 201 `{sha256, size}`; 409 con `missing`; 422 si el SHA-256 total no coincide |
+| `POST /uploads` | JSON `{sha256, size, chunk_size}` | 201 `{upload_id, chunk_count}`; 422 si `chunk_size` excede 64 MiB, si la subida tendría más de 100 000 chunks o si los datos no son válidos |
+| `PUT /uploads/{id}/chunks/{index}` | Bytes del chunk; cabecera `X-Chunk-SHA256` | 204; 413 si el cuerpo supera el tamaño esperado del chunk, sin leerlo completo; 422 si el hash no coincide, el chunk es más corto o el índice está fuera de rango; 404 si la subida no existe, sin leer el cuerpo |
+| `GET /uploads/{id}` | — | 200 `{received, missing}`, para que el cliente reenvíe; 404 si no existe o ya se completó |
+| `POST /uploads/{id}/complete` | — | 201 `{sha256, size}`; 409 con `missing`; 422 si el SHA-256 total no coincide; 404 si no existe o la completó otra petición concurrente |
 
-Reenviar un chunk ya recibido con el mismo hash es idempotente.
+Reenviar un chunk ya recibido con el mismo hash es idempotente. Mientras no haya `ObjectStore` configurado (F-23), todas las rutas responden 503.
+
+El PUT reserva un único buffer del tamaño esperado y lo llena por partes, sin copia final: nunca hay más de un chunk en memoria por petición [B.5 M3]. El tope de 100 000 chunks acota los índices que `status` y `complete` materializan; con chunks de 4 MiB equivale a unos 390 GiB.
 
 ### Flujo
 
@@ -179,7 +181,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 6. **Doble escritura en disco** (staging y luego MinIO): puede bajar el throughput medido. Se reporta en la ficha; si pesa demasiado, se revisa AD-42.
 7. **Prueba entre nodos** depende de que F-38 (despliegue en tres nodos) esté disponible.
 8. **`put` aborta por excepción (desviación aceptada en verificación).** QA encontró que leer el staging dos veces, una para el hash y otra para el `put`, permitía que un chunk cambiado entre ambas pasadas llegara a `ObjectStore` bajo un SHA-256 ajeno (H1). Ahora el hash se calcula sobre el mismo flujo que lee `put`, y si no coincide la lectura lanza `IntegrityMismatch` antes del último byte. Por eso `put` sí se llama, pero termina en excepción. **Requisito para F-23 (MinIO) y F-28 (cifrado):** el adaptador de `ObjectStore` no debe confirmar el objeto si la lectura de `content` lanza una excepción. Falta llevarlo al contrato en `docs/CONTRATOS.md` y a `comprobar_object_store`, en una PR aparte según «Cambiar un contrato». Aprobado por Melany Vindas.
-9. **Carrera entre `receive` y `discard` (H2, baja).** Un `receive` concurrente que llega después de `discard` vuelve a crear la carpeta de la subida con un chunk y sin manifiesto. Se resuelve en la parte 2, junto con las subidas abandonadas de la pregunta 4.
+9. **Carrera entre `receive` y `discard` (H2, baja). Resuelta en la parte 2.** `put_chunk` exige el manifiesto y ya no crea la carpeta; `discard` renombra la carpeta de forma atómica antes de borrarla, para que un `put_chunk` concurrente no deje restos. Lo cubre una prueba de estrés de 200 rondas. La pregunta 4 (subidas abandonadas) sigue abierta: no hay `DELETE` ni expiración.
+10. **El servidor drena el cuerpo tras un error (H7, informativa).** Después de responder 413, 404 o 422, uvicorn sigue leyendo y descartando el resto del cuerpo para conservar la conexión *keep-alive*. No ocupa memoria, solo red y CPU.
 
 ## Aprobaciones
 
@@ -202,3 +205,16 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Melany Vindas | 2026-11-10 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-10 | Revisor (subagente, contexto nuevo): APROBADO. Diff de la parte 1 cumple el SPEC; sin errores de logica en src; capas y sin llaves. Orquestador: 268 lineas, suite 1086 verde, conformidad 0, bitacora publicada. Autoria: 6 commits aplicados con git am pasaron a Melany Vindas conservando fechas y contenido (rebase con --exec); los hashes anteriores en la tabla de aprobaciones quedan como referencia historica. Pendientes para la parte 2: ResourceWarning en tests/contratos.py:71 y mapeo de ValueError/UploadNotFound. Verificacion independiente. (2f2f6c0) |
 | revision | Melany Vindas | 2026-11-10 |  |
+| verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: orquestador escribio las pruebas, verificacion no independiente. Diff solo en tests/ (444 lineas). Rojo por falta de funcionalidad: rutas_archivos y subir_por_chunks no existen; 4 de test_chunks fallan con DID NOT RAISE (H2). Resto de la suite en verde. Contra un borrador no confirmado: rutas y cliente 41/41, integracion 200 MiB 2/2 con uvicorn real, suite 1129 verde. ResourceWarning corregido. Conformidad 0. (427f2c7) |
+| tests | Melany Vindas | 2026-11-11 |  |
+| verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: orquestador implemento y verifico, verificacion no independiente. Rutas /uploads (201/204/409/422/404, 503 sin almacen), cliente scripts/subir_por_chunks.py y H2: put_chunk exige manifiesto y no recrea la carpeta. Error de IA detectado: el primer arreglo de H2 dejaba 88/200 carpetas huerfanas con put y discard concurrentes; discard ahora renombra atomico antes de borrar y una prueba de estres lo cubre (falla sin el arreglo, 8/8 verde con el). Suite 1129 verde sin ResourceWarning; integracion 3/3 con subida real de 200 MiB. Riesgo: el chunk se lee completo en memoria antes de validar tamano. Conformidad: solo falta docs/dataset.md de F-04, ajeno a esta rama. (844fe4e) |
+| implementacion | Melany Vindas | 2026-11-11 |  |
+| devuelta de verificacion | Melany Vindas | 2026-11-11 | QA: H3 PUT lee el cuerpo entero en RAM (B.5 M3), H4 size sin tope agota memoria, H5 complete concurrente da 500 |
+| verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Arreglo de devuelta QA, sin subagente (no independiente). H3: PUT consulta el tamano esperado y lee el cuerpo por partes, corta con 413 al excederlo (B.5 M3). H4: start rechaza mas de 100000 chunks con 422. H5: complete traduce la carrera con otro complete a UploadNotFound. Pruebas de QA en verde, suite 1133 verde sin ResourceWarning, integracion 4/4 en 5 corridas incluida subida de 200 MiB y complete concurrente. 28 lineas. (06ceb32) |
+| implementacion | Melany Vindas | 2026-11-11 |  |
+| verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) re-verifico: H3, H4 y H5 cerrados con sondas en uvicorn real (1 GiB sin Content-Length o mentiroso: 413, RAM +6 MiB; 100000 chunks 201, 100001 422; 50 rondas de complete y PUT concurrentes sin 500). Hallazgo H6: copia final dejaba 2 chunks en RAM; arreglado con un buffer reservado sin copia (B.5 M3). 8 pruebas de QA matan 4 mutantes vivos. Suite 1141 verde, integracion 4/4 en 3 corridas. (3810af4) |
+| verificacion | Melany Vindas | 2026-11-11 |  |
+| verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. Diff solo en docs/specs/F-22/SPEC.md (protocolo con 413, tope 100000 chunks, 404 concurrente, 503; H2 resuelto, H7 informativa) y AD-28 en ARQUITECTURA. Sin ficha M3: no hay datos medidos (parte 3). README sin cambios: el despliegue no cambio. Bitacora con 4 errores reales de la IA. (5df88a5) |
+| documentacion | Melany Vindas | 2026-11-11 |  |
+| verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) devolvio dos veces y aprobo los arreglos 1, 2 y 5: receive en run_in_threadpool (no bloquea el event loop, B.5 M3 intacto), KeyError del ObjectStore ya no se disfraza de 404, separador eliminado. Su segunda revision hallo una carrera previa en received() (is_dir y luego iterdir) que daba 500 en 4/25; arreglada por el orquestador con prueba determinista, 0/25 fallos (verificacion no independiente de ese punto). Anotado: discard borra sin renombrar si rename falla con OSError. Diff 226 lineas en src y scripts. Suite 1144 verde. (a7c8e59) |
+| revision | Melany Vindas | 2026-11-11 |  |
