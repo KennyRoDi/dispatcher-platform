@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
-**Verificación IA:** tests ab8cd75
+**Verificación IA:** implementacion d80b225
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
 
 ## Objetivo
@@ -87,3 +87,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | 9 pruebas nuevas en tests/unit/test_cancelacion_en_curso.py, sin codigo de produccion; 8 en rojo por la razon esperada, 1 (run sin supervisor) en verde por conservar el comportamiento (ab8cd75) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-10 | 1256 pruebas unitarias en verde; supervisor cableado en process/_run y main() (d80b225) |
