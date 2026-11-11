@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** verificacion 8c9a806
+**Verificación IA:** documentacion d262949
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -182,3 +182,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 8c9a806 sobre ancla genesis: solo tests nuevos (diff comprobado); archivo QA ejecutado: ver pytest. 4 xfail baja: ancla genesis determinista por llave, una copia de ella oculta truncado a 0/1 entradas (ampliar SUP-31); mensaje engañoso con log ausente y ancla ilegible. Sin carrera en 8 procesos/hilos x100 corridas (segun QA), recuperacion tras os._exit. Decision: declarar como limites. (8c9a806) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Cuenta de la frase obsoleta '1 entrada sin ancla' en los 3 documentos: ver grep. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (d262949) |
