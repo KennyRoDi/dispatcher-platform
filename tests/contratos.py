@@ -97,3 +97,14 @@ def comprobar_alert_reader(publicador, lector, reloj):
     assert isinstance(primera.alert_id, str) and primera.alert_id
     assert primera.alert_id != ultima.alert_id
     assert lector.recent(1) == [ultima]
+
+
+def comprobar_case_catalog(crear):
+    """`crear(caso)` devuelve un catálogo que contiene solo ese `CaseInfo`."""
+    from src.domain.consolidated_report import CaseInfo, CaseSource
+
+    instante = datetime(2026, 11, 3, tzinfo=timezone.utc)
+    caso = CaseInfo("c1", "completed", instante, instante, (CaseSource("a" * 64, "a.txt", "texto", "completed"),))
+    catalogo = crear(caso)
+    assert catalogo.case("c1") == caso
+    assert catalogo.case("inexistente") is None
