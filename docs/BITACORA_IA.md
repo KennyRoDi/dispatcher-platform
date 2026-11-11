@@ -840,3 +840,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Supervisor cableado en process/_run/main (POSIX), cancel idempotente, poll en puerto, SystemClock; 1731 passed en Docker |
 | Validado / corregido / descartado | Sí |
 | Cómo se validó | Pruebas unitarias y ejecución en Docker Linux; revisión del diff |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-3-estrategias-de-carga-final`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Documentar verificación M1 de F-19 parte 3 en la rama final. |
+| Consulta resumida | Registrar resultados medidos y corregir el nombre de la prueba POSIX, que colisionaba al recolectar pytest con una unitaria de igual basename. |
+| Resultado obtenido | QA-parte-3 referencia tests/integration/test_comparar_carga_posix.py; las 3 pruebas POSIX se omiten en Windows. La evidencia Docker/WSL2 y sus límites constan en JSON y ficha QA. |
+| Validado / corregido / descartado | Corrección documental; pruebas focales ya verificadas, no repetidas. La bitácora se publica mediante flujo.py. |
+| Cómo se validó | Revisión documental y actualización mínima de QA-parte-3. |
+| Error de la IA | El primer preflight reveló TypeError por resultados anidados en modo por proceso; corregido en 8eecde5. La medición inicial no instaló por HOME del contenedor no escribible; corregido usando /tmp. Pytest encontró colisión entre tests/unit/test_comparar_carga.py y tests/integration/test_comparar_carga.py; resuelta al renombrar la prueba POSIX a test_comparar_carga_posix.py. |
