@@ -125,3 +125,9 @@ def test_salidas_desde_hallazgos_usan_la_categoria():
 
     assert observed_from_findings("a", hallazgos) == obtenido("a", "arma", "odio")
     assert observed_from_findings("b", []) == obtenido("b")
+
+
+def test_el_resumen_de_exactitud_indefinida_no_falla():
+    from src.adapters.dataset_truth_files import render_text
+
+    assert "n/d" in render_text(Comparison(scores=(), total=0, exact_matches=0))

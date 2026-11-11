@@ -51,9 +51,14 @@ def render_text(comparison: Comparison) -> str:
 
 def render_markdown(comparison: Comparison) -> str:
     separator = ["---"] * len(HEADERS)
-    table = [HEADERS, separator, *_score_rows(comparison)]
+    rows = [tuple(_escape_cell(cell) for cell in row) for row in _score_rows(comparison)]
+    table = [HEADERS, separator, *rows]
     lines = ["| " + " | ".join(row) + " |" for row in table]
     return "\n".join([*lines, "", _summary(comparison)])
+
+
+def _escape_cell(cell: str) -> str:
+    return " ".join(cell.replace("|", "\\|").split())
 
 
 def _is_labeled_image(row: dict) -> bool:
@@ -67,7 +72,7 @@ def _is_labeled_image(row: dict) -> bool:
 def _read_rows(path: Path) -> list[dict]:
     try:
         raw = json.loads(Path(path).read_text(encoding="utf-8"))
-    except ValueError as error:
+    except (ValueError, RecursionError) as error:
         raise ValueError(f"{path}: JSON ilegible: {error}") from error
     if not isinstance(raw, list):
         raise ValueError(f"{path}: se esperaba una lista de objetos")
@@ -129,5 +134,5 @@ def _percent(value: float | None) -> str:
 def _summary(comparison: Comparison) -> str:
     return (
         f"Muestra: {comparison.total} elementos. "
-        f"Exactitud (coincidencia exacta): {comparison.accuracy:.1%}"
+        f"Exactitud (coincidencia exacta): {_percent(comparison.accuracy)}"
     )
