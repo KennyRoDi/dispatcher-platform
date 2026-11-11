@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion db69f86
+**Verificación IA:** verificacion 3b22114
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -120,3 +120,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: 5 hallazgos medios (ValueError/OverflowError en marcas, TypeError con timestamp sin zona, empates no deterministas, marca sobrescrita) y 6 bajos |
 | verificación IA de implementacion | orquestador | 2026-11-11 | 14 hallazgos QA corregidos en db69f86; suite verde; solo se quitaron decoradores xfail (db69f86) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | orquestador | 2026-11-11 | QA 14 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (3b22114) |
