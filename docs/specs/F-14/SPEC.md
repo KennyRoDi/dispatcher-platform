@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 15f497e
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -126,3 +126,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | orquestador | 2026-11-11 | 5 hallazgos QA corregidos en 3337814; suite verde; solo se quitaron marcadores xfail (3337814) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA 5 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (15f497e) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
