@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-27-1-tls-entre-nodos
 **Verificación IA:** implementacion 98aa38f
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -171,3 +171,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: submit_case/cancel_case/fetch_report/poll_case envian en claro con TLS activo; fetch_results, demo_feeder y generate_dataset fuera de tls.py (media); TlsConfigError sin atrapar; credenciales en config_summary |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de hallazgos QA. Suite completa tras 98aa38f: 1909 passed, 8 skipped, 4 xfailed. Diff de tests: se editaron 2 tests existentes con cambio de asercion, comprobado por diff: test_tls_cableado (check_minio con MINIO_SECURE=false ahora afirma (False,msg) en vez de raises) y test_tls_qa de la parte 1 (se quita https://u:p@h/ de URLs validas porque ahora se rechaza); ambos justificados por los hallazgos 3 y 5. Alcance ampliado: fetch_results, demo_feeder, generate_dataset ahora usan resolve_session. Queda: Storage con cliente inyectado sin comprobar (xfail) y 3 xfail de la parte 1. (98aa38f) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
