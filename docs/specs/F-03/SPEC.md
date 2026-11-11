@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion bb95679
+**Verificación IA:** revision 48e5326
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -177,3 +177,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Documentador cambió solo docs/specs/F-03/SPEC.md (fd93078): CLI descrita (--seed 1 por defecto, --out obligatorio, --params, --validar, chats en <out>/chats/, códigos de salida) y 6 defectos de QA ronda 2 en la parte 7. Contrasté con scripts/dataset_sintetico.py (líneas 45, 76, 245-248): coincide. Sin cambios a Aprobaciones; README, ARQUITECTURA y CONTRATOS no mencionan el generador (grep del documentador, no repetido). Borrador de bitácora corregido por mí: los hallazgos de ronda 1 son 5, no 4. (fd93078) |
 | verificación IA de documentacion | Claude Code (subagente documentador, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Segundo cambio del documentador (7f5366b), solo SPEC: licencia MIT, etiqueta neutro y limpieza de huérfanos (opción C) en la parte 7, y se retira 'provisional'. Leí el diff completo: coincide con lo decidido por la persona, sin tocar Aprobaciones ni fase. grep: no queda 'negativo' ni 'provisional' en esos pasajes. Árbol limpio, commit empujado. (bb95679) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 5: APROBADO sin bloqueantes. Comprobé en el código las observaciones citadas (imports de scripts/dataset_sintetico.py, orden por case en las líneas 101-102, semilla en document_generator.py:32). Árbol limpio, commit empujado, pruebas en verde en la fase anterior (1521 passed, 22 xfailed). No re-ejecuté pytest en esta fase. (48e5326) |
