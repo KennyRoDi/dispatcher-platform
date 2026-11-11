@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests 3a57f79
+**Verificación IA:** implementacion a984328
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -127,3 +127,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo tests/unit/test_custody_chain.py; src intacto. Ejecute: error de coleccion ImportError custody_chain (rojo). Desviacion: evidencia alterada y linaje quedan para parte 3 (verify_custody, necesita ObjectStore). API asumida (seal, Anchor, make_anchor, verify_chain, Violation, CustodyEntry.line) la fijan las pruebas. (3a57f79) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo src/domain/custody_chain.py (116 lineas) y SPEC; tests intactos. Suite completa tras a984328: 1813 passed, 8 skipped, 3 xfailed. Decisiones: verify_chain devuelve solo la primera violacion y no revisa el ancla si hay una. (a984328) |
