@@ -20,7 +20,7 @@
 | F-15 | pendiente |
 | F-16 | hecha |
 | F-17 | hecha |
-| F-18 | plan |
+| F-18 | tests |
 | F-19 | tests |
 | F-20 | pendiente |
 | F-21 | pendiente |
