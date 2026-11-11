@@ -64,7 +64,7 @@ Solo acciones de rutas que existen hoy en `src/coordinator/`.
 | Capa | Archivo | Contenido |
 |---|---|---|
 | Dominio | `src/domain/rbac.py` | `Role` y `Action` (`Enum`, no `str`), `PERMISOS` (`MappingProxyType` de `frozenset` de `Action` por `Role`) y `can(role, action) -> bool`, que falla cerrado (`False`) ante cualquier valor que no sea `Role`/`Action`. Sin FastAPI ni JWT. |
-| Aplicación | `src/application/ports.py` (una línea añadida) | Puerto `TokenVerifier.verify(token) -> Identity`, con `Identity(subject, role)` y `InvalidToken`. |
+| Aplicación | `src/application/ports.py` (17 líneas añadidas) | Puerto `TokenVerifier.verify(token) -> Identity`, con `Identity(subject, role)` y `InvalidToken`. |
 | Adaptador | `src/adapters/jwt_tokens.py` | `JwtTokenVerifier` con PyJWT; `issue_token(...)` usado solo por el script y las pruebas. |
 | Adaptador (HTTP) | `src/coordinator/seguridad.py` | `autorizar`: dependencia FastAPI que lee `Authorization`, llama al puerto, busca la acción de la ruta, aplica `can` y responde 401 o 403; contiene el mapa ruta-acción. |
 | Composición | `src/coordinator/main.py` | `include_router(..., dependencies=[Depends(autorizar)])` en cada router. |
@@ -117,7 +117,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
 | 1 | `feat(F-26): matriz de permisos por rol en el dominio` | `src/domain/rbac.py` (`Role`, `Action`, `can`); registro de AD-33, SUP-28 y SUP-29 en `docs/ARQUITECTURA.md` y `docs/REQUERIMIENTOS.md`. Aprox. 60 líneas de código. |
-| 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas. |
+| 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas estimadas; reales 224 sin pruebas. |
 | 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas. |
 
 ## Riesgos y preguntas abiertas
@@ -143,7 +143,7 @@ Límites declarados de la parte 2 (QA y correcciones):
 
 - **JSON roto o muy grande sin token (abierto).** Con cuerpo inválido, FastAPI responde 422 y parsea el cuerpo antes de autenticar. Arreglo propuesto: middleware ASGI que compruebe `Authorization` antes de leer el cuerpo. Queda como `xfail` en `tests/unit/test_seguridad_qa.py`; decidir en la parte 3.
 - **Corregidos:** `exp` e `iat` no finitos o fuera de año 9999 se rechazan; `sub` vacío o de espacios se rechaza; `JWT_SECRET_FILE` se lee en binario con tope de 4096 bytes, exige archivo regular (`O_NONBLOCK`, `S_ISREG`) y un archivo no UTF-8 no filtra bytes al registro.
-- **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave.
+- **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave mientras siga en la caché; una clave desalojada vuelve a registrarlo. `src/adapters/jwt_tokens.py` falta en «Quién toca qué» de `docs/CONTRATOS.md`: se agrega en la parte 3.
 - **Sin prueba:** varias cabeceras `Authorization` (gana la primera), `JWT_SECRET` sin medir entropía, BOM en el secreto, y los códigos 404/405/307/401 distinguen rutas existentes de inexistentes.
 
 ## Aprobaciones
