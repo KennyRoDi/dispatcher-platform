@@ -10,6 +10,8 @@ REMITENTE_DE_AUDIO = "audio"
 # El analizador solo recibe la ruta y no conoce la hora de la nota; la época solo satisface la zona horaria
 # que exige ChatMessage. La hora real la combina el reporte (SUP-15).
 INICIO_DEL_AUDIO = datetime(1970, 1, 1, tzinfo=timezone.utc)
+# Más allá de esto, la época más el tiempo pasa de datetime.max y datetime lanza OverflowError.
+TIEMPO_MAXIMO_S = (datetime.max.replace(tzinfo=timezone.utc) - INICIO_DEL_AUDIO).total_seconds() - 1
 
 
 @dataclass(frozen=True)
@@ -20,7 +22,7 @@ class TranscriptSegment:
     confianza: float
 
     def __post_init__(self) -> None:
-        if not (math.isfinite(self.inicio) and math.isfinite(self.fin) and 0 <= self.inicio <= self.fin):
+        if not (es_tiempo(self.inicio) and es_tiempo(self.fin) and self.inicio <= self.fin):
             raise ValueError(f"tiempos de segmento inválidos: inicio={self.inicio}, fin={self.fin}")
         object.__setattr__(self, "confianza", umbral_valido(self.confianza, "confianza"))
         object.__setattr__(self, "texto", self.texto.strip())
@@ -28,6 +30,12 @@ class TranscriptSegment:
     @property
     def intervalo(self) -> str:
         return f"t={tramo(self.inicio, self.fin)}"
+
+
+def es_tiempo(valor: object) -> bool:
+    # bool es subclase de int: sin excluirlo, True pasaría como 1 segundo.
+    es_numero = isinstance(valor, (int, float)) and not isinstance(valor, bool)
+    return es_numero and math.isfinite(valor) and 0 <= valor <= TIEMPO_MAXIMO_S
 
 
 def tramo(inicio: float, fin: float) -> str:

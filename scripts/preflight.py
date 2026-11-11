@@ -1,5 +1,6 @@
 """Valida el presupuesto de memoria antes de iniciar workers con Compose."""
 
+import ipaddress
 import json
 import os
 import subprocess
@@ -16,19 +17,35 @@ COMPOSE_FILES = ["deploy/docker-compose.worker.yml"]
 GIB = 1024**3
 
 
-def _node_memory_bytes(meminfo: Path = Path("/proc/meminfo")) -> int:
-    for line in meminfo.read_text(encoding="ascii").splitlines():
-        if line.startswith("MemTotal:"):
-            parts = line.split()
-            if len(parts) != 3 or parts[2] != "kB":
-                break
-            return int(parts[1]) * 1024
-    raise ValueError("No se pudo leer MemTotal en /proc/meminfo")
+def _node_memory_bytes() -> int:
+    result = subprocess.run(
+        ["docker", "info", "--format", "{{.MemTotal}}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    output = result.stdout.strip()
+    if not output.isascii() or not output.isdigit() or int(output) <= 0:
+        raise ValueError("Docker no devolvió un MemTotal válido en bytes")
+    return int(output)
 
 
 def _reserve_bytes(node_memory: int) -> int:
     fifteen_percent_ceil = (node_memory * 15 + 99) // 100
     return max(GIB, fifteen_percent_ceil)
+
+
+def _memory_limit_bytes(value: object, service_name: str, variable: str) -> int:
+    if isinstance(value, int) and not isinstance(value, bool):
+        limit = value
+    elif isinstance(value, str) and value.isascii() and value.isdigit():
+        limit = int(value)
+    else:
+        raise ValueError(f"Servicio {service_name} no tiene {variable} válido")
+    if limit <= 0:
+        raise ValueError(f"Servicio {service_name} no tiene {variable} válido")
+    return limit
 
 
 def _compose_config(compose_files: list[str]) -> dict:
@@ -56,18 +73,25 @@ def validate_config(config: dict, node_memory: int) -> None:
             raise ValueError(f"Servicio {name} inválido")
         environment = service.get("environment") or {}
         if "worker" in name.lower():
-            if not service.get("hostname"):
+            hostname = service.get("hostname")
+            node_name = environment.get("NODE_NAME")
+            if not hostname or not node_name:
                 raise ValueError(f"Servicio {name} no define NODE_NAME como hostname")
-            for variable in ("NODE_NAME", "NODE_IP"):
-                value = service.get("hostname") if variable == "NODE_NAME" else environment.get(variable)
+            if hostname != node_name:
+                raise ValueError(f"NODE_NAME debe coincidir con hostname en el servicio {name}")
+            for variable in ("NODE_IP",):
+                value = environment.get(variable)
                 if not value:
                     raise ValueError(f"{variable} es obligatorio para el worker")
+                if variable == "NODE_IP":
+                    try:
+                        ipaddress.ip_address(value)
+                    except ValueError as error:
+                        raise ValueError("NODE_IP debe ser una dirección IPv4 o IPv6 válida") from error
         else:
             continue
-        memory = service.get("mem_limit")
-        swap = service.get("memswap_limit")
-        if not isinstance(memory, int) or memory <= 0:
-            raise ValueError(f"Servicio {name} no tiene mem_limit válido")
+        memory = _memory_limit_bytes(service.get("mem_limit"), name, "mem_limit")
+        swap = _memory_limit_bytes(service.get("memswap_limit"), name, "memswap_limit")
         if memory != swap:
             raise ValueError(f"Servicio {name} permite swap o tiene límites distintos")
         limits.append(memory)

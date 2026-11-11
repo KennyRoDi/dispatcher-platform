@@ -1,0 +1,117 @@
+import random
+from dataclasses import dataclass
+from enum import Enum
+
+MIB = 1024 * 1024
+IMAGE_CATEGORIES = ("objetos", "paisajes", "documentos", "personas")
+AUDIO_SECONDS_RANGE = (5, 300)
+MIN_HETEROGENEOUS = 10
+MIN_HEAVY = 5
+MIN_HEAVY_BYTES = 200 * MIB
+
+
+class Level(str, Enum):
+    LIGHT = "liviano"
+    HEAVY = "pesado"
+    NONE = "no"
+
+
+ALL_KINDS = ("texto", "imagen", "audio", "documento")
+HEAVY_KINDS = ("texto", "imagen", "audio", "video")
+SIMPLE_KINDS = ("texto", "imagen", "audio")
+
+
+@dataclass(frozen=True)
+class DatasetParams:
+    cases: int = 40
+    light_heterogeneous: int = 5
+    heavy_heterogeneous: int = 5
+    messages: int = 20_000
+    images: int = 300
+    audios: int = 150
+    heavy_bytes: int = 200 * MIB
+
+
+@dataclass(frozen=True)
+class CasePlan:
+    name: str
+    heterogeneo: str
+    kinds: tuple[str, ...]
+    messages: int
+    images: int
+    audios: int
+    heavy_bytes: int
+
+
+@dataclass(frozen=True)
+class DatasetPlan:
+    seed: int
+    cases: tuple[CasePlan, ...]
+    image_positive_ratio: dict[str, float]
+    audio_durations: tuple[int, ...]
+
+
+def plan_dataset(seed: int, params: DatasetParams) -> DatasetPlan:
+    rng = random.Random(seed)
+    layout = _case_layout(params, rng)
+    messages = _split(params.messages, "texto", layout, rng)
+    images = _split(params.images, "imagen", layout, rng)
+    audios = _split(params.audios, "audio", layout, rng)
+    cases = tuple(
+        CasePlan(
+            name=f"caso-{index + 1:02d}",
+            heterogeneo=level.value,
+            kinds=kinds,
+            messages=messages.get(index, 0),
+            images=images.get(index, 0),
+            audios=audios.get(index, 0),
+            heavy_bytes=params.heavy_bytes if level is Level.HEAVY else 0,
+        )
+        for index, (level, kinds) in enumerate(layout)
+    )
+    total_audios = sum(case.audios for case in cases)
+    return DatasetPlan(
+        seed=seed,
+        cases=cases,
+        image_positive_ratio={c: round(rng.uniform(0.1, 0.5), 2) for c in IMAGE_CATEGORIES},
+        audio_durations=tuple(rng.randint(*AUDIO_SECONDS_RANGE) for _ in range(total_audios)),
+    )
+
+
+def check_minimums(plan: DatasetPlan) -> list[str]:
+    cases = plan.cases
+    heterogeneous = [c for c in cases if c.heterogeneo != Level.NONE.value]
+    heavy = [c for c in cases if c.heavy_bytes >= MIN_HEAVY_BYTES]
+    checks = [
+        (len(cases), 40, "casos"),
+        (len(heterogeneous), MIN_HETEROGENEOUS, "casos heterogeneos"),
+        (len([c for c in cases if c.heterogeneo == Level.HEAVY.value]), MIN_HEAVY, "casos heterogeneos pesados"),
+        (len(heavy), MIN_HEAVY, "casos pesados de al menos 200 MiB"),
+        (sum(c.messages for c in cases), 20_000, "mensajes"),
+        (sum(c.images for c in cases), 300, "imagenes"),
+        (sum(c.audios for c in cases), 150, "audios"),
+    ]
+    return [f"{label}: {found} de al menos {minimum}" for found, minimum, label in checks if found < minimum]
+
+
+def _case_layout(params: DatasetParams, rng: random.Random) -> list[tuple[Level, tuple[str, ...]]]:
+    layout = [(Level.LIGHT, ALL_KINDS)] * params.light_heterogeneous
+    layout += [(Level.HEAVY, HEAVY_KINDS + ("documento",))] * params.heavy_heterogeneous
+    for _ in range(max(0, params.cases - len(layout))):
+        layout.append((Level.NONE, _simple_kinds(rng)))
+    return layout
+
+
+def _simple_kinds(rng: random.Random) -> tuple[str, ...]:
+    count = rng.randint(1, 2)
+    return tuple(rng.sample(SIMPLE_KINDS, count))
+
+
+def _split(total: int, kind: str, layout: list, rng: random.Random) -> dict[int, int]:
+    holders = [index for index, (_, kinds) in enumerate(layout) if kind in kinds]
+    if not holders:
+        return {}
+    shares = {index: total // len(holders) for index in holders}
+    for index in rng.sample(holders, total % len(holders)):
+        shares[index] += 1
+    return shares

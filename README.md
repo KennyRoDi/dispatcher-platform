@@ -96,9 +96,39 @@ pytest -m acceptance tests/acceptance/test_imagen_aciertos.py
 
 La muestra son 20 fotos propias de José Andrés (CC BY 4.0); la tabla prueba el funcionamiento de punta a punta, no la precisión. La corrida del 2026-11-09, con el análisis de sus fallos, está en `docs/evidencia/F-08_aciertos_2026-11-09.md`.
 
+**Analizador de audio (F-09).** Sus dependencias van en `requirements-audio.txt`, aparte de `requirements-dev.txt` para que CI no instale torch. Incluye `requirements-texto.txt`, porque la transcripción pasa por el análisis de texto de F-07. torch se instala primero, solo CPU:
+
+```bash
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-audio.txt
+```
+
+Transcribe con faster-whisper 1.2.1 (SYSTRAN, MIT) en CPU, con los pesos de Whisper (OpenAI, MIT) convertidos a CTranslate2 en `Systran/faster-whisper-base`. La revisión de esos pesos queda fijada en `config/audio.toml`, donde `idioma` debe ser un código de idioma de Whisper (por ejemplo `es`) y cualquier otro valor falla al cargar. Los pesos no van en el repositorio: se descargan a la caché de Hugging Face en la primera carga, que necesita red. La prueba de integración toma la nota de voz de `F09_NOTA`, que debe ser propia o con licencia [B.3], y se salta si faster-whisper no está instalado. Desde la raíz del repositorio:
+
+```bash
+F09_NOTA=<ruta> pytest -m integration tests/integration/test_whisper_transcriber_real.py
+```
+
+Referencia R14 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
+
+La muestra de `tests/datos/audio/` son 5 notas de voz `.ogg` Opus (2 con una amenaza explícita y 3 neutras), con su transcripción esperada, procedencia y licencia en `transcripciones.json`. Son la voz propia de José Andrés leyendo guiones sintéticos y ficticios, redactados con IA, bajo licencia CC BY 4.0 [B.3]. El script `scripts/comparar_transcripcion.py` compara la transcripción obtenida con la esperada y calcula la tasa de error por palabra (WER) tras normalizar mayúsculas, tildes y puntuación, sin umbral.
+
+`requirements-audio.txt` fija `av==18.1.0`: faster-whisper 1.2.1 falla con PyAV 19.0.2 (`TypeError ... metadata_errors`), medido en la corrida.
+
+**La corrida con el modelo real se hizo el 2026-11-10** (faster-whisper 1.2.1, av 18.1.0, pesos `base` fijados, Python 3.14, CPU, `int8`). Su evidencia, con las observaciones medidas, está en `docs/evidencia/F-09_transcripcion_2026-11-10.md`: WER de 15.4, 9.1, 36.4, 27.3 y 0.0 % sobre las 5 notas. US-09 queda demostrada solo con esa muestra de 5 notas propias y sintéticas, sin representatividad: `amenaza_01` es un falso negativo, porque Whisper `base` oyó «más a ver» en vez de «vas a ver», y un tono sostenido produce un segmento inventado de `...`. Para repetirla, desde la raíz del repositorio y con `requirements-audio.txt` instalado:
+
+```bash
+F09_NOTA=tests/datos/audio/amenaza_01.ogg pytest -m integration tests/integration/test_whisper_transcriber_real.py
+pytest -m integration tests/integration/test_whisper_errores_de_av_reales.py
+python -m scripts.comparar_transcripcion --muestra tests/datos/audio --esperadas tests/datos/audio/transcripciones.json --salida docs/evidencia/F-09_transcripcion_<fecha>.md
+pytest -m acceptance tests/acceptance/test_audio_transcripcion.py
+```
+
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*
+
+Para workers, configure `WORKER_MEM_LIMIT` en el `.env` local con un límite por worker medido para ese nodo; no hay un valor predeterminado. Desde la raíz del repositorio, valide presupuesto y arranque con `python scripts/start_worker.py`. En el nodo GPU use `python scripts/start_worker.py --gpu`. El wrapper ejecuta el preflight antes de `docker compose up`; también puede ejecutarse por separado con `python scripts/preflight.py [--gpu]`. El preflight obtiene `MemTotal` del daemon Linux de Docker con `docker info --format '{{.MemTotal}}'`; en B/C/D, Docker Desktop consulta su entorno WSL2 aunque Python corra desde PowerShell. Consulte el procedimiento de tres arranques y lecturas de cgroups en [la ficha M1](docs/modulo-M1-memoria.md). Las mediciones reales de límites en nodos siguen pendientes.
 
 ### Uso
 

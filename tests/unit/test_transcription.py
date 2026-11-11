@@ -81,3 +81,16 @@ def test_segmentos_como_mensajes_sin_segmentos_devuelve_lista_vacia():
 def test_segmento_rechaza_tiempos_no_finitos(inicio, fin):
     with pytest.raises(ValueError):
         TranscriptSegment(inicio, fin, "hola", 0.5)
+
+
+@pytest.mark.parametrize("inicio, fin", [(True, 2.0), (0.0, True), (False, False)], ids=["inicio", "fin", "ambos"])
+def test_segmento_rechaza_bool_como_tiempo(inicio, fin):
+    with pytest.raises(ValueError):
+        TranscriptSegment(inicio, fin, "hola", 0.5)
+
+
+@pytest.mark.parametrize("inicio, fin", [(1e12, 1e12 + 1.0), (0.0, 1e15)], ids=["inicio", "fin"])
+def test_tiempo_fuera_del_rango_de_fechas_da_value_error(inicio, fin):
+    # 1970 más 1e12 s pasa del año 9999 y datetime lanza OverflowError.
+    with pytest.raises(ValueError):
+        segmentos_como_mensajes([TranscriptSegment(inicio, fin, "hola", 0.5)])
