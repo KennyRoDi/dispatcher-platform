@@ -2,6 +2,7 @@ import io
 from collections import defaultdict
 from datetime import datetime, timezone
 
+from src.application.ports import KeyUnavailable
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import QueueFull
 from src.domain.text_analysis import MessageAnalysis
@@ -60,6 +61,16 @@ class FakeObjectStore:
 
     def open(self, sha256):
         return io.BytesIO(self.objetos[sha256])
+
+
+class FakeKeyProvider:
+    def __init__(self, kek=None):
+        self._kek = kek
+
+    def kek(self):
+        if self._kek is None:
+            raise KeyUnavailable("sin KEK")
+        return self._kek
 
 
 class FakeWorkQueue:
