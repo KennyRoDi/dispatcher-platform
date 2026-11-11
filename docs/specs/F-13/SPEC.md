@@ -1,7 +1,7 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-13-1-reporte-consolidado
 **Verificación IA:** revision 131a892
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
