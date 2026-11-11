@@ -401,6 +401,8 @@ El reaper (`scripts/reaper.py`) corre en la máquina A cada `REAPER_INTERVAL` se
 | `HEARTBEAT_INTERVAL` | 5.0 s | Intervalo de latido del worker |
 | `HEARTBEAT_TTL` | 15 s | Expiración de la clave `worker:{id}` |
 | `REAPER_INTERVAL` | 10.0 s | Intervalo de ejecución del reaper |
+| `FOOTPRINT_<OP>_BYTES` | Obligatoria, sin valor predeterminado | Huella de memoria en bytes de la operación `<OP>` (F-17); una por operación |
+| `ADMISSION_MARGIN_BYTES` | Obligatoria, sin valor predeterminado | Margen de memoria libre en bytes que debe quedar tras admitir una sub-tarea (F-17) |
 | `REAPER_MAX_AGE` | 2100.0 s | Antigüedad máxima de una sub-tarea `assigned`/`running` antes de recuperarla |
 | `MAX_ATTEMPTS` | 3 | Ejecuciones máximas por sub-tarea antes de darla por perdida |
 
