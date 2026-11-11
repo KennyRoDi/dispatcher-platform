@@ -18,7 +18,7 @@
 | F-13 | pendiente |
 | F-14 | pendiente |
 | F-15 | pendiente |
-| F-16 | revision |
+| F-16 | documentacion |
 | F-17 | en-pr |
 | F-18 | pendiente |
 | F-19 | pendiente |
