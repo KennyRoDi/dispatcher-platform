@@ -208,3 +208,25 @@ def comprobar_token_verifier(verificador, token_valido, identidad, tokens_invali
     for token in (*tokens_invalidos, ""):
         with pytest.raises(InvalidToken):
             verificador.verify(token)
+
+
+def comprobar_case_state_store(almacen):
+    from src.domain.case_state import CaseState
+
+    inicio = datetime(2026, 11, 3, tzinfo=timezone.utc)
+    assert almacen.state("c1") is None
+    assert almacen.history("c1") == []
+    assert almacen.counts("c1") == (0, 0)
+    assert almacen.mark_reported("c1", "s1", "completed") is True
+    assert almacen.mark_reported("c1", "s1", "failed") is False
+    assert almacen.mark_reported("c1", "s2", "failed") is True
+    assert almacen.counts("c1") == (1, 1)
+    assert almacen.counts("c2") == (0, 0)
+    almacen.set_state("c1", CaseState.PROCESSING, inicio)
+    almacen.set_state("c1", CaseState.COMPLETED, inicio + timedelta(seconds=1))
+    assert almacen.state("c1") is CaseState.COMPLETED
+    assert almacen.state("c2") is None
+    assert almacen.history("c1") == [
+        (CaseState.PROCESSING, inicio),
+        (CaseState.COMPLETED, inicio + timedelta(seconds=1)),
+    ]

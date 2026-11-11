@@ -1,8 +1,8 @@
 # SPEC F-10: Estados y cierre
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 5976303
+**Base:** feat/F-10-1-estados-y-cierre
+**Verificación IA:** revision d8ad108
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -103,3 +103,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; fase solo documental |
 | verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 1: diff cubre dominio de la parte 1 del plan de pila; caso de uso, puerto, Redis y cableado asignados a partes 2 y 3 del SPEC; AD-43 y SUP-39 sin duplicados; bitácora declara uso de IA (5976303) |
 | revision | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; revisión sin código nuevo |
+| verificación IA de tests | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: 10 pruebas unitarias de ReportSubtask, doble FakeCaseStateStore y comprobar_case_state_store; fallan por ImportError (puerto y caso de uso aún no existen). Firma mark_reported lleva outcome (3er arg) para poder contar fallidas. (43edf58) |
+| tests | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: puerto CaseStateStore y ReportSubtask; 17 pruebas verdes (reporte + arquitectura). Corregida aserción de historial en test_caso_cancelado (el fixture ya añade PROCESSING: error de la prueba, no del código). (f93eb46) |
+| implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; suite completa falla solo en 3 pruebas TLS ajenas de Windows (test_tls_cableado*) |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: QA de CaseStateStore y ReportSubtask contra el SPEC; 5 pruebas borde nuevas (terminales no se reabren, aislamiento entre casos, sin estado previo, resultado desconocido no consume id, reporte contrario tras cierre); 24 pruebas verdes con arquitectura, sin imports de adaptadores. Hallazgo: reporte tardío tras el cierre se cuenta pero no cambia el estado final. (8f34bb6) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: bitácora publicada; sin cambios de contratos ni AD/SUP (no hay decisión nueva). Verificación previa aprobada con --excepcion sin necesidad, por error del agente. (11c78ae) |
+| documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 2: diff (puerto CaseStateStore, ReportSubtask, doble, contrato) cubre el plan de pila; capas respetadas, 24 pruebas verdes; bitácora veraz con errores de IA. Nota: SPEC describe mark_reported sin outcome, la implementación lo añade (declarado en verificación de tests) (d8ad108) |
+| revision | José Andrés Loría Herrera | 2026-11-11 |  |
