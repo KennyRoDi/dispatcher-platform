@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30 y de F-28 (partes 1 a 3). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (parte 1). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
@@ -54,6 +54,23 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 
 **Justificación (AD-16, AD-34):** AES-256-GCM en la aplicación protege también contra quien lee MinIO, lo que SSE del lado del servidor no cubre. Una DEK por objeto envuelta por una KEK de archivo `0400` evita reutilizar nonces. Se eligió sobre MinIO SSE, LUKS y Vault por costo operativo con el tiempo disponible. Detalle en `docs/ARQUITECTURA.md` §8.
 
+### F-27 TLS entre nodos
+
+**Responsable:** Kenni Rodriguez. Decisión: AD-37 y SUP-33 en [ARQUITECTURA](ARQUITECTURA.md) §8 y [REQUERIMIENTOS](REQUERIMIENTOS.md). Diseño: `docs/specs/F-27/SPEC.md`.
+
+Parte 1:
+
+- `src/infrastructure/tls.py`: `TlsSettings.from_env` (`TLS_ENABLED`, `TLS_CA_FILE`; falla cerrado si falta la CA o no es legible), `client_context` (TLS 1.3 mínimo, `CERT_REQUIRED`, verificación de hostname), `exigir_cifrado` (rechaza `http://`, `redis://` y `MINIO_SECURE=false` con TLS activo) y constructores `redis_kwargs`, `requests_session` y `minio_http_client`.
+- `requests_session` usa `trust_env=False` y `verify` fijo a la CA del equipo, de modo que `REQUESTS_CA_BUNDLE`, proxies y `.netrc` no lo alteran, y rechaza redirecciones de https a un esquema en claro.
+- Pruebas unitarias y de integración con sockets locales y certificados efímeros de `trustme`, generados dentro de la prueba y sin versionar ninguno.
+- Todavía no hay cableado en workers, coordinador ni scripts (parte 2), ni servidores con TLS ni `generar_certs.sh` (parte 3).
+
+**Fuentes y dependencias de terceros:**
+
+- Módulo `ssl` de Python, `openssl`, `redis-py`, `minio-py` y `requests`.
+- `trustme` 1.2.1, solo desarrollo (`requirements-dev.txt`): licencia MIT o Apache-2.0 según `pip show trustme`; https://github.com/python-trio/trustme.
+- RFC 8446 (TLS 1.3); RFC 6125 y RFC 9525 (verificación de identidad del servidor).
+
 ## 2. Concepto de Sistemas Operativos
 
 ### F-30 Workers sin privilegios
@@ -73,6 +90,10 @@ Conceptos que respalda el diseño, sin datos medidos:
 - **Memoria:** el objeto se procesa por chunks, de modo que la memoria usada queda acotada a un chunk (4 MiB por defecto, tope de 64 MiB) y no al tamaño del archivo.
 - **Integridad:** AES-256-GCM autentica cada chunk; reordenar, duplicar o truncar chunks hace fallar el descifrado.
 - **Permisos de archivo:** el proveedor `FileKeyProvider` exige que el archivo de la KEK sea regular y de modo 0400 o 0600, para que otros usuarios del sistema no puedan leerlo.
+
+### F-27 TLS entre nodos
+
+TLS protege el canal entre procesos de distintos nodos: cifra, comprueba la integridad y autentica al servidor con una cadena de confianza. El módulo `ssl` de Python delega en OpenSSL; el cliente decide con qué CA confía y qué versión mínima acepta. JWT (F-26) identifica a quien llama; no protege el canal. Tailscale tampoco sustituye a TLS: la captura debe mostrar el handshake (`docs/ARQUITECTURA.md` §6).
 
 ## 3. Método de medición
 
@@ -114,6 +135,16 @@ Búsqueda de llaves en el historial (la automatiza `tests/unit/test_historial_si
 git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'
 ```
 
+### F-27 TLS entre nodos
+
+Comandos exactos de `docs/IMPLEMENTACION.md` §5; los ejecuta la persona en el Nodo A con `sudo`, con la IP real de Tailscale:
+
+```bash
+sudo tcpdump -i <if> -w m4.pcap 'port 8443 or 6380 or 9000'
+tshark -r m4.pcap -Y tls.handshake.type==1
+strings m4.pcap | grep -c <marcador_sintetico>
+```
+
 ## 4. Resultados
 
 ### F-30 Workers sin privilegios
@@ -139,6 +170,15 @@ Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de l
 
 **Salida de la búsqueda en el historial:** pendiente: la búsqueda manual en el historial no se ha registrado aquí. La prueba automática `tests/unit/test_historial_sin_llaves.py` sí corre en la suite y pasa.
 
+### F-27 TLS entre nodos
+
+| Medición | Resultado |
+|---|---|
+| Handshakes TLS en la captura (`tshark`) | pendiente |
+| Coincidencias del marcador (`strings ... \| grep -c`) | pendiente |
+| Cliente sin la CA rechazado en los servicios reales | pendiente |
+| Costo de TLS sobre el throughput de M3 | pendiente |
+
 ## 5. Interpretación
 
 ### F-30 Workers sin privilegios
@@ -148,3 +188,7 @@ Pendiente. Las pruebas unitarias y `python -m scripts.verificar_workers` respald
 ### F-28 Cifrado en reposo
 
 Pendiente. Las pruebas unitarias respaldan el formato y la detección de alteraciones, no el costo de CPU en los nodos. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+
+### F-27 TLS entre nodos
+
+Pendiente. Sin captura real no hay resultado de TLS y el módulo no pasa de 2 [Parte I §5]. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
