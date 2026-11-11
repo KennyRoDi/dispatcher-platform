@@ -55,8 +55,11 @@ def _enviar(session, url: str, ruta: Path, chunk_size: int, indices) -> None:
 def subir(ruta: Path, url_base: str, chunk_size: int, session=requests, reintentos: int = 3) -> dict:
     ruta = Path(ruta)
     size = ruta.stat().st_size
-    inicio = _exigir(session.post(f"{url_base}/uploads", json={
-        "sha256": sha256_archivo(ruta), "size": size, "chunk_size": chunk_size}, timeout=60), 201, "iniciar").json()
+    inicio_respuesta = session.post(f"{url_base}/uploads", json={
+        "sha256": sha256_archivo(ruta), "size": size, "chunk_size": chunk_size}, timeout=60)
+    if inicio_respuesta.status_code == 200:
+        return _exigir(inicio_respuesta, 200, "consultar objeto").json()
+    inicio = _exigir(inicio_respuesta, 201, "iniciar").json()
     url = f"{url_base}/uploads/{inicio['upload_id']}"
     pendientes = range(inicio["chunk_count"])
     for _ in range(reintentos + 1):

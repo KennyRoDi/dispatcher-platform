@@ -36,9 +36,11 @@ def _no_existe(upload_id: str) -> HTTPException:
 @router.post("", status_code=201)
 def iniciar(cuerpo: InicioSubida, subidas: ChunkedUpload = Depends(obtener_subidas)) -> dict:
     try:
-        upload_id, cantidad = subidas.start(cuerpo.sha256, cuerpo.size, cuerpo.chunk_size)
+        upload_id, cantidad = subidas.start_if_missing(cuerpo.sha256, cuerpo.size, cuerpo.chunk_size)
     except ValueError as error:
         raise HTTPException(422, str(error)) from None
+    if upload_id is None:
+        return JSONResponse({"stored": True, "sha256": cuerpo.sha256, "size": cuerpo.size}, status_code=200)
     return {"upload_id": upload_id, "chunk_count": cantidad}
 
 

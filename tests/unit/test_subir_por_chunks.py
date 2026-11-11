@@ -85,6 +85,17 @@ def test_subir_envia_un_chunk_por_indice(tmp_path, servidor):
     assert sorted(sesion.chunks_enviados) == [0, 1, 2]
 
 
+def test_objeto_existente_no_envia_chunks(tmp_path, servidor):
+    cliente, almacen = servidor
+    datos = b"ya almacenado"
+    clave = hashlib.sha256(datos).hexdigest()
+    almacen.objetos[clave] = datos
+    sesion = SesionSobreTestClient(cliente)
+    resultado = subir_por_chunks.subir(archivo(tmp_path, datos), URL, chunk_size=4, session=sesion)
+    assert resultado == {"stored": True, "sha256": clave, "size": len(datos)}
+    assert sesion.chunks_enviados == []
+
+
 def test_subir_reenvia_los_chunks_que_faltan(tmp_path, servidor):
     cliente, almacen = servidor
     datos = b"y" * 3500

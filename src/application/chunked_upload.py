@@ -24,6 +24,21 @@ class ChunkedUpload:
         self._object_store = object_store
         self._max_chunk_size = max_chunk_size
 
+    def already_stored(self, sha256: str) -> bool:
+        return self._object_store.exists(sha256)
+
+    def start_if_missing(self, sha256: str, size: int, chunk_size: int) -> tuple[str | None, int]:
+        manifest = UploadManifest(sha256, size, chunk_size)
+        if manifest.chunk_size > self._max_chunk_size:
+            raise ValueError(f"chunk_size {chunk_size} excede el máximo {self._max_chunk_size}")
+        if manifest.chunk_count > MAX_CHUNKS:
+            raise ValueError(f"{manifest.chunk_count} chunks exceden el máximo {MAX_CHUNKS}; usa un chunk_size mayor")
+        if self._object_store.exists(sha256):
+            return None, manifest.chunk_count
+        upload_id = uuid.uuid4().hex
+        self._staging.save_manifest(upload_id, manifest.to_dict())
+        return upload_id, manifest.chunk_count
+
     def start(self, sha256: str, size: int, chunk_size: int) -> tuple[str, int]:
         manifest = UploadManifest(sha256, size, chunk_size)
         if manifest.chunk_size > self._max_chunk_size:

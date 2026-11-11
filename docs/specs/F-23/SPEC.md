@@ -18,7 +18,7 @@ El enunciado pide «manejo eficiente de archivos grandes» [B.5 M3] y RF-32 exig
 - Composición en el coordinador desde variables de entorno, con TLS según `src/infrastructure/tls.py`, para que las rutas de subida dejen de responder 503.
 - Script de medición de la tasa de deduplicación y su sección en la ficha M3.
 
-**No incluye:** deduplicación por bloques o chunks (AD-11 la descarta); recolección de objetos sin referencias; cifrado (F-28, Kenni); cambios en `deploy/` (Kenni); el catálogo de casos, que ya referencia fuentes por SHA-256 (`CaseSource.sha256`).
+**No incluye:** deduplicación por bloques o chunks (AD-11 la descarta); recolección de objetos sin referencias; cambios al diseño del cifrado (F-28, Kenni); el catálogo de casos, que ya referencia fuentes por SHA-256 (`CaseSource.sha256`). Incluye el cableado de variables y volumen `STAGING_DIR` en `deploy/docker-compose.local.yml`, solicitado por Melany para el coordinador.
 
 ## Criterios de aceptación
 
@@ -56,7 +56,7 @@ Criterios adicionales derivados de los requisitos:
 
 **Concurrencia.** Dos `put` simultáneos del mismo contenido pueden pasar ambos el `exists` y escribir dos veces la misma clave. MinIO reemplaza el objeto de forma atómica y el contenido en claro es idéntico, así que sigue habiendo un solo objeto. Con F-28 el texto cifrado cambia, pero descifra al mismo contenido.
 
-**Decisiones.** Aplica AD-10, AD-11 y AD-28. Propone AD-41: «Deduplicación antes de transferir en el protocolo de chunks», que se registra en `docs/ARQUITECTURA.md` §8 en la parte que la implemente.
+**Decisiones.** Aplica AD-10, AD-11 y AD-34. La deduplicación antes de transferir se registra como AD-44 en `docs/ARQUITECTURA.md` §8; AD-43 corresponde a la tabla de transiciones de F-10.
 
 **Código del I Proyecto que reutiliza.** La conexión de `src/workers/storage.py` (cliente `minio`, `exigir_cifrado`, `minio_http_client`) y el arnés de MinIO efímero de `tests/integration/test_encrypted_object_store_minio.py`.
 
@@ -78,7 +78,7 @@ M3, tasa de deduplicación (`docs/IMPLEMENTACION.md` §5):
 python scripts/measure/m3_dedup.py --dir <carpeta del dataset> --reps 3 --out m3_dedup.csv
 ```
 
-El script sube cada archivo con `subir_por_chunks` a un coordinador con MinIO y reporta bytes lógicos, bytes guardados (suma de los objetos del bucket) y `1 − bytes_guardados / bytes_lógicos`. Tres repeticiones; la primera parte de un bucket vacío. Ficha de destino: `docs/modulo-M3-es-almacenamiento.md`, sección de deduplicación. No mide entre nodos, así que no depende de F-38.
+El script sube cada archivo con `subir_por_chunks` a un coordinador con MinIO y reporta bytes lógicos, bytes guardados (suma de los objetos del bucket) y `1 − bytes_guardados / bytes_lógicos`. Tres repeticiones; la primera parte de un bucket vacío. Medición real 2026-11-11: 480 archivos sintéticos; 2,079,898,017 bytes lógicos; 687,678,832 bytes almacenados; 1,392,219,185 bytes ahorrados (66.936897%). Ficha y CSV: `docs/modulo-M3-es-almacenamiento.md` y `docs/evidencia/F-23_deduplicacion_2026-11-11.md`. No mide entre nodos, así que no depende de F-38.
 
 ## Plan de pila
 
@@ -88,15 +88,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 |---|---|---|
 | 1 | `test(F-23): exigir que objectstore no confirme un put fallido` | Solo el contrato, según «Cambiar un contrato»: `tests/contratos.py`, `docs/CONTRATOS.md` y su aplicación al doble y a `EncryptedObjectStore`. Estimado: ~40 líneas |
 | 2 | `feat(F-23): guardar objetos por contenido en minio` | `src/adapters/minio_object_store.py`, pruebas unitarias e integración con MinIO real. Estimado: ~120 líneas |
-| 3 | `feat(F-23): deduplicar subidas antes de transferir` | `start`, ruta, cliente, `src/infrastructure/almacen.py` y la línea de `main.py`; AD-41. Va después de fusionar F-22 parte 2 (#98). Estimado: ~150 líneas |
-| 4 | `docs(F-23): medir tasa de deduplicacion` | `scripts/measure/m3_dedup.py` y sección de la ficha M3 con datos medidos |
+| 3 | `feat(F-23): deduplicar subidas antes de transferir` | `start`, ruta, cliente, composición MinIO y volumen de staging en Compose; registra AD-44. Va después de fusionar la parte 2 de F-23 |
+| 4 | `docs(F-23): medir tasa de deduplicacion` | Ejecutar `scripts/measure/m3_dedup.py` con tres pasadas del dataset completo y registrar CSV y mediciones; evidencia añadida a esta entrega |
 
 ## Riesgos y preguntas abiertas
 
 1. **Cambio de contrato.** La parte 1 va sola y hay que avisar a Kenni (F-28) y a quienes consumen `ObjectStore`. Es aditivo: el doble y `EncryptedObjectStore` ya lo cumplen hoy. ¿Se aprueba como primera PR?
-2. **Cifrado en la composición.** ¿Quién envuelve `MinioObjectStore` con `EncryptedObjectStore`? Propuesta: la parte 3 lo hace si hay KEK configurada y, si no, guarda en claro, sin decidir por Kenni. Hay que confirmarlo con él.
+2. **Cifrado en la composición.** La composición F-23 envuelve MinIO siempre con `EncryptedObjectStore`; F-28 exige fallar cerrado si falta o es inválida la KEK, nunca guardar en claro. El operador configura `KEK_FILE` como secreto fuera del repositorio.
 3. **Cambio del protocolo de F-22.** `POST /uploads` pasa a responder 200 `stored` además de 201. El cliente de F-22 se actualiza en la misma parte; no hay otros consumidores.
-4. **Variables de entorno y bucket.** Hay que coordinar con Kenni en `deploy/` las variables, el bucket `objetos` y el volumen de staging (riesgo 5 de F-22).
+4. **Variables de entorno y bucket.** La composición y `deploy/docker-compose.local.yml` configuran `MINIO_ENDPOINT`, credenciales, `MINIO_SECURE`, `OBJECTS_BUCKET` y el volumen persistente para `STAGING_DIR`. El despliegue multi-nodo debe montar el staging del Nodo A en el contenedor coordinador.
 5. **MinIO real.** La prueba de integración necesita Docker o `MINIO_ENDPOINT`. Claude no puede levantarlo en su entorno: la ejecuta Melany o el equipo y se guarda la evidencia, como en F-28.
 6. **Escritura doble concurrente.** Dos `put` del mismo contenido pueden escribir ambos. Se acepta: el resultado es un solo objeto con el mismo contenido.
 7. **Medición.** Necesita los archivos del dataset y un coordinador con MinIO. La puede correr cualquier integrante con esos recursos; los números se miden, nunca se estiman.
