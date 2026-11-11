@@ -156,6 +156,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - Redis y MinIO reales no se probaron: solo handshake contra un servidor TLS stub de stdlib (dato del QA).
 - Las URLs del coordinador con `usuario:clave` se rechazan.
 
+Menores de la revisión de la parte 2 (no corregidos): `src/coordinator/conexion.py` crea el cliente Redis al importar, de modo que con TLS activo y sin `TLS_CA_FILE` importar el coordinador lanza `TlsConfigError` (a considerar en la parte 3); `submit_case`, `cancel_case` y `fetch_report` crean una `Session` por llamada sin cerrarla y `from_env` registra el aviso «TLS desactivado» en cada una; `run_load.main`, `reaper.py` y `seed_minio.py` no atrapan `TlsConfigError` y salen con traza; `scripts/run_load.py:23-24` duplica un import; `tls.py:69` llama dos veces a `urlsplit`.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
