@@ -595,3 +595,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador reprodujo shortlog en main, el recuento de la bitacora en estado (45 entradas) y conformidad.py. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por autorizacion de la persona (feature solo documental); la verificacion fue del orquestador sin QA independiente; las aprobaciones fueron delegadas. |
 | Cómo se validó | Apoyo por modulo, filas no modulo, .mailmap, Nahum Murillo y bitacoras de M2, M4 y M5 quedan como pendientes de decision del equipo; no se verifico la autoria por persona mas alla del conteo de git. |
 | Error de la IA | El SPEC propuso SUP-23 y SUP-24 para decisiones nuevas, pero esos numeros ya existian en REQUERIMIENTOS.md y ARQUITECTURA.md (F-16 y preflight); se detecto al revisar el repositorio y se corrigio el SPEC. Ademas, un primer recuento de commits por dia con git log --since dio cifras menores que las reales (Kenni 8 en vez de 42 el 03/nov) por filtrar por fecha de commit; se repitio con awk sobre la fecha de autor. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-12 (`feat/F-12-2-cancelacion-real`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5; documentación con Haiku 5.5) |
+| Componente | F-12 |
+| Propósito | Cancelación real en el worker (F-12 parte 2): SIGTERM, SIGKILL, limpieza de /scratch |
+| Consulta resumida | Implementar y probar cancelación con ProcessSupervisor; documentar en AD-30 |
+| Resultado obtenido | cancelacion.py, worker_node.py, rutas_casos.py; 49 pruebas en Linux; demo con 3 procesos antes y 0 después |
+| Validado / corregido / descartado | Pruebas @posix en Docker y demo con ps/ls; puntos abiertos: process y main() sin supervisor, gracia menor que stop_grace_period (F-16), KeyError en segunda cancelación |
+| Cómo se validó | Ejecución real en contenedor Linux y revisión del diff |
+| Error de la IA | signal.SIGKILL no existe en Windows (corregido con getattr); desajuste de firma de cancel; ps no instalado en la imagen (se instaló procps) |
