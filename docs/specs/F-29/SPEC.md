@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** revision
+**Fase:** implementacion
 **Base:** feat/F-29-1-cadena-de-custodia
 **Verificación IA:** documentacion 9d885e8
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -173,3 +173,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Medicion del QA marcada sin re-medir. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (9d885e8) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de revision | Kenni Rodriguez | 2026-11-11 | Revisor: tolerar 1 entrada sin ancla (A2) permite truncar un log largo a su primera entrada y borrar el ancla sin deteccion (regresion frente a la parte 1) |
