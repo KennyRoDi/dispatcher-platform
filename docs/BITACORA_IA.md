@@ -1285,3 +1285,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas F-22 focalizadas 93 passed; conformidad 0; compileall y diff-check limpios. No se ejecutó benchmark. |
 | Cómo se validó | Comando documentado según SPEC; el objeto se retira después de cada repetición para evitar que la deduplicación contamine throughput. |
 | Error de la IA | Inicialmente propuse ejecutar el benchmark sobre los tres contenedores locales de F-38; comprobé que esa evidencia es solo una simulación en una máquina y la descarté para no atribuirle mediciones entre nodos. |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-23 (`feat/F-23-4-deduplicar-subidas-antes-de-transferir`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-23 |
+| Propósito | F-23 composición MinIO y deduplicación previa |
+| Consulta resumida | Conectar rutas de chunks a MinIO TLS y cifrado, staging en volumen del Nodo A, y evitar transferencia cuando existe SHA-256. |
+| Resultado obtenido | Composición desde env, KEK obligatoria por F-28, volumen persistente y endpoint/client deduplican. Añadido runner M3 sin resultados, porque no hay dataset ni servicio desplegado. |
+| Validado / corregido / descartado | pytest focalizadas: 115 passed; integración MinIO real: 4 passed; conformidad: 0. |
+| Cómo se validó | El cifrado se aplica siempre; no se usa almacenamiento plaintext. Medición queda pendiente hasta dataset multimedia y coordinador/MinIO. |
+| Error de la IA | La primera ficha M3 no tenía encabezados requeridos por conformidad; se corrigió a las secciones oficiales antes del commit final. |
