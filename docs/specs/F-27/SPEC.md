@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-27-1-tls-entre-nodos
 **Verificación IA:** tests 30fcac4
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -166,3 +166,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: tls.py cumple diseño, sin llaves ni certificados versionados, trustme solo en dev; pytest segun revisor 1864 passed/3 xfailed, integracion TLS 25 passed/3 xfailed. Menores: estimacion de lineas (128 vs 110), conflicto de modulo-M4 con otras ramas al fusionar. (6bd4d8a) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (test_tls_cableado.py, tests/conftest.py nuevo) y SPEC; src y scripts intactos. Ejecute test_tls_cableado: ver resultado arriba (fallos por razon correcta segun developer: 23 fallan, 8 pasan de TLS apagado/cliente inyectado). Aviso: tests/conftest.py tambien lo crea la rama de F-26 parte 3: conflicto al fusionar. Sin cubrir: demo_feeder, fetch_results, seed_minio, generate_dataset. Implementacion tocara archivos de Jose (config.py, reporter.py, storage.py), conexion.py (Nahum) y 3 scripts: avisar antes de fusionar. (30fcac4) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
