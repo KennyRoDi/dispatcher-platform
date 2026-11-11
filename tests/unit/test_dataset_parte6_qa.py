@@ -85,7 +85,7 @@ def test_si_falla_no_quedan_huerfanos_detras_de_un_enlace_preexistente(tmp_path)
     out = tmp_path / "out"
     out.mkdir()
     (out / "caso-01").symlink_to(outside)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(SystemExit):
         main(["--out", str(out), "--params", str(_params_file(tmp_path))], runner=FailingAt(20))
 
     assert list(outside.iterdir()) == []

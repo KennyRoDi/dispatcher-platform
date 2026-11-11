@@ -6,6 +6,8 @@ CLAUDE.md
 
 # Heredado del I Proyecto
 .env
+*.key
+jwt.secret
 .venv/
 __pycache__/
 *.pyc
@@ -36,3 +38,6 @@ certs/
 kek*
 
 dataset/sintetico/
+
+# Llave de custodia (F-29): nunca versionar
+*.custody-key

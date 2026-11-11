@@ -51,7 +51,7 @@ La misma semilla produce el mismo plan y el mismo manifiesto: nombres, conteos y
 ## Tras un fallo
 
 - Si la generación falla, se borran los archivos creados en esa ejecución, pero el `manifest.json` previo ya se borró y no se restaura. Tras un fallo se borra `--out` y se repite.
-- No se garantiza la limpieza ante `SIGTERM` ni una señal fatal: el proceso termina con código 143 y quedan archivos huérfanos.
+- Ante `SIGTERM` el generador limpia lo creado y sale con código 143; ante `SIGKILL` o una señal fatal no se garantiza y quedan archivos huérfanos.
 - Se rechaza con error cualquier enlace simbólico dentro de `--out`, aunque no sea de un caso. No se detecta uno creado durante la ejecución.
 - `generate_heavy_cases` usado directo: si falla el caso N, quedan en disco los archivos de los casos anteriores; bórrelos antes de repetir.
 

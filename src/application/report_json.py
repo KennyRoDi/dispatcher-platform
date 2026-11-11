@@ -1,5 +1,5 @@
 from src.domain.consolidated_report import ConsolidatedReport, Fragment, ReportedFinding, TimelineEvent
-from src.domain.evidence_position import BoxLocator, MessageLocator, SegmentLocator, UnknownLocator
+from src.domain.evidence_position import BoxLocator, Locator, MessageLocator, SegmentLocator, UnknownLocator
 
 
 def report_to_dict(report: ConsolidatedReport) -> dict:
@@ -65,12 +65,13 @@ def _fragment(fragment: Fragment) -> dict:
     }
 
 
-def _locator(locator) -> dict:
+def _locator(locator: Locator) -> dict:
     if isinstance(locator, MessageLocator):
         return {"tipo": "mensaje", "indice": locator.index, "source_ref": locator.source_ref}
     if isinstance(locator, SegmentLocator):
         return {"tipo": "segmento", "indice": locator.index, "inicio_s": locator.start_s, "fin_s": locator.end_s}
     if isinstance(locator, BoxLocator):
         return {"tipo": "caja", "x1": locator.x1, "y1": locator.y1, "x2": locator.x2, "y2": locator.y2}
-    assert isinstance(locator, UnknownLocator)
-    return {"tipo": "desconocido", "raw": locator.raw}
+    if isinstance(locator, UnknownLocator):
+        return {"tipo": "desconocido", "raw": locator.raw}
+    raise TypeError(f"localizador no soportado: {type(locator).__name__}")

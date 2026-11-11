@@ -40,7 +40,7 @@ class AlertingFindingStore:
 
 
 def notify_case_closed(publisher: AlertPublisher, case_id: str, status: str) -> None:
-    _publish_all(publisher, [case_closed_alert(case_id, status)])
+    _publish_all(_safe(publisher), [case_closed_alert(case_id, status)])
 
 
 def _safe(publisher: AlertPublisher) -> AlertPublisher:

@@ -1,12 +1,14 @@
 import logging
 import os
-from datetime import datetime, timezone
 from functools import lru_cache
 from types import MappingProxyType
 
 from fastapi import Depends, HTTPException, Request
+from starlette.datastructures import Headers
+from starlette.responses import JSONResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
-from src.adapters.jwt_tokens import ClosedVerifier, verificador_desde_entorno
+from src.adapters.jwt_tokens import ClosedVerifier, UtcClock, verificador_desde_entorno
 from src.application.ports import InvalidToken, TokenVerifier
 from src.domain.rbac import Action, can
 
@@ -42,16 +44,11 @@ RUTAS_PUBLICAS = frozenset(
 )
 
 
-class _UtcClock:
-    def now(self) -> datetime:
-        return datetime.now(timezone.utc)
-
-
 @lru_cache(maxsize=4)
 def _verificador_para(archivo: str | None, secreto: str | None) -> TokenVerifier:
     entorno = {"JWT_SECRET_FILE": archivo or "", "JWT_SECRET": secreto or ""}
     try:
-        return verificador_desde_entorno(entorno, _UtcClock())
+        return verificador_desde_entorno(entorno, UtcClock())
     except ValueError as error:
         log.error("autenticacion cerrada por configuracion de secreto invalida: %s", error)
         return ClosedVerifier()
@@ -67,8 +64,8 @@ def _unauthorized() -> HTTPException:
     )
 
 
-def _bearer_token(request: Request) -> str:
-    scheme, _, token = request.headers.get("Authorization", "").partition(" ")
+def _bearer_token(authorization: str) -> str:
+    scheme, _, token = authorization.partition(" ")
     if scheme.lower() != "bearer" or not token or " " in token:
         raise _unauthorized()
     return token
@@ -79,9 +76,38 @@ def autorizar(request: Request, verificador: TokenVerifier = Depends(obtener_ver
     if clave in RUTAS_PUBLICAS:
         return
     try:
-        identidad = verificador.verify(_bearer_token(request))
+        identidad = verificador.verify(_bearer_token(request.headers.get("Authorization", "")))
     except InvalidToken:
         raise _unauthorized() from None
     accion = ACCIONES_POR_RUTA.get(clave)
     if accion is None or not can(identidad.role, accion):
         raise HTTPException(403, "rol sin permiso para esta ruta")
+
+
+class AutenticacionPrevia:
+    """Rechaza con 401 antes de que FastAPI lea o valide el cuerpo."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http" and not self._autorizada(scope):
+            error = _unauthorized()
+            respuesta = JSONResponse({"detail": error.detail}, 401, headers=error.headers)
+            return await respuesta(scope, receive, send)
+        await self.app(scope, receive, send)
+
+    @staticmethod
+    def _autorizada(scope: Scope) -> bool:
+        if (scope["method"], scope["path"]) in RUTAS_PUBLICAS:
+            return True
+        reemplazos = scope["app"].dependency_overrides
+        if autorizar in reemplazos:
+            return True
+        obtener = reemplazos.get(obtener_verificador, obtener_verificador)
+        try:
+            token = _bearer_token(Headers(scope=scope).get("Authorization", ""))
+            obtener().verify(token)
+        except (HTTPException, InvalidToken):
+            return False
+        return True

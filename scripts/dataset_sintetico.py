@@ -2,8 +2,12 @@ import argparse
 import dataclasses
 import json
 import re
+import signal
+import subprocess
 import sys
-from collections.abc import Callable
+import threading
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from src.adapters.chat_export_generator import export_plan_chats
@@ -17,8 +21,8 @@ from src.domain.dataset_plan import (
     MIN_CASES,
     MIN_HEAVY,
     MIN_HEAVY_BYTES,
-    MIN_HETEROGENEOUS,
     MIN_IMAGES,
+    MIN_LIGHT,
     MIN_MESSAGES,
     DatasetParams,
     DatasetPlan,
@@ -46,11 +50,15 @@ REQUIRED_KINDS = {
     Level.LIGHT.value: ("texto", "imagen", "audio", "documento"),
     Level.HEAVY.value: ("texto", "imagen", "audio", "video"),
 }
+KINDS = ("texto", "imagen", "audio", "video", "documento")
 CHATS_DIR = "chats"
 DEFAULT_OUT = "~/scratch/dataset"
-MIN_LIGHT = 5
 MIN_DISTINCT_DURATIONS = 2
 WHATSAPP_HEADER = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}, \d{2}:\d{2} - ", re.MULTILINE)
+
+
+class OutDirError(RuntimeError):
+    pass
 
 
 def build_manifest(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg) -> list[dict]:
@@ -125,6 +133,12 @@ def _row_defect(row) -> str | None:
         return f"{row['path']}: bytes debe ser un entero, no {row['bytes']!r}"
     if not isinstance(row["case"], str):
         return f"{row['path']}: case debe ser una cadena, no {row['case']!r}"
+    if row["heterogeneo"] not in {level.value for level in Level}:
+        return f"{row['path']}: heterogeneo {row['heterogeneo']!r} fuera de {[level.value for level in Level]}"
+    if row["kind"] not in KINDS:
+        return f"{row['path']}: kind {row['kind']!r} fuera de {list(KINDS)}"
+    if row["positivo"] is not None and not isinstance(row["positivo"], bool):
+        return f"{row['path']}: positivo debe ser un booleano o null, no {row['positivo']!r}"
     return None
 
 
@@ -157,12 +171,10 @@ def _check_minimums(rows: list[dict], root: Path) -> tuple[list[str], list[str]]
     cases = {r["case"] for r in rows}
     by_level = {level.value: {r["case"] for r in rows if r["heterogeneo"] == level.value} for level in Level}
     heavy_files = {r["case"] for r in rows if r["bytes"] >= MIN_HEAVY_BYTES and r["heterogeneo"] == Level.HEAVY.value}
-    heterogeneous = by_level[Level.LIGHT.value] | by_level[Level.HEAVY.value]
     durations = {r["duracion_s"] for r in rows if r["kind"] == "audio"}
     messages, message_problems = _count_messages(rows, root)
     checks = [
         (len(cases), MIN_CASES, "casos"),
-        (len(heterogeneous), MIN_HETEROGENEOUS, "casos heterogeneos"),
         (len(by_level[Level.LIGHT.value]), MIN_LIGHT, "casos heterogeneos livianos"),
         (len(by_level[Level.HEAVY.value]), MIN_HEAVY, "casos heterogeneos pesados"),
         (len(heavy_files), MIN_HEAVY, "casos pesados de al menos 200 MiB"),
@@ -223,19 +235,44 @@ def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = ru
         parser.error(f"--params: {error}")
     if (out.exists() or out.is_symlink()) and not out.is_dir():
         parser.error(f"--out: {out} no es un directorio")
-    rows = _generate(plan_dataset(args.seed, params), out, runner)
+    try:
+        with _sigterm_as_exit():
+            rows = _generate(plan_dataset(args.seed, params), out, runner)
+    except OutDirError as error:
+        parser.error(f"--out: {error}")
+    except subprocess.TimeoutExpired as error:
+        parser.exit(1, f"{parser.prog}: ffmpeg excedio {error.timeout} s y se cancelo; se limpio lo creado\n")
     print(f"{len(rows)} archivos en {out}")
     return 0
 
 
-def _generate(plan: DatasetPlan, out: Path, runner: Runner) -> list[dict]:
-    created_dirs = [directory for directory in (out, *out.parents) if not directory.exists()]
-    out.mkdir(parents=True, exist_ok=True)
-    before = set(out.rglob("*"))
+@contextmanager
+def _sigterm_as_exit() -> Iterator[None]:
+    if threading.current_thread() is not threading.main_thread():
+        yield
+        return
+
+    def stop(signum, frame):
+        raise SystemExit(128 + signum)
+
+    previous = signal.signal(signal.SIGTERM, stop)
     try:
+        yield
+    finally:
+        signal.signal(signal.SIGTERM, previous)
+
+
+def _generate(plan: DatasetPlan, out: Path, runner: Runner) -> list[dict]:
+    # resolve() normaliza '..' para que created_dirs liste solo lo que mkdir va a crear de verdad.
+    out = out.resolve()
+    created_dirs = [directory for directory in (out, *out.parents) if not directory.exists()]
+    before: set[Path] = set()
+    try:
+        out.mkdir(parents=True, exist_ok=True)
+        before = set(out.rglob("*"))
         links = sorted(str(path) for path in before if path.is_symlink())
         if links:
-            raise RuntimeError(f"--out contiene enlaces simbolicos que no se siguen: {links}")
+            raise OutDirError(f"contiene enlaces simbolicos que no se siguen: {links}")
         (out / MANIFEST_NAME).unlink(missing_ok=True)
         before.discard(out / MANIFEST_NAME)
         rows = build_manifest(plan, out, runner)
@@ -246,14 +283,22 @@ def _generate(plan: DatasetPlan, out: Path, runner: Runner) -> list[dict]:
     return rows
 
 
+# Limpieza de mejor esfuerzo: un rmdir fallido (directorio con archivos ajenos) no debe tapar el error original.
 def _remove_created(out: Path, before: set[Path], created_dirs: list[Path]) -> None:
-    for path in sorted(set(out.rglob("*")) - before, reverse=True):
-        if path.is_dir() and not path.is_symlink():
-            path.rmdir()
-        else:
-            path.unlink()
+    try:
+        created = sorted(set(out.rglob("*")) - before, reverse=True)
+    except OSError:
+        created = []
+    for path in created:
+        try:
+            path.rmdir() if path.is_dir() and not path.is_symlink() else path.unlink()
+        except OSError:
+            pass
     for directory in created_dirs:
-        directory.rmdir()
+        try:
+            directory.rmdir()
+        except OSError:
+            pass
 
 
 def _load_params(path: str | None) -> DatasetParams:
@@ -266,9 +311,6 @@ def _load_params(path: str | None) -> DatasetParams:
     names = {field.name for field in dataclasses.fields(DatasetParams)}
     if not isinstance(raw, dict) or not set(raw) <= names:
         raise ValueError(f"se esperaba un objeto con las claves {sorted(names)}")
-    for name, value in raw.items():
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-            raise ValueError(f"{name} debe ser un entero no negativo, no {value!r}")
     return DatasetParams(**raw)
 
 

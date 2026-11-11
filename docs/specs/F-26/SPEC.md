@@ -1,8 +1,8 @@
 # SPEC F-26: Autenticación y roles
 
 **Fase:** pr
-**Base:** feat/F-26-1-autenticacion-y-roles
-**Verificación IA:** revision 06103eb
+**Base:** feat/F-26-2-autenticacion-y-roles
+**Verificación IA:** revision eb08072
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -118,7 +118,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 |---|---|---|
 | 1 | `feat(F-26): matriz de permisos por rol en el dominio` | `src/domain/rbac.py` (`Role`, `Action`, `can`); registro de AD-33, SUP-28 y SUP-29 en `docs/ARQUITECTURA.md` y `docs/REQUERIMIENTOS.md`. Aprox. 60 líneas de código. |
 | 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas estimadas; reales 224 sin pruebas. |
-| 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas. |
+| 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas estimadas; reales 141 en src y scripts. |
 
 ## Riesgos y preguntas abiertas
 
@@ -141,7 +141,7 @@ Hallazgos de QA de la parte 1 (sin defectos en `rbac.py`; rutas no cubiertas por
 
 Límites declarados de la parte 2 (QA y correcciones):
 
-- **JSON roto o muy grande sin token (abierto).** Con cuerpo inválido, FastAPI responde 422 y parsea el cuerpo antes de autenticar. Arreglo propuesto: middleware ASGI que compruebe `Authorization` antes de leer el cuerpo. Queda como `xfail` en `tests/unit/test_seguridad_qa.py`; decidir en la parte 3.
+- **JSON roto o muy grande sin token (resuelto en la parte 3).** Con cuerpo inválido, FastAPI respondía 422 y parseaba el cuerpo antes de autenticar. El middleware ASGI `AutenticacionPrevia` (`src/coordinator/seguridad.py`) comprueba `Authorization` antes de leer el cuerpo, de modo que ya no queda como `xfail`.
 - **Corregidos:** `exp` e `iat` no finitos o fuera de año 9999 se rechazan; `sub` vacío o de espacios se rechaza; `JWT_SECRET_FILE` se lee en binario con tope de 4096 bytes, exige archivo regular (`O_NONBLOCK`, `S_ISREG`) y un archivo no UTF-8 no filtra bytes al registro.
 - **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave mientras siga en la caché; una clave desalojada vuelve a registrarlo. `src/adapters/jwt_tokens.py` falta en «Quién toca qué» de `docs/CONTRATOS.md`: se agrega en la parte 3.
 - **Sin prueba:** varias cabeceras `Authorization` (gana la primera), `JWT_SECRET` sin medir entropía, BOM en el secreto, y los códigos 404/405/307/401 distinguen rutas existentes de inexistentes.
@@ -177,4 +177,28 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador (sin subagente documentador, verificación no independiente) | 2026-11-10 | SPEC con limites declarados y entrada de bitacora publicada (c6271f6) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | orquestador + revisor (subagente APROBADO, 3 menores corregidos) | 2026-11-10 | orden de imports y precisiones del SPEC aplicadas (06103eb) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests (diff sin src ni scripts). Ejecute: test_api_jwt+auth_habilitada+gitignore 55 failed/27 passed (los 27 verdes son rutas que ya cumplen, p.ej. publicas/422); test_emitir_token error de coleccion ModuleNotFoundError scripts.emitir_token; test_coordinator+contract+seguridad_qa 56 passed. Desviacion: fixture sin_autorizacion es no-op de autorizar, no FakeTokenVerifier. Sin cambio en workers (SERVICE_TOKEN fuera de alcance). (2110b77) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests. Ejecute suite completa tras f792c68: 2048 passed, 7 skipped, 3 xfailed. 144 lineas añadidas en src/scripts. Desviacion a revisar: middleware AutenticacionPrevia se salta la verificacion si app.dependency_overrides contiene autorizar (codigo de produccion conoce el mecanismo de pruebas); verify corre dos veces por peticion. (f792c68) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | Diff aeaf130 solo tests/unit/test_cableado_qa.py (src intacto). Ejecute el archivo: ver salida de pytest. QA sin bypass de autenticacion; 7 hallazgos bajos (OverflowError en --minutos, sub vacio, root_path, doble verify, sin aviso con AUTH_ENABLED=false, JWT_SECRET no UTF-8 filtra caracter, .gitignore parcial) como xfail strict, a declarar como limites. Salto por dependency_overrides no alcanzable por red (no reproduje yo el analisis). (aeaf130) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+
+Límites declarados de la parte 3 (QA `aeaf130`, 14 `xfail` en `tests/unit/test_cableado_qa.py`):
+
+- `scripts/emitir_token.py --minutos` enorme da `OverflowError` con traza.
+- `--sub` vacío emite un token que el coordinador luego rechaza.
+- Con `root_path` (proxy con prefijo) `/health` deja de ser pública.
+- `verify` corre dos veces por petición (middleware y dependencia).
+- Sin aviso en el registro con `AUTH_ENABLED=false`.
+- `JWT_SECRET` con un byte inválido filtra un carácter al registro.
+- `.gitignore` solo cubre `jwt.secret`, `*.key` y `.env`; otros nombres de archivo de secreto no.
+- El middleware salta la verificación si `app.dependency_overrides` contiene `autorizar`. No es alcanzable por red, pero es un olor de diseño: producción conoce el mecanismo de pruebas.
+- `scripts/submit_case.py` y `scripts/run_load.py` no envían token.
+- Los workers necesitan un token con rol `servicio` (responsable: José).
+- El dashboard necesita un token de supervisor (responsable: Melany).
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff aeaf130..92deb88 solo docs (modulo-M4 borrador y SPEC). Salidas curl marcadas pendientes, sin datos inventados. Bitacora publicada en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (92deb88) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: cableado de 3 routers, middleware sin fugas, sin secretos, capas verdes, limites coinciden con 14 xfail; pytest segun revisor 2049 passed/17 xfailed. Menor corregido por mi (cifra real en SPEC). Quedan: salto por dependency_overrides declarado como olor de diseño. (eb08072) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |

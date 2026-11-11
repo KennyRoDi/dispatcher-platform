@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from src.adapters.media_generator import BITEXACT, FFMPEG_BASE, LICENSE_NAME, ORIGIN, Runner, produce, run_ffmpeg
-from src.domain.dataset_plan import DatasetPlan, checked_case_name
+from src.domain.dataset_plan import MAX_HEAVY_BYTES, DatasetPlan, checked_case_name
 
 VIDEO_KIND = "video"
 VIDEO_EXTENSION = "mpg"
@@ -14,7 +14,8 @@ VIDEO_BITRATE_BPS = 40_000_000
 VIDEO_MARGIN_SECONDS = 2
 NOISE_SEED_LIMIT = 2**31
 # mpeg2video con minrate=maxrate rellena hasta el bitrate fijo: el tamano depende de la duracion, no del contenido.
-VIDEO_CODEC = ["-c:v", "mpeg2video", "-b:v", str(VIDEO_BITRATE_BPS), "-minrate", str(VIDEO_BITRATE_BPS), "-maxrate", str(VIDEO_BITRATE_BPS), "-bufsize", str(VIDEO_BITRATE_BPS), "-an"]
+_BITRATE = str(VIDEO_BITRATE_BPS)
+VIDEO_CODEC = ["-c:v", "mpeg2video", "-b:v", _BITRATE, "-minrate", _BITRATE, "-maxrate", _BITRATE, "-bufsize", _BITRATE, "-an"]
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,9 @@ class HeavyFile:
 
 
 def generate_heavy_cases(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg) -> list[HeavyFile]:
+    for case in plan.cases:
+        if case.heavy_bytes > MAX_HEAVY_BYTES:
+            raise ValueError(f"heavy_bytes de {case.name} excede el tope de {MAX_HEAVY_BYTES} bytes: {case.heavy_bytes}")
     rng = random.Random(plan.seed)
     files: list[HeavyFile] = []
     for case in plan.cases:

@@ -171,3 +171,13 @@ def test_fallo_de_alerta_en_cierre_no_propaga():
     notify_case_closed(_seguro(roto), "c1", "completed")
 
     assert roto.llamadas == 1
+
+
+def test_cierre_con_publicador_sin_envolver_tampoco_propaga(caplog):
+    roto = PublicadorRoto()
+
+    with caplog.at_level(logging.ERROR):
+        notify_case_closed(roto, "c1", "completed")
+
+    assert roto.llamadas == 1
+    assert caplog.records

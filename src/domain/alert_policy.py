@@ -1,7 +1,7 @@
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from collections.abc import Iterable
 
 from src.domain.finding import Finding, Severity
 

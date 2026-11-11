@@ -14,6 +14,9 @@ from tests.ayudas_cierre import crear_caso, reportar
 from tests.dobles import FakeAlertPublisher
 
 
+pytestmark = pytest.mark.usefixtures("sin_autorizacion")
+
+
 @pytest.fixture
 def fake(monkeypatch):
     servidor = fakeredis.FakeRedis(decode_responses=True)

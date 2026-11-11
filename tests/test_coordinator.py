@@ -24,7 +24,7 @@ def fake(monkeypatch):
 
 
 @pytest.fixture
-def client(fake):
+def client(fake, sin_autorizacion):
     return TestClient(main.app)
 
 

@@ -1,12 +1,51 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: no hay salidas reales de nodos en este documento; la única de F-27 es una prueba local en una sola máquina, que no acredita M4. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: no hay salidas reales de nodos en este documento; la única de F-27 es una prueba local en una sola máquina, que no acredita M4. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
 ### F-30 Workers sin privilegios
 
 Configuración (AD-36, SUP-32): `user: "10001:10001"`, `read_only: true`, `cap_drop: [ALL]`, `security_opt: [no-new-privileges:true]`, volumen `scratch` propio por worker en `/scratch` y `tmpfs` en `/tmp` de 64 MB. Está en `Dockerfile.worker`, `deploy/docker-compose.worker.yml` y `deploy/docker-compose.local.yml`.
+
+### F-26 Autenticación y roles
+
+Decisión AD-33 (provisional; SUP-28 y SUP-29). Fuente de la matriz: `src/domain/rbac.py` (`PERMISOS`).
+
+| Rol | crear_caso | consultar_caso | cancelar_caso | ver_monitoreo | reportar_subtarea |
+|---|---|---|---|---|---|
+| analista | sí | sí | no | no | no |
+| supervisor | no | sí | sí | sí | no |
+| administrador | sí | sí | sí | sí | no |
+| servicio | no | no | no | no | sí |
+
+El rol `servicio` es para los workers (`POST /subtasks/report`).
+
+**Token.**
+
+- JWT firmado con HS256 (decisión AD-33), con PyJWT (licencia MIT, https://github.com/jpadilla/pyjwt).
+- Claims usados: `sub`, rol, `iat`, `exp`. El coordinador rechaza `sub` vacío y fechas no finitas.
+- Se envía como `Authorization: Bearer <token>`.
+
+**Secreto.** El secreto nunca va en el repositorio. Generarlo fuera de él:
+
+```bash
+openssl rand -hex 32 > ~/jwt.secret
+chmod 600 ~/jwt.secret
+export JWT_SECRET_FILE=~/jwt.secret
+```
+
+`JWT_SECRET` (variable directa) se admite, pero se prefiere el archivo. `.gitignore` cubre `jwt.secret`, `*.key` y `.env`.
+
+**AUTH_ENABLED.** Activa por defecto. Solo `0`, `false`, `no` u `off` la desactivan (`src/coordinator/main.py`). Desactivarla es solo para pruebas locales.
+
+**Emitir un token.**
+
+```bash
+PYTHONPATH=. python scripts/emitir_token.py --rol supervisor --sub demo-supervisor --minutos 30
+```
+
+Roles: `analista`, `supervisor`, `administrador`, `servicio`.
 
 ### F-28 Cifrado en reposo
 
@@ -95,6 +134,10 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 
 **Parte 4: prueba de aceptación de la captura.** `tests/acceptance/test_tls_entre_nodos.py` levanta la captura, procesa un caso con marcador sintético y revisa con `tshark` y `strings`. Solo se verificó su omisión (skip); no hay ejecución real.
 
+### F-29 Cadena de custodia
+
+Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. Parte 2: `JsonlCustodyLog` en `src/adapters/jsonl_custody_log.py`, log JSONL de solo-anexión (`O_APPEND`, `fsync`, `flock`, modo 0600) que implementa `CustodyLog.record`, escribe el ancla de forma atómica y un ancla génesis al crear el log; `record` verifica solo las últimas 2 líneas y el ancla, y el verificador completo detecta una línea intermedia manipulada. La llave entra como bytes; el verificador con evidencia y linaje, la CLI y la lectura de `CUSTODY_KEY_FILE` llegan en la parte 3.
+
 ## 2. Concepto de Sistemas Operativos
 
 ### F-30 Workers sin privilegios
@@ -105,6 +148,14 @@ Conceptos que respalda la configuración:
 - **Capacidades de Linux:** `cap_drop: [ALL]` retira todas las capacidades del proceso y `no-new-privileges:true` impide recuperarlas con binarios setuid.
 - **Namespaces:** el contenedor ve su propio árbol de procesos, montajes y usuarios; la raíz de solo lectura (`read_only: true`) impide modificar el sistema de archivos de la imagen.
 - **cgroups:** el volumen `scratch` en `/scratch` cuenta contra el cgroup del contenedor, a diferencia de `tmpfs`, por eso el video grande va a `/scratch` y no a memoria.
+
+### F-26 Autenticación y roles
+
+Conceptos que respalda la configuración (no medidos):
+
+- **Control de acceso por rol (RBAC) y mínimo privilegio:** cada identidad recibe solo las acciones de su rol; el rol técnico `servicio` de los workers solo puede reportar sub-tareas. Es la misma idea que los UID y permisos del sistema operativo, aplicada en la capa de aplicación.
+- **Permisos de archivo:** el secreto de firma vive en un archivo fuera del repositorio con modo `600`, de modo que solo su dueño puede leerlo [B.5 M4].
+- **Secretos fuera del código:** el repositorio es público; la llave nunca se versiona.
 
 ### F-28 Cifrado en reposo
 
@@ -118,6 +169,14 @@ Conceptos que respalda el diseño, sin datos medidos:
 ### F-27 TLS entre nodos
 
 TLS protege el canal entre procesos de distintos nodos: cifra, comprueba la integridad y autentica al servidor con una cadena de confianza. El módulo `ssl` de Python delega en OpenSSL; el cliente decide con qué CA confía y qué versión mínima acepta. JWT (F-26) identifica a quien llama; no protege el canal. Tailscale tampoco sustituye a TLS: la captura debe mostrar el handshake (`docs/ARQUITECTURA.md` §6).
+
+### F-29 Cadena de custodia
+
+Conceptos que respalda el diseño, sin datos medidos:
+
+- **Integridad con hash encadenado:** cada eslabón sella la evidencia y el hash del eslabón previo; alterar, borrar, insertar o reordenar una entrada rompe el enlace en esa posición.
+- **HMAC en vez de SHA-256 solo:** sin llave, quien altera el log puede recalcular toda la cadena; con HMAC-SHA-256 necesita la llave, que vive fuera del repositorio [B.5 M4].
+- **Ancla del último eslabón:** el archivo de ancla delata el truncamiento, que el encadenamiento por sí solo no ve.
 
 ## 3. Método de medición
 
@@ -139,6 +198,18 @@ docker inspect --format '{{.HostConfig.ReadonlyRootfs}}' <worker>
 docker inspect --format '{{.HostConfig.CapDrop}}' <worker>
 docker inspect --format '{{.HostConfig.SecurityOpt}}' <worker>
 ```
+
+### F-26 Autenticación y roles
+
+```bash
+TOKEN=$(PYTHONPATH=. python scripts/emitir_token.py --rol analista --sub demo-analista)
+curl -i -X POST http://localhost:8000/cases -H "Authorization: Bearer $TOKEN" ...   # crear
+curl -i http://localhost:8000/cases -H "Authorization: Bearer $TOKEN"              # consultar
+curl -i http://localhost:8000/stats -H "Authorization: Bearer $TOKEN"              # monitoreo
+curl -i http://localhost:8000/cases                                                # sin token
+```
+
+El cuerpo de `POST /cases` se omite; ver `docs/DEMO.md`.
 
 ### F-28 Cifrado en reposo
 
@@ -185,6 +256,10 @@ F27_CAPTURA=1 COORDINATOR_URL=https://<ip>:8443 TLS_CA_FILE=<ca.pem> pytest test
 
 Comandos de la prueba local de los servidores: en la [evidencia local](evidencia/F-27_servidores_tls_local_2026-11-11.md) (`generar_certs.sh`, `docker compose up`, `redis-cli --tls`, `openssl s_client`, `curl --cacert`).
 
+### F-29 Cadena de custodia
+
+No aplica como medición de SO M1 a M5: F-29 aporta evidencia de ejecución. El comando previsto, que se ejecuta en la demo con un log y una evidencia sintéticos, antes y después de manipularlos, es `PYTHONPATH=. python -m scripts.verify_custody --log <log.jsonl> --anchor <log.jsonl.head> [--store <dir>]`, con la llave en `CUSTODY_KEY_FILE` (32 bytes aleatorios, fuera del repositorio, distinta de la KEK de F-28). Pendiente: la CLI llega en una parte posterior de la pila.
+
 ## 4. Resultados
 
 ### F-30 Workers sin privilegios
@@ -201,6 +276,17 @@ Pendiente: sin evidencia medida en tres nodos reales. Las salidas esperadas y su
 | `SecurityOpt` | contiene `no-new-privileges:true` | pendiente: se mide en los tres nodos reales |
 
 Nodos: José, Nahúm y Melany; cada uno captura sus salidas.
+
+### F-26 Autenticación y roles
+
+Pendiente: sin ejecución en la demo.
+
+| Caso | Código esperado | Resultado |
+|---|---|---|
+| Sin token o token inválido/vencido | 401 | pendiente: se mide en la demo |
+| Rol sin permiso (analista en `/stats`, supervisor en `POST /cases`) | 403 | pendiente: se mide en la demo |
+| Rol con permiso | 2xx | pendiente: se mide en la demo |
+| `GET /health` sin token | 200 (ruta pública) | pendiente: se mide en la demo |
 
 ### F-28 Cifrado en reposo
 
@@ -221,11 +307,26 @@ Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de l
 
 **Prueba local de servidores TLS (una sola máquina, sin captura de red; no acredita M4).** Con `redis:7-alpine`, MinIO de Chainguard y el coordinador construido con `Dockerfile.worker`, todo en `127.0.0.1`: los tres servicios quedaron `healthy` con `user:` propio; `redis-cli --tls` y `openssl s_client` verificaron la CA y el hostname con TLS 1.3, Redis rechazó TLS 1.2, el puerto 6379 quedó cerrado, y el coordinador atendió `https://localhost:8443/health` con la CA y rechazó la petición sin ella o en claro. La prueba encontró dos fallos del Compose original (Redis sin permiso de escritura en `redis-data` y healthcheck de MinIO que no pasaba), ya corregidos. Detalle y salidas en [la evidencia](evidencia/F-27_servidores_tls_local_2026-11-11.md).
 
+### F-29 Cadena de custodia
+
+Pendiente: sin salida del verificador antes y después de manipular un log y una evidencia.
+
+| Prueba | Esperado | Salida medida |
+|---|---|---|
+| Verificador sobre cadena íntegra | sin violaciones, código de salida 0 | pendiente |
+| Verificador tras alterar una entrada | falla e indica la posición | pendiente |
+| Verificador tras truncar el log | falla por ancla | pendiente |
+| Verificador tras alterar una evidencia | falla e indica la entrada | pendiente |
+
 ## 5. Interpretación
 
 ### F-30 Workers sin privilegios
 
 Pendiente. Las pruebas unitarias y `python -m scripts.verificar_workers` respaldan que la configuración está escrita, no que el kernel la aplique en los nodos. Sin evidencia medida en los tres nodos reales, el módulo M4 tiene máximo 2 [Parte I §5].
+
+### F-26 Autenticación y roles
+
+Pendiente. Las pruebas unitarias respaldan la matriz y la verificación del token, no el comportamiento medido en la demo. Límites conocidos: ver «Notas» en `docs/specs/F-26/SPEC.md`. Sin evidencia medida, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ### F-28 Cifrado en reposo
 
@@ -236,3 +337,7 @@ Pendiente. Las pruebas unitarias respaldan el formato y la detección de alterac
 Pendiente. La prueba local respalda que los servidores arrancan con TLS y UID propio y que el cliente verifica la CA, no que el tráfico entre nodos reales vaya cifrado: falta la captura con `tshark` y `strings`. Sin captura real no hay resultado de TLS y M4 no pasa de 2 [Parte I §5].
 
 **Repetir M3.** TLS puede alterar M1 a M3: hay que repetir al menos el throughput de M3 con TLS activo y reportar la diferencia (`docs/IMPLEMENTACION.md` §7). No se estima aquí.
+
+### F-29 Cadena de custodia
+
+Pendiente. Las pruebas unitarias respaldan la lógica de sellado y detección, no la demostración con manipulación real. Límites declarados (SUP-31): quien posea la llave puede forjar la cadena (HMAC simétrico) y un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta mientras el ancla viva en el mismo disco. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].

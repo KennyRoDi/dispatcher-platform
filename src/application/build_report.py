@@ -2,7 +2,7 @@ from dataclasses import replace
 from datetime import timezone
 
 from src.application.analyze_audio import CATEGORIA_TRANSCRIPCION
-from src.application.ports import CaseCatalog, Clock, FindingStore, ObjectStore
+from src.application.ports import CaseCatalog, Clock, FindingStore, ObjectStore, OmissionAwareFindingStore
 from src.domain.consolidated_report import (
     CaseInfo,
     CaseSource,
@@ -13,7 +13,7 @@ from src.domain.consolidated_report import (
     category_summary,
     find_incidents,
 )
-from src.domain.evidence_position import MessageLocator, SegmentLocator, parse_position
+from src.domain.evidence_position import Locator, MessageLocator, SegmentLocator, parse_position
 from src.domain.finding import Finding
 
 
@@ -31,7 +31,7 @@ def build_report(
     case = catalog.case(case_id)
     if case is None:
         raise CaseNotFound(case_id)
-    stored = findings.list(case_id)
+    stored, omitted = _read_findings(findings, case_id)
     exists = _CachedExists(store)
     reported = tuple(ReportedFinding(f, _fragments(f, case, exists)) for f in stored)
     return ConsolidatedReport(
@@ -42,22 +42,28 @@ def build_report(
         findings=reported,
         categories=category_summary(stored),
         timeline=build_timeline(reported),
-        incidents=find_incidents(reported, case),
+        incidents=find_incidents(reported, case, omitted),
     )
+
+
+def _read_findings(findings: FindingStore, case_id: str) -> tuple[list[Finding], int]:
+    if isinstance(findings, OmissionAwareFindingStore):
+        return findings.list_with_omitted(case_id)
+    return findings.list(case_id), 0
 
 
 class _CachedExists:
     def __init__(self, store: ObjectStore) -> None:
         self._store = store
-        self._known: dict[str, bool] = {}
+        self._known: dict[str, bool | None] = {}
 
-    def __call__(self, sha: str) -> bool:
+    def __call__(self, sha: str) -> bool | None:
         if sha not in self._known:
             try:
                 self._known[sha] = self._store.exists(sha)
             except Exception:
-                # Almacén caído: el objeto queda como no verificable y el reporte sigue.
-                self._known[sha] = False
+                # Almacén caído: None = no verificable, distinto de «no existe»; el reporte sigue.
+                self._known[sha] = None
         return self._known[sha]
 
 
@@ -66,11 +72,11 @@ def _fragments(finding: Finding, case: CaseInfo, exists: _CachedExists) -> tuple
     if not locators:
         return ()
     sha = finding.evidence.object_sha256
-    source, in_store = _source(case, sha), exists(sha)
+    source, in_store = _source(case, sha), exists(sha) if sha else None
     return tuple(_fragment(finding, locator, source, in_store) for locator in locators)
 
 
-def _fragment(finding, locator, source: CaseSource | None, in_store: bool) -> Fragment:
+def _fragment(finding: Finding, locator: Locator, source: CaseSource | None, in_store: bool | None) -> Fragment:
     timestamp = locator.timestamp_utc if isinstance(locator, MessageLocator) else None
     is_segment = isinstance(locator, SegmentLocator)
     # Solo la transcripción trae el texto del segmento en detail; en otras categorías es metadato de posiciones.

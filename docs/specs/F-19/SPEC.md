@@ -1,8 +1,8 @@
 # SPEC F-19: Estrategias de carga
 
 **Fase:** pr
-**Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** revision a5a3aa6
+**Base:** main
+**Verificación IA:** revision 1fc59eb
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -74,6 +74,10 @@ Destino: `docs/evidencia/F-19/` para crudos y metadatos; `docs/modulo-M1-memoria
 
 En Docker Linux 29.7.2, Python 3.13.18, faster-whisper 1.2.1, PyAV 18.1.0 y CTranslate2 4.9.0, `fork_compartido` agotó el timeout de 120 s; con `hilos=1`, también agotó el timeout diagnóstico de 30 s. `workers_compartidos` pasó la prueba Linux con Whisper real N=2 y comparación completa de segmentos. Las 5 integraciones pasaron en 5.87 s; las 51 pruebas unitarias focales pasaron en Windows. Detalle y límites en [QA-parte-2.md](QA-parte-2.md). Esto acredita compatibilidad en ese entorno, no una medición de memoria ni una elección definitiva para M1.
 
+## Resultados de parte 3
+
+Implementación de lectura RSS/PSS/cgroup y CLI terminada. Preflight y 20 ejecuciones M1 en Docker Desktop Linux/WSL2 (4 GiB, sin swap) completadas; con N=2, `workers_compartidos` registró PSS medio 281929728 bytes frente a 420311450 para `por_proceso`. Es evidencia de esta carga y entorno, no de workers desplegados ni de otros modelos. Ver [QA-parte-3.md](QA-parte-3.md) y JSON crudos allí referenciados; AD-07 se apoya provisionalmente en esta medición.
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
@@ -81,16 +85,13 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
 | 1 | `feat(F-19): seleccionar estrategia de carga de modelos` | Selección pura y protocolo de carga con operaciones inyectadas; unitarias y límite documentado. Hasta 150 líneas de producto. No acredita procesos ni memoria reales |
-| 2 | `feat(F-19): ejecutar carga por proceso y compartida con fork` | Supervisor Linux, ciclo de procesos y composición Whisper; prueba real obligatoria de igualdad/compatibilidad, fallos y recolección. Hasta 400 líneas de producto; base parte 1 |
+| 2 | `feat(F-19): ejecutar carga por proceso y compartida con workers CTranslate2` | Supervisor Linux, ciclo de procesos y composición Whisper; prueba real obligatoria de igualdad/compatibilidad, fallos y recolección. Hasta 400 líneas de producto; base parte 1 |
 | 3 | `feat(F-19): medir memoria y comparar estrategias de carga` | Lector RSS/PSS, CLI de validación/medición, crudos, ficha M1 y conclusión AD-07. Hasta 400 líneas de producto; base parte 2. Dividir antes de cerrar si excede el límite |
 
 ## Riesgos y preguntas abiertas
 
-- Aprobar o ajustar SUP-25: comparación inicial de Whisper CPU, sin generalizar a texto/imagen ni dar por medida la tabla completa de huellas M1.
-- Seguridad de fork con CTranslate2 no comprobada. Python advierte sobre hilos/fork ([os.fork](https://docs.python.org/3.14/library/os.html#os.fork)); faster-whisper expone paralelismo nativo ([fuente v1.2.1](https://github.com/SYSTRAN/faster-whisper/blob/v1.2.1/faster_whisper/transcribe.py)). Fijar un hilo no demuestra ausencia de hilos nativos. Si falla la puerta real, detenerse y proponer decisión humana.
-- Confirmar acceso al nodo Linux/WSL2 con smaps/cgroup legibles y memoria limitada antes de parte 2. No se modifica `deploy/` ni se presume que Windows demuestre CoW.
-- N=1/N=2, cinco repeticiones, un hilo y timeout 120 s son parámetros propuestos, no capacidad medida ni política productiva. Registrar cualquier ajuste y pedir decisión si cambia el SPEC aprobado.
-- CoW puede perder ahorro durante inferencia; el supervisor añade memoria y se incluye. Un modelo, entrada y nodo no justifican una elección universal.
+- La medición M1 de F-19 cubre Whisper CPU en Docker Desktop Linux/WSL2 con un límite de 4 GiB y sin swap; no representa un worker desplegado en los tres nodos ni mide otros modelos o cargas. La elección de `workers_compartidos` queda sustentada solo para este experimento; huellas por modelo y validación en workers reales siguen abiertas.
+- N=1/N=2, cinco repeticiones, un hilo y timeout 120 s son parámetros del experimento, no una política de capacidad productiva. Cualquier cambio al protocolo aprobado requiere registrar su justificación.
 
 ## Aprobaciones
 
@@ -130,4 +131,26 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Revisión de SPEC corrigió que cpu_threads/intra-op permanece igual y num_workers/inter_threads varía por estrategia (1 vs N). Solo diff documental de una línea; QA Linux y Windows ya registrados, no repetidos. Verificación documental encargada al rol documentador; verificación de IA no independiente. (6e61b5a) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de revision | Codex | 2026-11-10 | APROBADO F-19 parte 2. Revisión final del diff 11 archivos vs SPEC: API factory num_workers, procesos y threads compatibles; cleanup ante error/timeout; test real POSIX omitido en Windows; ADD y resultados honestos. Hallazgo previo de Windows y precisión de hilos/intra-op corregidos. Verificación misma sesión, no independiente. (a5a3aa6) |
+| revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de tests | Codex | 2026-11-10 | Pruebas TDD rojas en Windows: test_model_memory.py y test_comparar_carga.py fallan al importar los módulos de producción aún no creados (2 errores de colección; ninguna implementación). git diff --check limpio; verificación same-session, no independiente. (430e8db) |
+| tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de implementacion | Codex | 2026-11-10 | 42 unitarias de WhisperTranscriber (incluye hilos/num_workers), 16 unitarias de memoria/CLI y 8 unitarias del lector pasaron en Windows; la integración POSIX nueva se omite en Windows (3 skipped). git diff --check limpio; código de producción bajo 400 líneas. No se ejecutó ninguna medición: Docker daemon apagado y no hay acceso al nodo Linux/cgroup. Verificación misma sesión, no independiente. (93b09fb) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de verificacion | Codex | 2026-11-10 | PENDIENTE: unitarias focales ya verdes; integración POSIX requiere Linux. Docker npipe no existe y WSL devuelve E_ACCESSDENIED; no hay nodo Linux/cgroup v2 limitado. No se ejecutaron preflight ni repeticiones M1; QA-parte-3 documenta comandos y recurso faltante. No aprobar hasta lecturas reales PSS/memory.current. (0ca579a) |
+| verificación IA de verificacion | Codex | 2026-11-10 | Verificación de F-19 parte 3: preflight POSIX y 20 ejecuciones M1 reales en Docker Linux/WSL2 (N=1/2, dos estrategias, cinco repeticiones), cgroup v2 4 GiB sin swap y usuario no-root; PSS y memory.current están en JSON crudos y resumidos en QA-parte-3. Unitarias focales previamente verdes; 3 integraciones omitidas en Windows por POSIX. git diff --check limpio. Alcance limitado a Whisper CPU y este contenedor; la verificación la hizo el mismo agente, no independiente. (1ada1d3) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | Codex subagente documental | 2026-11-10 | Revisé QA-parte-3, resultados de parte 3 en SPEC, ficha M1 y AD-07 contra los JSON de medición y entorno reportado; no hallé contradicciones factuales actuales. Historial de bloqueo en registro anterior del SPEC corresponde al estado de entonces. Bitácora registrada por flujo.py y publicada en estado. Verificación documental acotada a estas rutas; no edité ni avancé fase. (7ab4c82) |
+| verificación IA de documentacion | Codex | 2026-11-10 | Verificación documental propia: revisé diff stat de documentación de F-19 parte 3; el agente documentador comprobó consistencia entre QA-parte-3, SPEC, ficha M1, AD-07 y los JSON medidos, y flujo.py registró la bitácora con incidencias reales. Sin cambios locales pendientes. (6f4f4be) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | SPEC parte 3 aún afirma que acceso WSL2 y mediciones M1 están pendientes; la medición ya está registrada. |
+| verificación IA de documentacion | Codex | 2026-11-10 | Reverificación documental tras hallar y corregir riesgos obsoletos en el SPEC. git diff --stat confirma el único cambio documental previsto; QA, resultados SPEC, ficha M1 y AD-07 concuerdan con los JSON reales y límites Docker/WSL2. Bitácora de F-19 ya publicada. Revisión documental comprobada en la misma sesión, no independiente. (4453054) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de revision | Codex | 2026-11-10 | Revisión F-19 parte 3 contra criterios SPEC: selección de ambas estrategias, resultados equivalentes, instrumentación PSS/RSS/cgroup y comparación real con 5 repeticiones por configuración; evidencia y límites están documentados. Hallazgo anterior de texto obsoleto en riesgos fue corregido y fase documental repetida/verificada. Pruebas focales ya pasaron y medición Linux concluyó; no repetí. git diff --check limpio. Revisión propia, no independiente. (8c12578) |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Se revierte explícitamente la aprobación de revisión que quedó obsoleta tras el refactor; reabrimos verificación antes del cierre. |
+| verificación IA de verificacion | Codex | 2026-11-10 | Reverificación tras refactor y cierre: 	ests/unit/test_comparar_carga.py pasó 9/9; el CLI conserva equivalencia y resumen; el diff de producto quedó bajo 400 líneas. El cierre detectó colisión de nombres entre pruebas unitarias y POSIX; la integración se renombró a 	est_comparar_carga_posix.py, sin alterar sus casos. La medición M1 real permanece intacta. git diff --check limpio. Verificación propia, no independiente. (59a3c23) |
+| verificación IA de verificacion | Codex | 2026-11-10 | Verificación F-19 parte 3 en rama limpia: test_comparar_carga unitario 9/9 tras refactor; colisión de import pytest resuelta al renombrar integración POSIX. Código de producto bajo 400 líneas; JSON de 20 ejecuciones M1 y límites/alcance documentados. Sin repetir la medición ni tests ya pasados. git diff --check limpio. Misma sesión, no independiente. (14f7513) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | Codex | 2026-11-10 | Documentación F-19 parte 3 revisada: QA registra el nombre nuevo de integración POSIX y el fallo de colisión resuelto; la bitácora de esta rama está publicada con los errores reales. Los resultados y límites M1 concuerdan con la evidencia JSON. Verificación documental según control mínimo, no independiente. (42ecc34) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de revision | Codex | 2026-11-10 | Revisión final F-19 parte 3 contra SPEC tras fixes de cierre: ambos modos están implementados y medidos, equivalencia validada, datos crudos y tabla M1 trazables; límites Docker/WSL2 y no generalización constan en QA/M1/AD-07. Colisión pytest corregida con basename único. Código ≤400 líneas; pruebas focales 9/9 pasadas y medición 20/20. git diff --check limpio. Revisión del mismo agente, no independiente. (1fc59eb) |
 | revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
