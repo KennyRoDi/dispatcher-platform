@@ -57,7 +57,10 @@ class _Respuesta(io.RawIOBase):
         return len(datos)
 
     def close(self) -> None:
-        if not self.closed:
+        if self.closed:
+            return
+        try:
             self._respuesta.close()
+        finally:
             self._respuesta.release_conn()
-        super().close()
+            super().close()
