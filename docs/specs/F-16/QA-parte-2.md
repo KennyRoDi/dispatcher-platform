@@ -27,7 +27,7 @@ Con configuración `.env` sintética (`NODE_NAME=qa-local`, `NODE_IP=127.0.0.1`,
 | Usuario no root | Aprobado en contenedores de prueba | Los tres comandos `id` devolvieron `uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)`. |
 | Variables e IP inválidas | Aprobado | `validate_config` exige hostname, IPv4/IPv6 válida, límites positivos e igualdad `mem_limit`/`memswap_limit`; hay pruebas para campos ausentes, `not-an-ip` y swap desigual. |
 | Fallo cerrado antes de `compose up` | Aprobado | Prueba unitaria verifica que presupuesto excesivo devuelve error sin invocar Compose. El código captura error de daemon/config antes de construir y ejecutar `up`. |
-| Tres arranques medidos en cada nodo B/C/D | Pendiente | El host local no se identificó como B/C/D; faltan acceso Tailscale y `.env` de cada nodo. |
+| Tres arranques medidos en cada nodo B/C/D | Pendiente | Tailscale alcanza por ping a `hp-nahum` y `magdalena`, pero el puerto SSH 22 no responde y no hay canal shell remoto; tampoco está disponible el `.env` de cada nodo. El host local no se identificó como B/C/D. |
 
 ## Pruebas
 
