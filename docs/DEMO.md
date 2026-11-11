@@ -21,6 +21,8 @@ sin necesitar el `.env` del equipo:
 
 ## Comandos
 
+La demo local va **en claro**: `.env.demo` y `docker-compose.demo.yml` fijan `TLS_ENABLED=false` (F-27). No la uses entre nodos; el despliegue de tres nodos exige TLS (`docs/DEPLOY_WORKERS.md`).
+
 ```bash
 docker compose -f deploy/docker-compose.demo.yml up -d --build   # iniciar
 docker compose -f deploy/docker-compose.demo.yml logs -f feeder  # ver casos enviados

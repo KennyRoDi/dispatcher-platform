@@ -20,6 +20,19 @@ Borrador de la parte 1 de F-27. Otras ramas (F-26, F-28 a F-30) añaden sus secc
 - Con TLS activo, una URL `http://` o `redis://`, o `MINIO_SECURE=false`, se rechaza al arrancar, sin degradar a texto claro.
 - Salidas reales de un arranque con TLS y de un rechazo: pendiente (sin captura ni ejecución medida).
 
+### Certificados y Compose (parte 3)
+
+- `deploy/tls/generar_certs.sh` crea la CA (EC P-256, `pathlen:0`, 365 días) y el certificado del Nodo A (90 días) en `CERTS_DIR`, fuera del repo. Si a la CA le quedan 91 días o menos, se regenera y hay que redistribuir `ca.pem` a los workers.
+- Coordinador `8443` y Redis `6380` con TLS; MinIO con su certificado. Pasos en `docs/DEPLOY_WORKERS.md`.
+
+### Límites declarados
+
+- Redis y MinIO reales no se han probado con TLS: sin salida medida.
+- Con `CERTS_UID`/`CERTS_GID`, `redis-data` y `minio-data` pueden requerir un `chown` único.
+- Con `TLS_ENABLED=false` el worker igual exige `TLS_CA_FILE`.
+- Pendientes de otros dueños: `dashboard/app.py:23` y `scripts/generate_dataset.py:18,291` aún apuntan a `http` y 8000.
+- Sin evidencia medida, M4 máximo 2.
+
 ### Concepto de Sistemas Operativos y de redes
 
 TLS protege el canal entre procesos de distintos nodos: cifra, comprueba la integridad y autentica al servidor con una cadena de confianza. El módulo `ssl` de Python delega en OpenSSL; el cliente decide con qué CA confía y qué versión mínima acepta. JWT (F-26) identifica a quien llama; no protege el canal. Tailscale tampoco sustituye a TLS: la captura debe mostrar el handshake (`docs/ARQUITECTURA.md` §6).
