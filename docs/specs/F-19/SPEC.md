@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion 4453054
+**Verificación IA:** revision 8c12578
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -145,3 +145,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | SPEC parte 3 aún afirma que acceso WSL2 y mediciones M1 están pendientes; la medición ya está registrada. |
 | verificación IA de documentacion | Codex | 2026-11-10 | Reverificación documental tras hallar y corregir riesgos obsoletos en el SPEC. git diff --stat confirma el único cambio documental previsto; QA, resultados SPEC, ficha M1 y AD-07 concuerdan con los JSON reales y límites Docker/WSL2. Bitácora de F-19 ya publicada. Revisión documental comprobada en la misma sesión, no independiente. (4453054) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de revision | Codex | 2026-11-10 | Revisión F-19 parte 3 contra criterios SPEC: selección de ambas estrategias, resultados equivalentes, instrumentación PSS/RSS/cgroup y comparación real con 5 repeticiones por configuración; evidencia y límites están documentados. Hallazgo anterior de texto obsoleto en riesgos fue corregido y fase documental repetida/verificada. Pruebas focales ya pasaron y medición Linux concluyó; no repetí. git diff --check limpio. Revisión propia, no independiente. (8c12578) |
