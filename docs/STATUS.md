@@ -39,7 +39,7 @@
 | F-34 | pendiente |
 | F-35 | pendiente |
 | F-36 | en-pr |
-| F-37 | revision |
+| F-37 | en-pr |
 | F-38 | hecha |
 | F-39 | pendiente |
 | F-40 | hecha |
