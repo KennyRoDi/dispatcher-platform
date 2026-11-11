@@ -2,6 +2,8 @@ import io
 from collections import defaultdict
 from datetime import datetime, timezone
 
+from src.application.ports import KeyUnavailable
+from src.domain.alert_policy import StoredAlert
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import QueueFull
 from src.domain.text_analysis import MessageAnalysis
@@ -60,6 +62,16 @@ class FakeObjectStore:
 
     def open(self, sha256):
         return io.BytesIO(self.objetos[sha256])
+
+
+class FakeKeyProvider:
+    def __init__(self, kek=None):
+        self._kek = kek
+
+    def kek(self):
+        if self._kek is None:
+            raise KeyUnavailable("sin KEK")
+        return self._kek
 
 
 class FakeWorkQueue:
@@ -123,8 +135,48 @@ class FakeResourceReader:
 
 
 class FakeAlertPublisher:
-    def __init__(self):
+    def __init__(self, reloj=None):
         self.alertas = []
+        self.marcas = []
+        self._reloj = reloj
 
     def publish(self, kind, case_id, detail):
         self.alertas.append((kind, case_id, detail))
+        self.marcas.append(self._reloj.now() if self._reloj else None)
+
+
+class FakeAlertReader:
+    """Lee lo que publicó un FakeAlertPublisher con reloj; las más recientes primero."""
+
+    def __init__(self, publicador):
+        self._publicador = publicador
+
+    def recent(self, limit):
+        alertas = [
+            StoredAlert(str(numero), kind, case_id, detail, marca)
+            for numero, ((kind, case_id, detail), marca) in enumerate(zip(self._publicador.alertas, self._publicador.marcas), 1)
+        ]
+        return list(reversed(alertas))[:limit]
+
+
+class FakeCaseCatalog:
+    def __init__(self, casos=()):
+        self.casos = {caso.case_id: caso for caso in casos}
+
+    def add(self, caso):
+        self.casos[caso.case_id] = caso
+
+    def case(self, case_id):
+        return self.casos.get(case_id)
+
+
+class FakeTokenVerifier:
+    def __init__(self, identidades=None):
+        self.identidades = dict(identidades or {})
+
+    def verify(self, token):
+        from src.application.ports import InvalidToken
+
+        if token not in self.identidades:
+            raise InvalidToken("token desconocido")
+        return self.identidades[token]

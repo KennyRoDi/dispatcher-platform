@@ -64,7 +64,7 @@ def test_rechazar_un_enlace_no_borra_el_manifiesto_previo(tmp_path):
     assert (out / MANIFEST_NAME).read_text(encoding="utf-8") == "[]"
 
 
-@pytest.mark.xfail(strict=True, reason="el SPEC solo pide no seguir un enlace dentro de un caso, pero _generate rechaza cualquier enlace bajo --out aunque no sea de un caso")
+@pytest.mark.xfail(strict=True, reason="el SPEC declara aceptado que _generate rechace cualquier enlace simbolico bajo --out, aunque no sea de un caso")
 def test_un_enlace_ajeno_a_los_casos_dentro_de_out_no_impide_generar(tmp_path):
     outside = tmp_path / "fuera"
     outside.mkdir()
