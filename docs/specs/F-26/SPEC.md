@@ -63,7 +63,7 @@ Solo acciones de rutas que existen hoy en `src/coordinator/`.
 
 | Capa | Archivo | Contenido |
 |---|---|---|
-| Dominio | `src/domain/rbac.py` | `Role` (enum), `Action` (enum), `can(role, action) -> bool`; la matriz es un `dict` inmutable. Sin FastAPI ni JWT. |
+| Dominio | `src/domain/rbac.py` | `Role` y `Action` (`Enum`, no `str`), `PERMISOS` (`MappingProxyType` de `frozenset` de `Action` por `Role`) y `can(role, action) -> bool`, que falla cerrado (`False`) ante cualquier valor que no sea `Role`/`Action`. Sin FastAPI ni JWT. |
 | Aplicación | `src/application/ports.py` (una línea añadida) | Puerto `TokenVerifier.verify(token) -> Identity`, con `Identity(subject, role)` y `InvalidToken`. |
 | Adaptador | `src/adapters/jwt_tokens.py` | `JwtTokenVerifier` con PyJWT; `issue_token(...)` usado solo por el script y las pruebas. |
 | Adaptador (HTTP) | `src/coordinator/seguridad.py` | `autorizar`: dependencia FastAPI que lee `Authorization`, llama al puerto, busca la acción de la ruta, aplica `can` y responde 401 o 403; contiene el mapa ruta-acción. |
@@ -129,6 +129,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 5. **Rutas futuras** (`rutas_archivos.py`, alertas) quedan fuera de la matriz y la prueba `test_toda_ruta_esta_clasificada` obligará a clasificarlas al fusionarse, lo que puede bloquear a su dueño: confirmar que se acepta.
 6. **Expiración de 60 min y HS256** son provisionales (SUP-28, AD-33); no hay dato que las respalde.
 7. **PyJWT:** versión exacta se fija en la parte 2 tras comprobarla con `pip`; no se afirma aquí.
+
+## Notas para las partes 2 y 3
+
+Hallazgos de QA de la parte 1 (sin defectos en `rbac.py`; rutas no cubiertas por este SPEC):
+
+- **`/cases/` con barra final.** Existe como ruta aparte (`POST` y `GET`, `include_in_schema=False`) y debe estar en el mapa ruta-acción con la misma acción que `/cases`; si no, `test_toda_ruta_esta_clasificada` fallará.
+- **Rutas de documentación de FastAPI:** `/openapi.json`, `/docs`, `/docs/oauth2-redirect` y `/redoc`. Clasificarlas como públicas o deshabilitarlas; decisión pendiente de la persona.
+- **Scripts sin token:** `scripts/submit_case.py` y `scripts/run_load.py` no envían `Authorization`; se romperán al activar la autenticación (parte 3) y hay que darles el token.
+- **Dashboard:** llama a `/tasks/workers`, ruta que no existe (previo a F-26); no se resuelve aquí, se avisa a su dueña.
 
 ## Aprobaciones
 
