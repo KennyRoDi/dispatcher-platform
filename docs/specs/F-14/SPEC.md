@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-14-2-alertas
 **Verificación IA:** tests b952465
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -145,3 +145,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: ~108 lineas src, AlertReader con contrato y doble, 503 fijo, AD-39 coincide con codigo; 4 menores no bloqueantes anotados en CLAUDE.md local (fca1529) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y ayudas (b952465); src intacto; test_cierre_alertas: 11 fallan por asercion (no se publica alerta aun) y 5 de regresion pasan; aceptacion A con reloj sintetico, evidencia solo con F14_EJEMPLO_JSON (b952465) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
