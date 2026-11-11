@@ -608,3 +608,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas @posix en Docker y demo con ps/ls; puntos abiertos: process y main() sin supervisor, gracia menor que stop_grace_period (F-16), KeyError en segunda cancelación |
 | Cómo se validó | Ejecución real en contenedor Linux y revisión del diff |
 | Error de la IA | signal.SIGKILL no existe en Windows (corregido con getattr); desajuste de firma de cancel; ps no instalado en la imagen (se instaló procps) |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-1-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Resolver conflictos PR52 con main |
+| Consulta resumida | Integrar cambios recientes y continuar controles |
+| Resultado obtenido | Merge 1d268ff: validacion NUL y rutas multiplataforma, produce compartido, pruebas Windows y deteccion de privilegio symlink |
+| Validado / corregido / descartado | Conflictos resueltos conservando correcciones de main y F19; PR mergeable, sin fusionar |
+| Cómo se validó | Suite completa Windows 1689 passed 10 skipped 8 deselected 3 xfailed; conformidad 0 problemas; GitHub sin conflictos |
