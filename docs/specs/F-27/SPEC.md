@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion ece11d8
+**Verificación IA:** verificacion 89f7e33
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -150,3 +150,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: requests_session ignora CA propia con REQUESTS_CA_BUNDLE (alta); proxies/netrc; redirect https->http; redis_kwargs ssl duplicado; exigir_cifrado acepta ssl_cert_reqs=none; hosts vacios; minio_secure 0/false; CA no validada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de hallazgos QA en tls.py; diff de tests solo quita marcadores xfail (comprobado). Suite completa tras ece11d8: 1864 passed, 8 skipped, 3 xfailed. Integracion segun developer: 25 passed, 3 xfailed. Quedan 3 xfail: redis_kwargs lleva ssl=True y rompe Redis.from_url (decision: la parte 2 usa host/port con ssl=True; limite), ?ssl_cert_reqs=none via from_url directo, TLS 1.3 minimo en requests. (ece11d8) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 92ec5ac: 26 xfail, 23 corregidos y desmarcados; quedan 3 declarados como limites. Defecto alto (REQUESTS_CA_BUNDLE pisaba la CA) corregido con trust_env=False y verify fijo. No ejecute la integracion de TLS por mi cuenta tras la correccion (developer: 25 passed). (89f7e33) |
