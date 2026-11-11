@@ -31,7 +31,7 @@
 | F-26 | en-pr |
 | F-27 | pendiente |
 | F-28 | en-pr |
-| F-29 | tests |
+| F-29 | implementacion |
 | F-30 | pendiente |
 | F-31 | en-pr |
 | F-32 | en-pr |
