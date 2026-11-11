@@ -261,23 +261,19 @@ NODE_NAME=<salida de: hostname>
 NODE_IP=<salida de: tailscale ip -4>
 WORKER_ID=
 WORKER_MEM_LIMIT=2g
-ADMISSION_MARGIN_BYTES=1
-FOOTPRINT_TRANSCODE_VIDEO_BYTES=1
-FOOTPRINT_EXTRACT_AUDIO_BYTES=1
-FOOTPRINT_GENERATE_THUMBNAIL_BYTES=1
-FOOTPRINT_CONVERT_AUDIO_BYTES=1
-FOOTPRINT_EXTRACT_METADATA_BYTES=1
 ```
 
 - `WORKER_ID` va **vacío** (ver «Tres errores que rompen la identidad»).
 - `TLS_CA_FILE` es la ruta de Windows; el Compose la monta en `/certs/ca.pem` dentro del contenedor.
-- `WORKER_MEM_LIMIT` es obligatorio: sin él Compose falla con `define WORKER_MEM_LIMIT en .env`. `ADMISSION_MARGIN_BYTES` y las cinco `FOOTPRINT_*_BYTES` también son obligatorias, incluso para `check_connectivity`, porque lee la misma configuración que el worker. **Los valores `2g` y `1` de arriba son marcadores para esta prueba de conexión: no están medidos y no valen como datos.** Antes de arrancar el worker real hay que medirlos (M1 §4.1) y sustituirlos.
+- `WORKER_MEM_LIMIT` es obligatorio: sin él Compose falla con `define WORKER_MEM_LIMIT en .env`. **`2g` es un marcador para esta prueba de conexión: no está medido y no vale como dato.** Hay que medirlo antes de arrancar el worker real.
+- `ADMISSION_MARGIN_BYTES` y las cinco `FOOTPRINT_*_BYTES` se dejan vacías: `check_connectivity` no las exige (comprobado en un nodo Windows real). El worker sí las necesita para arrancar, y sin la medición M1 §4.1 no se inventan.
 - No escribas el `.env` con `>` ni con `Out-File`, y no lo subas a git (`.gitignore` ya lo excluye).
 - `NODE_NAME` y `NODE_IP` no deben estar definidos en el shell con otro valor: `Get-ChildItem Env:NODE_NAME, Env:NODE_IP -ErrorAction SilentlyContinue` no debe imprimir nada.
 
-**Paso 6. Verificar el `.env` y probar de extremo a extremo.** La primera vez construye la imagen del worker y tarda varios minutos.
+**Paso 6. Verificar el `.env` y probar de extremo a extremo.** Reconstruye antes la imagen: una imagen `deploy-worker` anterior a F-27 no incluye TLS y la prueba falla aunque todo lo demás esté bien. La primera construcción tarda varios minutos.
 
 ```powershell
+docker compose --env-file .env -f deploy/docker-compose.worker.yml build worker
 docker compose --env-file .env -f deploy/docker-compose.worker.yml config --quiet
 $LASTEXITCODE
 docker compose --env-file .env -f deploy/docker-compose.worker.yml run --rm worker python -m scripts.check_connectivity
@@ -449,7 +445,8 @@ Ninguna fila se ha reproducido sobre nodos reales. «Sin comprobar» marca lo qu
 | `check_connectivity` falla en el contenedor, pero en el host `Test-NetConnection <IP_TAILSCALE_NODO_A> -Port 6380` responde | **Sin comprobar.** Un contenedor de Docker Desktop en WSL2 no alcanza la red Tailscale del host. Es la base de esta topología | **La Parte 2 se detiene** y se devuelve a `plan`: `python scripts/flujo.py devolver plan "motivo"`. No improvises otra red |
 | `curl: (60)` o error de revocación en Windows con `curl.exe` | Schannel no puede comprobar la revocación de una CA propia. Reproducido en un nodo Windows real | Añade `--ssl-no-revoke` al `curl.exe` y conserva `--cacert` (ver «Conectarse al Nodo A desde Windows», paso 4) |
 | `define WORKER_MEM_LIMIT en .env` | Falta `WORKER_MEM_LIMIT` en `.env` | Defínelo; para la prueba de conexión sirve `2g` (no medido) |
-| `ADMISSION_MARGIN_BYTES es obligatoria y debe ser un entero en bytes` (o `FOOTPRINT_*`) | Faltan en `.env`; `check_connectivity` lee la misma configuración que el worker | Defínelas como enteros; marcadores en la sección de conexión, medidas reales en M1 §4.1 |
+| `ADMISSION_MARGIN_BYTES es obligatoria y debe ser un entero en bytes` (o `FOOTPRINT_*`) | Al arrancar el worker (no en `check_connectivity`): faltan en `.env` | Mídelas según M1 §4.1; no las inventes |
+| `check_connectivity` falla con TLS aunque `.env` y red estén bien | Imagen `deploy-worker` antigua, anterior a F-27. Ocurrió en un nodo Windows real | `docker compose --env-file .env -f deploy/docker-compose.worker.yml build worker` y repite |
 | `Test-NetConnection` tampoco responde | Tailscale inactivo en alguna máquina, o el Nodo A sin levantar | `tailscale status`, `tailscale ping <IP_TAILSCALE_NODO_A>` y, en el Nodo A, `docker compose ps` |
 | `docker compose up` falla al publicar puertos en el Nodo A | **Sin comprobar.** Tailscale inactivo o `NODE_IP` distinto de `tailscale ip -4`. También podría ocurrir tras reiniciar, si Docker arranca antes que Tailscale | Activa Tailscale, corrige `NODE_IP` y repite `docker compose up -d` |
 | `required variable NODE_NAME is missing a value` | Falta `--env-file .env`, comando fuera de la raíz o `.env` sin completar | Repite desde la raíz con `--env-file .env` |
