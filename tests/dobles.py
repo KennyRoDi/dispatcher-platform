@@ -146,3 +146,13 @@ class FakeAlertReader:
             for numero, ((kind, case_id, detail), marca) in enumerate(zip(self._publicador.alertas, self._publicador.marcas), 1)
         ]
         return list(reversed(alertas))[:limit]
+
+class FakeCaseCatalog:
+    def __init__(self, casos=()):
+        self.casos = {caso.case_id: caso for caso in casos}
+
+    def add(self, caso):
+        self.casos[caso.case_id] = caso
+
+    def case(self, case_id):
+        return self.casos.get(case_id)

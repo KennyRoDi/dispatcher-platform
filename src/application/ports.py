@@ -5,6 +5,7 @@ from typing import BinaryIO, Protocol, runtime_checkable
 
 from src.domain.alert_policy import StoredAlert
 from src.domain.chat_message import ChatMessage
+from src.domain.consolidated_report import CaseInfo
 from src.domain.finding import Finding
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import Subtask
@@ -45,6 +46,11 @@ class WorkQueue(Protocol):
 class FindingStore(Protocol):
     def add(self, case_id: str, findings: Sequence[Finding]) -> None: ...
     def list(self, case_id: str) -> list[Finding]: ...
+
+
+@runtime_checkable
+class CaseCatalog(Protocol):
+    def case(self, case_id: str) -> CaseInfo | None: ...
 
 
 @runtime_checkable

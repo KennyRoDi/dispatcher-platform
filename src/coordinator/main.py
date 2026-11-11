@@ -43,7 +43,7 @@ import logging
 
 from fastapi import FastAPI
 
-from src.coordinator import rutas_alertas, rutas_casos, rutas_monitoreo, rutas_subtareas
+from src.coordinator import rutas_alertas, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,3 +63,4 @@ app.include_router(rutas_casos.router)
 app.include_router(rutas_subtareas.router)
 app.include_router(rutas_monitoreo.router)
 app.include_router(rutas_alertas.router)
+app.include_router(rutas_reporte.router)
