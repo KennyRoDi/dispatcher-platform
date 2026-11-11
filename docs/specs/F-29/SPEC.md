@@ -1,8 +1,8 @@
 # SPEC F-29: Cadena de custodia
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 6b32b10
+**Base:** feat/F-29-1-cadena-de-custodia
+**Verificación IA:** revision 8578c42
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -38,7 +38,7 @@ Concretado:
 2. Sin alteraciones, `verify` devuelve `ok` y exit 0 (también con el log vacío y con una sola entrada).
 3. Alterar cualquier campo de una entrada (hash, operación, actor, fecha, `seq`) hace fallar `verify` y reporta la posición de esa entrada (número de línea, base 1) y el motivo.
 4. Borrar, insertar, duplicar o reordenar líneas se detecta en la posición donde se rompe el enlace.
-5. Truncar el final del log (quitar una o más entradas) se detecta por el ancla, con la posición esperada del último eslabón; quitar la entrada final y el ancla también se detecta como ancla ausente.
+5. Truncar el final del log (quitar una o más entradas) se detecta por el ancla, con la posición esperada del último eslabón; quitar la entrada final y el ancla también se detecta como ancla ausente (sin ancla con entradas es violación; el ancla génesis cubre el log recién creado).
 6. Recalcular toda la cadena con SHA-256 sin la llave no pasa la verificación: el HMAC no coincide en la primera entrada tocada.
 7. Alterar el contenido de una evidencia en el almacén (su SHA-256 recalculado difiere del registrado) o borrarla hace fallar `verify` y reporta la posición de la entrada de ingreso o de transformación afectada y el hash esperado. Si falta la llave, `verify` falla cerrado (exit 2) y no declara la cadena válida.
 8. Una transformación cuya evidencia de origen no fue ingresada ni es resultado de una entrada previa se reporta como violación de linaje en su posición.
@@ -60,7 +60,7 @@ Concretado:
 
 **Formato de la entrada (AD-35, provisional).** Una línea JSON con claves ordenadas y UTF-8 por entrada: `seq` (desde 0), `ts` (UTC, ISO 8601), `evidence_sha256`, `operation` (`ingreso` o el nombre de la transformación), `result_sha256` (igual a `evidence_sha256` en `ingreso`), `actor`, `prev_hash` y `entry_hash`. La primera entrada usa `prev_hash = "0" * 64`. `entry_hash = HMAC-SHA256(key, prev_hash ‖ JSON canónico de los demás campos)`, con el JSON canónico en claves ordenadas y sin espacios, para que no dependa del formato.
 
-**Ancla del último eslabón.** Archivo `<log>.head` con `{"seq", "entry_hash", "mac"}` donde `mac = HMAC-SHA256(key, "head" ‖ seq ‖ entry_hash)`. Se reescribe (archivo temporal, `fsync`, `rename`, `fsync` del directorio) tras cada anexo y después del `fsync` del log. Si el proceso muere entre ambos pasos, el ancla queda una entrada atrás: el verificador lo acepta si la cadena es válida y tolera un ancla atrasada una entrada sin aviso y rechaza como violación `ancla` la atrasada más de una (ver «Límites declarados de la parte 1»); si el ancla está por delante del log, es truncamiento.
+**Ancla del último eslabón.** Archivo `<log>.head` con `{"seq", "entry_hash", "mac"}` donde `mac = HMAC-SHA256(key, "head" ‖ seq ‖ entry_hash)`. Se reescribe (archivo temporal, `fsync`, `rename`, `fsync` del directorio) tras cada anexo y después del `fsync` del log. Si el proceso muere entre ambos pasos, el ancla queda una entrada atrás: el verificador lo acepta si la cadena es válida (el adaptador escribe un ancla génesis al crear el log, y sin ancla con entradas es violación) y tolera un ancla atrasada una entrada sin aviso y rechaza como violación `ancla` la atrasada más de una (ver «Límites declarados de la parte 1»); si el ancla está por delante del log, es truncamiento.
 
 **Verificador.** Recorre el log en orden. Para cada línea comprueba: JSON válido, `seq` consecutivo desde 0, `prev_hash` igual al `entry_hash` anterior y HMAC correcto. Se detiene en el primer eslabón roto: `position` es su número de línea (base 1), porque los eslabones siguientes ya no son confiables. Luego compara el último eslabón con el ancla (`mac` válido, mismo `seq` y `entry_hash`). Después comprueba el linaje (toda `operation` distinta de `ingreso` parte de un `evidence_sha256` ya ingresado o resultado de una entrada previa) y, por cada objeto, que `sha256(open(sha))` coincida con el registrado y que exista; esta parte se ejecuta sobre las entradas anteriores al eslabón roto y reporta todas las evidencias alteradas, cada una con la posición de su entrada. Cada hallazgo es `Violation(position, kind, detail)` con `kind` en `entrada`, `enlace`, `sello`, `truncado`, `ancla`, `linaje`, `evidencia`.
 
@@ -84,7 +84,7 @@ Concretado:
 | Unitaria | `test_borrar_insertar_o_reordenar_detecta_posicion` | Rotura de enlace con su posición |
 | Unitaria | `test_truncar_log_se_detecta` (una y varias entradas, y ancla borrada) | El ancla delata el truncamiento |
 | Unitaria | `test_recalcular_cadena_sin_llave_no_pasa` | El HMAC impide la reescritura completa |
-| Unitaria | `test_ancla_atrasada_no_falla_y_adelantada_si` | Tolerancia exacta a una caída entre log y ancla |
+| Unitaria | `test_ancla_atrasada_no_falla_y_adelantada_si` | Tolerancia exacta a una caída entre log y ancla; sin ancla con entradas es violación |
 | Unitaria | `test_alterar_evidencia_se_detecta` y `test_evidencia_ausente_se_detecta` con `FakeObjectStore` | El SHA-256 recalculado difiere; posición de la entrada |
 | Unitaria | `test_linaje_sin_ingreso_se_detecta` | Una transformación de evidencia no ingresada falla |
 | Unitaria | `test_falla_cerrado_sin_llave` y `test_no_extiende_cadena_alterada` | Sin llave no hay veredicto; no se anexa sobre un log roto |
@@ -107,6 +107,22 @@ No aplica. F-29 aporta evidencia de ejecución a la ficha M4, no mediciones de S
 - Log vacío sin ancla pasa.
 - Rendimiento (dato del QA, no medición de SO): 100000 entradas en 4,8 s con `tracemalloc`.
 - Evidencia alterada y linaje se prueban en la parte 3.
+
+## Límites declarados de la parte 2
+
+- La llave entra como `key: bytes` de 32 bytes. `FileKeyProvider` y `CUSTODY_KEY_FILE` se cablean en la parte 3, cuando F-28 (en PR aparte) esté fusionada o disponible.
+- `record` verifica solo las últimas 2 líneas y el ancla (`verify_tail`). Una línea intermedia manipulada solo la detecta el verificador completo.
+- Motivo del cambio (dato del QA sobre la primera implementación, que verificaba todo el log en cada `record`; no es medición de SO): costo cuadrático, 1000 entradas 7,5 s y 4000 entradas 121,4 s acumulado. No se volvió a medir tras la corrección (pendiente).
+- A9: un ingreso con `result_sha256 != evidence_sha256` se acepta (xfail estricto; las pruebas existentes lo usan). Decisión pendiente.
+- Un reloj sin zona se trata como UTC.
+- Archivos con modo 0600. `flock` sobre archivo local (no NFS).
+- Ancla génesis: al crear el log el adaptador escribe un ancla con `seq` 0, `entry_hash = GENESIS_HASH` y MAC, antes del primer anexo. Un log sin ancla y con entradas es siempre violación `ancla` (ya no se tolera «1 entrada sin ancla»). Se tolera el ancla atrasada una entrada; con ancla génesis, un log de 0 o 1 entradas.
+- La ancla génesis es determinista por llave: una copia de ella oculta el truncado de un log de N entradas a 0 o 1 (ampliación de SUP-31; alternativa no hecha: atarla a un nonce del log).
+- Con el log ausente y un ancla ilegible o falsa, el mensaje de error es engañoso (QA, xfail).
+- Carrera al crear el log corregida con `_create_log`: 1 fallo en 60 corridas antes; 0 en 100 corridas con 8 procesos o hilos, según QA (dato del QA, no medición de SO).
+- Reloj sin zona = UTC: decisión ya existente, sin cambio.
+- Antes de anexar se reintenta el ancla atrasada (`_catch_up_anchor`); si falla la escritura o el `fsync` del anexo, se hace `ftruncate` al tamaño previo.
+- Sin tope de tamaño de campo (QA: un `actor` de 50 MiB tarda 0,36 s por `record`; dato del QA).
 
 ## Plan de pila
 
@@ -150,3 +166,23 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: codigo cumple diseño, sin llaves fijas, capas, limites coinciden con codigo; pytest segun revisor 1879 passed/5 xfailed. Menor 1 corregido por mi en el SPEC (solo si el patron coincidio; ver diff). Menor 2: AD-35/SUP-31 no mencionan tolerancia de una entrada (declarada en SPEC). (6b32b10) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (test_jsonl_custody_log.py, dobles.py, contratos.py); src intacto. Ejecute: error de coleccion ModuleNotFoundError src.adapters.jsonl_custody_log (rojo). Decision: la llave entra como key: bytes (F-28 no esta en esta rama); lectura de CUSTODY_KEY_FILE con FileKeyProvider queda para la parte 3. Asume modo 0600 y flock (decisiones del developer no fijadas en SPEC). No valida el log completo, solo ultimo eslabon + ancla. (e448419) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: src/adapters/jsonl_custody_log.py (125 lineas), .gitignore, SPEC; tests intactos. Suite completa tras c6e5b6a: 1923 passed, 8 skipped, 5 xfailed. Desviacion declarada: verifica el log completo en cada record (O(n), costo total cuadratico; el SPEC decia leer solo el ultimo eslabon). (c6e5b6a) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: A1-A9 (ancla fallida bloquea el log, caida tras 1er anexo, write parcial sin rollback, O_TRUNC sigue symlink, symlink de log, reemplazo durante flock, reloj naive, hashes sin validar, result!=evidence) y costo cuadratico: 4000 entradas 121 s |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de A1-A8 y rendimiento; diff de tests solo quita marcadores xfail (comprobado). Suite completa tras d8c75a7: 1943 passed, 8 skipped, 6 xfailed. Dominio tocado (verify_tail, _check_anchor): tests de custody_chain verdes. A9 no implementado (SPEC exige result==evidence solo en ingreso; helpers de pruebas lo violan): queda xfail y limite. record ya no verifica el log completo: manipulacion de linea intermedia solo la detecta el verificador (parte 3). Warnings ResourceWarning son de src/workers/storage.py (previo). (d8c75a7) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 1726a84: 11 xfail, 8 corregidos; queda A9 (ingreso con result!=evidence se acepta; decision: limite). Costo cuadratico medido por QA (1000 entradas 7,5 s; 4000 entradas 121,4 s acumulado) ya corregido en implementacion (no re-medido por mi). 6 procesos concurrentes sin ruptura segun QA. (f1fde64) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Medicion del QA marcada sin re-medir. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (9d885e8) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de revision | Kenni Rodriguez | 2026-11-11 | Revisor: tolerar 1 entrada sin ancla (A2) permite truncar un log largo a su primera entrada y borrar el ancla sin deteccion (regresion frente a la parte 1) |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Ancla genesis: src y 13 pruebas nuevas; unico cambio en tests existentes: 2->3 en el conteo de os.replace (comprobado por diff). Suite completa tras 4106891: 1954 passed, 8 skipped, 6 xfailed. Developer reporta ademas una carrera al crear el log (1 de 60 corridas) cerrada en 4106891 (_create_log); el commit anterior estuvo empujado con la carrera. (4106891) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 8c9a806 sobre ancla genesis: solo tests nuevos (diff comprobado); archivo QA ejecutado: ver pytest. 4 xfail baja: ancla genesis determinista por llave, una copia de ella oculta truncado a 0/1 entradas (ampliar SUP-31); mensaje engañoso con log ausente y ancla ilegible. Sin carrera en 8 procesos/hilos x100 corridas (segun QA), recuperacion tras os._exit. Decision: declarar como limites. (8c9a806) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Cuenta de la frase obsoleta '1 entrada sin ancla' en los 3 documentos: ver grep. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (d262949) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: hueco de truncado cerrado con ancla genesis (casos concretos comprobados por el revisor), adaptador cumple SPEC, limites coinciden con los 4 xfail y A9; pytest segun revisor 1966 passed/10 xfailed. Menores: wording SPEC l.63 vs l.119, _write_anchor envoltorio para parchear en tests, costo de record tras la correccion sin re-medir. (8578c42) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |

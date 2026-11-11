@@ -80,7 +80,7 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 
 ### F-29 Cadena de custodia
 
-Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. El log JSONL en disco, el verificador con evidencia y linaje y la CLI llegan en partes posteriores.
+Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. Parte 2: `JsonlCustodyLog` en `src/adapters/jsonl_custody_log.py`, log JSONL de solo-anexión (`O_APPEND`, `fsync`, `flock`, modo 0600) que implementa `CustodyLog.record`, escribe el ancla de forma atómica y un ancla génesis al crear el log; `record` verifica solo las últimas 2 líneas y el ancla, y el verificador completo detecta una línea intermedia manipulada. La llave entra como bytes; el verificador con evidencia y linaje, la CLI y la lectura de `CUSTODY_KEY_FILE` llegan en la parte 3.
 
 ## 2. Concepto de Sistemas Operativos
 

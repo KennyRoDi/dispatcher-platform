@@ -28,3 +28,6 @@ servidor_central.log
 kek*
 
 dataset/sintetico/
+
+# Llave de custodia (F-29): nunca versionar
+*.custody-key
