@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-13-2-reporte-consolidado
-**Verificación IA:** revision 3067dd4
+**Verificación IA:** tests dc12d33
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: 181 lineas src, capas ok, CaseCatalog con contrato y doble, limites AD-38 coinciden; 4 menores no bloqueantes anotados en CLAUDE.md local (3067dd4) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests (dc12d33), src intacto; 4 modulos nuevos fallan en coleccion con ModuleNotFoundError (rojo); hash real de subtarea trae task_type, no kind: implementacion debe leer kind con respaldo task_type (dc12d33) |
