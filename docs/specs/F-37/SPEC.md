@@ -1,6 +1,6 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-37-1-saturacion-de-memoria
 **Verificación IA:** revision e6f67d2
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
