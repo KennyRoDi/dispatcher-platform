@@ -1108,3 +1108,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Pruebas rojas (test_dataset_pendientes_b.py y ampliaciones) y corrección en dataset_plan, media_generator, heavy_case_generator, chat_export_generator y dataset_sintetico; se retiraron xfail corregidos |
 | Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
 | Cómo se validó | Revisión del diff contra la lista de menores de F-03 anotada en la bitácora local; quedan pendientes la licencia formal y el enlace de Drive de los casos pesados |
+
+## 2026-11-11 · Kenni Rodriguez · F-29 (`feat/F-29-3-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Sonnet 5.5 (Claude Code) con subagentes developer, QA y documentador |
+| Componente | F-29 |
+| Propósito | F-29 parte 3: caso de uso verify_custody, CLI scripts/verify_custody.py, QA y prueba A local sintetica |
+| Consulta resumida | Implementar el verificador de custodia (cadena, ancla, linaje, evidencia) segun el SPEC y probarlo con pruebas rojas primero |
+| Resultado obtenido | verify_custody, CLI con exit 0/1/2, 4 hallazgos de QA (2 corregidos, 2 xfail), 12 escenarios de prueba A local sintetica; ficha M4 con resultados pendientes en nodos reales |
+| Validado / corregido / descartado | pytest en verde y conformidad 0 problemas, verificados por el orquestador; aprobaciones delegadas por la persona (modo autonomo), sin verificacion humana independiente de las fases |
+| Cómo se validó | Pruebas en rojo, implementacion minima, QA adversarial, correccion de QA-1 y QA-2, documentacion |
+| Error de la IA | El developer afirmo que la rama no incluia F-28 cuando FileKeyProvider ya estaba en main; el QA hallo 4 defectos en la primera implementacion (UTF-8 invalido aceptado, ancla leida despues del log con falso truncado, mensaje de error de llave con KEK_FILE, objeto ilegible que oculta violaciones; los dos primeros corregidos, los otros con xfail estricto); el agente de tests no pudo hacer commit por una falla del clasificador de Bash y lo hizo el orquestador |
