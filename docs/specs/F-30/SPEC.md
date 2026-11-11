@@ -1,6 +1,6 @@
 # SPEC F-30: Workers sin privilegios
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** documentacion 8637cca
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
@@ -111,3 +111,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA a246d6eb: 15 xfail, todos desmarcados tras el arreglo (63 passed en los 2 archivos F-30 segun developer; suite completa 1827 passed). Docker: solo docker compose config del compose local; NO se construyo ni ejecuto el worker (sin imagen; sin pull): id -u y touch /x sin ejecutar. Riesgo latente: adaptadores ML escriben en ~/.cache (no cableados en worker_node hoy): hara falta HF_HOME/XDG_CACHE_HOME a un volumen. (aff6543) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (ARQUITECTURA AD-36, REQUERIMIENTOS SUP-32, modulo-M4 nuevo, SPEC); push comprobado (rama alineada con origen); AD-36/SUP-32 sin uso en otras ramas (git grep). Salidas de M4 marcadas pendientes. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (8637cca) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
