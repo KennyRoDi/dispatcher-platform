@@ -4,6 +4,10 @@
 
 ## Hallazgos
 
+### Identidad del worker desde PowerShell: corregida
+
+La revisión final detectó que el preflight aceptaba `service.hostname` distinto de `service.environment.NODE_NAME`, posible cuando una variable de PowerShell sobrescribe el valor interpolado desde `.env`. El fix `7d7ce7b` exige que ambos valores existan y coincidan. `test_preflight_rechaza_node_name_distinto_del_hostname` falló antes del fix con `DID NOT RAISE ValueError`; ahora el conjunto focal pasa.
+
 ### Lectura de MemTotal desde Windows
 
 La QA anterior detectó que Python desde PowerShell no puede abrir `/proc/meminfo`. El fix `9e5343e` usa `docker info --format '{{.MemTotal}}'` para consultar al daemon Linux de Docker Desktop. En la sesión local posterior, el comando devolvió `16728616960` bytes. El host reportó `DESKTOP-796L2A2`, contexto `desktop-linux`; su identidad como B, C o D no está confirmada.
@@ -33,7 +37,7 @@ Pruebas focalizadas, reproducidas en el HEAD actual:
 py -m pytest -q tests/unit/test_f16_preflight.py tests/unit/test_f16_compose_memory.py tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py --tb=short
 ```
 
-Resultado: `76 passed in 0.28s`.
+Resultado tras el fix `7d7ce7b`: `77 passed in 0.55s`.
 
 Suite completa, reproducida por el orquestador en el mismo HEAD:
 
@@ -41,7 +45,7 @@ Suite completa, reproducida por el orquestador en el mismo HEAD:
 py -m pytest -q -m "not integration and not acceptance"
 ```
 
-Resultado: `1161 passed, 2 skipped, 3 deselected, 1 warning` (advertencia preexistente de Starlette; 47.18 s).
+Resultado tras el fix `7d7ce7b`: `1162 passed, 2 skipped, 3 deselected, 1 warning` (advertencia preexistente de Starlette; 47.17 s).
 
 ## Evidencia de Docker local
 
