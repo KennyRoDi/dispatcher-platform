@@ -789,3 +789,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificacion humana independiente |
 | Cómo se validó | Subagentes developer, qa-tester y documentador; el orquestador verifico con la suite |
 | Error de la IA | La implementacion inicial tomaba read()==None como EOF y cifraba objetos truncados sin error; QA lo detecto y se corrigio |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-3-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Implementar y verificar el lector PSS/cgroup y CLI M1 de F-19 parte 3 |
+| Consulta resumida | Completar comparación de memoria entre por_proceso y workers_compartidos según SPEC/AD-07 |
+| Resultado obtenido | Unitarias focales verdes; no se ejecutaron mediciones M1. Docker no disponible, WSL E_ACCESSDENIED, sin nodo Linux worker/cgroup v2 accesible. |
+| Validado / corregido / descartado | pytest focal 16/16 y 8/8; WhisperTranscriber 42/42; integración POSIX 3 skipped en Windows; docker info y WSL fallaron por daemon/acceso. |
+| Cómo se validó | TDD de parser RSS/PSS/cgroup y equivalencia/CLI; QA-parte-3.md registra comandos M1 pendientes. La fase 4 no se aprobó. |
+| Error de la IA | Escribí inicialmente un literal bytes con carácter no ASCII en un test; corregido a bytes ASCII y las pruebas del módulo pasaron. |
