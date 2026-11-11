@@ -154,6 +154,8 @@ def cancel_case(case_id: str) -> dict:
         "cancelled_at": now,
         "finished_at": now,
     })
+    conexion.redis_client.set(f"cancel:{case_id}", now)
+    conexion.redis_client.publish(f"cancel:{case_id}", case_id)
 
     done_set_key = f"case:{case_id}:done"
     subtask_ids = conexion.redis_client.lrange(f"case:{case_id}:subtasks", 0, -1)

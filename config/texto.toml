@@ -1,0 +1,40 @@
+# Umbrales provisionales (SUP-17): se calibran con la tabla de aciertos de la Parte 3.
+tamano_lote = 50
+n_palabras_clave = 5
+umbral_ofensa = 0.5
+
+[[severidad]]
+categoria = "amenaza"
+umbral = 0.5
+nivel = "alta"
+
+[[severidad]]
+categoria = "ofensivo"
+umbral = 0.5
+nivel = "media"
+
+# Léxico sintético mínimo; los temas definitivos deben coincidir con la verdad de referencia.
+[temas]
+conflicto = ["deuda", "pagar", "dinero", "amenazar"]
+reunion = ["reunion", "cafe", "plaza", "hora"]
+
+# Modelos ya entrenados [B.1]; se fija la versión para que la evidencia sea reproducible.
+# Las revisiones de HuggingFace son el campo `sha` de https://huggingface.co/api/models/<nombre>.
+[modelos.spacy]
+nombre = "es_core_news_sm"
+revision = "3.8.0"
+
+[modelos.sentimiento]
+nombre = "pysentimiento/robertuito-sentiment-analysis"
+revision = "a2cc0f67ebd705c55191e25a05ba23d885fcc09b"
+
+[modelos.ofensa]
+nombre = "pysentimiento/robertuito-hate-speech"
+revision = "db125ee7be2ad74457b900ae49a7e0f14f7a496c"
+
+# Patrones del Matcher de spaCy; solo detectan amenazas explícitas, no implícitas.
+[[patrones_amenaza]]
+# LOWER y no LEMMA: el lematizador puede fallar con «Vas» en mayúscula al inicio del mensaje.
+# Solo formas dirigidas a otra persona: «vamos a ver qué dice» o «voy a ver la película» no amenazan.
+nombre = "vas_a_ver"
+patron = [{ LOWER = { IN = ["vas", "van"] } }, { LOWER = "a" }, { LOWER = "ver" }]

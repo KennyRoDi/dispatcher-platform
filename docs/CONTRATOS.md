@@ -18,7 +18,7 @@ Cada módulo se desarrolla de principio a fin sin esperar a otro. Los módulos s
 | `Finding`, `EvidenceRef`, `Severity` | Compartido | Workers (produce), reporte y alertas (consume) |
 | `ChatMessage` | Compartido | F-02 (produce), F-07 (consume) |
 | `ConversationParser` | Nahúm, F-02 | José Andrés, F-07 |
-| `Analyzer` | José Andrés, F-07 a F-09 | Workers |
+| `Analyzer` | José Andrés, F-07 a F-09; conformidad: `comprobar_analyzer` en `tests/contratos.py` | Workers |
 | `WorkQueue` | Nahúm, F-06; Melany agrega el límite, F-24 | M2, M1 (reencolar), workers |
 | `ObjectStore` | Melany, F-23; Kenni lo envuelve con cifrado, F-28 | Coordinador, workers |
 | `FindingStore` | Kenni, F-13 | Workers (escribe), reporte (lee) |
@@ -35,7 +35,7 @@ Cada módulo crea archivos propios, para que dos PR no choquen.
 | Dueño | Archivos |
 |---|---|
 | Nahúm: coordinador, M2 | `src/coordinator/rutas_casos.py`, `rutas_subtareas.py`, `src/domain/scheduling.py`, `case_state.py`, `retry.py` |
-| José Andrés: workers, M1, M5 | `src/workers/`, `src/domain/admission.py`, `oom_policy.py`, `routing.py`, `src/adapters/*_analyzer.py` |
+| José Andrés: workers, M1, M5 | `src/workers/`, `src/domain/admission.py`, `oom_policy.py`, `routing.py`, `text_analysis.py`, `image_detection.py`, `transcription.py`, `severity.py` (F-14 de Kenni lo reutiliza: avisar al cambiarlo), `src/application/analyze_text.py`, `analyze_image.py`, `analyze_audio.py`, `src/adapters/*_analyzer.py`, `src/adapters/spacy_hf_text_models.py`, `hashing.py`, `yolo_detector.py`, `whisper_transcriber.py`, `config/texto.toml`, `imagen.toml`, `audio.toml`, `requirements-texto.txt`, `requirements-imagen.txt`, `requirements-audio.txt`, `scripts/aciertos_texto.py`, `scripts/aciertos_imagen.py`, `scripts/comparar_transcripcion.py`, `tests/datos/audio/` |
 | Melany: M3, dashboard | `src/coordinator/rutas_archivos.py` (nuevo), `src/domain/chunks.py`, `src/adapters/minio_object_store.py`, `dashboard/` |
 | Kenni: M4, reporte, alertas, despliegue | `src/domain/rbac.py`, `custody_chain.py`, `src/coordinator/seguridad.py` (nuevo), `src/application/build_report.py`, `deploy/` |
 

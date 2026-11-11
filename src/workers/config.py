@@ -5,10 +5,12 @@ import socket
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping
+from typing import Iterable, Mapping
 
 import dotenv
 import redis
+
+from src.domain.admission import FootprintTable
 
 OPERATIONS = (
     "transcode_video",
@@ -177,6 +179,24 @@ class Settings:
     def threads_per_job(self) -> int:
         cpu_count = os.process_cpu_count() or 1
         return max(1, cpu_count // self.worker_concurrency)
+
+
+def _required_bytes(env: Mapping[str, str], name: str) -> int:
+    value = env.get(name, "").strip()
+    if not value.isascii() or not value.isdecimal():
+        raise ValueError(f"{name} es obligatoria y debe ser un entero en bytes")
+    return int(value)
+
+
+def load_admission_config(
+    env: Mapping[str, str], operations: Iterable[str]
+) -> tuple[FootprintTable, int]:
+    margin = _required_bytes(env, "ADMISSION_MARGIN_BYTES")
+    footprints = {
+        operation: _required_bytes(env, f"FOOTPRINT_{operation.upper()}_BYTES")
+        for operation in operations
+    }
+    return FootprintTable(footprints), margin
 
 
 def make_redis(settings: Settings) -> redis.Redis:
