@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-28-2-cifrado-en-reposo
-**Verificación IA:** revision 23a5f4a
+**Verificación IA:** tests 217ccec
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -168,3 +168,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: FileKeyProvider cumple SPEC, sin llaves fijas, capas verdes, limites coinciden con xfail; pytest segun revisor 1928 passed/9 xfailed. Menores 1 y 2 (modo 0600, strip, O_NONBLOCK) corregidos por mi en el SPEC. Prueba inestable declarada. (23a5f4a) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo tests (unit decorador, integracion MinIO, historial); src intacto. Ejecute: test_encrypted_object_store error de coleccion ModuleNotFoundError (rojo); integracion tambien error de coleccion; test_historial_sin_llaves 2 passed (no depende del modulo nuevo). Decision del developer: regex del historial exige asignacion al inicio de linea y admite minioadmin (riesgo 7 del SPEC). Prueba I no ejecutada contra MinIO real. (217ccec) |
