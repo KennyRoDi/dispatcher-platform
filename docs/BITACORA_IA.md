@@ -1084,3 +1084,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Pruebas rojas (test_reporte_pendientes.py) y corrección en redis_finding_store, build_report, report_json, rutas_reporte, consolidated_report y ports; AD-38 actualizado |
 | Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
 | Cómo se validó | Revisión del diff contra la lista de menores de la revisión de las partes 2 y 3 de F-13 |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`fix/F-14-pendientes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5) |
+| Componente | F-14 |
+| Propósito | Corregir pendientes menores de las alertas de F-14 anotados por la revisión |
+| Consulta resumida | Corregir: notify_case_closed sin protección del publicador, helper para crear el flujo de alertas, comentario de NEVER_DECODE, orden de imports y SPEC desalineado |
+| Resultado obtenido | Pruebas rojas y corrección en alerting, alert_policy, redis_alert_stream y rutas_alertas; SPEC alineado |
+| Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
+| Cómo se validó | Revisión del diff contra la lista de menores de la revisión de las partes 1 a 3 de F-14 |
