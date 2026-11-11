@@ -28,7 +28,7 @@
 | F-23 | pendiente |
 | F-24 | pendiente |
 | F-25 | pendiente |
-| F-26 | verificacion |
+| F-26 | implementacion |
 | F-27 | pendiente |
 | F-28 | pendiente |
 | F-29 | pendiente |
