@@ -1,6 +1,6 @@
 # SPEC F-36: Cancelación en curso
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-36-1-cancelacion-en-curso
 **Verificación IA:** tests 1075f28
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
@@ -96,3 +96,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code Sonnet 5.5 (no independiente) | 2026-11-10 | Revisor: diff cumple SPEC parte 1 (supervisor en process/_run, main cableado, cancel idempotente, gracia 10s). Hallazgo menor ya registrado: stderr FFmpeg perdido en modo supervisado (44c6c61) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Claude Code Sonnet 5.5 (no independiente) | 2026-11-10 | 14 pruebas unitarias nuevas (tests/unit/test_cancel_heavy.py) en rojo: scenarios/cancel_heavy.py no existe; integración Linux (Docker, /proc, sin ps) 2 en verde sobre el supervisor existente y 1 omitida sin ffmpeg; aceptación omitida sin CANCEL_HEAVY_JSON (medicion pendiente, nodos reales F-38); sin codigo de produccion (1075f28) |
+| tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; la parte 2 es un escenario sin TDD estricto: la integración y la aceptación ya pasan o se omiten, solo las unitarias del escenario están en rojo |
