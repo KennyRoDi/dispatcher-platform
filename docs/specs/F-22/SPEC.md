@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-22-3-medicion-throughput
 **Verificación IA:** verificacion ef54219
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -223,3 +223,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-11 | Runner M3 añadido: exige archivo >=200 MiB, cinco repeticiones predeterminadas por tamaño, mide transferencia completa y completion, guarda CSV y media/desviación, elimina el objeto entre repeticiones para evitar dedup. Sintaxis y conformidad 0; pruebas nuevas 6 passed. Medición real pendiente por falta de archivo/nodos; QA no independiente. (d2cd1e4) |
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó continuar sin aprobación humana; pruebas 6/6 y conformidad 0; la medición de sistema no se ejecuta porque no están disponibles el archivo de 200 MiB y los nodos reales, no se estima evidencia. |
 | verificación IA de verificacion | Codex | 2026-11-11 | QA del runner M3 F-22: pruebas del parser y suite de chunks/rutas/cliente en verde; conformidad 0. No se corren mediciones: falta archivo sintético >=200 MiB, coordinador accesible y clúster real de nodos; F-38 local es simulación y no sirve como evidencia. Verificación no independiente. (ef54219) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo. Evidencia de rendimiento debe ser medida y no hay dataset de medios ni nodos reales; se registra la limitación sin valores estimados. |
