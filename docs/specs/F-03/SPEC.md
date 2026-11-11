@@ -28,7 +28,7 @@ El equipo obtiene un dataset reproducible que cumple el mínimo de [B.3 Dataset 
 - **Cuando** se ejecuta
 - **Entonces** hay ≥ 40 casos, ≥ 10 heterogéneos (5 livianos y 5 pesados), ≥ 20 000 mensajes, ≥ 300 imágenes, ≥ 150 audios y ≥ 5 casos con archivos ≥ 200 MB
 
-Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (mismos nombres, conteos y hashes de contenido); el manifiesto declara la proporción de contenido positivo por categoría de imagen (RF-20) y duraciones distintas de audio (RF-21); todos los archivos tienen origen `sintetico` y la licencia `generado por el equipo, uso academico` (RNF-04; provisional, el repo no tiene `LICENSE`); cada caso pesado es heterogéneo.
+Adicionales derivados del enunciado: misma semilla produce el mismo manifiesto (mismos nombres, conteos y hashes de contenido); el manifiesto declara la proporción de contenido positivo por categoría de imagen (RF-20) y duraciones distintas de audio (RF-21); todos los archivos tienen origen `sintetico` y la licencia `generado por el equipo, uso academico` (RNF-04; valor actual hasta la parte 7, que lo cambia a MIT); cada caso pesado es heterogéneo.
 
 ## Diseño
 
