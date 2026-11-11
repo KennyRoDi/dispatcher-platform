@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-03-6-dataset-sintetico
 **Verificación IA:** verificacion 153e182
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -197,3 +197,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Ejecute pytest unit: 1588 passed, 7 skipped, 0 failed; integracion ffmpeg real revisada en la misma corrida. Diff desde tests: solo 4 archivos de src/scripts (25+/17-), tests/ intactos. Desviaciones aceptadas: NUL en _row_defect; enlaces simbolicos en --out se rechazan con RuntimeError. No revise el rechazo de symlinks fuera del caso de la prueba. (c6a400b) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | pytest: 1588 passed, 7 skipped, 6 xfailed. Con --runxfail los 6 xfail de test_dataset_parte7_qa.py fallan. Diff desde la implementacion solo añade esa prueba y el SPEC; src/scripts intactos. Reproduccion ffmpeg real (seed 7, diff -r identico) es dato del QA, no repetido. (153e182) |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA parte 7: corregir hallazgos 1 (sustituto Unicode en _check_row), 4 (--out enlace roto como error de uso) y 5 (rechazo de enlace no borra manifest previo); 2, 3 y 6 quedan como pendientes locales |
