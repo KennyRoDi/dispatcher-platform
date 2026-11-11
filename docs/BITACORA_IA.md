@@ -1072,3 +1072,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Corrección en dataset_verdad.py, dataset_truth_files.py, ground_truth.py y provenance.py; se retiraron los xfail corregidos |
 | Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
 | Cómo se validó | Revisión del diff contra los hallazgos de QA anotados en la bitácora local; los xfail restantes (rellenos y Unicode) quedan por decisión SUP-27 |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`fix/F-13-pendientes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5) |
+| Componente | F-13 |
+| Propósito | Corregir pendientes menores del reporte consolidado de F-13 anotados por la revisión |
+| Consulta resumida | Corregir: 503 que filtraba host y puerto, almacén no verificable distinto de objeto inexistente, hallazgos ilegibles como incidencia, consulta con sha vacío, assert por TypeError y tipos |
+| Resultado obtenido | Pruebas rojas (test_reporte_pendientes.py) y corrección en redis_finding_store, build_report, report_json, rutas_reporte, consolidated_report y ports; AD-38 actualizado |
+| Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
+| Cómo se validó | Revisión del diff contra la lista de menores de la revisión de las partes 2 y 3 de F-13 |
