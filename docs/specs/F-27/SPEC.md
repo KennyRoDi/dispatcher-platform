@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-27-1-tls-entre-nodos
 **Verificación IA:** implementacion 5be25e1
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -169,3 +169,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: 7 archivos de src/scripts (+67/-22), tests intactos. Suite completa tras 5be25e1: 1895 passed, 8 skipped, 3 xfailed. Toca archivos de Jose (config, reporter, storage), conexion.py (Nahum) y 3 scripts: avisar. Limites: Reporter rechaza http con TLS activo aunque se inyecte sesion; Storage no comprueba con cliente inyectado; demo_feeder, fetch_results, seed_minio, generate_dataset quedan en claro. Sin prueba real contra servicios. (5be25e1) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: submit_case/cancel_case/fetch_report/poll_case envian en claro con TLS activo; fetch_results, demo_feeder y generate_dataset fuera de tls.py (media); TlsConfigError sin atrapar; credenciales en config_summary |
