@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** implementacion 85d6de3
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -129,3 +129,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests. Suite completa tras 85d6de3: 1784 passed, 8 skipped, 3 xfailed. 148 lineas en src (envelope_cipher 139). cryptography==50.0.2. Sin llaves fijas (grep). Desviaciones a documentar en AD-34: AAD incluye cabecera; tope MAX_CHUNK_SIZE 64 MiB; decrypt entrega chunks previos autenticados antes de fallar. (85d6de3) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: _read_exact toma read()==None como EOF y cifra un objeto truncado sin error (media); KEK no-bytes da TypeError en vez de KeyUnavailable; chunk_size float/bool aceptado |
