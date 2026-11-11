@@ -124,6 +124,21 @@ No aplica. F-29 aporta evidencia de ejecución a la ficha M4, no mediciones de S
 - Antes de anexar se reintenta el ancla atrasada (`_catch_up_anchor`); si falla la escritura o el `fsync` del anexo, se hace `ftruncate` al tamaño previo.
 - Sin tope de tamaño de campo (QA: un `actor` de 50 MiB tarda 0,36 s por `record`; dato del QA).
 
+## Límites declarados de la parte 3
+
+- La llave se lee con `FileKeyProvider` (F-28) desde `CUSTODY_KEY_FILE`; esto cierra el pendiente de la parte 2. Una llave de 32 ceros se acepta.
+- `verify_custody.py` declara un `Protocol KeyProvider` local porque `ports.py` no lo expone (ajustar si F-28 lo mueve).
+- El hash de los objetos se calcula con `hashlib` en el caso de uso, porque la capa de aplicación no importa adaptadores; no se usa `sha256_de_archivo`.
+- Un ingreso exige que el objeto exista. El resultado de una transformación ausente se omite; con otro hash es violación `evidencia`.
+- Un ancla ilegible se trata como `Anchor(seq=-1)` y produce violación `ancla`.
+- El adaptador `DirectoryStore` vive en el script.
+- Códigos de salida: 0 sin violaciones, 1 con violaciones, 2 si no se pudo verificar.
+- QA-1 (UTF-8 inválido) y QA-2 (ancla leída antes que el log) corregidos: UTF-8 inválido da `utf8_invalido` y exit 1.
+- QA-3 (el mensaje de error de llave nombra `KEK_FILE`, viene de `FileKeyProvider` de F-28) y QA-4 (un objeto ilegible aborta con exit 2 y oculta violaciones de cadena) quedan con xfail estricto.
+- Un nombre de objeto de más de 255 caracteres da exit 2.
+- El verificador carga todo el log en memoria. Dato del QA bajo `tracemalloc`, no medición de SO: 200000 entradas, 81,5 MB de log, pico de 324 MiB.
+- Prueba A local sintética en `docs/evidencia/F-29_prueba_A_local_sintetica_2026-11-11.md`: una sola máquina; no acredita la prueba A en nodos ni M4.
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
@@ -136,7 +151,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 ## Riesgos y preguntas abiertas
 
-1. **Orden frente a F-28.** El backlog no declara dependencia, pero reutilizar `FileKeyProvider` exige que la parte 2 de F-28 esté en `main` (hoy en PR). ¿Se apila la parte 2 de F-29 sobre F-28, o se espera la fusión? La parte 1 no depende.
+1. **Orden frente a F-28 (resuelta: F-28 ya está en `main`; la parte 3 usa `FileKeyProvider`).** El backlog no declara dependencia, pero reutilizar `FileKeyProvider` exige que la parte 2 de F-28 esté en `main` (hoy en PR). ¿Se apila la parte 2 de F-29 sobre F-28, o se espera la fusión? La parte 1 no depende.
 2. **Dónde vive el ancla.** En el mismo disco que el log, quien lo escribe puede reponer un ancla antigua y truncar a ese punto. ¿Se acepta el límite (SUP-31) o se copia el ancla a otro nodo en F-38?
 3. **Llave simétrica.** Quien verifica puede forjar. ¿Se acepta HMAC, o se prefiere Ed25519 (verificador sin poder de forjar, más gestión)?
 4. **Escritor único.** Workers en tres nodos deberían enviar sus registros al coordinador; hoy no hay endpoint. ¿Lo crea quien cablea el puerto (rutas de subtareas) o se anota como límite?
