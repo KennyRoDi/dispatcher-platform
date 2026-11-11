@@ -1,6 +1,6 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests f18bbd6
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
@@ -114,3 +114,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | orquestador | 2026-11-11 | SPEC F-13 completo (grep … = 0), diff contra main solo el SPEC, Base main; AD-38 y SUP-34 libres segun arquitecto; pila de 3 partes; 10 preguntas abiertas con decision provisional: aceptar (811c1a5) |
 | plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests (2 archivos nuevos), src intacto; ambos modulos fallan en coleccion con ModuleNotFoundError src.domain.evidence_position (rojo); API asumida fijada por las pruebas (f18bbd6) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
