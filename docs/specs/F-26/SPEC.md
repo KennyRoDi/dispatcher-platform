@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-26-1-autenticacion-y-roles
-**Verificación IA:** tests 2d114a5
+**Verificación IA:** implementacion f85b3d9
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -159,3 +159,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests (4 archivos nuevos, dobles y contratos, y 'jwt' añadido a TERCEROS_PROHIBIDOS en test_arquitectura); src, scripts y requirements intactos. pytest: errores de coleccion ModuleNotFoundError jwt_tokens (rojo por falta de modulos). PyJWT 2.15.1 instalado solo en el venv. Decision /docs publicas o deshabilitadas: pendiente, la prueba admite ambas. (2d114a5) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff: requirements (pyjwt==2.15.1), ports.py, jwt_tokens.py, seguridad.py; tests intactos (diff de tests vacio). Ejecute la suite completa tras el ultimo commit: 1941 passed, 7 skipped, 3 xfailed. Sin comentarios nuevos ni secretos fijos (grep). 198 lineas de codigo (<400). Desviaciones aceptadas: ClosedVerifier ante configuracion invalida; /docs publicas; sin cache del verificador. (f85b3d9) |
