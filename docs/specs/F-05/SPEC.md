@@ -3,37 +3,97 @@
 **Fase:** plan
 **Base:** main
 **Verificación IA:** pendiente
-**Historia:** US-05 · **Requisitos:** … · **Responsable:** N
+**Historia:** US-05 · **Requisitos:** RF-04, RF-05 · **Responsable:** N
 
 ## Objetivo
 
-… Qué cambia para quién y por qué, citando el enunciado.
+El coordinador hoy no descompone un caso por tipo de contenido. Cada sub-tarea nace ya resuelta por el cliente a una de las 5 operaciones de FFmpeg y va a `queue:{operacion}` (`src/coordinator/rutas_casos.py:46-49,114`); no existen colas por texto, imagen y audio, ni la regla de que un video produce sub-tareas de audio e imagen. El enunciado exige «colas de trabajo con descomposición del caso en sub-tareas y **routing por tipo de contenido** hacia workers especializados» (B.4, línea 301) y RF-04/RF-05 piden sub-tareas trazables a su fuente y al caso, y que texto, imagen y audio lleguen solo a colas consumidas por su tipo de worker.
+
+Esta feature entrega, para el coordinador (Nahúm) y los workers de F-07 a F-09, una función pura que descompone un caso en sub-tareas y un mapa tipo→cola, más el caso de uso que las encola por el puerto `WorkQueue`, con un log de routing como evidencia.
+
+**Qué existe y qué falta (verificado en el código):**
+
+| Pieza | Estado | Dónde |
+|---|---|---|
+| `Subtask` con `case_id`, `source_sha256`, `kind`; `ContentKind` = TEXT, IMAGE, AUDIO (sin video) | Existe | `src/domain/subtask.py:7-10,18-27` |
+| Puerto `WorkQueue` y su doble `FakeWorkQueue`, con contrato `comprobar_work_queue` | Existe | `src/application/ports.py:63-69`, `tests/dobles.py:79-103`, `tests/contratos.py:21-35` |
+| Routing por clase de nodo (cpu/gpu) por tipo, con alternativa | Existe (F-32); es otra cosa: elige clase de nodo, no cola | `src/domain/routing.py:13-37`, `config/routing.toml`, `src/adapters/routing_config.py` |
+| Clasificación por extensión, solo `video`/`audio`/`other` | Existe, sin texto ni imagen, atada a FastAPI | `src/coordinator/router.py:35-54` |
+| Enrutado a colas por operación FFmpeg, con cola `:high` | Existe, camino heredado que usa el worker FFmpeg | `src/coordinator/router.py:112-118`, `src/coordinator/rutas_casos.py:28-131`, `src/workers/config.py:16-22,176-180` |
+| Selección de colas por worker (`WORKER_QUEUES`) | Existe, pero solo admite las 5 operaciones | `src/workers/config.py:74-86,136-137` |
+| Descomposición de fuentes (texto, imagen, audio, video) en sub-tareas | **Falta** | n/a |
+| Video → sub-tareas de audio e imagen | **Falta** | n/a |
+| Mapa tipo→cola de análisis y su log de routing | **Falta** | n/a |
+| Adaptador Redis de `WorkQueue` | **Falta** (lo entrega F-06, con `BLMOVE`) | n/a |
+| Entidad `Case`/fuente en el dominio | **Falta** (F-01 pendiente) | n/a |
 
 ## Alcance
 
-**Incluye:** …
+**Incluye:**
+- Dominio puro: `SourceKind` (texto, imagen, audio, video), `CaseSource`, `classify_source(nombre)` por extensión, `decompose(...)` y el mapa `queue_for(kind)`.
+- Caso de uso `DispatchCase` sobre los puertos `WorkQueue` y `Clock`, que encola cada sub-tarea en la cola de su tipo y registra un log de routing por sub-tarea.
+- Adaptador Redis mínimo de `WorkQueue` para colas por tipo (`RPUSH`/`BLPOP`, límite por `LLEN`), provisional hasta que F-06 lo reemplace por `BLMOVE`, para la prueba de integración con `fakeredis`.
+- Pruebas de conformidad del adaptador con `comprobar_work_queue`.
 
-**No incluye:** …
+**No incluye:**
+- Cambiar `Subtask`, `ContentKind` ni `RoutingTable` (contratos compartidos y F-32): el video es un tipo de fuente, no un `ContentKind`.
+- Cambiar el camino heredado `POST /cases` y las colas `queue:{operacion}` del worker FFmpeg.
+- Elegir la clase de nodo (cpu/gpu): es F-32; las colas de F-05 son por tipo.
+- Extraer el audio o los fotogramas de un video (lo hace el worker de F-08/F-09 al recibir la sub-tarea), `BLMOVE` e `inflight` (F-06), límite y `Retry-After` (F-24), prioridad como ZSET (AD-04), documentos adjuntos y la entidad `Case` (F-01).
 
 ## Criterios de aceptación
 
-… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
+Copiados de `docs/backlog/cola-workers.md` (US-05):
+
+- **Dado** un caso con texto, imagen, audio y video
+- **Cuando** se descompone
+- **Entonces** cada sub-tarea llega a la cola de su tipo; el video genera sub-tareas de audio e imagen
+
+Pruebas previstas por la historia: U descomposición y mapa de colas; I `fakeredis`; A worker de cada tipo consume solo lo suyo. Demuestra: prueba A. Evidencia: log de routing.
 
 ## Diseño
 
-… Contratos de `docs/CONTRATOS.md` que implementa y que usa. Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+**Contratos.** Usa `WorkQueue`, `Clock` (`src/application/ports.py`), `Subtask`, `ContentKind` y `Priority` sin modificarlos. No implementa ningún contrato nuevo de `docs/CONTRATOS.md`. Programa contra `FakeWorkQueue` y `FakeClock` de `tests/dobles.py`; el adaptador Redis pasa por `comprobar_work_queue`. Aplica AD-18 (colas por tipo; la clase de nodo sigue siendo de F-32) y AD-12 solo en lo que `has_capacity` ya ofrece.
+
+**Capas y archivos (todos nuevos; ningún archivo ajeno se toca):**
+
+| Capa | Archivo | Contenido |
+|---|---|---|
+| Dominio | `src/domain/decomposition.py` | `SourceKind`, `CaseSource(sha256, name, kind)`, `classify_source`, `decompose`, `queue_for`, `QUEUE_BY_KIND` |
+| Aplicación | `src/application/dispatch_case.py` | `DispatchCase(queue, clock).execute(case_id, sources, priority)` y log de routing |
+| Adaptador | `src/adapters/redis_type_queue.py` | `RedisTypeQueue(redis, capacity)` que implementa `WorkQueue` (provisional hasta F-06) |
+
+**Reglas de `decompose`** (decisiones propuestas, ver preguntas abiertas):
+- Texto, imagen y audio dan una sub-tarea del mismo `ContentKind`; el video da dos: una `AUDIO` y una `IMAGE`, ambas con el `source_sha256` del video.
+- Id determinista `{case_id}:{sha256}:{kind}`: trazable a caso, fuente y tipo, y la misma fuente repetida en un caso produce una sola sub-tarea (sin duplicar evidencia idéntica).
+- Orden estable: el de las fuentes y, por fuente, imagen antes que audio.
+- `classify_source` reconoce por extensión (sin distinguir mayúsculas): texto `.txt`, `.csv`, `.json`; imagen `.jpg`, `.jpeg`, `.png`; audio `.opus`, `.ogg`, `.mp3`, `.wav`, `.m4a`, `.aac`, `.flac`; video `.mp4`, `.mov`, `.mkv`, `.avi`, `.webm`. Una extensión desconocida lanza `ValueError` con el nombre (nunca se descarta en silencio). Las extensiones de audio y video se alinean con las de `src/coordinator/router.py:35-41`, que no se modifica.
+- Mapa de colas: TEXT→`queue:text`, IMAGE→`queue:image`, AUDIO→`queue:audio`; nombres distintos de los de las operaciones FFmpeg, de modo que no se mezclan con el camino heredado. Se define en dominio como constante; el refactor de IMPLEMENTACION §4 («pasar el mapa a configuración») queda fuera de esta feature.
+
+**`DispatchCase`.** Fija `enqueued_at` con `Clock.now()`, descompone, comprueba `has_capacity` de cada cola destino antes de encolar y, si alguna está llena, lanza `QueueFull` sin haber encolado nada (la comprobación no es atómica entre procesos; es aceptable porque F-24 hace el límite real). Después encola en el orden de `decompose` y emite por sub-tarea un log INFO `routing case=<id> subtask=<id> kind=<tipo> source=<sha256> queue=<cola>`. Devuelve la lista de `(cola, Subtask)`.
+
+**Worker por tipo.** «Consume solo lo suyo» se cumple porque cada worker toma de una única cola por tipo vía `WorkQueue.take(queue, ...)`; la selección de colas del worker FFmpeg (`WORKER_QUEUES`) no cambia. Cablear los workers de F-07 a F-09 a `queue:{tipo}` es de esas features.
+
+**Reutiliza** `Subtask.to_dict`/`from_dict` (serialización en Redis del adaptador), `Priority.from_name`, `FakeWorkQueue` y `comprobar_work_queue`.
+
+**Decisión nueva propuesta** (se registra en `docs/ARQUITECTURA.md` §8 en la fase de documentación, no ahora): descomposición por tipo con colas `queue:{tipo}` y video como fuente que se expande, sin ampliar `ContentKind`. Alternativa rechazada: añadir `VIDEO` a `ContentKind`, porque rompe `RoutingTable`, que exige regla por cada `ContentKind` (`src/domain/routing.py:13-20`), y es contrato compartido.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | … | … |
-| Integración | … | … |
-| Aceptación | … | … |
+| Unitaria | `test_video_genera_subtareas_de_audio_e_imagen` | Un video da exactamente una sub-tarea `AUDIO` y una `IMAGE` con el `source_sha256` del video |
+| Unitaria | `test_caso_heterogeneo_da_una_subtarea_por_fuente_y_dos_por_video` | Texto, imagen, audio y video dan 5 sub-tareas con `case_id`, ids deterministas y orden estable |
+| Unitaria | `test_fuente_repetida_no_duplica_subtarea`, `test_extension_desconocida_se_rechaza`, `test_caso_sin_fuentes_da_lista_vacia` | Casos borde de la descomposición y de `classify_source` |
+| Unitaria | `test_tipo_enruta_a_su_cola` | `queue_for` cubre todos los `ContentKind` con colas distintas entre sí y distintas de las 5 operaciones FFmpeg |
+| Unitaria | `test_dispatch_encola_cada_subtarea_en_la_cola_de_su_tipo`, `test_dispatch_con_cola_llena_no_encola_nada`, `test_dispatch_registra_log_de_routing` | `DispatchCase` con `FakeWorkQueue` y `FakeClock`, sin red ni reloj real; el log trae caso, sub-tarea, tipo, fuente y cola |
+| Contrato | `comprobar_work_queue` sobre `RedisTypeQueue` con `fakeredis` | El adaptador cumple el mismo contrato que el doble |
+| Integración | `test_dispatch_con_fakeredis_deja_cada_subtarea_en_su_lista` | Con `fakeredis`, `DispatchCase` + `RedisTypeQueue` deja en `queue:text`, `queue:image` y `queue:audio` los payloads esperados y recuperables con `Subtask.from_dict` (marcador `integration`) |
+| Aceptación | `test_worker_de_cada_tipo_consume_solo_lo_suyo` | Dado un caso con texto, imagen, audio y video, tres consumidores, uno por cola, toman solo sub-tareas de su `kind`; el video aporta una a audio y otra a imagen; no queda nada sin consumir (marcador `acceptance`, `FakeWorkQueue`) |
 
 ## Mediciones
 
-… Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
+No aplica.
 
 ## Plan de pila
 
@@ -41,11 +101,26 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-05): …` | … |
+| 1 | `feat(F-05): descomponer caso y enrutar por tipo` | Dominio `decomposition.py` y caso de uso `dispatch_case.py` con log de routing, contra los puertos y dobles. Estimado 110 a 140 líneas |
+| 2 | `feat(F-05): encolar sub-tareas por tipo en redis` | `redis_type_queue.py`, adaptador provisional de `WorkQueue`, con su contrato y la prueba de integración con `fakeredis`. Estimado 70 a 90 líneas |
 
 ## Riesgos y preguntas abiertas
 
-… Lo que la persona que aprueba debe decidir.
+**Decisiones propuestas por el Arquitecto (criterio delegado: la más conveniente y menos problemática):**
+1. **Video no entra a `ContentKind`.** Se trata como fuente que se expande; evita cambiar un contrato compartido y romper `RoutingTable` y su TOML.
+2. **Colas `queue:text|image|audio`, separadas de las FFmpeg.** No se toca el camino heredado ni a su worker; los dos mundos conviven hasta integrarlos.
+3. **Id `{case_id}:{sha256}:{kind}` con deduplicación por fuente.** Es determinista, trazable y reintentable sin duplicar.
+4. **Sin cambios al `POST /cases` heredado.** El enganche del coordinador a `DispatchCase` queda para cuando F-01 defina la entidad `Case` con fuentes (de Nahúm también); F-05 entrega lo que ese enganche necesita.
+5. **Adaptador Redis provisional en la parte 2.** Es la única forma de cumplir «I `fakeredis`» sin esperar a F-06; se acota a `RPUSH`/`BLPOP` y F-06 lo reemplaza por `BLMOVE` e `inflight`.
+
+**Riesgos y preguntas abiertas:**
+- **Solape con F-06.** Ambas son de Nahúm y F-06 también entrega un adaptador Redis de `WorkQueue`. Si F-06 se fusiona antes, la parte 2 se reduce a su prueba de integración y se elimina `redis_type_queue.py`. La persona decide si prefiere eso o mantener la parte 2 como está.
+- **Cómo sabe el worker que debe extraer pistas.** `Subtask` no distingue «imagen propia» de «fotogramas de un video»; ambos tienen el mismo `kind` y el `source_sha256` del video. El worker detecta el contenedor por el archivo. Si se quiere explícito, hay que agregar un campo a `Subtask`, que es un cambio de contrato (PR aparte, con aviso a José y Nahúm). No se resuelve aquí.
+- **Documentos adjuntos.** El enunciado menciona «video/documento» en casos heterogéneos pero B.4 solo pide routing para texto, imagen, audio y video; quedan fuera y una extensión de documento lanza `ValueError`. Confirmar.
+- **Lista de extensiones** de texto, imagen, audio y video es propuesta nuestra; F-02 puede fijar los formatos de chat admitidos. Se alineará cuando exista.
+- **Cola llena a mitad de caso.** La comprobación previa de capacidad no es atómica entre procesos y puede dejar un caso parcialmente encolado si hay concurrencia; F-24 (backpressure, en PR) y F-06 lo resuelven. Se declara como límite, sin medición.
+- **Prioridad.** `Subtask.priority` viaja en el payload pero no separa colas (la prioridad como ZSET es AD-04, de M2). El camino heredado sí usa `:high`; no se replica aquí.
+- **Evidencia «log de routing».** Se guardará como salida del log de la prueba de aceptación en `docs/evidencia/` en la fase de documentación; no se inventa ni se estima ningún dato.
 
 ## Aprobaciones
 
