@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 86fcb73
+**Verificación IA:** documentacion f3df7a2
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -143,3 +143,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA e928ff8: 8 xfail, 3 corregidos y desmarcados tras ffdd5de; quedan 3 desviaciones declaradas (decrypt entrega chunks previos, encrypt generador, SHA en mayusculas no se normaliza). Sin llaves en trazas. Memoria 32 MiB: pico <8 chunks segun QA (no reproducido por mi). Suite 1825 passed. (86fcb73) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff 86fcb73..f3df7a2 solo docs (ARQUITECTURA AD-34, REQUERIMIENTOS SUP-30, modulo-M4 borrador, SPEC). Numeros presentes (grep). Sin pytest: no cambio codigo. Bitacora en estado segun el subagente (no la verifique). Cita NIST §8.3 no verificada por mi. (f3df7a2) |
