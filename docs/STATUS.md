@@ -33,7 +33,7 @@
 | F-28 | pendiente |
 | F-29 | pendiente |
 | F-30 | pendiente |
-| F-31 | documentacion |
+| F-31 | revision |
 | F-32 | pendiente |
 | F-33 | pendiente |
 | F-34 | pendiente |
