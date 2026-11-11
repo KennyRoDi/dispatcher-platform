@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-23-3-deduplicar-antes-de-transferir
-**Verificación IA:** revision 3cbadc3
+**Verificación IA:** tests 1ceae1e
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó el avance autónomo. Documentación inspeccionada y bitácora oficial publicada. |
 | verificación IA de revision | Codex | 2026-11-11 | Revisión contra SPEC F-23 parte 2: MinioObjectStore implementa exists/put/open, deduplica SHA-256, valida claves inseguras, libera conexión al cerrar y preserva el contrato de put fallido. Integración MinIO real 4/4, unitarias 23/23, sin secretos. QA del revisor no independiente. (3cbadc3) |
 | revision | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar las fases de manera autónoma; revisión del diff contra SPEC y CI verde. |
+| verificación IA de tests | Codex | 2026-11-11 | F-23 parte 3: staging del coordinador desde STAGING_DIR, MinIO cifrado obligatorio con KEK, TLS validado, dedup antes del staging, cliente evita chunks repetidos, volumen local persistente, script M3. Unitarias 115 passed, integración MinIO real 4 passed, conformidad 0. M3 medido pendiente por falta dataset/coordinador; verificación no independiente. (1ceae1e) |
