@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido
-**Verificación IA:** revision 872ab48
+**Verificación IA:** tests a3621ec
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: diff de 30 lineas en tests/contratos.py y CONTRATOS.md, cumple el SPEC parte 1 sin agregados; cambio aditivo; sin llaves ni datos reales; commit en Conventional Commits. (872ab48) |
 | revision | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 14 unitarias de MinioObjectStore con cliente minio simulado y 4 de integracion con MinIO real (contrato, 8 subidas concurrentes dejan un objeto, put fallido de 1 y 12 MiB no deja objeto). Rojo: el modulo no existe. SPEC: el adaptador valida solo claves inseguras, aprobado por Melany. Contra un borrador: 14/14 y 4/4 contra moto (no MinIO real). (a3621ec) |
