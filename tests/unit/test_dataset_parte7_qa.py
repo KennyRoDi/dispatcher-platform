@@ -15,7 +15,6 @@ def _generated(tmp_path):
     return out, _rows(out)
 
 
-@pytest.mark.xfail(strict=True, reason="_check_row llama a file.resolve() fuera del try: una ruta con sustituto suelto lanza UnicodeEncodeError con traza")
 def test_una_ruta_con_sustituto_unicode_suelto_se_reporta_como_problema(tmp_path):
     out, rows = _generated(tmp_path)
     rows[0]["path"] = "caso-01/\ud800x"
@@ -26,7 +25,6 @@ def test_una_ruta_con_sustituto_unicode_suelto_se_reporta_como_problema(tmp_path
     assert any("caso-01" in problem for problem in problems)
 
 
-@pytest.mark.xfail(strict=True, reason="main solo rechaza un --out existente que no es directorio; un enlace roto llega a mkdir y lanza FileExistsError con traza")
 def test_un_out_que_es_un_enlace_roto_se_rechaza_con_error_de_uso(tmp_path):
     out = tmp_path / "roto"
     out.symlink_to(tmp_path / "no-existe")
@@ -53,7 +51,6 @@ def test_un_out_con_punto_punto_conserva_el_error_original_y_no_deja_padres(tmp_
     assert not (tmp_path / "rel").exists()
 
 
-@pytest.mark.xfail(strict=True, reason="el rechazo de enlaces ocurre despues de borrar <out>/manifest.json: un rechazo sin generar nada destruye el manifiesto previo")
 def test_rechazar_un_enlace_no_borra_el_manifiesto_previo(tmp_path):
     out = tmp_path / "out"
     out.mkdir()

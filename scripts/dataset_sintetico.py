@@ -132,8 +132,11 @@ def _check_row(row: dict, root: Path) -> list[str]:
     if row["licencia"] != LICENSE_NAME:
         problems.append(f"{path}: licencia {row['licencia']!r} distinta de {LICENSE_NAME!r}")
     file = root / path
-    if not file.resolve().is_relative_to(root.resolve()):
-        return problems + [f"{path}: apunta fuera del directorio del manifiesto"]
+    try:
+        if not file.resolve().is_relative_to(root.resolve()):
+            return problems + [f"{path}: apunta fuera del directorio del manifiesto"]
+    except UnicodeError:
+        return problems + [f"{path}: ruta con caracteres no codificables"]
     try:
         if not file.is_file():
             return problems + [f"{path}: no existe"]
@@ -215,7 +218,7 @@ def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = ru
         params = _load_params(args.params)
     except ValueError as error:
         parser.error(f"--params: {error}")
-    if out.exists() and not out.is_dir():
+    if (out.exists() or out.is_symlink()) and not out.is_dir():
         parser.error(f"--out: {out} no es un directorio")
     rows = _generate(plan_dataset(args.seed, params), out, runner)
     print(f"{len(rows)} archivos en {out}")
@@ -225,12 +228,13 @@ def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = ru
 def _generate(plan: DatasetPlan, out: Path, runner: Runner) -> list[dict]:
     created_dirs = [directory for directory in (out, *out.parents) if not directory.exists()]
     out.mkdir(parents=True, exist_ok=True)
-    (out / MANIFEST_NAME).unlink(missing_ok=True)
     before = set(out.rglob("*"))
     try:
         links = sorted(str(path) for path in before if path.is_symlink())
         if links:
             raise RuntimeError(f"--out contiene enlaces simbolicos que no se siguen: {links}")
+        (out / MANIFEST_NAME).unlink(missing_ok=True)
+        before.discard(out / MANIFEST_NAME)
         rows = build_manifest(plan, out, runner)
         (out / MANIFEST_NAME).write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     except BaseException:
