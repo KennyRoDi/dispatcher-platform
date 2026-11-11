@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-13-2-reporte-consolidado
-**Verificación IA:** documentacion eba8f45
+**Verificación IA:** revision 3c44e26
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -150,3 +150,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 3 en AD-38, nota del ejemplo, curl en DEMO.md, SPEC corregido a docs/ejemplos; bitacora en estado; sin cambios de codigo (eba8f45) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 3: 170 lineas src, case_id validado, ruta no pisa /report, limites AD-38 coinciden con codigo; 4 menores no bloqueantes anotados en CLAUDE.md local (3c44e26) |
