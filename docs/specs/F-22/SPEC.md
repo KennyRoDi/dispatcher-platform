@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-22-3-medicion-throughput
-**Verificación IA:** tests 0c25562
+**Verificación IA:** implementacion d2cd1e4
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -220,3 +220,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Codex | 2026-11-11 | F-22 parte 3, fase tests: pruebas de parseo de tamaños binarios y rechazo de tamaños inválidos/duplicados; import falla en rojo esperado porque el runner aún no existe. Sin código de producción; verificación no independiente. (0c25562) |
 | tests | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó el avance autónomo; suite de pruebas nueva falla por la función/runner aún ausente como se espera en TDD. |
+| verificación IA de implementacion | Codex | 2026-11-11 | Runner M3 añadido: exige archivo >=200 MiB, cinco repeticiones predeterminadas por tamaño, mide transferencia completa y completion, guarda CSV y media/desviación, elimina el objeto entre repeticiones para evitar dedup. Sintaxis y conformidad 0; pruebas nuevas 6 passed. Medición real pendiente por falta de archivo/nodos; QA no independiente. (d2cd1e4) |
