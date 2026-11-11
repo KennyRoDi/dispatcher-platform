@@ -111,13 +111,18 @@ class JsonlCustodyLog:
             raise CustodyCorrupted("el ancla de custodia es ilegible") from error
 
     def _catch_up_anchor(self, last: dict | None) -> None:
+        # El ancla génesis se escribe antes del primer anexo: así «sin ancla» con entradas siempre es alteración.
         # Tras una caída entre el anexo y el ancla, esta queda una entrada atrás; se corrige antes de anexar
         # para que fallos de E/S repetidos no la dejen fuera de la tolerancia de una entrada.
+        sealed_hash = last["entry_hash"] if last else GENESIS_HASH
         anchor = self._read_anchor()
-        if last and (anchor is None or anchor.seq < last["seq"]):
-            self._write_anchor(make_anchor(self._key, last["seq"], last["entry_hash"]))
+        if anchor is None or anchor.entry_hash != sealed_hash:
+            self._replace_anchor(make_anchor(self._key, last["seq"] if last else 0, sealed_hash))
 
     def _write_anchor(self, anchor: Anchor) -> None:
+        self._replace_anchor(anchor)
+
+    def _replace_anchor(self, anchor: Anchor) -> None:
         temporary = self._anchor_path.with_name(self._anchor_path.name + ".tmp")
         content = json.dumps({"seq": anchor.seq, "entry_hash": anchor.entry_hash, "mac": anchor.mac})
         temporary.unlink(missing_ok=True)

@@ -137,12 +137,14 @@ def _is_text(value: object) -> bool:
 
 def _check_anchor(key: bytes, total: int, hash_at: Callable[[int], str], anchor: Anchor | None) -> list[Violation]:
     if anchor is None:
-        return [Violation(total, "ancla", "falta el ancla del último eslabón")] if total > 1 else []
+        return [Violation(total, "ancla", "falta el ancla del último eslabón")] if total else []
     if not (_is_seq(anchor.seq) and _is_text(anchor.entry_hash) and _is_text(anchor.mac)):
         return [Violation(max(total, 1), "ancla", "el ancla está mal formada")]
     position = anchor.seq + 1
     if not _same(anchor.mac, _anchor_mac(key, anchor.seq, anchor.entry_hash)):
         return [Violation(position, "ancla", "el sello del ancla no coincide")]
+    if _is_genesis(anchor):
+        return [] if total <= 1 else [Violation(position, "ancla", "el ancla está atrasada más de una entrada")]
     if anchor.seq >= total:
         return [Violation(position, "truncado", "el log termina antes del último eslabón anclado")]
     if anchor.seq < total - 2:
@@ -150,6 +152,10 @@ def _check_anchor(key: bytes, total: int, hash_at: Callable[[int], str], anchor:
     if not _same(hash_at(anchor.seq), anchor.entry_hash):
         return [Violation(position, "ancla", "el ancla no coincide con el eslabón de su posición")]
     return []
+
+
+def _is_genesis(anchor: Anchor) -> bool:
+    return anchor.seq == 0 and _same(anchor.entry_hash, GENESIS_HASH)
 
 
 def _canonical(content: Mapping) -> str:

@@ -138,7 +138,7 @@ def test_el_ancla_se_escribe_con_archivo_temporal_y_rename_en_el_mismo_directori
 
     monkeypatch.setattr(os, "replace", espia)
     registrar(abrir(ruta, llave), 2)
-    assert len(reemplazos) == 2
+    assert len(reemplazos) == 3
     for origen, destino in reemplazos:
         assert destino == os.fspath(ruta_ancla(ruta))
         assert origen != destino
