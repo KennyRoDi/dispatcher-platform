@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 6ffc9b4
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -187,3 +187,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: hueco de truncado cerrado con ancla genesis (casos concretos comprobados por el revisor), adaptador cumple SPEC, limites coinciden con los 4 xfail y A9; pytest segun revisor 1966 passed/10 xfailed. Menores: wording SPEC l.63 vs l.119, _write_anchor envoltorio para parchear en tests, costo de record tras la correccion sin re-medir. (8578c42) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | pytest | 2026-11-11 | 51 pruebas nuevas en rojo por ModuleNotFoundError; sin codigo en src ni scripts (6ffc9b4) |
+| tests | Kenni Rodriguez | 2026-11-11 |  |
