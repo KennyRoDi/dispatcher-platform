@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
-**Verificación IA:** tests 8d643e9
+**Verificación IA:** implementacion 82f685d
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
 
 ## Objetivo
@@ -95,3 +95,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff contra main: SPEC y 3 archivos de test nuevos (unit, integracion, aceptacion); src, scripts y deploy intactos. Ejecute la unitaria: error de coleccion ModuleNotFoundError scripts.verificar_workers (rojo). Integracion y aceptacion se saltan sin docker/entorno. API asumida: incumplimientos_compose, incumplimientos_dockerfile, main(argv) con --compose/--dockerfile; exige user numerico, read_only, cap_drop ALL, no-new-privileges:true, tmpfs /tmp con size, volumen scratch y WORK_DIR=/scratch. (8d643e9) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: Dockerfile.worker, 2 compose, scripts/verificar_workers.py (114 lineas), un test de aceptacion renombrado (sin cambio de contenido); tests unitarios intactos. Ejecute: python -m scripts.verificar_workers rc=0; suite completa tras el commit: 1812 passed, 8 skipped, 3 xfailed. docker compose config valido segun developer (no lo repeti). Pendiente: el worker real con raiz de solo lectura NO se ejecuto; compose local con replicas:3 comparte un volumen scratch. (82f685d) |
