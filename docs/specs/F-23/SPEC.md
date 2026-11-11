@@ -13,7 +13,7 @@ El enunciado pide «manejo eficiente de archivos grandes» [B.5 M3] y RF-32 exig
 
 **Incluye:**
 - Regla del contrato `ObjectStore` pendiente de F-22 (riesgo 8): `put` no confirma el objeto si la lectura de `content` lanza una excepción, y `open` de una clave inexistente lanza `KeyError`.
-- Adaptador `MinioObjectStore` sobre el cliente `minio` ya usado en el I Proyecto, con validación de clave SHA-256 y deduplicación en `put`.
+- Adaptador `MinioObjectStore` sobre el cliente `minio` ya usado en el I Proyecto, con validación de clave segura y deduplicación en `put`.
 - Deduplicación antes de transferir en `POST /uploads` y en el cliente `scripts/subir_por_chunks.py`.
 - Composición en el coordinador desde variables de entorno, con TLS según `src/infrastructure/tls.py`, para que las rutas de subida dejen de responder 503.
 - Script de medición de la tasa de deduplicación y su sección en la ficha M3.
@@ -30,7 +30,7 @@ De `docs/backlog/m3-es-almacenamiento.md` (US-23):
 
 Criterios adicionales derivados de los requisitos:
 
-- RF-32: la clave de cada objeto es el SHA-256 en minúsculas de su contenido en claro (AD-11); una clave que no sea de 64 hexadecimales se rechaza con `ValueError` sin tocar MinIO.
+- RF-32: la clave de cada objeto es el SHA-256 en minúsculas de su contenido en claro (AD-11). El adaptador rechaza con `ValueError`, sin tocar MinIO, solo las claves inseguras: vacías, con `/` o iguales a `.` o `..`. La forma de 64 hexadecimales la garantiza quien llama (`normalizar_sha256` en F-22), porque `comprobar_object_store` usa claves cortas como `"abc"`; exigirla en el adaptador rompería el contrato. Decisión aprobada por Melany Vindas en la fase tests de la parte 2.
 - RF-32: con MinIO real, varias subidas concurrentes del mismo contenido dejan un solo objeto y su contenido es el original.
 - Contrato: si la lectura de `content` falla a mitad de `put`, el objeto no existe después; `open` de una clave inexistente lanza `KeyError`. Lo cumplen el doble, `MinioObjectStore` y `EncryptedObjectStore`.
 - [B.5 M3]: `POST /uploads` de un contenido ya guardado responde 200 `{"stored": true, "sha256", "size"}` sin crear subida en staging, y el cliente no envía chunks.
