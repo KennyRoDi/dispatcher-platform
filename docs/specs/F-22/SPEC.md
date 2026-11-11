@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-22-3-medicion-throughput
-**Verificación IA:** documentacion 6ae487b
+**Verificación IA:** revision a70f68a
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -226,3 +226,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo. Evidencia de rendimiento debe ser medida y no hay dataset de medios ni nodos reales; se registra la limitación sin valores estimados. |
 | verificación IA de documentacion | Codex | 2026-11-11 | Documentación M3 describe el runner, fórmula y bloqueo real; no inventa resultados. Bitácora intentada por el comando oficial. (6ae487b) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo; documentación revisada y las mediciones faltantes se declaran pendientes por falta de entorno real. |
+| verificación IA de revision | Codex | 2026-11-11 | Revisión F-22 parte 3: runner compatible con comando del SPEC, valida tamaños y archivo >=200 MiB, mide las fases solicitadas y elimina el objeto por repetición; código 132 líneas, CSV crudo y media/desviación. No reporta datos sin nodos reales; unitarias verdes. Revisión no independiente. (a70f68a) |
