@@ -26,7 +26,7 @@ FIELDS = {
     "positivo",
     "duracion_s",
 }
-LICENCIA = "generado por el equipo, uso academico"
+LICENCIA = "MIT"
 KINDS = {"texto", "imagen", "audio", "video", "documento"}
 ETIQUETAS = {"imagen": {"positivo", "neutro"}, "audio": {"tono", "ruido"}}
 REDUCED = {

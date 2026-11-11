@@ -49,7 +49,7 @@ def test_los_documentos_declaran_origen_licencia_y_semilla(plan, tmp_path):
     files = generate_documents(plan, tmp_path)
 
     assert ORIGIN == "sintetico"
-    assert LICENSE_NAME == media_generator.LICENSE_NAME == "generado por el equipo, uso academico"
+    assert LICENSE_NAME == media_generator.LICENSE_NAME == "MIT"
     assert files and all(f.origen == ORIGIN and f.licencia == LICENSE_NAME and f.semilla == 7 for f in files)
 
 
