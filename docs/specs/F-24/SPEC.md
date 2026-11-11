@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 930745a7
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -103,3 +103,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: el orquestador escribio el SPEC, verificacion no independiente. Sigue AD-12. Comprobado en codigo: WorkQueue ya declara has_capacity y QueueFull; create_case usa pipeline transaccional; queue_key en router.py; F-06 y F-20 pendientes (de Nahum); AD-45 libre. Sin campos pendientes; conformidad 0. Pila: limite en la API, primitiva Lua del scheduler, medicion. (c7509b60) |
 | plan | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 21 unitarias (QueueLimit desde entorno, borde exacto, desactivable, WATCH con reintentos, API 503 con Retry-After sin rastro, caso que no cabe entero, dos colas) y 1 de integracion con Redis real (20 productores, limite 50, la cola nunca lo supera). Rojo: modulos inexistentes y la integracion admite 200 de 200. Contra borrador: 21/21 y 3/3 con Redis real; suite 3773 verde en Linux. (930745a7) |
+| tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
