@@ -73,3 +73,11 @@ class ProcessRunner(Protocol):
     def signal_group(self, pid: int, sig: int) -> None: ...
 
     def reap(self, pid: int, block: bool = False) -> bool: ...
+
+
+class KeyUnavailable(Exception):
+    pass
+
+
+class DecryptionError(Exception):
+    pass
