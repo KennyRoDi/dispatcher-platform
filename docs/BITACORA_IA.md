@@ -1196,3 +1196,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Ficha con tabla medido/pendiente, comandos exactos y regla SUP-38; sin cifras de nodos |
 | Validado / corregido / descartado | José Andrés Loría Herrera (aprobación delegada en el chat) |
 | Cómo se validó | Se contrastó la ficha con las secciones Mediciones y Plan de pila del SPEC; la redacción la hizo la sesión principal, no un subagente |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-23 (`feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-23 |
+| Propósito | Completar la parte 1 del contrato ObjectStore como apoyo autorizado a Melany |
+| Consulta resumida | Verificar que put no deje objeto tras fallo de lectura y que open inexistente lance KeyError |
+| Resultado obtenido | Se preservó la cláusula contractual de put fallido y la fila ChunkStaging al integrar main; pruebas de contrato y cifrado: 53 passed, 6 xfailed |
+| Validado / corregido / descartado | pytest -q tests/unit/test_contratos.py tests/unit/test_encrypted_object_store.py tests/unit/test_encrypted_object_store_qa.py; scripts.conformidad repo: 0 problemas |
+| Cómo se validó | Orquestador; verificación en la misma sesión |
