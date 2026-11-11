@@ -33,7 +33,7 @@ def high_incident_alerts(case_id: str, findings: Iterable[Finding]) -> list[Aler
 
 
 def case_closed_alert(case_id: str, status: str) -> Alert:
-    if status not in ALERTING_STATUSES:
+    if not isinstance(status, str) or status not in ALERTING_STATUSES:
         raise ValueError(f"estado sin alerta de cierre: {status!r}")
     return Alert(CASE_CLOSED, case_id, json.dumps({"estado": status}))
 

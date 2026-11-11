@@ -161,13 +161,6 @@ def test_case_id_raro_viaja_intacto_en_la_alerta(case_id):
     assert publicador.alertas == [("caso_finalizado", case_id, '{"estado": "completed"}')]
 
 
-# --- Defectos encontrados (xfail strict) ---
-
-
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA media: add(case_id, iterador) agota el iterador en inner.add y la segunda pasada no ve hallazgos; se guarda y no se alerta, en silencio. Arreglo: materializar `findings = list(findings)` antes de inner.add.",
-)
 def test_un_generador_pasado_a_add_se_guarda_y_alerta():
     interno, publicador = FakeFindingStore(), FakeAlertPublisher()
     AlertingFindingStore(interno, publicador).add("c", (h for h in [_alto()]))
@@ -175,10 +168,6 @@ def test_un_generador_pasado_a_add_se_guarda_y_alerta():
     assert len(publicador.alertas) == 1
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA media: AlertingFindingStore no aisla fallos; con un publicador sin SafeAlertPublisher, add propaga tras guardar y se pierden las alertas restantes. El SPEC delega el aislamiento en quien componga, pero nada lo impide. Arreglo: envolver el publicador en SafeAlertPublisher dentro del constructor o exigirlo por tipo.",
-)
 def test_publicador_sin_envolver_no_rompe_add_ni_pierde_alertas_restantes():
     class FallaLaPrimera:
         def __init__(self):
@@ -196,29 +185,17 @@ def test_publicador_sin_envolver_no_rompe_add_ni_pierde_alertas_restantes():
     assert len(destino.alertas) == 1
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA baja: un estado no hashable (lista) da TypeError al hacer `status in frozenset`, no el ValueError del SPEC. Arreglo: comprobar isinstance(status, str) antes.",
-)
 def test_estado_no_hashable_se_rechaza_con_value_error():
     with pytest.raises(ValueError):
         case_closed_alert("c", ["completed"])
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA baja: SafeAlertPublisher registra case_id y kind con %s; un case_id con salto de linea inyecta lineas falsas en el log. Arreglo: usar %r.",
-)
 def test_el_log_no_permite_inyectar_lineas_con_el_case_id(caplog):
     with caplog.at_level(logging.ERROR):
         SafeAlertPublisher(PublicadorQueLanza(RuntimeError("x")), _log()).publish("k", "a\nERROR falso", "d")
     assert "\n" not in caplog.records[0].getMessage()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA baja: un publicador asincrono (coroutine function) se 'absorbe' sin error: la corrutina nunca se espera y la alerta se pierde sin log, solo RuntimeWarning. Arreglo: detectar inspect.isawaitable(resultado) y registrar/cerrar.",
-)
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning", "ignore::RuntimeWarning")
 def test_publicador_asincrono_no_pierde_la_alerta_en_silencio(caplog):
     class Asincrono:
