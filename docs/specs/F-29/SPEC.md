@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** implementacion a984328
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -129,3 +129,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo src/domain/custody_chain.py (116 lineas) y SPEC; tests intactos. Suite completa tras a984328: 1813 passed, 8 skipped, 3 xfailed. Decisiones: verify_chain devuelve solo la primera violacion y no revisa el ancla si hay una. (a984328) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: RecursionError y UnicodeEncodeError en verify_chain ante linea manipulada (media); U+2028/2029/0085 sin escapar; seal acepta no-str; claves duplicadas; ancla seq negativo; ancla atrasada N; Anchor mac no str |
