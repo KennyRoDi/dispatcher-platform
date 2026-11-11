@@ -1,6 +1,6 @@
 # SPEC F-31: Benchmark de inferencia
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision d9bd9c5
 **Historia:** US-31 · **Requisitos:** RF-40 (B.5 M5) · **Responsable:** J
@@ -78,3 +78,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | ficha docs/modulo-M5-computo.md con resultados Medición pendiente, sin cifras inventadas (3180897) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; medición real pendiente |
 | verificación IA de revision | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | Diff cumple SPEC: dominio puro, script con reloj/transcriptor inyectados, 15 unitarias en verde, ficha M5 con medición pendiente (d9bd9c5) |
+| revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; medición real pendiente |
