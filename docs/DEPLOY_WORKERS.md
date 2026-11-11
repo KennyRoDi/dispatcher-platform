@@ -94,6 +94,7 @@ Cada máquina tiene su propio `.env` en la raíz del repositorio. **Nunca se ver
 | `NODE_IP` | Salida de `tailscale ip -4` de esa máquina | No |
 | `WORKER_MEM_LIMIT` | Límite de memoria medido para ese worker, en formato admitido por Compose | No |
 | `ADMISSION_MARGIN_BYTES`, `FOOTPRINT_<OP>_BYTES` | **Obligatorias** (F-17), sin valor por defecto: medir según M1 §4.1; sin medir el worker no arranca. `<OP>` en mayúsculas: `TRANSCODE_VIDEO`, `EXTRACT_AUDIO`, `GENERATE_THUMBNAIL`, `CONVERT_AUDIO`, `EXTRACT_METADATA` | Según la medición |
+| `WORKER_TOKEN` | Token de rol `servicio` que emite el Nodo A con `python -m scripts.generar_credenciales --solo-worker <archivo>`; con él el worker reporta sub-tareas y sin él el coordinador responde 401. Vence a los 30 días (`--dias`). Nunca el `JWT_SECRET` ni `API_TOKEN` | Sí |
 | `TLS_CA_FILE` | Ruta de `ca.pem` en esa máquina (la copia desde el Nodo A). Obligatorio con TLS activo; con `TLS_ENABLED=false` puede omitirse | Sí |
 | `REDIS_HOST` | `<IP_TAILSCALE_NODO_A>` | Sí |
 | `COORDINATOR_URL` | `https://<IP_TAILSCALE_NODO_A>:8443` | Sí |
@@ -121,7 +122,10 @@ python3 -c "import secrets; print(secrets.token_hex(24))"
 ```bash
 cp .env.example .env
 nano .env
+python3 -m scripts.generar_credenciales --solo-worker worker-token.env   # JWT_SECRET, WORKER_TOKEN y API_TOKEN en .env
 ```
+
+`worker-token.env` contiene solo `WORKER_TOKEN`: cópialo por un canal privado al `.env` de cada nodo worker. El `JWT_SECRET` se queda en el Nodo A.
 
 **Nodos B, C y D.** PowerShell y Git pueden dejar CRLF, BOM o UTF-16, así que, después de editar, el archivo se reescribe en UTF-8 sin BOM y con LF. Cierra antes cualquier otra ventana de Notepad: el bloque espera a que cierres la que abre, con el archivo ya guardado.
 
