@@ -633,3 +633,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador ejecuto test_ground_truth y test_arquitectura tras la implementacion, conformidad.py en documentacion y comparo diffs. Los datos de prueba son dobles, no mediciones. SUP-27 sigue provisional. Las fases se aprobaron con --excepcion por delegacion de la persona, que no leyo cada fase. |
 | Cómo se validó | No se repitio la prueba de 200000 elementos del QA ni la suite completa tras documentacion. |
 | Error de la IA | El developer añadio el campo exact_matches a Comparison y definio accuracy por coincidencia exacta del conjunto sin que el SPEC lo declarara (SPEC decia Comparison(scores, total)); se detecto en la verificacion y se corrigio el SPEC. QA hallo en la implementacion que Comparison.accuracy lanza ZeroDivisionError con total 0 (el SPEC pide None) y que _require_unique da TypeError con ids de tipos mezclados en vez de ValueError; ambos quedan como xfail estricto. |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-2-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5) con subagentes developer, qa-tester y documentador (general-purpose) |
+| Componente | F-04 |
+| Propósito | F-04 parte 2: pruebas en rojo, implementacion y verificacion del validador de origen y licencia (src/domain/provenance.py, SUP-27) y declaracion de sus limites en el SPEC. |
+| Consulta resumida | Pruebas rojas de validate_provenance, implementacion minima en dominio puro, QA que intento romperlo y documentacion de los limites. |
+| Resultado obtenido | Commits 20a2779 (pruebas), 0f8345e (provenance.py, 61 lineas), 99b0f6f (11 xfail estrictos de QA) y abcaf2a (limites en el SPEC). Suite: 1669 passed, 7 skipped, 5 xfailed antes de los xfail de QA; conformidad 0 problemas. Sin mediciones de SO. |
+| Validado / corregido / descartado | El orquestador ejecuto la suite completa tras la implementacion, test_provenance y _qa tras QA y conformidad.py en documentacion. Las fases se aprobaron con --excepcion por delegacion de la persona, que no leyo cada fase y debe revisarlo al volver. SUP-27 sigue provisional. |
+| Cómo se validó | No se reprodujeron las observaciones de QA sin xfail ni se corrigieron los defectos: quedan declarados en el SPEC y en pendientes. |
+| Error de la IA | La implementacion de la IA acepto origen o licencia no str con AttributeError opaco en vez de un defecto con la ruta (5 casos), dejo pasar como licencia valida un relleno con espacios interiores o NBSP (3 casos) y una licencia de solo caracteres invisibles U+200B/U+FEFF (3 casos). QA lo detecto con 11 xfail estrictos; no se corrigio en esta parte. |
