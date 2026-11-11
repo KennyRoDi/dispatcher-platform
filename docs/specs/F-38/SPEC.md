@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 40e1a3e
+**Verificación IA:** verificacion 1f343ad
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -222,3 +222,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada; el SPEC admite sin pruebas si la corrida no revela errores de código |
 | verificación IA de implementacion | orquestador | 2026-11-11 | Sin cambios de codigo en src (diff solo docs/evidencia) (40e1a3e) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código |
+| verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte de evidencia; hallazgo real de la guia (variables F-17 omitidas) pasa a documentacion; captura real y Tailscale pendientes (1f343ad) |
