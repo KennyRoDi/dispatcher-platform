@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-27-2-tls-entre-nodos
 **Verificación IA:** revision b387b37
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -211,3 +211,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Docs actualizadas para incluir coordinator en user: CERTS_UID/CERTS_GID; limite declarado (e2d2eec) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO tras corregir coordinator user (39d0aac); Redis, MinIO y coordinador reales sin probar con imagen (b387b37) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
