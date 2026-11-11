@@ -9,6 +9,7 @@ from pathlib import Path
 
 import requests
 
+from src.infrastructure.tls import TlsConfigError, TlsSettings, exigir_cifrado, requests_session
 from src.workers.config import OPERATIONS, Settings
 from src.workers.storage import Storage, StorageError
 
@@ -101,25 +102,28 @@ def upload_plan(storage, plan: list[tuple[Path, str]], prefix: str, bucket: str)
     return keys_ops
 
 
-def sesion_autenticada(env=None):
+def resolve_session(coordinator_url: str, session=None, env=None) -> requests.Session:
+    tls = TlsSettings.from_env()
+    exigir_cifrado(tls, coordinator_url=coordinator_url)
+    if session is not None:
+        return session
+    sesion = requests_session(tls)
     token = (os.environ if env is None else env).get("API_TOKEN", "").strip()
-    if not token:
-        return requests
-    sesion = requests.Session()
-    sesion.headers["Authorization"] = f"Bearer {token}"
+    if token:
+        sesion.headers["Authorization"] = f"Bearer {token}"
     return sesion
 
 
-def submit_case(coordinator_url: str, keys_ops: list[tuple[str, str]], session=requests, priority: str = "normal") -> dict:
+def submit_case(coordinator_url: str, keys_ops: list[tuple[str, str]], session=None, priority: str = "normal") -> dict:
     payload = build_case_payload(keys_ops, priority=priority)
-    resp = session.post(f"{coordinator_url}/cases", json=payload, timeout=10)
+    resp = resolve_session(coordinator_url, session).post(f"{coordinator_url}/cases", json=payload, timeout=10)
     resp.raise_for_status()
     return resp.json()
 
 
-def cancel_case(coordinator_url: str, case_id: str, session=requests) -> dict | None:
+def cancel_case(coordinator_url: str, case_id: str, session=None) -> dict | None:
     try:
-        resp = session.post(f"{coordinator_url}/cases/{case_id}/cancel", timeout=10)
+        resp = resolve_session(coordinator_url, session).post(f"{coordinator_url}/cases/{case_id}/cancel", timeout=10)
         resp.raise_for_status()
         return resp.json()
     except requests.RequestException as e:
@@ -135,9 +139,9 @@ def count_subtasks(subtasks: list[dict]) -> tuple[int, int]:
     return ok, failed
 
 
-def fetch_report(coordinator_url: str, case_id: str, session=requests) -> dict | None:
+def fetch_report(coordinator_url: str, case_id: str, session=None) -> dict | None:
     try:
-        resp = session.get(f"{coordinator_url}/cases/{case_id}/report", timeout=10)
+        resp = resolve_session(coordinator_url, session).get(f"{coordinator_url}/cases/{case_id}/report", timeout=10)
         resp.raise_for_status()
         return resp.json()
     except (requests.RequestException, ValueError) as e:
@@ -189,10 +193,11 @@ def poll_case(
     case_id: str,
     poll_interval: float,
     timeout: float,
-    session=requests,
+    session=None,
     sleep=time.sleep,
     now=time.monotonic,
 ) -> dict:
+    session = resolve_session(coordinator_url, session)
     start = now()
     deadline = start + timeout
     last_status = None
@@ -260,11 +265,16 @@ def main(argv: list[str] | None = None) -> int:
         plan = [(path, "auto") for path, _ in plan]
 
     settings = Settings.from_env()
+    try:
+        resolve_session(settings.coordinator_url)
+        storage = None if args.no_upload else Storage(settings)
+    except TlsConfigError as e:
+        print(f"Error: {e}")
+        return 1
 
-    if args.no_upload:
+    if storage is None:
         keys_ops = [(f"{prefix}/{path.name}", op) for path, op in plan]
     else:
-        storage = Storage(settings)
         try:
             keys_ops = upload_plan(storage, plan, prefix, settings.dataset_bucket)
         except StorageError as e:
@@ -272,12 +282,11 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     coordinator_url = settings.coordinator_url
-    session = sesion_autenticada()
 
     try:
         with ThreadPoolExecutor(max_workers=max(1, args.repeat)) as pool:
             futures = [
-                pool.submit(submit_case, coordinator_url, keys_ops, session, args.priority)
+                pool.submit(submit_case, coordinator_url, keys_ops, None, args.priority)
                 for _ in range(args.repeat)
             ]
             cases = [fut.result() for fut in futures]
@@ -288,7 +297,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cancel_after is not None:
         time.sleep(max(0.0, args.cancel_after))
         for c in cases:
-            cancelled = cancel_case(coordinator_url, c["case_id"], session)
+            cancelled = cancel_case(coordinator_url, c["case_id"])
             if cancelled:
                 print(
                     f"Cancelado {c['case_id']}: estado={cancelled.get('status')} "
@@ -299,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         with ThreadPoolExecutor(max_workers=max(1, len(cases))) as pool:
             futures = {
-                pool.submit(poll_case, coordinator_url, c["case_id"], args.poll, args.timeout, session): c for c in cases
+                pool.submit(poll_case, coordinator_url, c["case_id"], args.poll, args.timeout): c for c in cases
             }
             for fut in as_completed(futures):
                 results.append(fut.result())
@@ -309,7 +318,7 @@ def main(argv: list[str] | None = None) -> int:
 
     for r in results:
         if not r.get("_timed_out"):
-            report = fetch_report(coordinator_url, r["case_id"], session)
+            report = fetch_report(coordinator_url, r["case_id"])
             if report:
                 print_report(r["case_id"], report)
 

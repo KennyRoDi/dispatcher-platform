@@ -104,3 +104,11 @@ class Identity:
 @runtime_checkable
 class TokenVerifier(Protocol):
     def verify(self, token: str) -> Identity: ...
+
+
+class KeyUnavailable(Exception):
+    pass
+
+
+class DecryptionError(Exception):
+    pass

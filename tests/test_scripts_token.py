@@ -1,5 +1,3 @@
-from argparse import Namespace
-
 import requests
 import responses
 
@@ -9,46 +7,34 @@ from scripts import submit_case as sc
 URL = "http://coord:8000"
 
 
-def test_sin_variable_se_usa_requests_como_hasta_ahora():
-    assert sc.sesion_autenticada({}) is requests
-    assert sc.sesion_autenticada({"API_TOKEN": "   "}) is requests
+def test_sin_variable_la_sesion_no_lleva_authorization():
+    assert "Authorization" not in sc.resolve_session(URL, env={}).headers
+    assert "Authorization" not in sc.resolve_session(URL, env={"API_TOKEN": "   "}).headers
 
 
 def test_con_variable_la_sesion_manda_bearer():
-    sesion = sc.sesion_autenticada({"API_TOKEN": " abc.def.ghi "})
+    sesion = sc.resolve_session(URL, env={"API_TOKEN": " abc.def.ghi "})
     assert sesion.headers["Authorization"] == "Bearer abc.def.ghi"
 
 
+def test_una_sesion_explicita_se_respeta_sin_tocarla():
+    propia = requests.Session()
+    assert sc.resolve_session(URL, propia, env={"API_TOKEN": "tok"}) is propia
+    assert "Authorization" not in propia.headers
+
+
 @responses.activate
-def test_submit_case_con_sesion_autenticada_envia_la_cabecera():
+def test_submit_case_con_token_en_el_entorno_envia_la_cabecera(monkeypatch):
+    monkeypatch.setenv("API_TOKEN", "tok")
     responses.add(responses.POST, f"{URL}/cases", json={"case_id": "c1"})
-    sesion = sc.sesion_autenticada({"API_TOKEN": "tok"})
-    sc.submit_case(URL, [("p/a.jpg", "auto")], sesion)
+    sc.submit_case(URL, [("p/a.jpg", "auto")])
     assert responses.calls[0].request.headers["Authorization"] == "Bearer tok"
 
 
 @responses.activate
-def test_main_de_run_load_pasa_la_sesion_con_token(monkeypatch):
-    capturado = {}
-
-    def falso_run_load(args, settings, session=requests, **_):
-        capturado["session"] = session
-        return 0, "ruta.md"
-
-    monkeypatch.setattr(rl, "run_load", falso_run_load)
+def test_run_load_con_token_en_el_entorno_resuelve_sesion_con_bearer(monkeypatch):
     monkeypatch.setenv("API_TOKEN", "tok")
-    assert rl.main([]) == 0
-    assert capturado["session"].headers["Authorization"] == "Bearer tok"
-
-
-def test_main_de_run_load_sin_variable_usa_requests(monkeypatch):
-    capturado = {}
-    monkeypatch.setattr(
-        rl, "run_load", lambda args, settings, session=requests, **_: capturado.update(s=session) or (0, "r")
-    )
-    monkeypatch.delenv("API_TOKEN", raising=False)
-    rl.main([])
-    assert capturado["s"] is requests
+    assert rl.resolve_session(URL).headers["Authorization"] == "Bearer tok"
 
 
 @responses.activate

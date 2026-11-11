@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30 y F-26. **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 y 2). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
@@ -47,6 +47,76 @@ PYTHONPATH=. python scripts/emitir_token.py --rol supervisor --sub demo-supervis
 
 Roles: `analista`, `supervisor`, `administrador`, `servicio`.
 
+### F-28 Cifrado en reposo
+
+Implementado en `src/adapters/envelope_cipher.py` (decisión AD-34, SUP-30 en `docs/ARQUITECTURA.md` y `docs/REQUERIMIENTOS.md`).
+
+**Biblioteca de terceros:** `cryptography==50.0.2` (Apache-2.0 o BSD-3-Clause), https://github.com/pyca/cryptography; se usa `AESGCM`. Fuente de la construcción: NIST SP 800-38D.
+
+**Formato de cable** (big-endian):
+
+| Campo | Bytes |
+|---|---|
+| Magia `EVC1` | 4 |
+| Versión (1) | 1 |
+| Tamaño de chunk | 4 |
+| Prefijo de nonce aleatorio | 4 |
+| Nonce de envoltura | 12 |
+| DEK envuelta por la KEK | 32 |
+| Etiqueta GCM de la DEK | 16 |
+| Chunks: texto cifrado + etiqueta | tamaño de chunk + 16 cada uno |
+
+Nonce de chunk: prefijo de 4 B más contador de 8 B. AAD de chunk: cabecera fija, SHA-256 del claro, índice y marca de último. Tope de chunk: 64 MiB.
+
+**Límites:** cifrar no oculta el tamaño del objeto; `decrypt` entrega los chunks ya autenticados antes de fallar en uno alterado. Detalle en `docs/specs/F-28/SPEC.md`.
+
+**Proveedor de la KEK (F-28 parte 2).**
+
+Implementado en el proveedor de archivo (`FileKeyProvider`):
+
+- `KEK_FILE`: ruta a un archivo regular de 32 bytes binarios, con modo exactamente 0400 o 0600, fuera del repositorio. Generación: `openssl rand -out <ruta> 32` y luego `chmod 0400 <ruta>`.
+- `KEK`: base64 de 32 bytes, solo para desarrollo.
+- `KEK_FILE` gana sobre `KEK`. Un valor vacío cuenta como no definido.
+- Falla cerrado: sin KEK válida lanza `KeyUnavailable`. Un modo distinto de 0400/0600 o un archivo no regular también la lanza.
+- Relee la fuente en cada llamada; no hay caché.
+- `.gitignore` excluye `*.kek` y `kek*`.
+
+**Decorador de almacén cifrado (F-28 parte 3).**
+
+Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`), decorador de `ObjectStore`.
+
+- `put` cifra el flujo con `EnvelopeCipher` antes de entregarlo al almacén interno; `open` descifra al leer. La clave sigue siendo el SHA-256 del claro (AD-11), por eso `exists` se delega sin cambios.
+- Cifra el contenido del objeto (cabecera, DEK envuelta y chunks con etiqueta). No cifra la clave ni oculta el tamaño.
+- Al almacén interno se le informa el tamaño del objeto cifrado: cabecera + claro + una etiqueta por chunk.
+- `open` descifra el primer chunk al abrir: un objeto corrupto o una KEK errónea fallan en `open`, no en la primera lectura.
+- **El cableado al adaptador MinIO no está hecho.** Ese adaptador es de F-23 (Melany); hoy `src/workers/storage.py` usa el cliente directo. Este decorador aún no se usa en el flujo real.
+
+**Justificación (AD-16, AD-34):** AES-256-GCM en la aplicación protege también contra quien lee MinIO, lo que SSE del lado del servidor no cubre. Una DEK por objeto envuelta por una KEK de archivo `0400` evita reutilizar nonces. Se eligió sobre MinIO SSE, LUKS y Vault por costo operativo con el tiempo disponible. Detalle en `docs/ARQUITECTURA.md` §8.
+
+### F-27 TLS entre nodos
+
+**Responsable:** Kenni Rodriguez. Decisión: AD-37 y SUP-33 en [ARQUITECTURA](ARQUITECTURA.md) §8 y [REQUERIMIENTOS](REQUERIMIENTOS.md). Diseño: `docs/specs/F-27/SPEC.md`.
+
+**Parte 1.**
+
+- `src/infrastructure/tls.py`: `TlsSettings.from_env` (`TLS_ENABLED`, `TLS_CA_FILE`; falla cerrado si falta la CA o no es legible), `client_context` (TLS 1.3 mínimo, `CERT_REQUIRED`, verificación de hostname), `exigir_cifrado` (rechaza `http://`, `redis://` y `MINIO_SECURE=false` con TLS activo) y constructores `redis_kwargs`, `requests_session` y `minio_http_client`.
+- `requests_session` usa `trust_env=False` y `verify` fijo a la CA del equipo, de modo que `REQUESTS_CA_BUNDLE`, proxies y `.netrc` no lo alteran, y rechaza redirecciones de https a un esquema en claro.
+- Pruebas unitarias y de integración con sockets locales y certificados efímeros de `trustme`, generados dentro de la prueba y sin versionar ninguno.
+- Todavía no hay cableado en workers, coordinador ni scripts (parte 2), ni servidores con TLS ni `generar_certs.sh` (parte 3).
+
+**Fuentes y dependencias de terceros:**
+
+- Módulo `ssl` de Python, `openssl`, `redis-py`, `minio-py` y `requests`.
+- `trustme` 1.2.1, solo desarrollo (`requirements-dev.txt`): licencia MIT o Apache-2.0 según `pip show trustme`; https://github.com/python-trio/trustme.
+- RFC 8446 (TLS 1.3); RFC 6125 y RFC 9525 (verificación de identidad del servidor).
+
+**Parte 2: cómo se activa.**
+
+- `TLS_ENABLED=true` y `TLS_CA_FILE=<ruta a ca.pem>`; sin CA legible el arranque falla.
+- Coordinador y scripts: URLs `https://`. Redis: `rediss://`. MinIO: `MINIO_SECURE=true`.
+- Con TLS activo, una URL `http://` o `redis://`, o `MINIO_SECURE=false`, se rechaza al arrancar, sin degradar a texto claro.
+- Salidas reales de un arranque con TLS y de un rechazo: pendiente (sin captura ni ejecución medida).
+
 ## 2. Concepto de Sistemas Operativos
 
 ### F-30 Workers sin privilegios
@@ -65,6 +135,19 @@ Conceptos que respalda la configuración (no medidos):
 - **Control de acceso por rol (RBAC) y mínimo privilegio:** cada identidad recibe solo las acciones de su rol; el rol técnico `servicio` de los workers solo puede reportar sub-tareas. Es la misma idea que los UID y permisos del sistema operativo, aplicada en la capa de aplicación.
 - **Permisos de archivo:** el secreto de firma vive en un archivo fuera del repositorio con modo `600`, de modo que solo su dueño puede leerlo [B.5 M4].
 - **Secretos fuera del código:** el repositorio es público; la llave nunca se versiona.
+
+### F-28 Cifrado en reposo
+
+Conceptos que respalda el diseño, sin datos medidos:
+
+- **Cifrado de sobre:** cada objeto tiene su propia llave de datos (DEK, 32 bytes de `os.urandom`) envuelta con la llave maestra del nodo (KEK); la KEK no se escribe en el repositorio ni en el historial [B.5 M4].
+- **Memoria:** el objeto se procesa por chunks, de modo que la memoria usada queda acotada a un chunk (4 MiB por defecto, tope de 64 MiB) y no al tamaño del archivo.
+- **Integridad:** AES-256-GCM autentica cada chunk; reordenar, duplicar o truncar chunks hace fallar el descifrado.
+- **Permisos de archivo:** el proveedor `FileKeyProvider` exige que el archivo de la KEK sea regular y de modo 0400 o 0600, para que otros usuarios del sistema no puedan leerlo.
+
+### F-27 TLS entre nodos
+
+TLS protege el canal entre procesos de distintos nodos: cifra, comprueba la integridad y autentica al servidor con una cadena de confianza. El módulo `ssl` de Python delega en OpenSSL; el cliente decide con qué CA confía y qué versión mínima acepta. JWT (F-26) identifica a quien llama; no protege el canal. Tailscale tampoco sustituye a TLS: la captura debe mostrar el handshake (`docs/ARQUITECTURA.md` §6).
 
 ## 3. Método de medición
 
@@ -99,6 +182,35 @@ curl -i http://localhost:8000/cases                                             
 
 El cuerpo de `POST /cases` se omite; ver `docs/DEMO.md`.
 
+### F-28 Cifrado en reposo
+
+Pendiente: costo de CPU y tamaño de chunk óptimo se miden con los comandos de `docs/IMPLEMENTACION.md` §5 (busca `F-28`); este documento no los reproduce y no contiene salidas medidas.
+
+Prueba I contra MinIO real.
+
+Archivo: `tests/integration/test_encrypted_object_store_minio.py`. Usa un adaptador mínimo solo de prueba. Sin las variables, se salta.
+
+```bash
+export MINIO_ENDPOINT=<host:puerto> MINIO_ACCESS_KEY=<usuario> MINIO_SECRET_KEY=<clave>
+pytest -q -m integration tests/integration/test_encrypted_object_store_minio.py
+```
+
+Búsqueda de llaves en el historial (la automatiza `tests/unit/test_historial_sin_llaves.py`):
+
+```bash
+git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'
+```
+
+### F-27 TLS entre nodos
+
+Comandos exactos de `docs/IMPLEMENTACION.md` §5; los ejecuta la persona en el Nodo A con `sudo`, con la IP real de Tailscale:
+
+```bash
+sudo tcpdump -i <if> -w m4.pcap 'port 8443 or 6380 or 9000'
+tshark -r m4.pcap -Y tls.handshake.type==1
+strings m4.pcap | grep -c <marcador_sintetico>
+```
+
 ## 4. Resultados
 
 ### F-30 Workers sin privilegios
@@ -127,6 +239,23 @@ Pendiente: sin ejecución en la demo.
 | Rol con permiso | 2xx | pendiente: se mide en la demo |
 | `GET /health` sin token | 200 (ruta pública) | pendiente: se mide en la demo |
 
+### F-28 Cifrado en reposo
+
+Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de leer la KEK en cada llamada ni de costo de CPU del decorador.
+
+**Salida de la prueba I:** ejecutada una vez, de forma local (una máquina, MinIO efímero en Docker, sin TLS ni red entre nodos): 2 pruebas pasadas; el objeto crudo en MinIO no contiene el marcador en claro y un bit alterado lanza `DecryptionError`. Salida completa en [docs/evidencia/F-28_prueba_I_minio_local_2026-11-11.md](evidencia/F-28_prueba_I_minio_local_2026-11-11.md). No es evidencia en los tres nodos ni mide costo de CPU.
+
+**Salida de la búsqueda en el historial:** pendiente: la búsqueda manual en el historial no se ha registrado aquí. La prueba automática `tests/unit/test_historial_sin_llaves.py` sí corre en la suite y pasa.
+
+### F-27 TLS entre nodos
+
+| Medición | Resultado |
+|---|---|
+| Handshakes TLS en la captura (`tshark`) | pendiente |
+| Coincidencias del marcador (`strings ... \| grep -c`) | pendiente |
+| Cliente sin la CA rechazado en los servicios reales | pendiente |
+| Costo de TLS sobre el throughput de M3 | pendiente |
+
 ## 5. Interpretación
 
 ### F-30 Workers sin privilegios
@@ -136,3 +265,11 @@ Pendiente. Las pruebas unitarias y `python -m scripts.verificar_workers` respald
 ### F-26 Autenticación y roles
 
 Pendiente. Las pruebas unitarias respaldan la matriz y la verificación del token, no el comportamiento medido en la demo. Límites conocidos: ver «Notas» en `docs/specs/F-26/SPEC.md`. Sin evidencia medida, el módulo M4 tiene máximo 2 [Parte I §5].
+
+### F-28 Cifrado en reposo
+
+Pendiente. Las pruebas unitarias respaldan el formato y la detección de alteraciones, no el costo de CPU en los nodos. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+
+### F-27 TLS entre nodos
+
+Pendiente. Sin captura real no hay resultado de TLS y el módulo no pasa de 2 [Parte I §5]. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
