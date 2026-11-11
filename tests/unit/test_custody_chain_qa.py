@@ -22,7 +22,6 @@ def _reponer(linea: str, **cambios) -> str:
 # ---- Hallazgos: cada uno falla hoy y queda como xfail estricto ----
 
 
-@pytest.mark.xfail(strict=True, reason="QA-1: JSON muy anidado da RecursionError en vez de una violacion 'entrada'")
 def test_json_muy_anidado_se_reporta_como_entrada(llave):
     entradas = construir(llave, 3)
     texto = lineas(entradas)
@@ -33,7 +32,6 @@ def test_json_muy_anidado_se_reporta_como_entrada(llave):
     assert (resultado[0].position, resultado[0].kind) == (2, "entrada")
 
 
-@pytest.mark.xfail(strict=True, reason="QA-2: sustituto aislado (\\ud800) en un campo da UnicodeEncodeError en verify")
 @pytest.mark.parametrize("campo", ["actor", "prev_hash", "entry_hash", "operation"])
 def test_sustituto_aislado_en_la_linea_se_reporta_sin_excepcion(llave, campo):
     entradas = construir(llave, 3)
@@ -45,7 +43,6 @@ def test_sustituto_aislado_en_la_linea_se_reporta_sin_excepcion(llave, campo):
     assert resultado[0].position == 2
 
 
-@pytest.mark.xfail(strict=True, reason="QA-3: seal acepta valores no str y el log queda imposible de verificar")
 @pytest.mark.parametrize("valor", [None, 7])
 def test_seal_rechaza_campos_que_verify_no_aceptaria(llave, valor):
     datos = {**campos(0), "actor": valor}
@@ -54,7 +51,6 @@ def test_seal_rechaza_campos_que_verify_no_aceptaria(llave, valor):
         seal(llave, GENESIS_HASH, 0, datos)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-4: ensure_ascii=False deja U+2028/U+0085 sin escapar y splitlines() parte la linea")
 @pytest.mark.parametrize("separador", ["\u2028", "\u2029", "\x85"])
 def test_la_linea_no_se_parte_con_splitlines(llave, separador):
     entrada = seal(llave, GENESIS_HASH, 0, {**campos(0), "actor": f"a{separador}b"})
@@ -62,7 +58,6 @@ def test_la_linea_no_se_parte_con_splitlines(llave, separador):
     assert len(entrada.line().splitlines()) == 1
 
 
-@pytest.mark.xfail(strict=True, reason="QA-5: claves duplicadas en el JSON se aceptan (gana la ultima); otro lector vera otro actor")
 def test_clave_duplicada_en_la_linea_se_rechaza(llave):
     entradas = construir(llave, 2)
     texto = lineas(entradas)
@@ -79,7 +74,6 @@ def test_llave_vacia_o_corta_se_rechaza(llave_debil):
         seal(llave_debil, GENESIS_HASH, 0, campos(0))
 
 
-@pytest.mark.xfail(strict=True, reason="QA-7: ancla con seq negativo (con sello valido) indexa desde el final y pasa")
 def test_ancla_con_seq_negativo_no_pasa(llave):
     entradas = construir(llave, 4)
     ancla = make_anchor(llave, -1, entradas[-1].entry_hash)
@@ -87,7 +81,6 @@ def test_ancla_con_seq_negativo_no_pasa(llave):
     assert verify_chain(lineas(entradas), llave, ancla)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-8: se acepta un ancla atrasada cualquier numero de entradas; el SPEC tolera solo una")
 def test_ancla_atrasada_mas_de_una_entrada_no_pasa(llave):
     entradas = construir(llave, 6)
     ancla = make_anchor(llave, entradas[3].seq, entradas[3].entry_hash)
@@ -95,7 +88,6 @@ def test_ancla_atrasada_mas_de_una_entrada_no_pasa(llave):
     assert verify_chain(lineas(entradas), llave, ancla)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-9: ancla con mac no str da AttributeError en vez de una violacion 'ancla'")
 def test_ancla_malformada_se_reporta_sin_excepcion(llave):
     entradas = construir(llave, 3)
 
