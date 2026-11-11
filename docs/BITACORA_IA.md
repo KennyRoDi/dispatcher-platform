@@ -1164,12 +1164,6 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 
 | Campo | Contenido |
 |---|---|
-| Uso de IA | No se usó IA en F-37. |
-
-## 2026-11-11 · José Andrés Loría Herrera · F-37 (`feat/F-37-1-saturacion-de-memoria`)
-
-| Campo | Contenido |
-|---|---|
 | Herramienta | Claude Code |
 | Componente | F-37 |
 | Propósito | F-37 parte 1: ficha de evidencia del escenario de saturación de memoria |
