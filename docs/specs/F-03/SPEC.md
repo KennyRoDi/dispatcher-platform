@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-03-6-dataset-sintetico
-**Verificación IA:** tests 0638cef
+**Verificación IA:** implementacion c6a400b
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -194,3 +194,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff contra la parte 6 solo toca tests/ y SPEC; sin xfail restantes; ejecute pytest: 16 failed por funcionalidad ausente (NUL, PermissionError, no enteros, padres, directorio previo, symlink, produce inexistente), resto verde. (0638cef) |
 | tests | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Ejecute pytest unit: 1588 passed, 7 skipped, 0 failed; integracion ffmpeg real revisada en la misma corrida. Diff desde tests: solo 4 archivos de src/scripts (25+/17-), tests/ intactos. Desviaciones aceptadas: NUL en _row_defect; enlaces simbolicos en --out se rechazan con RuntimeError. No revise el rechazo de symlinks fuera del caso de la prueba. (c6a400b) |
