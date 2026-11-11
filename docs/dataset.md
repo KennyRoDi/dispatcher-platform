@@ -5,7 +5,7 @@
 ## Procedencia
 
 - Generado por el equipo (Grupo 3) con `scripts/dataset_sintetico.py`; origen `sintetico` y licencia MIT en las 490 filas del manifiesto. Ningún dato es real ni de terceros [B.3].
-- Chats: plantillas de vocabulario neutro y frases de amenaza ficticias, redactadas con IA y aprobadas por la persona. Imágenes, audios y videos los produce `ffmpeg`, de FFmpeg developers (ffmpeg.org, LGPL/GPL según la compilación); no se redistribuye `ffmpeg`, solo su salida.
+- Chats: plantillas de vocabulario neutro y frases de amenaza ficticias, redactadas con IA; la persona aprobó las frases de amenaza ficticias y los mensajes sintéticos. Imágenes, audios y videos los produce `ffmpeg`, de FFmpeg developers (ffmpeg.org, LGPL/GPL según la compilación); no se redistribuye `ffmpeg`, solo su salida.
 - Decisión del generador: AD-25 en [ARQUITECTURA.md](ARQUITECTURA.md) §8. Diseño: `docs/specs/F-03/SPEC.md`.
 
 ## Limitación sintética
@@ -17,7 +17,7 @@
 
 ## Contenido generado (semilla 1)
 
-Recuento desde `manifest.json`: 40 casos; 300 imágenes, 150 audios (80 ruido y 70 tono), 25 textos, 10 documentos y 5 videos; 490 archivos, 1,9 GB. Es un dato del artefacto, no una medición de SO.
+Recuento desde `manifest.json`: 40 casos; 300 imágenes, 150 audios (80 ruido y 70 tono), 25 textos, 10 documentos y 5 videos; 490 archivos, 1,96 GB (1,83 GiB). Es un dato del artefacto, no una medición de SO.
 
 | Condición | Casos | Detalle |
 |---|---|---|
