@@ -78,8 +78,18 @@ class JsonlCustodyLog:
         try:
             return os.open(self._path, flags, FILE_MODE)
         except FileNotFoundError:
+            return self._create_log(flags)
+
+    def _create_log(self, flags: int) -> int:
+        try:
             self._verify([])
-            return os.open(self._path, flags | os.O_CREAT, FILE_MODE)
+        except CustodyCorrupted:
+            # Otro escritor pudo crear el log entre el primer intento y esta comprobación.
+            try:
+                return os.open(self._path, flags, FILE_MODE)
+            except FileNotFoundError:
+                raise CustodyCorrupted("el log de custodia falta y hay un ancla con entradas") from None
+        return os.open(self._path, flags | os.O_CREAT, FILE_MODE)
 
     def _is_current(self, fd: int) -> bool:
         try:
