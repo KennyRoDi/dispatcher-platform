@@ -63,3 +63,13 @@ Sin mediciones no hay conclusiones. Las preguntas que el benchmark debe responde
 - ¿Qué configuración conviene en cada tipo de nodo? Este punto alimenta el enrutamiento de F-32.
 
 Las cifras de F-32 (routing por tipo de nodo) y F-41 (fichas de evidencia) dependen de esta medición. Hasta que exista, cualquier afirmación sobre el mejor número de hilos o el ahorro de memoria es una hipótesis y no un resultado.
+
+## 6. Routing por tipo de nodo (F-32)
+
+**Justificación.** B.5 M5 pide dirigir cada tipo de sub-tarea a la clase de nodo que la ejecuta mejor. La política es una tabla estática tipo → clases en `config/routing.toml` (`[rutas]`), implementada por `RoutingTable` (`src/domain/routing.py`) y validada al arranque. Decisión registrada en AD-32 de `docs/ARQUITECTURA.md`.
+
+**Valores provisionales.** Medición pendiente. Audio prefiere `gpu` y cae a `cpu`; texto e imagen van a `cpu`. Ningún valor sale de datos medidos. La referencia de cada uno está en `[evidencia]` de `config/routing.toml`.
+
+**Medición que los sustituye.** F-31: `python scripts/measure/m5_bench.py --model whisper-base --compute cpu-float32,cpu-int8 --threads 1,2,4 --reps 5 --audio benchmark_set/`. Sus resultados (sección 4) fijan el orden de clases.
+
+**Pendiente.** Valores en nodos WSL2 reales (depende de F-38) y variante GPU, que queda pendiente hasta tener GPU.
