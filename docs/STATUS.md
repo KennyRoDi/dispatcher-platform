@@ -33,7 +33,7 @@
 | F-28 | pendiente |
 | F-29 | pendiente |
 | F-30 | pendiente |
-| F-31 | tests |
+| F-31 | implementacion |
 | F-32 | pendiente |
 | F-33 | pendiente |
 | F-34 | pendiente |
