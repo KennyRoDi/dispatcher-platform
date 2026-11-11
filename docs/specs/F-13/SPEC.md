@@ -1,6 +1,6 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** implementacion 83ab577
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
@@ -117,3 +117,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Dominio implementado (281 lineas src, sin ediciones a pruebas); suite completa verde (83ab577) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: 5 hallazgos medios (ValueError/OverflowError en marcas, TypeError con timestamp sin zona, empates no deterministas, marca sobrescrita) y 6 bajos |
