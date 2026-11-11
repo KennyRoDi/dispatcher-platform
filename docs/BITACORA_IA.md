@@ -879,3 +879,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente |
 | Cómo se validó | Verificación del orquestador con pytest y revisión de los subagentes |
 | Error de la IA | verify_chain lanzaba RecursionError/UnicodeEncodeError ante líneas manipuladas en vez de reportar violación; lo detectó QA y se corrigió |
+
+## 2026-11-11 · Kenni Rodriguez · F-29 (`feat/F-29-2-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagentes developer, qa-tester, documentador) |
+| Componente | F-29 |
+| Propósito | F-29 parte 2: registro de custodia JSONL de solo anexión |
+| Consulta resumida | Implementar JsonlCustodyLog, ancla atómica y límites de la parte 2 |
+| Resultado obtenido | Adaptador, pruebas y límites documentados en el SPEC; aprobaciones delegadas, sin verificación humana independiente |
+| Validado / corregido / descartado | Verificación del orquestador y QA por subagente; las aprobaciones de fase fueron delegadas por la persona |
+| Cómo se validó | Subagentes por rol; la persona no revisó de forma independiente |
+| Error de la IA | La primera implementación verificaba todo el log en cada record (costo cuadrático, 121 s con 4000 entradas), dejaba el log bloqueado tras un fallo de E/S del ancla y seguía symlinks al escribir el temporal; el QA lo detectó y se corrigió con verify_tail, reintento del ancla y O_NOFOLLOW |
