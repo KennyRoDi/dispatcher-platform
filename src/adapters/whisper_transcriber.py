@@ -43,7 +43,7 @@ class WhisperTranscriber:
         self.config = config
 
     @classmethod
-    def from_config(cls, ruta_config: Path) -> "WhisperTranscriber":
+    def from_config(cls, ruta_config: Path, num_workers: int = 1) -> "WhisperTranscriber":
         config = cargar_config_de_audio(ruta_config)
         # Importación diferida: las unitarias y el resto del worker no cargan faster-whisper, CTranslate2 ni PyAV.
         from faster_whisper import WhisperModel
@@ -53,6 +53,7 @@ class WhisperTranscriber:
             device="cpu",
             compute_type=config.compute_type,
             cpu_threads=config.hilos,
+            num_workers=num_workers,
             revision=config.revision,
         )
         return cls(modelo, config)

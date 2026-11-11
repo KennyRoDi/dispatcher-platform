@@ -7,32 +7,32 @@
 
 ## Objetivo
 
-Permitir al responsable de M1 ejecutar un modelo por proceso y un modelo precargado compartido tras `fork`, comprobar sus resultados y comparar memoria total para justificar AD-07 con datos [B.5 M1]. La comparación inicial usa Whisper CPU de F-09; no demuestra todavía la huella ni la conveniencia de esa estrategia para texto o imagen.
+Permitir al responsable de M1 ejecutar un modelo por proceso y un modelo con workers concurrentes de CTranslate2 que comparten pesos, comprobar resultados y comparar memoria total para justificar AD-07 con datos [B.5 M1]. La comparación inicial usa Whisper CPU de F-09; no demuestra todavía la huella ni la conveniencia para texto o imagen.
 
 ## Alcance
 
-**Incluye:** selección explícita de estrategia y N procesos, carga e inferencia con el transcriptor de F-09, validación Linux de igualdad y terminación, instrumentación RSS/PSS y `memory.current`, tabla comparativa y conclusión trazable en la ficha M1.
+**Incluye:** selección explícita de estrategia y N trabajos, carga e inferencia con el transcriptor de F-09, validación Linux de igualdad y terminación, instrumentación RSS/PSS y `memory.current`, tabla comparativa y conclusión trazable en la ficha M1.
 
-**No incluye:** entrenamiento; cambio de pesos, precisión o hilos entre variantes; admisión (F-17), OOM (F-18), cancelación del pipeline (F-12), routing/benchmark de cómputo (F-31/F-32), despliegue ajeno ni sustitución silenciosa de `fork` por `spawn` o `mmap`. Las huellas de otros modelos quedan pendientes y no se atribuyen a esta comparación.
+**No incluye:** entrenamiento; cambio de pesos, precisión o hilos intra-op entre variantes; admisión (F-17), OOM (F-18), cancelación del pipeline (F-12), routing/benchmark de cómputo (F-31/F-32), despliegue ajeno ni afirmar que los procesos independientes comparten memoria. Las huellas de otros modelos quedan pendientes y no se atribuyen a esta comparación.
 
 ## Criterios de aceptación
 
 - **Dado** el parámetro de estrategia.
-- **Cuando** se inicia con N procesos en cada variante.
+- **Cuando** se inicia con N ejecuciones concurrentes en cada variante.
 - **Entonces** ambas producen el mismo resultado y se obtiene su memoria total.
-- La selección distingue `por_proceso` y `fork_compartido`; rechaza otras estrategias y N no entero positivo, incluido `bool`. No degrada silenciosamente a otra variante.
-- Todos los hijos procesan la misma entrada con pesos y parámetros idénticos. Se comparan todos los campos de `TranscriptSegment`, incluidos confianza y tiempos. Un error, timeout o diferencia impide declarar equivalencia.
+- La selección distingue `por_proceso` y `workers_compartidos`; rechaza otras estrategias y N no entero positivo, incluido `bool`. No degrada silenciosamente a otra variante.
+- Todos los trabajos procesan la misma entrada con pesos y parámetros idénticos. Se comparan todos los campos de `TranscriptSegment`, incluidos confianza y tiempos. Un error, timeout o diferencia impide declarar equivalencia.
 - Se registra PSS total del supervisor y todos sus hijos vivos, RSS por PID y `memory.current` del mismo cgroup. La suma de RSS no se presenta como memoria física exclusiva.
 
 ## Diseño
 
 Se aplica AD-07 y se propone SUP-25: comenzar con Whisper CPU de F-09, por su dependencia explícita y muestra disponible. La aprobación del plan decide ese alcance; no se elige estrategia definitiva antes de medir.
 
-`src/domain/model_loading.py` contiene selección y validación puras. `src/infrastructure/model_loader.py` implementa `ModelLoader` con fábrica inyectada: `por_proceso` carga una instancia dentro de cada hijo; `fork_compartido` carga una instancia en un supervisor nuevo y la heredan sus N hijos. El supervisor permanece vivo durante la medición y se contabiliza. Se solicita `fork` explícitamente, sin depender del método predeterminado de Python 3.14. No se hace fork desde `worker_node.py`, que ya usa hilos, ni después de arrancar heartbeat, consumidores o clientes de red.
+`src/domain/model_loading.py` contiene selección y validación puras. `src/infrastructure/model_loader.py` implementa `ModelLoader` con fábrica inyectada: `por_proceso` carga una instancia dentro de cada proceso hijo; `workers_compartidos` crea una instancia Whisper con `num_workers=N` y ejecuta N llamadas desde hilos en un solo proceso hijo. faster-whisper pasa `num_workers` a CTranslate2 como `inter_threads`, que comparte los pesos entre workers. Un proceso supervisor externo aplica timeout y contabiliza sus procesos. No se hace fork después de cargar el modelo.
 
 Se reutiliza `WhisperTranscriber.from_config` y el contrato `Transcriber.transcribe(Path) -> list[TranscriptSegment]` de `src/application/analyze_audio.py`. El dominio no importa adaptadores ni multiprocessing. Se conservan pesos/revisión, idioma, precisión y beam size de `config/audio.toml`; el experimento fija el mismo número de hilos en ambas variantes y registra el valor sin alterar la configuración productiva. No se modifican `Analyzer`, `WorkQueue`, `ResourceReader` ni otros puertos compartidos; se inyectan dobles locales en las pruebas de F-19.
 
-Precargar antes de los hilos Python no garantiza ausencia de hilos nativos de CTranslate2, OpenMP o el tokenizador. La parte 2 exige prueba Linux con el modelo real antes de declarar listo el cargador. Un proceso externo impone timeout configurable explícito; un error termina y recolecta supervisor e hijos, también ante SIGTERM, sin zombies. No se hace inferencia de calentamiento en el padre antes de fork. Bloqueos, señales, salidas incompletas o diferencias detienen la comparación y requieren decisión humana antes de cambiar backend o estrategia.
+La estrategia anterior `fork_compartido` se bloqueó en Linux con Whisper real, incluso con un hilo. `workers_compartidos` carga CTranslate2 dentro del hijo y emplea su paralelismo documentado. La parte 2 exige prueba Linux con el modelo real. Un proceso externo impone timeout configurable y recolecta el hijo ante error o SIGTERM sin zombies.
 
 `scripts/measure/comparar_carga.py` será la entrada independiente del experimento y `src/infrastructure/model_memory.py` leerá smaps/cgroup. Barreras IPC mantienen vivos supervisor e hijos tras carga y tras inferencia hasta leerlos; no se leen PIDs ya terminados. Se registran PID, parentesco, UTC, configuración, versiones, hash de entrada, salidas y errores. Una lectura ausente o inválida invalida la repetición. La CLI ofrece validación de igualdad sin atribuir mediciones de SO y medición con datos crudos.
 
@@ -57,13 +57,13 @@ Solo M1 [B.5 M1], sin TDD de cifras físicas. Los siguientes comandos son la int
 Puerta de compatibilidad previa:
 
 ```bash
-python scripts/measure/comparar_carga.py --config config/audio.toml --hilos 1 --entrada tests/datos/audio/amenaza_01.ogg --procesos 2 --estrategias por_proceso fork_compartido --repeticiones 1 --timeout 120 --solo-validar --salida docs/evidencia/F-19/compatibilidad
+python scripts/measure/comparar_carga.py --config config/audio.toml --hilos 1 --entrada tests/datos/audio/amenaza_01.ogg --procesos 2 --estrategias por_proceso workers_compartidos --repeticiones 1 --timeout 120 --solo-validar --salida docs/evidencia/F-19/compatibilidad
 ```
 
 Después de pasarla, cinco ejecuciones nuevas por variante y por N=1/N=2, con supervisor e hijos nuevos en cada ejecución:
 
 ```bash
-python scripts/measure/comparar_carga.py --config config/audio.toml --hilos 1 --entrada tests/datos/audio/amenaza_01.ogg --procesos 1 2 --estrategias por_proceso fork_compartido --repeticiones 5 --timeout 120 --cgroup /sys/fs/cgroup --salida docs/evidencia/F-19/comparacion
+python scripts/measure/comparar_carga.py --config config/audio.toml --hilos 1 --entrada tests/datos/audio/amenaza_01.ogg --procesos 1 2 --estrategias por_proceso workers_compartidos --repeticiones 5 --timeout 120 --cgroup /sys/fs/cgroup --salida docs/evidencia/F-19/comparacion
 ```
 
 Registrar baseline de `memory.current` antes de cargar e instantáneas tras carga y tras consumir toda la inferencia. Conservar el texto crudo de `/proc/<pid>/smaps_rollup` para supervisor y cada hijo y de `/sys/fs/cgroup/memory.current`, `memory.max` y `memory.swap.max`. Extraer `Rss:`/`Pss:` en KiB; sumar PSS y convertir a bytes por 1024 al cotejar unidades. La tabla incluye cada repetición, media y rango, memoria absoluta y diferencia frente al baseline. `memory.current` incluye otros cargos y no equivale a PSS. No hay otros trabajos simultáneos en ese cgroup; las lecturas son secuenciales con los procesos en la barrera, no una instantánea atómica. No se vacía la caché del host ni se exige root.
