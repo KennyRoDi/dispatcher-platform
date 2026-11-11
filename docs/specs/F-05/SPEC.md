@@ -53,7 +53,7 @@ Pruebas previstas por la historia: U descomposición y mapa de colas; I `fakered
 
 ## Diseño
 
-**Contratos.** Usa `WorkQueue`, `Clock` (`src/application/ports.py`), `Subtask`, `ContentKind` y `Priority` sin modificarlos. No implementa ningún contrato nuevo de `docs/CONTRATOS.md`. Programa contra `FakeWorkQueue` y `FakeClock` de `tests/dobles.py`; el adaptador Redis pasa por `comprobar_work_queue`. Aplica AD-18 (colas por tipo; la clase de nodo sigue siendo de F-32) y AD-12 solo en lo que `has_capacity` ya ofrece.
+**Contratos.** Usa `WorkQueue`, `Clock` (`src/application/ports.py`), `Subtask`, `ContentKind` y `Priority` sin modificarlos. No implementa ningún contrato nuevo de `docs/CONTRATOS.md`. Programa contra `FakeWorkQueue` y `FakeClock` de `tests/dobles.py`; el adaptador Redis pasa por `comprobar_work_queue`. Toma AD-04 (ZSET por tipo con `puntaje = t_entrada − bono(prioridad)`) como diseño objetivo de las colas por tipo; el adaptador provisional de la parte 2 (`RPUSH`/`BLPOP` sobre listas) se aparta de AD-04 de forma temporal, hasta F-06/M2. De AD-12 usa solo `has_capacity`; el Lua atómico no se implementa aquí. La clase de nodo (AD-18) es de F-32 y no interviene.
 
 **Capas y archivos (todos nuevos; ningún archivo ajeno se toca):**
 
@@ -67,7 +67,7 @@ Pruebas previstas por la historia: U descomposición y mapa de colas; I `fakered
 - Texto, imagen y audio dan una sub-tarea del mismo `ContentKind`; el video da dos: una `AUDIO` y una `IMAGE`, ambas con el `source_sha256` del video.
 - Id determinista `{case_id}:{sha256}:{kind}`: trazable a caso, fuente y tipo, y la misma fuente repetida en un caso produce una sola sub-tarea (sin duplicar evidencia idéntica).
 - Orden estable: el de las fuentes y, por fuente, imagen antes que audio.
-- `classify_source` reconoce por extensión (sin distinguir mayúsculas): texto `.txt`, `.csv`, `.json`; imagen `.jpg`, `.jpeg`, `.png`; audio `.opus`, `.ogg`, `.mp3`, `.wav`, `.m4a`, `.aac`, `.flac`; video `.mp4`, `.mov`, `.mkv`, `.avi`, `.webm`. Una extensión desconocida lanza `ValueError` con el nombre (nunca se descarta en silencio). Las extensiones de audio y video se alinean con las de `src/coordinator/router.py:35-41`, que no se modifica.
+- `classify_source` reconoce por extensión (sin distinguir mayúsculas): texto `.txt`, `.csv`, `.json`; imagen `.jpg`, `.jpeg`, `.png` (ambas propuesta nuestra); audio `.mp3`, `.wav`, `.flac`, `.ogg`, `.m4a`, `.aac`, `.opus`, `.wma`; video `.mp4`, `.mkv`, `.avi`, `.mov`, `.webm`, `.flv`, `.wmv`, `.m4v`. Una extensión desconocida lanza `ValueError` con el nombre (nunca se descarta en silencio). Las extensiones de audio y video incluyen todas las de `src/coordinator/router.py:35-40`, que no se modifica, para no rechazar lo que el camino heredado acepta.
 - Mapa de colas: TEXT→`queue:text`, IMAGE→`queue:image`, AUDIO→`queue:audio`; nombres distintos de los de las operaciones FFmpeg, de modo que no se mezclan con el camino heredado. Se define en dominio como constante; el refactor de IMPLEMENTACION §4 («pasar el mapa a configuración») queda fuera de esta feature.
 
 **`DispatchCase`.** Fija `enqueued_at` con `Clock.now()`, descompone, comprueba `has_capacity` de cada cola destino antes de encolar y, si alguna está llena, lanza `QueueFull` sin haber encolado nada (la comprobación no es atómica entre procesos; es aceptable porque F-24 hace el límite real). Después encola en el orden de `decompose` y emite por sub-tarea un log INFO `routing case=<id> subtask=<id> kind=<tipo> source=<sha256> queue=<cola>`. Devuelve la lista de `(cola, Subtask)`.
@@ -76,7 +76,7 @@ Pruebas previstas por la historia: U descomposición y mapa de colas; I `fakered
 
 **Reutiliza** `Subtask.to_dict`/`from_dict` (serialización en Redis del adaptador), `Priority.from_name`, `FakeWorkQueue` y `comprobar_work_queue`.
 
-**Decisión nueva propuesta** (se registra en `docs/ARQUITECTURA.md` §8 en la fase de documentación, no ahora): descomposición por tipo con colas `queue:{tipo}` y video como fuente que se expande, sin ampliar `ContentKind`. Alternativa rechazada: añadir `VIDEO` a `ContentKind`, porque rompe `RoutingTable`, que exige regla por cada `ContentKind` (`src/domain/routing.py:13-20`), y es contrato compartido.
+**Decisión nueva propuesta** (se registra en `docs/ARQUITECTURA.md` §8 en la fase de documentación, no ahora, junto a AD-04 y no respaldada por AD-18): descomposición por tipo con colas `queue:{tipo}` y video como fuente que se expande, sin ampliar `ContentKind`. Alternativa rechazada: añadir `VIDEO` a `ContentKind`, porque rompe `RoutingTable`, que exige regla por cada `ContentKind` (`src/domain/routing.py:13-20`), y es contrato compartido.
 
 ## Pruebas
 
@@ -119,6 +119,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - **Documentos adjuntos.** El enunciado menciona «video/documento» en casos heterogéneos pero B.4 solo pide routing para texto, imagen, audio y video; quedan fuera y una extensión de documento lanza `ValueError`. Confirmar.
 - **Lista de extensiones** de texto, imagen, audio y video es propuesta nuestra; F-02 puede fijar los formatos de chat admitidos. Se alineará cuando exista.
 - **Cola llena a mitad de caso.** La comprobación previa de capacidad no es atómica entre procesos y puede dejar un caso parcialmente encolado si hay concurrencia; F-24 (backpressure, en PR) y F-06 lo resuelven. Se declara como límite, sin medición.
+- **Desviación de AD-04.** AD-04 prevé ZSET por tipo; el adaptador provisional de la parte 2 usa listas (`RPUSH`/`BLPOP`) y no aplica el puntaje por prioridad. Es temporal, hasta F-06/M2; la persona debe aceptarlo o pedir otro enfoque.
 - **Prioridad.** `Subtask.priority` viaja en el payload pero no separa colas (la prioridad como ZSET es AD-04, de M2). El camino heredado sí usa `:high`; no se replica aquí.
 - **Evidencia «log de routing».** Se guardará como salida del log de la prueba de aceptación en `docs/evidencia/` en la fase de documentación; no se inventa ni se estima ningún dato.
 
