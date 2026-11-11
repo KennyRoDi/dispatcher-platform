@@ -1,8 +1,8 @@
 # SPEC F-27: TLS entre nodos
 
 **Fase:** pr
-**Base:** feat/F-27-2-tls-entre-nodos
-**Verificación IA:** revision b387b37
+**Base:** feat/F-27-3-tls-entre-nodos
+**Verificación IA:** revision 12c2c90
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -212,3 +212,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO tras corregir coordinator user (39d0aac); Redis, MinIO y coordinador reales sin probar con imagen (b387b37) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Prueba de aceptacion creada (commit 20d5104), 2 skipped por diseno; src intacto; sin resultados inventados (20d5104) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada; la prueba de aceptación se salta sin captura real (sudo), no puede estar en rojo |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Parte sin codigo (0 lineas en src); suite sin cambios 2014 passed, 9 skipped, 4 xfailed (44fba43) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código |
+| verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte solo de prueba de aceptacion saltada y docs; captura real pendiente de la persona con sudo (c879d58) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs de la ficha M4 y guion revisados por el orquestador contra el SPEC (pila fila 4): resultados pendiente, sin datos inventados, M4 max 2; sin subagente revisor, verificacion no independiente (689196c) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código; revisión sin subagente |
+| verificación IA de revision | orquestador | 2026-11-11 | Revision del diff de la parte 4 contra el SPEC (fila 4 de la pila): prueba de aceptacion saltada por diseno, ficha M4 con resultados pendiente, 0 lineas de src; sin subagente revisor, verificacion no independiente (12c2c90) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin subagente revisor |

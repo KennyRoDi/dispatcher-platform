@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 a 3). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: no hay salidas reales de nodos en este documento; la única de F-27 es una prueba local en una sola máquina, que no acredita M4. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
@@ -124,11 +124,15 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 
 **Límites declarados.**
 
-- Redis y MinIO reales no se han probado con TLS: sin salida medida.
-- `coordinator`, `redis` y `minio` del Nodo A corren con `user: CERTS_UID:CERTS_GID` para leer `server.key` (0600). No se probó con las imágenes reales; el coordinador no escribe en disco (se revisó el código de `src/coordinator`), pero Redis y MinIO pueden requerir un `chown` único de `redis-data` y `minio-data`.
-- Con `TLS_ENABLED=false` el worker igual exige `TLS_CA_FILE`.
-- Pendientes de otros dueños: `dashboard/app.py:23` y `scripts/generate_dataset.py:18,291` aún apuntan a `http` y 8000.
+- Redis, MinIO y el coordinador con TLS se probaron solo en una máquina, con las imágenes reales ([evidencia local](evidencia/F-27_servidores_tls_local_2026-11-11.md)); no hay tres nodos reales, Tailscale ni captura de red.
+- `coordinator`, `redis` y `minio` del Nodo A corren con `user: CERTS_UID:CERTS_GID` para leer `server.key` (0600). `redis-data-init` ajusta la propiedad del volumen de Redis a ese UID. Solo se probó con UID 1000, que coincide con el de `appuser` del coordinador; un `CERTS_UID` distinto y el dueño `65532` de `/data/.minio.sys` de MinIO no se probaron ni se investigaron.
+- El healthcheck de MinIO usa `MC_HOST_local=https://localhost:9000 mc --config-dir /tmp/.mc ready local --insecure`, porque con `user:` propio `mc` no puede escribir `/.mc` y su alias apunta a `http`.
+- uvicorn no fija un mínimo de TLS 1.3: con TLS 1.2 el coordinador respondió 200 en la prueba local (AD-37). Redis sí rechazó TLS 1.2.
+- Con `TLS_ENABLED=false` el worker ya no exige `TLS_CA_FILE`; con TLS activo y sin CA se detiene.
+- Pendientes de otros dueños: `dashboard/app.py` y `scripts/generate_dataset.py` siguen apuntando a `http://localhost:8000`; hay que fijar la URL `https://<IP_TAILSCALE_NODO_A>:8443` y, en el dashboard, `REQUESTS_CA_BUNDLE`.
 - Sin evidencia medida, M4 máximo 2.
+
+**Parte 4: prueba de aceptación de la captura.** `tests/acceptance/test_tls_entre_nodos.py` levanta la captura, procesa un caso con marcador sintético y revisa con `tshark` y `strings`. Solo se verificó su omisión (skip); no hay ejecución real.
 
 ### F-29 Cadena de custodia
 
@@ -228,13 +232,29 @@ git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'
 
 ### F-27 TLS entre nodos
 
-Comandos exactos de `docs/IMPLEMENTACION.md` §5; los ejecuta la persona en el Nodo A con `sudo`, con la IP real de Tailscale:
+La ejecuta la persona en el Nodo A, con `sudo` y la IP real de Tailscale. Comandos exactos de `docs/IMPLEMENTACION.md` §5, una captura por intento:
 
 ```bash
 sudo tcpdump -i <if> -w m4.pcap 'port 8443 or 6380 or 9000'
 tshark -r m4.pcap -Y tls.handshake.type==1
 strings m4.pcap | grep -c <marcador_sintetico>
 ```
+
+Producto esperado: handshakes TLS y 0 coincidencias del marcador. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+
+Prueba de aceptación (se omite si falta algo de lo siguiente):
+
+```bash
+F27_CAPTURA=1 COORDINATOR_URL=https://<ip>:8443 TLS_CA_FILE=<ca.pem> pytest tests/acceptance/test_tls_entre_nodos.py -q
+```
+
+- `F27_CAPTURA=1`: obligatoria; sin ella se omite.
+- `COORDINATOR_URL` y `TLS_CA_FILE`: obligatorias.
+- `F27_INTERFAZ`: interfaz de captura; por defecto `any`.
+- `F27_LEVANTAR_NODO=1`: ejecuta `docker compose up -d --wait` y lo baja al terminar.
+- Requiere `tcpdump`, `tshark`, `strings` y `sudo` sin contraseña (`sudo -v` antes).
+
+Comandos de la prueba local de los servidores: en la [evidencia local](evidencia/F-27_servidores_tls_local_2026-11-11.md) (`generar_certs.sh`, `docker compose up`, `redis-cli --tls`, `openssl s_client`, `curl --cacert`).
 
 ### F-29 Cadena de custodia
 
@@ -282,8 +302,10 @@ Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de l
 |---|---|
 | Handshakes TLS en la captura (`tshark`) | pendiente |
 | Coincidencias del marcador (`strings ... \| grep -c`) | pendiente |
-| Cliente sin la CA rechazado en los servicios reales | pendiente |
+| Cliente sin la CA rechazado en los servicios reales | pendiente (solo prueba local, abajo) |
 | Costo de TLS sobre el throughput de M3 | pendiente |
+
+**Prueba local de servidores TLS (una sola máquina, sin captura de red; no acredita M4).** Con `redis:7-alpine`, MinIO de Chainguard y el coordinador construido con `Dockerfile.worker`, todo en `127.0.0.1`: los tres servicios quedaron `healthy` con `user:` propio; `redis-cli --tls` y `openssl s_client` verificaron la CA y el hostname con TLS 1.3, Redis rechazó TLS 1.2, el puerto 6379 quedó cerrado, y el coordinador atendió `https://localhost:8443/health` con la CA y rechazó la petición sin ella o en claro. La prueba encontró dos fallos del Compose original (Redis sin permiso de escritura en `redis-data` y healthcheck de MinIO que no pasaba), ya corregidos. Detalle y salidas en [la evidencia](evidencia/F-27_servidores_tls_local_2026-11-11.md).
 
 ### F-29 Cadena de custodia
 
@@ -312,7 +334,9 @@ Pendiente. Las pruebas unitarias respaldan el formato y la detección de alterac
 
 ### F-27 TLS entre nodos
 
-Pendiente. Sin captura real no hay resultado de TLS y el módulo no pasa de 2 [Parte I §5]. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+Pendiente. La prueba local respalda que los servidores arrancan con TLS y UID propio y que el cliente verifica la CA, no que el tráfico entre nodos reales vaya cifrado: falta la captura con `tshark` y `strings`. Sin captura real no hay resultado de TLS y M4 no pasa de 2 [Parte I §5].
+
+**Repetir M3.** TLS puede alterar M1 a M3: hay que repetir al menos el throughput de M3 con TLS activo y reportar la diferencia (`docs/IMPLEMENTACION.md` §7). No se estima aquí.
 
 ### F-29 Cadena de custodia
 
