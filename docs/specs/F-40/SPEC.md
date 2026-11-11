@@ -1,6 +1,6 @@
 # SPEC F-40: Matriz, historial y bitácora
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 98c774e
 **Historia:** US-40 · **Requisitos:** RNF-17, RNF-18, RNF-19, RNF-20; [Parte I §3, §4, §8], [Anexos 1 y 3], [B.9], [B.10] · **Responsable:** K
@@ -126,3 +126,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; sin subagente: verificacion no independiente) | 2026-11-10 | Ejecute PYTHONPATH=. python scripts/conformidad.py: 'Conformidad: 0 problema(s)' sobre la matriz actual. Capture git shortlog -sn --all y -sne --all el 2026-11-11 (UTC): Jose 595, Kenni 373, Melany 37, krd 24, Auditoria 20, Nahum 17 (el conteo de Kenni sube por mis commits de esta sesion). Salida guardada para la documentacion; sin cambios de codigo. (b2dd928) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | verificacion del orquestador sin QA independiente: feature solo documental; aprobacion delegada por la persona |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca docs/responsabilidades.md y SPEC. Ejecute conformidad.py: 0 problemas. Recontado: git shortlog -sn origin/main (Jose 395, Kenni 262, krd 24, Nahum 17), bitacora en estado 45 entradas; SUP-23 y SUP-24 ya existen en REQUERIMIENTOS:129 y ARQUITECTURA:240, corregido el SPEC. No re-ejecute pytest (solo docs). (98c774e) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
