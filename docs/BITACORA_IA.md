@@ -518,3 +518,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | pytest unitarias 1576 passed, 7 skipped, 9 xfailed; integracion con ffmpeg real 3 passed; codigo 144+/64- (<400); la persona aprobo cada fase. |
 | Cómo se validó | No se verifico linea por linea el script ni la opcion C ante señal fatal (declarado en el SPEC). |
 | Error de la IA | Prueba heredada test_validar_rechaza_origen_o_licencia_distintos[licencia-MIT] quedo invalida al pasar a MIT; la corrigio el orquestador a GPL (40ab507). El commit 9fc5937 cambio LICENSE_NAME a MIT sin mencionarlo en su mensaje. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-12 (`feat/F-12-1-cancelacion-real`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-12 |
+| Propósito | Supervisor de procesos con SIGTERM/SIGKILL (F-12 parte 1) |
+| Consulta resumida | Diseñar tests y supervisor con dobles y runner POSIX |
+| Resultado obtenido | ProcessSupervisor, ProcessRunner y PosixProcessRunner con 6 tests deterministas y 4 POSIX |
+| Validado / corregido / descartado | Pruebas deterministas en verde; los 4 tests POSIX reales no se ejecutaron en Windows, pendientes en WSL2/Linux |
+| Cómo se validó | Revisión humana de cada fase |
+| Error de la IA | cancel(pid, scratch=None) no coincidía con los tests; se cambió a cancel(pid) guardando el scratch por pid |
