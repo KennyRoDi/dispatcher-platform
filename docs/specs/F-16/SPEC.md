@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** documentacion b8e2690
+**Verificación IA:** revision 0eb2efd
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La revisión final detectó un conteo desactualizado en docs/modulo-M1-memoria.md: QA-parte-2 final registra 1162 aprobadas, pero la ficha dice 1161. Corregir solo el conteo y verificar. |
 | verificación IA de documentacion | Codex | 2026-11-10 | Revisión documental mínima tras hallazgo final: commit b8e2690 cambia únicamente el conteo de QA en ficha M1 de 1161 a 1162, coincidente con QA-parte-2 y SPEC. git show --check limpio, árbol limpio. No repetí pruebas; cambio solo documental. (b8e2690) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de revision | Codex | 2026-11-10 | Revisión independiente aprobada sobre b8e2690: conteo 1162 coincide entre ficha M1, QA y SPEC; cambios desde la revisión son metadatos de flujo en SPEC. git diff --check feat/F-16-1-limites-por-worker...HEAD limpio. B/C/D, calibración bajo carga y GPU runtime siguen pendientes conforme a excepción humana registrada; no hubo cambios de producto ni se repitió suite. (0eb2efd) |
