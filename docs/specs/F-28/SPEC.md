@@ -130,7 +130,7 @@ Hallazgos de QA que se aceptan y se declaran:
 
 - La KEK queda en las variables locales de la traza (Sentry `include_local_variables`, `pytest --showlocals`). No activar esas opciones.
 - Los 3 xfail `test_la_traza_no_conserva_la_kek_*` son defectuosos: el marco del propio test conserva la KEK. Pendiente reescribirlos o aceptar el límite.
-- Decisiones del developer no fijadas antes en el SPEC: sigue enlaces simbólicos y valida el destino; la variable `KEK` es base64; valores vacíos equivalen a no definidos; sin caché.
+- Decisiones del developer no fijadas antes en el SPEC: sigue enlaces simbólicos y valida el destino; la variable `KEK` es base64; valores vacíos equivalen a no definidos; sin caché. Además: el modo aceptado es exactamente `0400` o `0600` (0500, 0700 y bits especiales se rechazan; el SPEC decía solo `0400`); `from_env` aplica `.strip()` a `KEK_FILE` y `KEK`; el archivo se abre con `O_NONBLOCK`, por lo que un FIFO se rechaza; rutas con NUL o sustituto unicode dan `KeyUnavailable`.
 - Prueba inestable de la suite completa, 1 vez en 4, sin identificar. Hipótesis sin confirmar: las pruebas que recorren el historial git.
 - La parte 2 no cablea el proveedor al almacén; es la parte 3.
 
