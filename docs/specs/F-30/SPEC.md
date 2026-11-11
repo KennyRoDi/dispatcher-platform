@@ -1,6 +1,6 @@
 # SPEC F-30: Workers sin privilegios
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** tests 8d643e9
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
@@ -94,3 +94,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-11 | SPEC F-30 sin campos pendientes (grep 0); diff contra main solo el SPEC. Hallazgo del arquitecto (Dockerfile.worker ya tiene USER) comprobado con grep. AD-36/SUP-32 libres segun arquitecto (no re-verifique). Pila de 1 parte. 5 preguntas abiertas; decision provisional: aceptar, endurecer tambien el compose local, UID 10001, /scratch con volumen nombrado. (4f7548d) |
 | plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff contra main: SPEC y 3 archivos de test nuevos (unit, integracion, aceptacion); src, scripts y deploy intactos. Ejecute la unitaria: error de coleccion ModuleNotFoundError scripts.verificar_workers (rojo). Integracion y aceptacion se saltan sin docker/entorno. API asumida: incumplimientos_compose, incumplimientos_dockerfile, main(argv) con --compose/--dockerfile; exige user numerico, read_only, cap_drop ALL, no-new-privileges:true, tmpfs /tmp con size, volumen scratch y WORK_DIR=/scratch. (8d643e9) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
