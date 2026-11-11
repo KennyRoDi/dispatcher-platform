@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-28-1-cifrado-en-reposo
 **Verificación IA:** verificacion 8eb8ed0
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -155,3 +155,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 3 de 4 hallazgos QA en file_key_provider.py; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa tras b2aef68: 1928 passed, 8 skipped, 9 xfailed (1 sola corrida). Queda abierto: KEK en locales de la traza; los 3 tests xfail son defectuosos (el marco del propio test conserva la KEK): declarar como limite. (b2aef68) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA a93526b: 12 xfail; 5 corregidos y desmarcados; 4 sin cerrar (KEK en locales, 3 tests, defecto del test) y 3 pre-existentes. Prueba inestable de la suite no identificada ni reproducida (70 corridas verdes); hipotesis: pruebas que dependen del estado de git. Sin fuga de KEK por repr/str/cause/context. (8eb8ed0) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
