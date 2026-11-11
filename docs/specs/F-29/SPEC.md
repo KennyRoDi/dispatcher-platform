@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 62a009e
+**Verificación IA:** documentacion 4bd975d
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -207,3 +207,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 |  |
 | verificación IA de verificacion | pytest | 2026-11-11 | QA: 4 hallazgos; QA-1 y QA-2 corregidos (commit 62a009e), QA-3 y QA-4 xfail estricto declarados como limites; 3158 passed segun developer; prueba A local sintetica con 12 escenarios, no nodos reales (62a009e) |
 | verificacion | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de documentacion | conformidad | 2026-11-11 | SPEC con limites de la parte 3, ficha M4 con 5 secciones, evidencia local sintetica rotulada, .env.example con CUSTODY_KEY_FILE, bitacora publicada; conformidad 0 problemas (4bd975d) |
