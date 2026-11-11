@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 87a594b
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -116,3 +116,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | orquestador | 2026-11-11 | SPEC F-14 completo (grep … = 0), diff contra main solo el SPEC, Base main; AD-39 y SUP-35 libres segun arquitecto; pila de 3 partes; 11 preguntas abiertas con decision provisional: aceptar (la parte 3 toca rutas_subtareas.py de Nahum: avisar) (87a594b) |
