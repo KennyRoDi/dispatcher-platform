@@ -892,3 +892,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Verificación del orquestador y QA por subagente; las aprobaciones de fase fueron delegadas por la persona |
 | Cómo se validó | Subagentes por rol; la persona no revisó de forma independiente |
 | Error de la IA | La primera implementación verificaba todo el log en cada record (costo cuadrático, 121 s con 4000 entradas), dejaba el log bloqueado tras un fallo de E/S del ancla y seguía symlinks al escribir el temporal; el QA lo detectó y se corrigió con verify_tail, reintento del ancla y O_NOFOLLOW |
+
+## 2026-11-11 · Kenni Rodriguez · F-29 (`feat/F-29-2-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5; subagentes revisor, developer, QA) |
+| Componente | F-29 |
+| Propósito | Revisión y QA de la parte 2 de F-29: ancla génesis, tolerancia de anclas y carrera al crear el log |
+| Consulta resumida | Revisar el diff contra el SPEC, corregir la tolerancia de 1 entrada sin ancla y cerrar la carrera al crear el log |
+| Resultado obtenido | Ancla génesis en el adaptador; sin ancla con entradas es violación; _create_log; límites declarados en SPEC, AD-35 y SUP-31 |
+| Validado / corregido / descartado | Pruebas y revisión de subagentes; aprobaciones de fase delegadas por la persona, sin verificación humana independiente |
+| Cómo se validó | Subagentes con verificación del orquestador |
+| Error de la IA | El primer arreglo de A2 (tolerar 1 entrada sin ancla) permitía truncar un log largo a su primera entrada y borrar el ancla sin detección; lo halló el revisor y se reemplazó por un ancla génesis. Además el developer detectó una carrera al crear el log (1 fallo en 60 corridas), corregida con _create_log. |
