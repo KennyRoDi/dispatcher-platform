@@ -120,7 +120,7 @@ def make_two(client):
 
 def test_barrier_completed(client, fake):
     cid, (s1, s2) = make_two(client)
-    assert report(client, cid, s1).json()["case_status"] == "queued"
+    assert report(client, cid, s1).json()["case_status"] == "processing"
     assert report(client, cid, s2).json()["case_status"] == "completed"
     assert fake.hget(f"case:{cid}", "finished_at")
 
@@ -241,7 +241,7 @@ def test_report_groups_by_type_and_operation(client, fake):
     report(client, cid, s2)
     report(client, cid, s3, "failed", error="x", error_type="FFmpegError")
     report(client, cid, s4)
-    assert case_status(fake, cid) == "queued"
+    assert case_status(fake, cid) == "processing"
 
     rep = client.get(f"/cases/{cid}/report").json()
     assert rep["priority"] == "high"

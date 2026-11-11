@@ -1,8 +1,8 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** pr
-**Base:** feat/F-10-1-estados-y-cierre
-**Verificación IA:** revision d8ad108
+**Fase:** cerrada
+**Base:** feat/F-10-2-estados-y-cierre
+**Verificación IA:** revision e5fabe4
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -112,4 +112,15 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: bitácora publicada; sin cambios de contratos ni AD/SUP (no hay decisión nueva). Verificación previa aprobada con --excepcion sin necesidad, por error del agente. (11c78ae) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 2: diff (puerto CaseStateStore, ReportSubtask, doble, contrato) cubre el plan de pila; capas respetadas, 24 pruebas verdes; bitácora veraz con errores de IA. Nota: SPEC describe mark_reported sin outcome, la implementación lo añade (declarado en verificación de tests) (d8ad108) |
+| revision | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de tests | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 3 tests: 4 archivos (adaptador Redis con contrato, delegación de rutas, concurrente I, 7 estados A); en rojo por ImportError de redis_case_state, sin código de producción (fac4079) |
+| tests | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 3 impl: RedisCaseState (HSETNX+SADD, historial), ruta delega en ReportSubtask; 4 archivos de la parte en verde; tests/unit 2822 verdes, 2 fallos TLS preexistentes; ajustada aserción de test_cierre_alertas (queued->processing tras reporte parcial, por SPEC). Riesgo: doble cierre en carrera entre los dos últimos reportes (ReportSubtask, parte 2) (0af6c06) |
+| implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; comprobación de pruebas omitida: 2 fallos TLS ajenos preexistentes (test_tls_cableado) y flujo.py falla con stdout None al capturar pytest en Windows |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 3: con Redis 7 real (docker, puerto 6390) la prueba concurrente falló 1/17 (doble cierre y PROCESSING sobrescribiendo estado terminal: bug de mi implementación). Corregido: set_state con WATCH rechaza escrituras sobre estado terminal y devuelve bool; ReportSubtask no cierra si no se aplicó. 40/40 corridas concurrentes verdes; 74 pruebas del módulo verdes, 462 del coordinador verdes; +2 pruebas unitarias. Redis ajeno con contraseña no se usó (2e9198b) |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 3: con Redis 7 real (docker, puerto 6390) la prueba concurrente falló 1/17 (doble cierre y PROCESSING sobrescribiendo estado terminal: bug de mi implementación). Corregido: set_state con WATCH rechaza escrituras sobre estado terminal y devuelve bool; ReportSubtask no cierra si no se aplicó. 40/40 corridas concurrentes verdes; 74 pruebas del módulo y 462 del coordinador verdes; +2 unitarias; aserciones queued->processing en tests/test_coordinator.py. Redis ajeno con contraseña no se usó (aac1cd9) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; pruebas rápidas solo fallan por TLS ajeno (test_tls_cableado, test_tls_cableado_qa), sin relación con F-10 |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Documentación parte 3: AD-43 actualizado con RedisCaseState, HSETNX/SADD, historial y WATCH; 40 corridas concurrentes; bitácora publicada con el error real de doble cierre; sin AD/SUP nuevos ni ids duplicados (6b048b9) |
+| documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 3: diff contra origin/main cubre redis_case_state, historial, cableado de la ruta, prueba I y A de 7 estados; capas respetadas (arquitectura verde); bitácora declara IA y el error real de doble cierre; sin AD/SUP duplicados (e5fabe4) |
 | revision | José Andrés Loría Herrera | 2026-11-11 |  |

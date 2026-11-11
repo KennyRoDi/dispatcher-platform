@@ -23,5 +23,5 @@ class ReportSubtask:
         if actual in _REOPEN:
             self._store.set_state(case_id, CaseState.PROCESSING, self._clock.now())
         final = final_state(completed, failed, actual)
-        self._store.set_state(case_id, final, self._clock.now())
-        return final
+        applied = self._store.set_state(case_id, final, self._clock.now())
+        return final if applied is not False else None
