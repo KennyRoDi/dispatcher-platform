@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-14-2-alertas
 **Verificación IA:** documentacion be6051f
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -154,3 +154,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA: 1 defecto propio corregido; 3 previos a F-14 declarados como limites; sin segundo QA (2abf516) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 3 en AD-39 (AlertingFindingStore sin cablear: verificado con grep), prueba A con reloj sintetico, previos de Nahum declarados; bitacora en estado; sin cambios de codigo (be6051f) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
