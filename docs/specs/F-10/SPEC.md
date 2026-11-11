@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-10-1-estados-y-cierre
 **Verificación IA:** documentacion 11c78ae
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -110,3 +110,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: QA de CaseStateStore y ReportSubtask contra el SPEC; 5 pruebas borde nuevas (terminales no se reabren, aislamiento entre casos, sin estado previo, resultado desconocido no consume id, reporte contrario tras cierre); 24 pruebas verdes con arquitectura, sin imports de adaptadores. Hallazgo: reporte tardío tras el cierre se cuenta pero no cambia el estado final. (8f34bb6) |
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: bitácora publicada; sin cambios de contratos ni AD/SUP (no hay decisión nueva). Verificación previa aprobada con --excepcion sin necesidad, por error del agente. (11c78ae) |
+| documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
