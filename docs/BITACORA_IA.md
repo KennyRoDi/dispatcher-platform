@@ -957,3 +957,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pendiente de revisión humana |
 | Cómo se validó | Revisión del diff; sin mediciones |
 | Error de la IA | el QA halló 16 defectos en generar_certs.sh y compose tras la implementación (validación de NODE_IP solo por caracteres, feeder sin TLS_ENABLED=false, CA sin pathlen:0, llaves 0600 ilegibles por UID de redis/MinIO) |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-4-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5) |
+| Componente | F-27 |
+| Propósito | Documentar guion de captura TLS y prueba de aceptación (F-27 parte 4) |
+| Consulta resumida | Redactar sección de captura en docs/modulo-M4-seguridad.md y enlace en DEPLOY_WORKERS |
+| Resultado obtenido | Sección con comandos, variables y resultados pendientes; sin datos medidos |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin QA independiente (parte sin código); la prueba de aceptación solo se verificó con skip |
+| Cómo se validó | Revisión del orquestador contra SPEC e IMPLEMENTACION §5 |
