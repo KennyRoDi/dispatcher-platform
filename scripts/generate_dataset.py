@@ -42,6 +42,9 @@ from typing import Optional
 
 import requests
 
+from scripts.submit_case import resolve_session
+from src.infrastructure.tls import TlsConfigError
+
 DEFAULT_MANIFEST = Path("dataset/manifest.json")
 
 OPERATIONS_BY_TYPE: dict[str, tuple[str, ...]] = {
@@ -384,7 +387,13 @@ def main(argv: list[str] | None = None) -> int:
     results: list[SubmissionResult] = []
     t_start = time.monotonic()
 
-    with requests.Session() as session, ThreadPoolExecutor(max_workers=args.workers) as pool:
+    try:
+        session = resolve_session(args.url.rstrip("/"))
+    except TlsConfigError as e:
+        print(f"Error: {e}")
+        return 1
+
+    with session, ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = {
             pool.submit(submit_case, session, args.url.rstrip("/"), case, args.timeout): case
             for case in cases

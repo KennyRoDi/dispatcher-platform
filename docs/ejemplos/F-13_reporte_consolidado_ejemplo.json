@@ -1,0 +1,226 @@
+{
+  "case_id": "caso-heterogeneo",
+  "status": "completed",
+  "finalizado": true,
+  "generado_en": "2026-11-03T10:00:00+00:00",
+  "hallazgos": [
+    {
+      "categoria": "amenaza",
+      "severidad": "alta",
+      "confianza": 0.9,
+      "detalle": "3 2026-11-03T09:00:00+00:00 wa-3",
+      "evidencia": [
+        {
+          "fuente": {
+            "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+            "file_path": "chat-sintetico.txt",
+            "tipo": "texto"
+          },
+          "localizador": {
+            "tipo": "mensaje",
+            "indice": 3,
+            "source_ref": "wa-3"
+          },
+          "timestamp_utc": "2026-11-03T09:00:00+00:00",
+          "tramo_s": null,
+          "extracto": ""
+        }
+      ]
+    },
+    {
+      "categoria": "ofensivo",
+      "severidad": "media",
+      "confianza": 0.9,
+      "detalle": "7 2026-11-03T09:04:00+00:00 wa-7",
+      "evidencia": [
+        {
+          "fuente": {
+            "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+            "file_path": "chat-sintetico.txt",
+            "tipo": "texto"
+          },
+          "localizador": {
+            "tipo": "mensaje",
+            "indice": 7,
+            "source_ref": "wa-7"
+          },
+          "timestamp_utc": "2026-11-03T09:04:00+00:00",
+          "tramo_s": null,
+          "extracto": ""
+        }
+      ]
+    },
+    {
+      "categoria": "tema",
+      "severidad": "baja",
+      "confianza": 0.9,
+      "detalle": "",
+      "evidencia": []
+    },
+    {
+      "categoria": "objeto",
+      "severidad": "media",
+      "confianza": 0.9,
+      "detalle": "",
+      "evidencia": [
+        {
+          "fuente": {
+            "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+            "file_path": "imagen-sintetica.png",
+            "tipo": "imagen"
+          },
+          "localizador": {
+            "tipo": "caja",
+            "x1": 10,
+            "y1": 20,
+            "x2": 110,
+            "y2": 220
+          },
+          "timestamp_utc": null,
+          "tramo_s": null,
+          "extracto": ""
+        }
+      ]
+    },
+    {
+      "categoria": "transcripcion",
+      "severidad": "media",
+      "confianza": 0.9,
+      "detalle": "texto sintetico",
+      "evidencia": [
+        {
+          "fuente": {
+            "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+            "file_path": "audio-sintetico.wav",
+            "tipo": "audio"
+          },
+          "localizador": {
+            "tipo": "segmento",
+            "indice": 2,
+            "inicio_s": 1.0,
+            "fin_s": 4.5
+          },
+          "timestamp_utc": null,
+          "tramo_s": [
+            1.0,
+            4.5
+          ],
+          "extracto": "texto sintetico"
+        }
+      ]
+    }
+  ],
+  "categorias": [
+    {
+      "categoria": "amenaza",
+      "cantidad": 1,
+      "severidad_maxima": "alta"
+    },
+    {
+      "categoria": "objeto",
+      "cantidad": 1,
+      "severidad_maxima": "media"
+    },
+    {
+      "categoria": "ofensivo",
+      "cantidad": 1,
+      "severidad_maxima": "media"
+    },
+    {
+      "categoria": "tema",
+      "cantidad": 1,
+      "severidad_maxima": "baja"
+    },
+    {
+      "categoria": "transcripcion",
+      "cantidad": 1,
+      "severidad_maxima": "media"
+    }
+  ],
+  "linea_temporal": [
+    {
+      "categoria": "amenaza",
+      "severidad": "alta",
+      "fuente": {
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "file_path": "chat-sintetico.txt",
+        "tipo": "texto"
+      },
+      "localizador": {
+        "tipo": "mensaje",
+        "indice": 3,
+        "source_ref": "wa-3"
+      },
+      "timestamp_utc": "2026-11-03T09:00:00+00:00",
+      "tramo_s": null,
+      "extracto": ""
+    },
+    {
+      "categoria": "ofensivo",
+      "severidad": "media",
+      "fuente": {
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "file_path": "chat-sintetico.txt",
+        "tipo": "texto"
+      },
+      "localizador": {
+        "tipo": "mensaje",
+        "indice": 7,
+        "source_ref": "wa-7"
+      },
+      "timestamp_utc": "2026-11-03T09:04:00+00:00",
+      "tramo_s": null,
+      "extracto": ""
+    }
+  ],
+  "sin_marca_absoluta": [
+    {
+      "categoria": "transcripcion",
+      "severidad": "media",
+      "fuente": {
+        "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "file_path": "audio-sintetico.wav",
+        "tipo": "audio"
+      },
+      "localizador": {
+        "tipo": "segmento",
+        "indice": 2,
+        "inicio_s": 1.0,
+        "fin_s": 4.5
+      },
+      "timestamp_utc": null,
+      "tramo_s": [
+        1.0,
+        4.5
+      ],
+      "extracto": "texto sintetico"
+    },
+    {
+      "categoria": "objeto",
+      "severidad": "media",
+      "fuente": {
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "file_path": "imagen-sintetica.png",
+        "tipo": "imagen"
+      },
+      "localizador": {
+        "tipo": "caja",
+        "x1": 10,
+        "y1": 20,
+        "x2": 110,
+        "y2": 220
+      },
+      "timestamp_utc": null,
+      "tramo_s": null,
+      "extracto": ""
+    }
+  ],
+  "incidencias": [
+    {
+      "tipo": "severidad_alta",
+      "detalle": "hallazgo de severidad alta: amenaza en mensajes 3",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "categoria": "amenaza"
+    }
+  ]
+}

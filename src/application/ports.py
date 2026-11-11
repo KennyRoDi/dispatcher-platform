@@ -1,10 +1,14 @@
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import BinaryIO, Protocol, runtime_checkable
 
+from src.domain.alert_policy import StoredAlert
 from src.domain.chat_message import ChatMessage
+from src.domain.consolidated_report import CaseInfo
 from src.domain.finding import Finding
+from src.domain.rbac import Role
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import Subtask
 
@@ -47,6 +51,11 @@ class FindingStore(Protocol):
 
 
 @runtime_checkable
+class CaseCatalog(Protocol):
+    def case(self, case_id: str) -> CaseInfo | None: ...
+
+
+@runtime_checkable
 class CustodyLog(Protocol):
     def record(self, evidence_sha256: str, operation: str, result_sha256: str, actor: str) -> None: ...
 
@@ -64,3 +73,42 @@ class ResourceReader(Protocol):
 @runtime_checkable
 class AlertPublisher(Protocol):
     def publish(self, kind: str, case_id: str, detail: str) -> None: ...
+
+
+@runtime_checkable
+class AlertReader(Protocol):
+    def recent(self, limit: int) -> list[StoredAlert]: ...
+
+
+@runtime_checkable
+class ProcessRunner(Protocol):
+    def start(self, argv: Sequence[str]) -> int: ...
+
+    def signal_group(self, pid: int, sig: int) -> None: ...
+
+    def reap(self, pid: int, block: bool = False) -> bool: ...
+
+    def poll(self, pid: int) -> int | None: ...
+
+
+class InvalidToken(Exception):
+    pass
+
+
+@dataclass(frozen=True)
+class Identity:
+    subject: str
+    role: Role | str
+
+
+@runtime_checkable
+class TokenVerifier(Protocol):
+    def verify(self, token: str) -> Identity: ...
+
+
+class KeyUnavailable(Exception):
+    pass
+
+
+class DecryptionError(Exception):
+    pass
