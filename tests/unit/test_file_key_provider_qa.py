@@ -4,6 +4,8 @@ import traceback
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from src.adapters.file_key_provider import FileKeyProvider
 from src.application.ports import KeyUnavailable
 

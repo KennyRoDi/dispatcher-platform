@@ -2,6 +2,8 @@ import os
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from scripts.verify_custody import main
 from tests.ayudas_custodia import (
     CONTENIDO_A,

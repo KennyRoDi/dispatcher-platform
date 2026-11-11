@@ -1,3 +1,4 @@
+import os
 import base64
 import json
 import secrets
@@ -196,6 +197,7 @@ def secreto_en_archivo(tmp_path, contenido, modo):
     return str(archivo)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_secreto_desde_archivo_con_permisos_0400(tmp_path, secreto, reloj):
     ruta = secreto_en_archivo(tmp_path, secreto, 0o400)
     verificador = verificador_desde_entorno({"JWT_SECRET_FILE": ruta}, reloj)
@@ -203,6 +205,7 @@ def test_secreto_desde_archivo_con_permisos_0400(tmp_path, secreto, reloj):
     assert verificador.verify(token) == Identity("sol", Role.SUPERVISOR)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_el_salto_de_linea_final_del_archivo_no_forma_parte_del_secreto(tmp_path, secreto, reloj):
     ruta = secreto_en_archivo(tmp_path, secreto + "\n", 0o400)
     verificador = verificador_desde_entorno({"JWT_SECRET_FILE": ruta}, reloj)
@@ -210,6 +213,7 @@ def test_el_salto_de_linea_final_del_archivo_no_forma_parte_del_secreto(tmp_path
     assert verificador.verify(token).subject == "demo"
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 @pytest.mark.parametrize("modo", [0o644, 0o640, 0o604, 0o666])
 def test_archivo_de_secreto_legible_por_otros_se_rechaza(tmp_path, secreto, reloj, modo):
     ruta = secreto_en_archivo(tmp_path, secreto, modo)
@@ -217,17 +221,20 @@ def test_archivo_de_secreto_legible_por_otros_se_rechaza(tmp_path, secreto, relo
         verificador_desde_entorno({"JWT_SECRET_FILE": ruta}, reloj)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_archivo_con_secreto_corto_se_rechaza(tmp_path, reloj):
     ruta = secreto_en_archivo(tmp_path, secrets.token_hex(15), 0o400)
     with pytest.raises(ValueError):
         verificador_desde_entorno({"JWT_SECRET_FILE": ruta}, reloj)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_archivo_inexistente_se_rechaza(tmp_path, reloj):
     with pytest.raises(ValueError):
         verificador_desde_entorno({"JWT_SECRET_FILE": str(tmp_path / "no-existe")}, reloj)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_el_archivo_tiene_prioridad_sobre_la_variable(tmp_path, reloj):
     del_archivo, de_la_variable = secrets.token_hex(32), secrets.token_hex(32)
     ruta = secreto_en_archivo(tmp_path, del_archivo, 0o400)

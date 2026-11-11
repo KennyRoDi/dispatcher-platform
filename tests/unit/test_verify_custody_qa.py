@@ -4,6 +4,8 @@ import os
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 import scripts.verify_custody as cli
 from scripts.verify_custody import main
 from src.adapters.jsonl_custody_log import JsonlCustodyLog

@@ -15,7 +15,10 @@ NODE_NAME = "nodo-a-demo"
 ARCHIVOS = ["ca.pem", "ca.key", "server.pem", "server.key", "minio/public.crt", "minio/private.key"]
 LLAVES = ["ca.key", "server.key", "minio/private.key"]
 
-necesita_openssl = pytest.mark.skipif(shutil.which("openssl") is None, reason="openssl no está instalado")
+necesita_openssl = pytest.mark.skipif(
+    shutil.which("openssl") is None or os.name == "nt",
+    reason="requiere openssl y un bash POSIX; en Windows bash es el lanzador de WSL",
+)
 
 
 def _texto() -> str:
@@ -51,8 +54,8 @@ def _estado_del_repo() -> str:
 
 @pytest.fixture(scope="module")
 def certificados(tmp_path_factory) -> Path:
-    if shutil.which("openssl") is None:
-        pytest.skip("openssl no está instalado")
+    if shutil.which("openssl") is None or os.name == "nt":
+        pytest.skip("requiere openssl y un bash POSIX")
     tmp_path = tmp_path_factory.mktemp("certs")
     destino = tmp_path / "salida"
     antes = _estado_del_repo()
@@ -62,6 +65,7 @@ def certificados(tmp_path_factory) -> Path:
     return destino
 
 
+@pytest.mark.skipif(os.name == "nt", reason="el bit de ejecución no existe")
 def test_el_script_existe_y_es_ejecutable():
     assert SCRIPT.is_file()
     assert SCRIPT.stat().st_mode & stat.S_IXUSR, "falta el bit de ejecución"
