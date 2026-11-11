@@ -12,6 +12,7 @@ from pathlib import Path
 
 import redis.exceptions
 
+from src.workers.cancelacion import SubprocesosPorCaso, escuchar_cancelaciones
 from src.workers.config import Settings, make_redis
 from src.workers.heartbeat import Heartbeat, WorkerStats
 from src.workers.recovery import ACTIVE_STATES, recover_subtask
@@ -37,6 +38,7 @@ class Worker:
         reporter: Reporter | None = None,
         heartbeat_enabled: bool = True,
         ffmpeg_info: tuple[str, str] | None = None,
+        supervisor=None,
     ):
         self.settings = settings
         self.redis = redis_client if redis_client is not None else make_redis(settings)
@@ -47,16 +49,21 @@ class Worker:
         self.reporter = reporter if reporter is not None else Reporter(settings, self.redis)
         self.heartbeat_enabled = heartbeat_enabled
         self.ffmpeg_info = ffmpeg_info
+        self.subprocesos = SubprocesosPorCaso(supervisor) if supervisor is not None else None
         self.stats = WorkerStats()
         self.stop_event = threading.Event()
         self.host = settings.node_name
         self.heartbeat: Heartbeat | None = None
         self._consumers: list[threading.Thread] = []
         self._flusher: threading.Thread | None = None
+        self._listener: threading.Thread | None = None
         self._inflight_key = f"worker:{settings.worker_id}:inflight"
 
     def start(self) -> None:
         self.recover_own_inflight()
+        self._borrar_temporales_huerfanos()
+        if self.subprocesos is not None:
+            self._listener = escuchar_cancelaciones(self.redis, self.subprocesos, self.stop_event)
 
         try:
             self.storage.ensure_buckets()
@@ -93,8 +100,16 @@ class Worker:
             thread.join(timeout)
         if self._flusher is not None:
             self._flusher.join(timeout)
+        if self._listener is not None:
+            self._listener.join(timeout)
         if self.heartbeat is not None:
             self.heartbeat.join(timeout)
+
+    def _borrar_temporales_huerfanos(self) -> None:
+        if not self.settings.work_dir.is_dir():
+            return
+        for orfano in self.settings.work_dir.iterdir():
+            shutil.rmtree(orfano, ignore_errors=True)
 
     def recover_own_inflight(self) -> dict:
         """Recovers this worker's own leftover inflight subtasks (e.g. a restart with the same worker_id)."""
@@ -269,6 +284,8 @@ class Worker:
         output_bytes = 0
         encoder: str | None = None
 
+        subprocesos = self.subprocesos.para_subtarea(data["case_id"]) if self.subprocesos else None
+
         try:
             src = self.storage.download(data["file_path"], in_dir)
             started_at = datetime.now(timezone.utc).isoformat()
@@ -282,6 +299,10 @@ class Worker:
             ):
                 params["hwaccel"] = self.settings.hwaccel
             on_progress = self._make_progress_callback(subtask_key)
+            if subprocesos is not None:
+                extra = {"supervisor": subprocesos}
+            else:
+                extra = {}
 
             result = self.processor.process(
                 data["operation"],
@@ -291,6 +312,7 @@ class Worker:
                 on_progress=on_progress,
                 threads=self.settings.threads_per_job(),
                 timeout=self.settings.ffmpeg_timeout,
+                **extra,
             )
             outputs = self.storage.upload_outputs(result.outputs, data["case_id"], subtask_id)
             status = "completed"
@@ -311,6 +333,8 @@ class Worker:
                 error_type = "InternalError"
                 logger.exception("error interno procesando %s", subtask_id)
         finally:
+            if subprocesos is not None:
+                subprocesos.cerrar()
             shutil.rmtree(work_dir, ignore_errors=True)
 
         finished_at = datetime.now(timezone.utc).isoformat()
