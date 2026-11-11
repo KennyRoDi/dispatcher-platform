@@ -328,7 +328,6 @@ def test_whatsapp_termina_cada_mensaje_con_salto_de_linea():
     assert not exportado.endswith("\n\n")
 
 
-@pytest.mark.xfail(strict=True, reason="hallazgo QA (menor): los renderizadores no convierten a UTC un mensaje con otra zona")
 def test_los_renderizadores_normalizan_a_utc_un_mensaje_con_otra_zona():
     costa_rica = timezone(timedelta(hours=-6))
     mensaje = ChatMessage(datetime(2025, 1, 6, 23, 30, tzinfo=costa_rica), "Alma Sintética", "hola", "x-1")
@@ -340,7 +339,6 @@ def test_los_renderizadores_normalizan_a_utc_un_mensaje_con_otra_zona():
     assert telegram["date"] == "2025-01-07T05:30:00"
 
 
-@pytest.mark.xfail(strict=True, reason="hallazgo QA (menor): un nombre de caso con ../ escribe fuera del destino")
 def test_un_nombre_de_caso_no_escribe_fuera_del_destino(tmp_path):
     destino = tmp_path / "salida"
     caso = CasePlan("../escape", "no", ("texto",), 5, 0, 0, 0)

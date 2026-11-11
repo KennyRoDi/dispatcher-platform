@@ -148,7 +148,6 @@ def test_run_ffmpeg_propaga_el_timeout(monkeypatch):
         run_ffmpeg(["ffmpeg"])
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un archivo previo en la ruta hace pasar un ejecutor que no produjo nada")
 def test_archivo_previo_no_oculta_un_ejecutor_que_no_produce(tmp_path):
     _generate(out=tmp_path)
 
@@ -156,7 +155,6 @@ def test_archivo_previo_no_oculta_un_ejecutor_que_no_produce(tmp_path):
         _generate(runner=lambda args: None, out=tmp_path)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: la rotacion de formatos reinicia en cada caso y sobrerrepresenta mp3 y png")
 def test_formatos_de_audio_e_imagen_quedan_repartidos_en_todo_el_plan(tmp_path):
     files, _ = _generate(seed=1, params=DatasetParams(), out=tmp_path)
 
