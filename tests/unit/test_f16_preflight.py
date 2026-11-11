@@ -63,6 +63,14 @@ def test_preflight_rechaza_node_ip_que_no_es_una_direccion_ip():
         validate_config(config, node_memory=16 * 1024**3)
 
 
+def test_preflight_rechaza_node_name_distinto_del_hostname():
+    config = _config()
+    config["services"]["worker"]["environment"]["NODE_NAME"] = "node-other"
+
+    with pytest.raises(ValueError, match="NODE_NAME"):
+        validate_config(config, node_memory=16 * 1024**3)
+
+
 def test_preflight_suma_limites_de_todos_los_workers():
     config = _config()
     config["services"]["worker-2"] = {
