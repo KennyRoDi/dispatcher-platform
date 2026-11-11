@@ -1337,3 +1337,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas unitarias, aceptación (7 estados) y prueba I concurrente con Redis 7 real en docker |
 | Cómo se validó | Revisión de pruebas y corridas repetidas contra Redis |
 | Error de la IA | La implementación inicial dejaba doble cierre en reportes concurrentes (la prueba I con Redis real falló ~1 de 7 corridas: dos hilos cerraban y un PROCESSING tardío sobrescribía el estado terminal); se corrigió con set_state atómico (WATCH) y 40 corridas seguidas verdes. Además, la IA ajustó aserciones queued->processing en tests existentes por exigencia del SPEC |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-10 (`feat/F-10-3-estados-y-cierre`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-10 |
+| Propósito | Implementar y verificar F-10 parte 3: adaptador Redis de estados, historial y cableado de POST /subtasks/report |
+| Consulta resumida | Implementar redis_case_state.py y delegar la ruta en ReportSubtask; QA con Redis real |
+| Resultado obtenido | RedisCaseState, ruta delegada, set_state atómico con WATCH; 40 corridas concurrentes seguidas sin doble cierre |
+| Validado / corregido / descartado | Pruebas unitarias, aceptación (7 estados) y prueba I concurrente con Redis 7 real en docker |
+| Cómo se validó | Revisión de pruebas y corridas repetidas contra Redis |
+| Error de la IA | La implementación inicial cerraba dos veces con reportes concurrentes (la prueba I con Redis real falló en la primera corrida); un primer arreglo aún fallaba en 6 de 40 corridas porque un PROCESSING tardío sobrescribía el estado terminal; se corrigió rechazando toda escritura sobre estado terminal con WATCH y quedaron 40 corridas seguidas verdes. Además hubo que ajustar aserciones queued->processing en tests existentes por exigencia del SPEC |
