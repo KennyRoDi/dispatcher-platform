@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 96b0f6b
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -146,3 +146,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff 86fcb73..f3df7a2 solo docs (ARQUITECTURA AD-34, REQUERIMIENTOS SUP-30, modulo-M4 borrador, SPEC). Numeros presentes (grep). Sin pytest: no cambio codigo. Bitacora en estado segun el subagente (no la verifique). Cita NIST §8.3 no verificada por mi. (f3df7a2) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: diseño=codigo, AD-34 y limites reflejan desviaciones, sin llaves fijas, capas verdes, numeracion libre; pytest segun revisor 1825 passed/6 xfailed. Menor 1 corregido por mi en el SPEC. Cita NIST no verificada. (96b0f6b) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
