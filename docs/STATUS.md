@@ -21,7 +21,7 @@
 | F-16 | hecha |
 | F-17 | hecha |
 | F-18 | hecha |
-| F-19 | verificacion |
+| F-19 | hecha |
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
@@ -33,12 +33,12 @@
 | F-28 | hecha |
 | F-29 | hecha |
 | F-30 | hecha |
-| F-31 | en-pr |
-| F-32 | en-pr |
+| F-31 | hecha |
+| F-32 | hecha |
 | F-33 | pendiente |
 | F-34 | pendiente |
 | F-35 | pendiente |
-| F-36 | en-pr |
+| F-36 | hecha |
 | F-37 | hecha |
 | F-38 | hecha |
 | F-39 | pendiente |
