@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** revision b69ed5a
+**Verificación IA:** tests b950b4f
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -214,3 +214,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes, 3 menores. Arbol limpio, sin commits de codigo desde la documentacion; pytest 1591 passed/3 xfailed ejecutado por el revisor y coincide con mis corridas previas (no repetido tras la fase de docs). (b69ed5a) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte solo documental (docs/dataset.md, AD-25, .gitignore): sin pruebas nuevas. Comprobe que la rama no tiene cambios de codigo ni de pruebas respecto de main. Verificacion no independiente: sin subagente. Persona autorizo --excepcion. (b950b4f) |
