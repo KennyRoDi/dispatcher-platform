@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion b2f65c2
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -188,3 +188,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | Ejecute pytest: 1576 passed, 7 skipped, 9 xfailed. Con --runxfail los 9 xfail de test_dataset_parte6_qa.py fallan por el defecto descrito (PermissionError, ValueError NUL, DID NOT RAISE x4, huerfanos, directorio previo). Diff 40ab507..HEAD solo toca esa prueba y el SPEC (log de flujo); src/scripts intactos. No reproduje yo la generacion completa de 1,9 GB ni SIGINT real: son datos del QA. (91debbf) |
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff 91debbf..HEAD solo toca README.md y SPEC. Comprobe por grep: 'uso academico' y 'provisional' solo quedan en filas historicas de la tabla de verificaciones; parrafo de limites SIGTERM presente (SPEC:99); README añade frase MIT. Errores (a) y (b) del borrador contrastados por el documentador contra git; el (c) se degrada a desviacion del SPEC. Sin docs/dataset.md ni AD-25 (parte 7). Sin cambios de codigo. (b2f65c2) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
