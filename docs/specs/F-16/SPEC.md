@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-16-1-limites-por-worker
-**Verificación IA:** documentacion e737bb4
+**Verificación IA:** tests 2776de2
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -113,3 +113,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Verificación independiente de documentación tras extensión de evidencia local: revisé ficha M1 y borrador de bitácora contra QA 845ce39, Docker outputs y scripts. Los tres IDs y cgroups coinciden; host desktop-linux no se atribuye a B/C/D, WORKER_MEM_LIMIT 1g se declara sintético, sin carga B.3, y la ficha mantiene B/C/D, calibración y GPU runtime pendientes. Bitácora registra ambos errores de IA y fixes reales. Cambios solo docs; git show --check limpio y árbol limpio. No repetí pruebas de producto sin cambios en código. (e737bb4) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Revisión final detectó que validate_config no compara service.hostname con environment.NODE_NAME; Compose puede arrancar con identidad divergente si PowerShell sobrescribe el .env. Añadir prueba roja y validar la igualdad en preflight. |
+| verificación IA de tests | Codex | 2026-11-10 | Hallazgo revisión: contrasté test/unit diff 2776de2, solo agrega regresión NODE_NAME != hostname. Reproduje py -m pytest -q tests/unit/test_f16_preflight.py -k node_name_distinto --tb=short: 1 failed con DID NOT RAISE ValueError, 21 deselected, fallo exacto esperado por hueco. git show --check limpio, árbol limpio. (2776de2) |
