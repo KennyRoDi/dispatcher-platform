@@ -1,8 +1,8 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
 **Fase:** pr
-**Base:** feat/F-04-1-verdad-de-referencia-y-procedencia
-**Verificación IA:** revision 725a9d2
+**Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
+**Verificación IA:** revision 5d4b147
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -49,8 +49,15 @@ Derivados del enunciado y de este diseño:
 **Capas y archivos (todos nuevos y de Kenni).**
 - Dominio, `src/domain/ground_truth.py`: `GroundTruthItem(item_id, expected: frozenset[str])`, `ObservedItem(item_id, observed: frozenset[str])`, `observed_from_findings(item_id, findings)`, `CategoryScore(category, tp, fp, fn, tn)` con las propiedades `hits`, `errors`, `precision`, `recall`, `Comparison(scores, total, exact_matches)` con `accuracy`, y `compare(truth, observed, categories=None) -> Comparison`. Sin E/S, sin reloj, sin red. `accuracy` = `exact_matches / total` es global: cuenta los elementos cuyo conjunto obtenido coincide exactamente con el esperado e ignora `categories`. Con `total` 0 hoy lanza `ZeroDivisionError` (el criterio pide «no definida»): hallazgo de QA abierto, xfail estricto en `tests/unit/test_ground_truth_qa.py`. Si los `item_id` repetidos son de tipos mezclados, `sorted` da `TypeError` en vez de `ValueError` (xfail en el mismo archivo). Orden de las categorías: alfabético; si `categories` es `None`, es la unión de las esperadas y las obtenidas. `ValueError` si la muestra está vacía, si hay `item_id` repetidos, si un elemento no tiene salida o una salida no tiene etiqueta.
 - Dominio, `src/domain/provenance.py`: `SourceRecord(path, origin, license)`, `ProvenancePolicy(admitted_origins, public_licenses, rejected_licenses)` con los valores por defecto de SUP-27 y `validate_provenance(records, policy=ProvenancePolicy()) -> list[str]`, con el mismo formato de mensajes que `validate_manifest` de F-03 (`<ruta>: <defecto>`). `SourceRecord` y `ProvenancePolicy` son dataclasses congeladas; `origin` y `license` aceptan `str | None`. Compara origen y licencia sin distinguir mayúsculas (`casefold`) ni espacios exteriores. Un origen no admitido y una licencia en blanco o de relleno son defectos distintos: una fuente con ambos da dos mensajes, uno por defecto.
-- Adaptadores, `src/adapters/dataset_truth_files.py`: leen el manifiesto de F-03, la muestra y las salidas desde JSON y construyen los tipos de dominio; rechazan con `ValueError` rutas absolutas, con `..` o con `\x00`, y campos que no sean escalares. Un campo de origen o licencia ausente se convierte en `None`, para que lo reporte el validador y no el lector. `sample_from_manifest(rows)` convierte solo las filas de `imagen` con `categoria` y `etiqueta` (`positivo` → `{categoria}`, `neutro` → `{}`); las demás no tienen verdad de contenido. `render_markdown(comparison)` y `render_text(comparison)` formatean la tabla.
-- Entrada, `scripts/dataset_verdad.py`: subcomandos `procedencia` y `comparar`; solo analiza argumentos y orquesta los demás módulos. Usa `Path` y no escribe fuera de `--salida`.
+- Adaptadores, `src/adapters/dataset_truth_files.py`: leen JSON y construyen los tipos de dominio.
+  - `read_manifest_records(path)` y `read_sample_records(path)` (alias del primero) devuelven `list[SourceRecord]`; `read_sample_truth(path)` devuelve `list[GroundTruthItem]` desde `esperadas`; `read_observed(path)` devuelve `list[ObservedItem]` desde `categorias`.
+  - Rechazan con `ValueError` un JSON ilegible, un documento que no es lista, un elemento que no es objeto, y un `path` ausente, no `str`, vacío, absoluto, con `..` o con `\x00`. `esperadas` y `categorias` deben ser lista de texto; `origen` y `licencia` deben ser `str` o `None`. Un campo de origen o licencia ausente se convierte en `None`, para que lo reporte el validador y no el lector. Así se cumple lo que la parte 2 dejó a cargo de los lectores (entradas que no son texto).
+  - `sample_from_manifest(rows)` convierte solo las filas de `imagen` con `categoria` y `etiqueta` (`positivo` → `{categoria}`, `neutro` → `{}`); las demás no tienen verdad de contenido. Usa `POSITIVE` y `NEUTRAL` de `media_generator`.
+  - `render_text(comparison)` y `render_markdown(comparison)` devuelven la tabla con las columnas `categoria`, `aciertos`, `errores`, `precision`, `exhaustividad` y una línea final con el tamaño de la muestra y la exactitud. Precisión y exhaustividad sin denominador salen como `n/d`; los demás porcentajes, con un decimal.
+- Entrada, `scripts/dataset_verdad.py`: `main(argv=None) -> int`; solo analiza argumentos y orquesta los demás módulos. Se invoca con `PYTHONPATH=. python -m scripts.dataset_verdad` desde la raíz.
+  - `procedencia (--manifiesto RUTA | --muestra RUTA)`: exclusivas y una obligatoria. Imprime las fuentes defectuosas, o «N fuentes cumplen la procedencia».
+  - `comparar --muestra RUTA --salidas RUTA [--formato texto|markdown] [--salida RUTA]`: valida la procedencia de la muestra; si falla, imprime los defectos y no calcula. Si cumple, escribe la tabla en `--salida` o en la salida estándar. `--formato` es `texto` por omisión.
+  - Códigos de salida: 0 todo cumple o la tabla se produjo; 1 defectos de procedencia o un `ValueError`/`OSError` (imprime `error: ...` en stderr); 2 uso inválido de argumentos (lo da `argparse`).
 
 **Forma de la muestra etiquetada** (`muestra_etiquetada.json`, lista de objetos):
 
@@ -73,6 +80,17 @@ Derivados del enunciado y de este diseño:
 - **Caracteres invisibles.** Una licencia de solo `U+200B` o `U+FEFF` no cuenta como vacía y pasa (xfail, 3 casos).
 - **Rellenos fuera de la lista.** `N/A.`, `unknown` y `none` pasan con origen `sintetico` o `propio`, porque `rejected_licenses` es una lista cerrada que se amplía por política; solo una fuente `publico` los rechaza, y por no estar en `public_licenses`. Es consecuencia de SUP-27, que sigue provisional.
 - **`ProvenancePolicy` sin validación de tipos.** Una cadena en `admitted_origins` se recorre por caracteres (`"sintetico"` rechaza todo origen); un elemento no `str` (p. ej. `5`) da `AttributeError`; un `None` o un elemento vacío en `admitted_origins` se normaliza a `""` y admite en silencio un origen vacío, y en `rejected_licenses` no falla. No hay prueba.
+
+**Límites declarados de la parte 3.** La CLI y los lectores hacen menos de lo que parece. Los tres primeros puntos tienen xfail estricto en `tests/unit/test_dataset_verdad_qa.py` (4 casos); el resto son observaciones de QA sin prueba:
+- **`--salida` igual a una entrada.** Si coincide con `--muestra` o con `--salidas`, `comparar` sobrescribe ese archivo sin aviso (xfail, 2 casos).
+- **JSON muy anidado.** Lanza `RecursionError` con traza, no `error: ...` con código 1; `main` solo captura `ValueError` y `OSError` (xfail).
+- **Markdown sin escapar.** `render_markdown` no escapa `|` ni saltos de línea en la categoría y rompe la tabla (xfail).
+- **Pruebas que no fijan el formato.** Ninguna prueba exige el formato numérico (`_percent`, un decimal) ni el separador markdown (`---`): cambiarlos no rompe nada.
+- **Interrupción.** Ctrl-C termina con traza (`KeyboardInterrupt` no se captura). Con la salida cerrada (`| head -0`), `BrokenPipeError` al imprimir termina con «Exception ignored on flushing sys.stdout» y código 120.
+- **Ancho de columnas.** `render_text` alinea con `len()`, que desalinea con caracteres unicode anchos.
+- **`path` es un identificador.** `_is_safe` rechaza vacío, `\x00`, absolutas POSIX y `..`, pero acepta `.`, `a//b` y `C:\x`: el lector nunca abre esa ruta, solo la compara.
+- **Invocación.** `python scripts/dataset_verdad.py` directo falla con `ModuleNotFoundError: No module named 'src'`; el comando es `PYTHONPATH=. python -m scripts.dataset_verdad`.
+- **Validación de ruta duplicada con F-03.** `_is_safe` repite unas 4 líneas de la validación de F-03 (`dataset_sintetico`, privada). Decisión: un adaptador no importa un script, así que se duplica en vez de acoplar capas.
 
 **Reutilización.** Del I Proyecto no se toma código. Del repo se reutilizan `Finding` y las constantes de `src/adapters/media_generator.py` (`ORIGIN`, `LICENSE_NAME`, `POSITIVE`, `NEUTRAL`) solo en el adaptador, no en el dominio. El criterio VP/FP/FN/VN sigue a `scripts/aciertos_imagen.py`; no se importa.
 
@@ -161,4 +179,14 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca el SPEC; limites de la parte 2 presentes (grep); conformidad 0 problemas (ejecutado por mi). SUP-27 sigue provisional. Sin pytest nuevo (solo docs). (abcaf2a) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor DEVUELTO por un limite falso en SPEC:75 (None da TypeError); reproducido: ProvenancePolicy(admitted_origins=(None,)) admite origen vacio sin error; SPEC corregido. Revisor reprodujo pytest 1669 passed/16 xfailed y conformidad 0 problemas; resto de limites veraces. (725a9d2) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo 3 archivos de pruebas nuevos (2 unitarios, 1 aceptacion) y log del SPEC; src y scripts intactos. pytest: 3 errores de coleccion por ModuleNotFoundError (rojo por falta de modulos). API asumida fijada por las pruebas (read_*, sample_from_manifest, render_*, main). Acceptance usa dobles declarados. (c43864a) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo src/adapters/dataset_truth_files.py (131) y scripts/dataset_verdad.py (79); tests intactos. Ejecute suite completa y acceptance (resultados en la terminal de esta fase). Desviacion aceptada: no importa dataset_sintetico (privado); validacion de ruta duplicada de ~4 lineas. Declarado que la validacion de ruta esta duplicada con F-03. (3c5208b) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 4 xfail estrictos nuevos en test_dataset_verdad_qa.py; src y scripts intactos (diff). Ejecute esa prueba: 4 xfailed. CLI real sobre manifiesto de 490 filas dio 0 segun QA (no repetido por mi). Hallazgos menores a pendientes y a documentar en parte 4. (f80a91b) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo SPEC y ARQUITECTURA (AD-40 una clausula); SPEC con tamaño normal tras el incidente de edicion que el documentador revirtio antes del commit (comprobado con wc y diff --stat). conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). (b904fdd) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes; reprodujo 3 limites declarados y ejecuto pytest 1800 passed/20 xfailed, aceptacion 2 passed y conformidad 0. Sin commits de codigo desde la documentacion (comprobado). (5d4b147) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
