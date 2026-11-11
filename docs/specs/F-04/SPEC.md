@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-03-8-dataset-sintetico
 **Verificación IA:** revision bb7a2ce
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca ARQUITECTURA (AD-32), REQUERIMIENTOS (SUP-26/27 provisional) y SPEC. conformidad.py: 0 problemas (ejecutado por mi). Numeros libres en main segun grep del documentador. No repeti pytest (solo docs). (8095761) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO con observaciones. Hallazgo medio (AD-31 usado por la rama de F-12) reproducido con grep en todas las ramas remotas: AD-32 libre; renumerado en ARQUITECTURA y SPEC. conformidad 0 problemas. Revisor ejecuto pytest 1649 passed/5 xfailed (no repetido tras el cambio de texto). (bb7a2ce) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
