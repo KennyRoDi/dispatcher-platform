@@ -1246,3 +1246,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | 3 repeticiones: oom, requeue 96/144 MiB, giveup:oom; control killed |
 | Validado / corregido / descartado | Salida JSON cruda guardada en docs/evidencia/mediciones-f18 |
 | Cómo se validó | Ejecución real en Docker; revisión de JSON de las 3 corridas |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-37 (`docs/f37-cierre-completo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-37 |
+| Propósito | Cierre de F-37: integración con Redis real y actualización de ficha y SPEC |
+| Consulta resumida | Correr integración y aceptación en Docker y ajustar documentos |
+| Resultado obtenido | 2 pruebas pasan con Redis real; ficha y SPEC dicen lo medido y lo pendiente |
+| Validado / corregido / descartado | Salida cruda guardada en docs/evidencia/mediciones-f37-integracion |
+| Cómo se validó | Revisión del diff y de la salida de pytest |
+| Error de la IA | La prueba de integración F-37 se describía como prueba con WorkerNode y Redis, pero solo verifica funciones puras; detectado al leerla y corregido en la ficha |
