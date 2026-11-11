@@ -32,7 +32,10 @@ class ChunkedUpload:
 
     def receive(self, upload_id: str, index: int, data: bytes, sha256: str) -> None:
         verify_chunk(self._manifest(upload_id), index, data, sha256)
-        self._staging.put_chunk(upload_id, index, data)
+        try:
+            self._staging.put_chunk(upload_id, index, data)
+        except KeyError:
+            raise UploadNotFound(upload_id) from None
 
     def status(self, upload_id: str) -> tuple[list[int], list[int]]:
         manifest = self._manifest(upload_id)
@@ -51,9 +54,10 @@ class ChunkedUpload:
 
     def _manifest(self, upload_id: str) -> UploadManifest:
         try:
-            return UploadManifest.from_dict(self._staging.load_manifest(upload_id))
-        except KeyError:
+            datos = self._staging.load_manifest(upload_id)
+        except (KeyError, ValueError):
             raise UploadNotFound(upload_id) from None
+        return UploadManifest.from_dict(datos)
 
     def _flujo(self, upload_id: str, manifest: UploadManifest) -> io.BufferedReader:
         return io.BufferedReader(_ChunksVerificados(self._staging, upload_id, manifest), BLOQUE_LECTURA)

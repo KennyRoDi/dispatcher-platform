@@ -126,6 +126,8 @@ class FakeChunkStaging:
         return dict(self.manifiestos[upload_id])
 
     def put_chunk(self, upload_id, index, data):
+        if upload_id not in self.manifiestos:
+            raise KeyError(upload_id)
         self.chunks[upload_id][index] = bytes(data)
 
     def received(self, upload_id):

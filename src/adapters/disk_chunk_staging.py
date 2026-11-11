@@ -25,7 +25,12 @@ class DiskChunkStaging:
             raise KeyError(upload_id) from None
 
     def put_chunk(self, upload_id: str, index: int, data: bytes) -> None:
-        self._escribir(self._chunk(upload_id, index), data)
+        if not (self._carpeta(upload_id) / MANIFIESTO).is_file():
+            raise KeyError(upload_id)
+        try:
+            self._escribir(self._chunk(upload_id, index), data, crear_carpeta=False)
+        except FileNotFoundError:
+            raise KeyError(upload_id) from None
 
     def received(self, upload_id: str) -> set[int]:
         carpeta = self._carpeta(upload_id)
@@ -52,10 +57,11 @@ class DiskChunkStaging:
         return self._carpeta(upload_id) / f"chunk_{index:06d}"
 
     @staticmethod
-    def _escribir(destino: Path, datos: bytes) -> None:
+    def _escribir(destino: Path, datos: bytes, crear_carpeta: bool = True) -> None:
         # Temporal con nombre único y renombrado atómico: dos reenvíos simultáneos del mismo
         # chunk no se pisan y un corte nunca deja un chunk a medias con nombre válido.
-        destino.parent.mkdir(parents=True, exist_ok=True)
+        if crear_carpeta:
+            destino.parent.mkdir(parents=True, exist_ok=True)
         descriptor, temporal = tempfile.mkstemp(dir=destino.parent, prefix=".tmp-")
         try:
             with os.fdopen(descriptor, "wb") as archivo:
