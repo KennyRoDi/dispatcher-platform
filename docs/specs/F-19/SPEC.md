@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 54912ab
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -97,3 +97,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Codex | 2026-11-10 | Revision independiente del diff f3b5abe contra US-19, RF-27 y B.5 M1; SPEC sin campos pendientes, contratos conservados y pila de hasta 400 lineas. git diff --check HEAD^ HEAD limpio; python -m scripts.conformidad repo: 0 problemas; arbol limpio y HEAD igual a upstream. Solo documentos; no se ejecutaron inferencias ni mediciones. Compatibilidad real de fork pendiente para parte 2. Corregida colision SUP-24 usando SUP-25. (f3b5abe) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Codex | 2026-11-10 | Revision independiente de 54912ab contra SPEC parte 1: solo dos archivos nuevos de pruebas, seleccion y validacion estrategia/N y protocolo con fabrica/runtime inyectados, sin implementacion. python -m pytest -q tests/unit/test_model_loading.py tests/unit/test_model_loader.py --tb=short: 46 failed por ModuleNotFoundError de src.domain.model_loading ausente; coleccion correcta sin skip ni xfail. git diff --check limpio; conformidad repo 0 problemas; arbol limpio y HEAD igual upstream. Suite general bloqueada por fallo preexistente Windows os.geteuid en test_dataset_sintetico_qa2.py:46. No procesos reales ni mediciones; pendientes partes 2 y 3. (54912ab) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
