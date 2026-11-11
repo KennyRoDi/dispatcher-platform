@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 45f017b
 **Historia:** US-31 · **Requisitos:** RF-40 (B.5 M5) · **Responsable:** J
 
 ## Objetivo
@@ -67,3 +67,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-31 completo sin campos …, plan de 1 PR, medición pendiente anotada (45f017b) |
