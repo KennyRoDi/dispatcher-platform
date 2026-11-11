@@ -1,6 +1,6 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 79e10a9
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Sonnet 5.5) | 2026-11-11 | 22 unitarias + arquitectura en verde; verificacion no independiente (c00f66f) |
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; suite completa no recolecta en Windows (os.geteuid/fcntl, 11 módulos ajenos a F-37); 26 pruebas del módulo y arquitectura en verde |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | 26 pruebas verdes; bordes probados (muestras vacías, hueco exacto 3x, memory.max=max, OOM, parámetros inválidos); 91 líneas; Docker: 3435 pasan, fallos solo TLS/certs/permisos ajenos. Mediciones en nodos: Medición pendiente (79e10a9) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | suite completa no recolecta en Windows; en Docker fallos solo en TLS/certs/permisos, ajenos a F-37. Aprobación delegada por José en el chat |
