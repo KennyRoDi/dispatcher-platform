@@ -7,6 +7,8 @@ from pathlib import Path, PurePosixPath
 
 import requests
 
+from scripts.submit_case import resolve_session
+from src.infrastructure.tls import TlsConfigError
 from src.workers.config import Settings
 from src.workers.storage import Storage, StorageError
 
@@ -96,7 +98,7 @@ def fetch_case(
     return counts
 
 
-def main(argv: list[str] | None = None, session=requests, storage=None) -> int:
+def main(argv: list[str] | None = None, session=None, storage=None) -> int:
     parser = argparse.ArgumentParser(description="Descarga las salidas y el reporte de uno o mas casos.")
     parser.add_argument("case_ids", nargs="+")
     parser.add_argument("--out", type=Path, default=Path("resultados"))
@@ -104,8 +106,13 @@ def main(argv: list[str] | None = None, session=requests, storage=None) -> int:
     args = parser.parse_args(argv)
 
     settings = Settings.from_env()
-    if storage is None:
-        storage = Storage(settings)
+    try:
+        session = resolve_session(settings.coordinator_url, session)
+        if storage is None:
+            storage = Storage(settings)
+    except TlsConfigError as e:
+        print(f"Error: {e}")
+        return 1
 
     failed_cases = 0
     for case_id in args.case_ids:
