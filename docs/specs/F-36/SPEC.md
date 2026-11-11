@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
-**Verificación IA:** plan 7a7f81d
+**Verificación IA:** tests ab8cd75
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
 
 ## Objetivo
@@ -85,3 +85,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | SPEC sin campos pendientes (sin marcadores); 2 PR de pila; cubre puntos abiertos de F-12 (supervisor inerte, main sin cablear, KeyError en doble cancel, gracia 10 s < stop_grace_period 31m); medicion B.6 marcada Medicion pendiente (nodos reales). Rama con origin/main fusionado. (d2cbae0) |
 | verificación IA de plan | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | SPEC completo; 2 PR de pila; cubre puntos abiertos de F-12; medicion B.6 como Medicion pendiente. Rama con origin/main fusionado. (7a7f81d) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | 9 pruebas nuevas en tests/unit/test_cancelacion_en_curso.py, sin codigo de produccion; 8 en rojo por la razon esperada, 1 (run sin supervisor) en verde por conservar el comportamiento (ab8cd75) |
