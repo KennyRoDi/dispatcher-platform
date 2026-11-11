@@ -1,6 +1,6 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision a545358
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
