@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** documentacion d262949
+**Verificación IA:** revision 8578c42
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -184,3 +184,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Cuenta de la frase obsoleta '1 entrada sin ancla' en los 3 documentos: ver grep. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (d262949) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: hueco de truncado cerrado con ancla genesis (casos concretos comprobados por el revisor), adaptador cumple SPEC, limites coinciden con los 4 xfail y A9; pytest segun revisor 1966 passed/10 xfailed. Menores: wording SPEC l.63 vs l.119, _write_anchor envoltorio para parchear en tests, costo de record tras la correccion sin re-medir. (8578c42) |
