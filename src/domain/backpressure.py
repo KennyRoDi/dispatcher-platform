@@ -7,6 +7,10 @@ PROFUNDIDAD_POR_DEFECTO = 1000
 REINTENTO_POR_DEFECTO = 5
 
 
+class CaseTooLarge(ValueError):
+    """El caso pide más subtareas para una cola que su límite: no cabría ni con la cola vacía."""
+
+
 @dataclass(frozen=True)
 class QueueLimit:
     """Profundidad máxima por cola (AD-12); `max_depth == 0` desactiva el límite para el experimento."""
@@ -33,6 +37,9 @@ class QueueLimit:
 
     def admite(self, profundidad: int, entrantes: int) -> bool:
         return self.desactivado or profundidad + entrantes <= self.max_depth
+
+    def cabe_alguna_vez(self, entrantes: int) -> bool:
+        return self.admite(0, entrantes)
 
 
 def _entero(env: Mapping[str, str], nombre: str, defecto: int) -> int:

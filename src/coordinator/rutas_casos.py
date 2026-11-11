@@ -22,7 +22,7 @@ from src.coordinator.apoyo import (
 )
 from src.coordinator.modelos import CaseRequest, SubtaskRequest
 from src.coordinator.router import classify, queue_key, resolve_task_type
-from src.domain.backpressure import QueueLimit
+from src.domain.backpressure import CaseTooLarge, QueueLimit
 from src.domain.subtask import QueueFull
 
 logger = logging.getLogger(__name__)
@@ -119,6 +119,8 @@ def create_case(case_req: CaseRequest) -> dict:
     limite = QueueLimit.from_env(os.environ)
     try:
         transaccion_acotada(conexion.redis_client, Counter(q for _, _, q in resolved), limite, escribir)
+    except CaseTooLarge as error:
+        raise HTTPException(422, f"el caso excede el límite de {limite.max_depth} subtareas de la cola {error}") from None
     except QueueFull:
         raise HTTPException(503, "cola llena: reintente más tarde",
                             headers={"Retry-After": str(limite.retry_after)}) from None
