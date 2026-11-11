@@ -982,3 +982,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas; verificacion no independiente |
 | Cómo se validó | Orquestador con subagentes; ejecucion en contenedores locales |
 | Error de la IA | la guía de despliegue omitía ADMISSION_MARGIN_BYTES y FOOTPRINT_<OP>_BYTES; los workers reiniciaban en bucle y /workers devolvía []; lo reveló la simulación local |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`feat/F-13-1-reporte-consolidado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-13 |
+| Propósito | F-13 parte 1: dominio del reporte consolidado (posiciones y línea temporal) |
+| Consulta resumida | Arquitecto, developer, QA y documentador por subagentes sobre el SPEC de F-13 |
+| Resultado obtenido | Dominio en verde, AD-38 y SUP-34 provisionales |
+| Validado / corregido / descartado | Orquestador con aprobaciones delegadas; verificación no independiente de la persona |
+| Cómo se validó | Pruebas unitarias, QA sobre el parser y revisión del diff contra el SPEC |
+| Error de la IA | el QA halló 14 defectos del parser de posiciones y del orden de la línea temporal (isdigit acepta «²», OverflowError en marcas, TypeError con marca sin zona, empates no deterministas, marca falsa en source_ref que sobrescribía la real) |
