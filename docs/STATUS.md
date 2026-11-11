@@ -12,7 +12,7 @@
 | F-07 | hecha |
 | F-08 | hecha |
 | F-09 | hecha |
-| F-10 | en-pr |
+| F-10 | tests |
 | F-11 | pendiente |
 | F-12 | hecha |
 | F-13 | hecha |
