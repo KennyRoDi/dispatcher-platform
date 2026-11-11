@@ -1350,3 +1350,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas unitarias, aceptación (7 estados) y prueba I concurrente con Redis 7 real en docker |
 | Cómo se validó | Revisión de pruebas y corridas repetidas contra Redis |
 | Error de la IA | La implementación inicial cerraba dos veces con reportes concurrentes (la prueba I con Redis real falló en la primera corrida); un primer arreglo aún fallaba en 6 de 40 corridas porque un PROCESSING tardío sobrescribía el estado terminal; se corrigió rechazando toda escritura sobre estado terminal con WATCH y quedaron 40 corridas seguidas verdes. Además hubo que ajustar aserciones queued->processing en tests existentes por exigencia del SPEC |
+
+## 2026-11-11 · Melany Vindas · F-24 (`feat/F-24-1-frenar-productores-con-colas-acotadas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) |
+| Componente | F-24 |
+| Propósito | F-24 parte 1: frenar productores con colas acotadas (503 con Retry-After) |
+| Consulta resumida | Planificar, probar, implementar y verificar con QA independiente la admision acotada en POST /cases |
+| Resultado obtenido | Admision con script Lua atomico, 503 con Retry-After, 422 para casos que nunca caben, validacion al arrancar |
+| Validado / corregido / descartado | Corregido: QA devolvio por 503 falsos (H1) y se rediseno con Lua antes de aprobar |
+| Cómo se validó | Redis real: estres con productores y workers, paridad clave por clave con el pipeline, mutantes; suite 3778 verde en Linux |
+| Error de la IA | 1) La IA diseno la admision con WATCH/MULTI/EXEC y no previo que cualquier RPUSH o LPOP invalida el WATCH: daba 503 en 7-25 % de los casos con la cola casi vacia; se cambio a Lua. 2) No previo que un caso mas grande que el limite recibiria 503 para siempre. 3) La configuracion invalida daba 500 por peticion en vez de fallar al arrancar. |
