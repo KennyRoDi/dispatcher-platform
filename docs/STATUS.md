@@ -25,7 +25,7 @@
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
-| F-23 | documentacion |
+| F-23 | revision |
 | F-24 | pendiente |
 | F-25 | pendiente |
 | F-26 | hecha |
