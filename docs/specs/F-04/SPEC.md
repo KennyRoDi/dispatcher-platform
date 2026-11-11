@@ -131,7 +131,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | 1 | `feat(F-04): comparador de aciertos y errores por categoría` | `src/domain/ground_truth.py` (≈ 110 líneas) y sus pruebas. Documentos: registro de AD-32 en `docs/ARQUITECTURA.md` §8 y de SUP-26 y SUP-27 en `docs/REQUERIMIENTOS.md` |
 | 2 | `feat(F-04): validador de procedencia y licencia` | `src/domain/provenance.py` (≈ 90 líneas) y sus pruebas |
 | 3 | `feat(F-04): lectores, CLI de procedencia y comparación` | `src/adapters/dataset_truth_files.py` y `scripts/dataset_verdad.py` (≈ 250 líneas), pruebas unitarias de la CLI y la prueba de aceptación |
-| 4 | `docs(F-04): procedencia por fuente y tabla de aciertos en dataset.md` | Sección de procedencia y licencia con el recuento real del manifiesto de F-03 y la salida real de `procedencia`. La tabla de aciertos va solo si hay salidas reales de análisis sobre la muestra; si no, queda «pendiente: sin salidas reales de análisis». Bitácora de IA |
+| 4 | `docs(F-04): procedencia por fuente y tabla de aciertos en dataset.md` | Sección de procedencia y licencia con el recuento real del manifiesto de F-03 y la salida real de `procedencia`. La tabla de aciertos va solo si hay salidas reales de análisis sobre la muestra; si no, queda «pendiente: sin salidas reales de análisis». Bitácora de IA. Hecha: sección de procedencia con recuento y salida reales en `docs/dataset.md`; la tabla de aciertos queda pendiente (sin salidas reales de análisis) |
 
 Las partes 1 y 2 son independientes entre sí; la 3 depende de ambas. Si la parte 3 supera 400 líneas, se divide en lectores y CLI.
 
