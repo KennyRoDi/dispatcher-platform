@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 3c75908
+**Verificación IA:** documentacion dc0b28c
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -102,3 +102,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | Autorizado por la persona: suite general bloqueada por os.geteuid en Windows y dos fallos preexistentes reproducidos en baseline 887f2c7; pruebas focales y arquitectura 50 passed, sin cambios en tests |
 | verificación IA de verificacion | Codex | 2026-11-10 | Revision independiente QA parte1 commit 3c75908: criterios del SPEC trazados y limites partes2/3 explicitos. Ejecute pytest focal con seis nuevas pruebas QA y arquitectura: 56 passed. Reproduje script mutaciones: 6 de 6 detectadas; conteo coincide con seis casos y salida cruda. Conformidad 0 problemas; diff check limpio; src y pruebas originales intactos; arbol limpio y HEAD upstream coinciden. No mediciones SO aplicables a parte1. Suite general no verde por os.geteuid Windows y fallos preexistentes ya documentados; no se extiende excepcion sin autorizacion humana para esta fase. (3c75908) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | Autorizado por la persona para verificacion: suite general bloqueada por os.geteuid Windows y fallos preexistentes documentados; 56 pruebas focales y arquitectura aprobadas y 6/6 mutaciones detectadas |
+| verificación IA de documentacion | Codex | 2026-11-10 | Revision independiente de dc0b28c contra codigo, SPEC y QA parte1: ficha M1 describe LoadingConfig/ModelLoader existentes y distingue dobles de procesos/mediciones reales pendientes; AD07/SUP25 reflejan aprobacion de plan sin eleccion definitiva. Borrador bitacora veraz con campos del script y error real SUP24/SUP25; pendiente publicacion tras aprobacion humana. Solo cuatro documentos; sin cambios en src/tests/BITACORA_IA/STATUS. Conformidad repo 0 problemas y diff check limpio; arbol limpio y HEAD upstream coinciden. No mediciones nuevas ni repeticion innecesaria de suite para documentacion. (dc0b28c) |
