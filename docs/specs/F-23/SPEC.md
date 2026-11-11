@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-23-3-deduplicar-antes-de-transferir
-**Verificación IA:** documentacion bf5e115
+**Verificación IA:** revision 08e4f8e
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó autonomía; funcionalidad probada. No se producen cifras de tasa sin dataset completo y entorno MinIO/coordinador con bucket limpio. |
 | verificación IA de documentacion | Codex | 2026-11-11 | Documentación M3, variables, volumen y decisión AD-43 revisadas; bitácora F-23 publicada. Conformidad 0; faltan solo datos medidos del dataset real. (bf5e115) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo; documentación contrastada con código, SPEC y resultado de pruebas. |
+| verificación IA de revision | Codex | 2026-11-11 | Corrección: crear OBJECTS_BUCKET al iniciar si falta, igual que otros adaptadores de almacenamiento. Prueba de composición lo verifica; 3 pruebas unitarias, conformidad 0. QA no independiente. (08e4f8e) |
