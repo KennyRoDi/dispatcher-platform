@@ -136,4 +136,4 @@ def test_ruta_como_cadena_se_rechaza():
     reglas = {kind: ["cpu"] for kind in ContentKind}
     reglas[ContentKind.AUDIO] = "cpu"
     with pytest.raises(ValueError):
-        RoutingTable(reglas)
+        dominio().RoutingTable(reglas)
