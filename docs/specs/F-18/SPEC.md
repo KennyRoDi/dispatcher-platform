@@ -1,6 +1,6 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision c445152
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
@@ -70,3 +70,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code | 2026-11-10 | Documentación: sin cambios necesarios (SUP-14 y ARQUITECTURA ya cubren); bitácora publicada (6a6122d) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code | 2026-11-10 | Revisión: diff coincide con SPEC parte 1 (oom_policy, read_memory_events, pruebas); APROBADO; no independiente (c445152) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
