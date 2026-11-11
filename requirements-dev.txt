@@ -5,3 +5,4 @@ responses==0.26.3
 httpx==0.28.1
 PyYAML==6.0.3
 reportlab==5.0.1
+trustme==1.2.1

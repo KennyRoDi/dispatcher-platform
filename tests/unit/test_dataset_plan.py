@@ -96,6 +96,35 @@ def test_plan_bajo_el_minimo_se_reporta(cambios, palabra):
     assert any(palabra in problema for problema in problemas)
 
 
+def test_heterogeneos_se_exigen_por_nivel_cinco_livianos_y_cinco_pesados():
+    sin_livianos = check_minimums(_plan(light_heterogeneous=0, heavy_heterogeneous=10))
+    sin_pesados = check_minimums(_plan(light_heterogeneous=10, heavy_heterogeneous=0))
+
+    assert any("livianos" in problema for problema in sin_livianos)
+    assert any("pesados" in problema for problema in sin_pesados)
+
+
+def test_un_caso_no_heterogeneo_con_heavy_bytes_no_cuenta_como_pesado():
+    plan = _plan()
+    cases = tuple(replace(c, heavy_bytes=200 * MIB) if c.heterogeneo == "no" else c for c in plan.cases)
+
+    assert check_minimums(replace(plan, cases=cases)) == []
+    sin_pesados = tuple(replace(c, heavy_bytes=0) if c.heterogeneo == "pesado" else c for c in cases)
+    assert any("200 MiB" in p for p in check_minimums(replace(plan, cases=sin_pesados)))
+
+
+def test_el_dominio_expone_el_minimo_de_livianos():
+    from src.domain import dataset_plan
+
+    assert dataset_plan.MIN_LIGHT == 5
+
+
+def test_los_tipos_de_un_caso_pesado_incluyen_video_y_documento():
+    plan = _plan()
+
+    assert all({"video", "documento"} <= set(c.kinds) for c in _por_heterogeneo(plan, "pesado"))
+
+
 def test_plan_bajo_varios_minimos_los_reporta_todos():
     problemas = check_minimums(_plan(messages=1, images=1, audios=1))
 

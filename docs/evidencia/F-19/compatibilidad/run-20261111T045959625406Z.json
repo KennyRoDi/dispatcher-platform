@@ -1,0 +1,73 @@
+{
+  "captured_at_utc": "2026-11-11T04:59:59.564594+00:00",
+  "node": "0043782ecc30",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.13.18 (main, Nov  5 2026, 07:59:38) [GCC 14.2.0]",
+  "versions": {
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.9.0",
+    "av": "18.1.0"
+  },
+  "config": {
+    "nombre": "base",
+    "revision": "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66",
+    "idioma": "es",
+    "compute_type": "int8",
+    "beam_size": 5,
+    "hilos": 1
+  },
+  "input_sha256": "3cd6d40c57c7ca5c97500666901879ca027e98b004ec43e3ce9794b3f4e552b4",
+  "runs": [
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "repetition": 1,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": null,
+      "snapshots": []
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "repetition": 1,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": null,
+      "snapshots": []
+    }
+  ],
+  "summary": []
+}
