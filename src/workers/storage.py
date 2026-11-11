@@ -7,6 +7,7 @@ from typing import Iterable
 
 import minio
 
+from src.infrastructure.tls import TlsSettings, exigir_cifrado, minio_http_client
 from src.workers.config import Settings
 
 logger = logging.getLogger(__name__)
@@ -17,13 +18,20 @@ class StorageError(Exception):
 
 
 class Storage:
-    def __init__(self, settings: Settings, client: minio.Minio | None = None):
+    def __init__(self, settings: Settings, client: minio.Minio | None = None, tls: TlsSettings | None = None):
         self.settings = settings
-        self.client = client if client is not None else minio.Minio(
+        self.client = client if client is not None else self._connect(settings, tls)
+
+    @staticmethod
+    def _connect(settings: Settings, tls: TlsSettings | None) -> minio.Minio:
+        tls = tls if tls is not None else TlsSettings.from_env()
+        exigir_cifrado(tls, minio_secure=settings.minio_secure)
+        return minio.Minio(
             settings.minio_endpoint,
             access_key=settings.minio_access_key,
             secret_key=settings.minio_secret_key,
             secure=settings.minio_secure,
+            http_client=minio_http_client(tls),
         )
 
     def ensure_buckets(self) -> None:

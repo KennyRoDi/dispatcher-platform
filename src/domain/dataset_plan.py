@@ -1,17 +1,26 @@
 import random
+from numbers import Integral
 from dataclasses import dataclass
 from enum import Enum
 
 MIB = 1024 * 1024
 IMAGE_CATEGORIES = ("objetos", "paisajes", "documentos", "personas")
 AUDIO_SECONDS_RANGE = (5, 300)
-MIN_HETEROGENEOUS = 10
+MIN_LIGHT = 5
 MIN_HEAVY = 5
+MIN_HETEROGENEOUS = MIN_LIGHT + MIN_HEAVY
 MIN_HEAVY_BYTES = 200 * MIB
 MIN_CASES = 40
 MIN_MESSAGES = 20_000
 MIN_IMAGES = 300
 MIN_AUDIOS = 150
+MAX_CASES = 10_000
+MAX_MESSAGES = 10_000_000
+MAX_IMAGES = 100_000
+MAX_AUDIOS = 100_000
+# Con 4 GiB el video dura unos 15 minutos y ffmpeg lo codifica muy por debajo de FFMPEG_TIMEOUT_SECONDS (209 MiB en 1,1 s).
+MAX_HEAVY_BYTES = 4 * 1024 * MIB
+MAXIMUMS = {"cases": MAX_CASES, "messages": MAX_MESSAGES, "images": MAX_IMAGES, "audios": MAX_AUDIOS, "heavy_bytes": MAX_HEAVY_BYTES}
 
 
 class Level(str, Enum):
@@ -21,7 +30,7 @@ class Level(str, Enum):
 
 
 ALL_KINDS = ("texto", "imagen", "audio", "documento")
-HEAVY_KINDS = ("texto", "imagen", "audio", "video")
+HEAVY_KINDS = ("texto", "imagen", "audio", "video", "documento")
 SIMPLE_KINDS = ("texto", "imagen", "audio")
 
 
@@ -37,10 +46,13 @@ class DatasetParams:
 
     def __post_init__(self) -> None:
         for name, value in vars(self).items():
-            if isinstance(value, bool) or not isinstance(value, int):
+            if isinstance(value, bool) or not isinstance(value, Integral):
                 raise ValueError(f"{name} debe ser un entero: {value!r}")
+            object.__setattr__(self, name, int(value))
             if value < 0:
                 raise ValueError(f"{name} no puede ser negativo: {value}")
+            if value > MAXIMUMS.get(name, value):
+                raise ValueError(f"{name} no puede superar {MAXIMUMS[name]}: {value}")
         if self.cases < 1:
             raise ValueError("cases debe ser al menos 1")
 
@@ -101,12 +113,13 @@ def checked_case_name(name: str) -> str:
 
 def check_minimums(plan: DatasetPlan) -> list[str]:
     cases = plan.cases
-    heterogeneous = [c for c in cases if c.heterogeneo != Level.NONE.value]
-    heavy = [c for c in cases if c.heavy_bytes >= MIN_HEAVY_BYTES]
+    light = [c for c in cases if c.heterogeneo == Level.LIGHT.value]
+    heavy_heterogeneous = [c for c in cases if c.heterogeneo == Level.HEAVY.value]
+    heavy = [c for c in heavy_heterogeneous if c.heavy_bytes >= MIN_HEAVY_BYTES]
     checks = [
         (len(cases), MIN_CASES, "casos"),
-        (len(heterogeneous), MIN_HETEROGENEOUS, "casos heterogeneos"),
-        (len([c for c in cases if c.heterogeneo == Level.HEAVY.value]), MIN_HEAVY, "casos heterogeneos pesados"),
+        (len(light), MIN_LIGHT, "casos heterogeneos livianos"),
+        (len(heavy_heterogeneous), MIN_HEAVY, "casos heterogeneos pesados"),
         (len(heavy), MIN_HEAVY, "casos pesados de al menos 200 MiB"),
         (sum(c.messages for c in cases), MIN_MESSAGES, "mensajes"),
         (sum(c.images for c in cases), MIN_IMAGES, "imagenes"),
@@ -117,7 +130,7 @@ def check_minimums(plan: DatasetPlan) -> list[str]:
 
 def _case_layout(params: DatasetParams, rng: random.Random) -> list[tuple[Level, tuple[str, ...]]]:
     layout = [(Level.LIGHT, ALL_KINDS)] * params.light_heterogeneous
-    layout += [(Level.HEAVY, HEAVY_KINDS + ("documento",))] * params.heavy_heterogeneous
+    layout += [(Level.HEAVY, HEAVY_KINDS)] * params.heavy_heterogeneous
     for _ in range(max(0, params.cases - len(layout))):
         layout.append((Level.NONE, _simple_kinds(rng)))
     return layout[: params.cases]

@@ -1,7 +1,7 @@
 # Módulo M1: gestión de memoria
 
 **Responsable:** José Andrés Loría Herrera (`joselhcr`).
-**Corte:** F-16 parte 2, F-17 y F-19 parte 1, 2026-11-10. **Mediciones de SO: pendientes.** Esta ficha todavía no acredita el módulo completo ni el límite aplicado por Docker/WSL2.
+**Corte:** F-16 parte 2, F-17 y F-19 parte 3, 2026-11-11. La medición de F-19 se realizó en Docker Desktop Linux/WSL2 con límite configurado; no acredita un worker desplegado ni el módulo M1 completo.
 
 ## 1. Qué se implementó
 
@@ -94,13 +94,15 @@ Método, aún sin ejecutar: `docker exec <id> cat /sys/fs/cgroup/memory.current`
 
 | Estrategia F-19 | Igualdad con Whisper real | PSS total supervisor e hijos | RSS por PID / memory.current | Repeticiones físicas |
 |---|---|---|---|---|
-| por_proceso | Pendiente parte 2 | Pendiente parte 3 | Pendiente parte 3 | 0 |
-| fork_compartido | Pendiente parte 2 | Pendiente parte 3 | Pendiente parte 3 | 0 |
+| por_proceso | Rechazada: timeout en Docker Linux, QA-parte-2 | PSS medio N=1: 264806195; N=2: 420311450 bytes | `memory.current` medio N=1: 816900506; N=2: 975574630 bytes | 5 por N |
+| workers_compartidos | Aprobada, QA-parte-2 | PSS medio N=1: 261983232; N=2: 281929728 bytes | `memory.current` medio N=1: 815903539; N=2: 836598989 bytes | 5 por N |
+
+La comparación de parte 3 usó Whisper CPU, Python 3.13.18, faster-whisper 1.2.1, CTranslate2 4.9.0, PyAV 18.1.0, cgroup v2 `memory.max=4294967296`, `memory.swap.max=0` y procesos no-root. Los JSON crudos (incluidos RSS, PSS y `memory.current` por etapa y repetición) están en `docs/evidencia/F-19/`; resumen y comandos en [QA-parte-3.md](specs/F-19/QA-parte-3.md).
 
 ## 5. Interpretación
 
-Las pruebas respaldan el cálculo de presupuesto, la validación estática del cableado y la lectura estricta de archivos con el contrato actual. Sin mediciones reales no se puede concluir que el kernel aplique un límite, que los valores elegidos sean adecuados ni que los nodos soporten la carga. AD-29 tiene aprobación de diseño; SUP-24 sigue siendo supuesto pendiente de validación y la calibración de límites sigue pendiente según SUP-17.
+Las pruebas respaldan el cálculo de presupuesto, la validación estática del cableado y la lectura estricta de archivos con el contrato actual. La medición F-19 confirma el límite configurado por el cgroup del contenedor en el entorno WSL2; no permite concluir que los nodos desplegados soporten la carga. AD-29 tiene aprobación de diseño; SUP-24 sigue siendo supuesto pendiente de validación y la calibración de límites sigue pendiente según SUP-17.
 
 La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D bajo la carga definida y decidir `WORKER_MEM_LIMIT` por nodo. La validación local con 1 GiB sintético no acredita esos valores. Los demás productos obligatorios de M1 siguen pendientes por feature: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM provocado y recuperación; F-19, huella RSS/PSS por modelo y comparación de estrategias de carga. F-37 cubre saturación del nodo (B.6).
 
-F-19 parte 1 respalda el protocolo programado y su validación con dobles. No demuestra ahorro de memoria, ausencia de zombies del SO, manejo real de SIGTERM ni compatibilidad nativa de Whisper tras fork. AD-07 conserva modelo por proceso como elección provisional hasta medir; la aprobación de SUP-25 solo fija el alcance experimental y sus parámetros iniciales.
+F-19 partes 1–3 respaldan el protocolo, la compatibilidad con Whisper y la comparación medida en el entorno indicado. A N=2, `workers_compartidos` presentó menor PSS y `memory.current` promedio que `por_proceso`; mantener esta estrategia es provisional y acotado a esa carga. La medición no demuestra ahorro para otros modelos, ausencia general de zombies ni desempeño de workers desplegados. La aprobación de SUP-25 fija el alcance experimental y sus parámetros iniciales.
