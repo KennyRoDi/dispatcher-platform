@@ -46,3 +46,10 @@ def test_capa_respeta_regla_de_dependencias(capa):
     for archivo in (SRC / capa).rglob("*.py"):
         prohibidas = importaciones_prohibidas(archivo.read_text(encoding="utf-8"), capa)
         assert not prohibidas, f"{archivo}: {sorted(prohibidas)}"
+
+
+def test_dominio_no_importa_capas_externas():
+    archivo = SRC / "domain" / "case_state.py"
+    assert archivo.exists(), "falta src/domain/case_state.py (F-10)"
+    prohibidas = importaciones_prohibidas(archivo.read_text(encoding="utf-8"), "domain")
+    assert not prohibidas, sorted(prohibidas)
