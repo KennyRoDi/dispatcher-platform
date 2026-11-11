@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** documentacion 8fda877
+**Verificación IA:** documentacion 6e61b5a
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -127,3 +127,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-10 | Documentación parte 2 verificada: QA-parte-2 registra fork fallido, alternativa Linux 5 passed y omisión correcta en Windows (5 skipped); SPEC enlaza informe y delimita evidencia. Bitácora F-19 ya publicada por flujo.py. Sin cifras inventadas. Verificación documental same-session, no independiente. (8fda877) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Aclarar en SPEC que hilos/cpu_threads intra-op se conserva igual; num_workers/inter_threads varía por estrategia (1 por modelo frente a N workers compartidos). |
+| verificación IA de documentacion | Codex | 2026-11-10 | Revisión de SPEC corrigió que cpu_threads/intra-op permanece igual y num_workers/inter_threads varía por estrategia (1 vs N). Solo diff documental de una línea; QA Linux y Windows ya registrados, no repetidos. Verificación documental encargada al rol documentador; verificación de IA no independiente. (6e61b5a) |
