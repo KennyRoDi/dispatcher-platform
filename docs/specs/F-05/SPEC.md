@@ -1,6 +1,6 @@
 # SPEC F-05: Descomponer y enrutar
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 32f5896
 **Historia:** US-05 · **Requisitos:** RF-04, RF-05 · **Responsable:** N
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (Claude Sonnet 5.5), subagente arquitecto independiente | 2026-11-11 | Releí el SPEC completo y comprobé con grep y sed: sin marcadores pendientes; criterio de US-05 copiado de docs/backlog/cola-workers.md; RF-04 y RF-05 en REQUERIMIENTOS.md; cita de B.4 en ENUNCIADO.md línea 301; tipos y puertos existentes (ContentKind sin video, QueueFull en src/domain/subtask.py:14, WorkQueue, FakeWorkQueue, comprobar_work_queue, Priority.from_name, RoutingTable exige regla por ContentKind). Hallé 2 defectos (AD-18 mal citado, es routing por clase de nodo de F-32; extensiones no alineadas con router.py:35-40), los devolví al subagente y verifiqué el diff 572fb48..836a12e. Solo cambia docs/specs/F-05/SPEC.md. Sin pruebas: la fase no tiene código. (29cda02) |
 | plan | Kenni Rodriguez | 2026-11-11 |  |
 | verificación IA de tests | Claude Code (Claude Sonnet 5.5), subagente developer independiente | 2026-11-11 | Leí los 3 archivos de prueba completos (235 lineas) y los contraste con la tabla de pruebas del SPEC: cada criterio tiene su prueba (video a audio e imagen, caso heterogeneo, fuente repetida, extension desconocida, caso vacio, mapa de colas, encolado por tipo, cola llena sin encolar nada con la llena no primera, log de routing, aceptacion de un consumidor por cola). Ejecute pytest sobre los 3 archivos: 3 errors por ModuleNotFoundError de src.domain.decomposition y src.application.dispatch_case, es decir rojo por funcionalidad ausente. git diff main..HEAD: solo SPEC y 3 archivos de tests, 0 archivos en src/, dobles.py y contratos.py intactos. Priority.ALTA/MEDIA/BAJA y FakeWorkQueue.take(queue, worker_id, timeout) existen como las usan las pruebas. Las 22 extensiones parametrizadas coinciden con las listas del SPEC. Observacion: el informe del subagente contaba 28 casos y 19 extensiones; el recuento real es 35 casos y 22 extensiones. No verifique que las pruebas pasen al implementar; eso es de la fase siguiente. test_auth_habilitada.py pasa solo (20 passed); no ejecute la suite completa. (32f5896) |
+| tests | Kenni Rodriguez | 2026-11-11 |  |
