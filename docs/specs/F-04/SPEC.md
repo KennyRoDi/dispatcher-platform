@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-03-8-dataset-sintetico
-**Verificación IA:** implementacion 73a68be
+**Verificación IA:** verificacion b0f1c19
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo src/domain/ground_truth.py (92 lineas); tests intactos. Ejecute test_ground_truth + test_arquitectura: verdes. Desviacion aceptada: campo exact_matches y accuracy por coincidencia exacta del conjunto (lo exigen las pruebas). No corri la suite completa (1649 passed segun el developer). (73a68be) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 2 xfail estrictos nuevos (accuracy con total 0, ids de tipos mezclados) en test_ground_truth_qa.py; src intacto. Ejecute test_ground_truth y _qa: 14 pasan/xfail segun lo esperado. Hallazgos menores a pendientes; accuracy global se declara en documentacion. No repeti la prueba de 200000 elementos (dato del QA). (b0f1c19) |
