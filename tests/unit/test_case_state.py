@@ -75,3 +75,45 @@ def test_barrier_duplicado_tras_cierre_no_reabre_ni_cambia():
 
 def test_barrier_sin_reportes_esta_abierto():
     assert Barrier(expected=3).is_closed() is False
+
+
+def test_barrier_duplicado_con_otro_resultado_conserva_el_primero():
+    barrier = Barrier(expected=1)
+    barrier.report("s1", "completed")
+    barrier.report("s1", "failed")
+    assert barrier._outcomes == {"s1": "completed"}
+
+
+def test_barrier_cierre_no_depende_del_orden():
+    for orden in (["a", "b", "c"], ["c", "a", "b"], ["b", "b", "c", "a", "a"]):
+        barrier = Barrier(expected=3)
+        for subtask_id in orden:
+            barrier.report(subtask_id, "completed")
+        assert barrier.is_closed() is True
+
+
+def test_barrier_caso_vacio_cierra_de_inmediato():
+    assert Barrier(expected=0).is_closed() is True
+
+
+def test_barrier_cierre_una_sola_vez_por_reportes_nuevos():
+    barrier = Barrier(expected=2)
+    nuevos = [barrier.report(s, "completed") for s in ("a", "b", "a", "b", "a")]
+    assert nuevos == [True, True, False, False, False]
+
+
+@pytest.mark.parametrize("estado", list(CaseState))
+def test_transicion_a_si_mismo_se_rechaza(estado):
+    with pytest.raises(InvalidTransition):
+        transition(estado, estado)
+
+
+def test_caso_cancelado_no_se_reabre_por_conteos():
+    assert final_state(0, 0, actual=CaseState.CANCELLED) == CaseState.CANCELLED
+    assert final_state(0, 5, actual=CaseState.CANCELLED) == CaseState.CANCELLED
+
+
+def test_estado_final_de_cualquier_conteo_es_terminal():
+    for completadas in range(4):
+        for fallidas in range(4):
+            assert final_state(completadas, fallidas) in TERMINALES
