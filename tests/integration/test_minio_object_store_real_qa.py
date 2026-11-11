@@ -9,7 +9,7 @@ from src.adapters.envelope_cipher import EnvelopeCipher
 from src.adapters.minio_object_store import MinioObjectStore
 from tests.contratos import comprobar_object_store
 from tests.dobles import FakeKeyProvider
-from tests.integration.test_minio_object_store_real import (  # noqa: F401
+from tests.integration.test_minio_object_store import (  # noqa: F401
     MIB,
     _objetos,
     bucket,
