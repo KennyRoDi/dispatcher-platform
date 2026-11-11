@@ -53,7 +53,9 @@ def obtener_verificador() -> TokenVerifier:
 
 
 def _unauthorized() -> HTTPException:
-    return HTTPException(401, "credenciales ausentes o invalidas", headers={"WWW-Authenticate": "Bearer"})
+    return HTTPException(
+        401, "credenciales ausentes o invalidas", headers={"WWW-Authenticate": "Bearer"}
+    )
 
 
 def _bearer_token(request: Request) -> str:

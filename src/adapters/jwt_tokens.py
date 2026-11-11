@@ -36,7 +36,11 @@ class JwtTokenVerifier:
                 token,
                 self._secret,
                 algorithms=[ALGORITHM],
-                options={"require": list(REQUIRED_CLAIMS), "verify_exp": False, "verify_iat": False},
+                options={
+                    "require": list(REQUIRED_CLAIMS),
+                    "verify_exp": False,
+                    "verify_iat": False,
+                },
             )
         except jwt.PyJWTError:
             raise InvalidToken("token invalido") from None
