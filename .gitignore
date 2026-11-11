@@ -6,6 +6,8 @@ CLAUDE.md
 
 # Heredado del I Proyecto
 .env
+*.key
+jwt.secret
 .venv/
 __pycache__/
 *.pyc
