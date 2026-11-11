@@ -433,3 +433,39 @@ def test_bordes_de_tamano_se_reensamblan(datos, tamano):
         caso.receive(upload_id, indice, parte, sha(parte))
     caso.complete(upload_id)
     assert almacen.objetos == {sha(datos): datos}
+
+
+class _StagingQueDescartaTrasLeerManifiesto(FakeChunkStaging):
+    """Reproduce H2: `discard` ocurre entre la lectura del manifiesto y el `put_chunk`."""
+
+    def __init__(self):
+        super().__init__()
+        self.descartar = set()
+
+    def load_manifest(self, upload_id):
+        manifiesto = super().load_manifest(upload_id)
+        if upload_id in self.descartar:
+            self.discard(upload_id)
+        return manifiesto
+
+
+def test_chunk_que_llega_tras_descartar_la_subida_no_se_guarda():
+    staging = _StagingQueDescartaTrasLeerManifiesto()
+    caso = ChunkedUpload(staging, FakeObjectStore(), max_chunk_size=64)
+    upload_id, _ = iniciar(caso, b"abcdefgh")
+    staging.descartar.add(upload_id)
+    with pytest.raises(UploadNotFound):
+        caso.receive(upload_id, 0, b"abcd", sha(b"abcd"))
+    assert staging.received(upload_id) == set()
+
+
+def test_chunk_tras_descartar_en_disco_no_recrea_la_carpeta(tmp_path):
+    staging = DiskChunkStaging(tmp_path)
+    caso = ChunkedUpload(staging, FakeObjectStore(), max_chunk_size=64)
+    upload_id, _ = iniciar(caso, b"abcdefgh")
+    manifiesto = staging.load_manifest(upload_id)
+    staging.discard(upload_id)
+    with pytest.raises(KeyError):
+        staging.put_chunk(upload_id, 0, b"abcd")
+    assert not (tmp_path / upload_id).exists()
+    assert manifiesto["size"] == 8
