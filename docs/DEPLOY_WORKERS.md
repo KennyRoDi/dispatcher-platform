@@ -169,6 +169,8 @@ curl -s -o /dev/null -w "%{http_code}\n" "https://<IP_TAILSCALE_NODO_A>:8443/ope
 
 Esperado: `redis`, `minio` y `coordinator` en `healthy`, `reaper` corriendo y código `200`. Consola de MinIO: `https://<IP_TAILSCALE_NODO_A>:9001`, con las credenciales de tu `.env`.
 
+Captura de TLS para M4 (`tcpdump`, `tshark`, prueba de aceptación): [modulo-M4-seguridad.md](modulo-M4-seguridad.md#tls-entre-nodos-f-27-captura).
+
 MinIO dejó de publicar imágenes públicas, por eso el Compose usa `cgr.dev/chainguard/minio:latest`. Si dejara de estar disponible, define otra en `.env` con `MINIO_IMAGE=...`.
 
 ### Cada nodo worker (PowerShell)

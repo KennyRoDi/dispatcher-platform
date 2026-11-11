@@ -43,15 +43,29 @@ TLS protege el canal entre procesos de distintos nodos: cifra, comprueba la inte
 - `trustme` 1.2.1, solo desarrollo (`requirements-dev.txt`): licencia MIT o Apache-2.0 según `pip show trustme`; https://github.com/python-trio/trustme.
 - RFC 8446 (TLS 1.3); RFC 6125 y RFC 9525 (verificación de identidad del servidor).
 
-### Mediciones
+### TLS entre nodos (F-27): captura
 
-Comandos exactos de `docs/IMPLEMENTACION.md` §5; los ejecuta la persona en el Nodo A con `sudo`, con la IP real de Tailscale:
+La ejecuta la persona en el Nodo A, con `sudo` y la IP real de Tailscale. Comandos exactos de `docs/IMPLEMENTACION.md` §5, una captura por intento:
 
 ```bash
 sudo tcpdump -i <if> -w m4.pcap 'port 8443 or 6380 or 9000'
 tshark -r m4.pcap -Y tls.handshake.type==1
 strings m4.pcap | grep -c <marcador_sintetico>
 ```
+
+Producto esperado: handshakes TLS y 0 coincidencias del marcador. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+
+**Prueba de aceptación** (`tests/acceptance/test_tls_entre_nodos.py`): levanta la captura, procesa un caso con marcador sintético y revisa con `tshark` y `strings`. Se omite si falta algo de lo siguiente:
+
+```bash
+F27_CAPTURA=1 COORDINATOR_URL=https://<ip>:8443 TLS_CA_FILE=<ca.pem> pytest tests/acceptance/test_tls_entre_nodos.py -q
+```
+
+- `F27_CAPTURA=1`: obligatoria; sin ella se omite.
+- `COORDINATOR_URL` y `TLS_CA_FILE`: obligatorias.
+- `F27_INTERFAZ`: interfaz de captura; por defecto `any`.
+- `F27_LEVANTAR_NODO=1`: ejecuta `docker compose up -d --wait` y lo baja al terminar.
+- Requiere `tcpdump`, `tshark`, `strings` y `sudo` sin contraseña (`sudo -v` antes).
 
 | Medición | Resultado |
 |---|---|
@@ -60,4 +74,6 @@ strings m4.pcap | grep -c <marcador_sintetico>
 | Cliente sin la CA rechazado en los servicios reales | pendiente |
 | Costo de TLS sobre el throughput de M3 | pendiente |
 
-Sin captura real no hay resultado de TLS y el módulo no pasa de 2 [Parte I §5]. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+La prueba de aceptación solo se verificó con su omisión (skip); no hay ejecución real. Sin captura real no hay resultado de TLS y M4 no pasa de 2 [Parte I §5].
+
+**Repetir M3.** TLS puede alterar M1 a M3: hay que repetir al menos el throughput de M3 con TLS activo y reportar la diferencia (`docs/IMPLEMENTACION.md` §7). No se estima aquí.
