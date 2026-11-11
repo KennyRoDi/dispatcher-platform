@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-04-3-verdad-de-referencia-y-procedencia
 **Verificación IA:** implementacion 9b2bc15
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -193,3 +193,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte 4 solo documental (docs/dataset.md): sin pruebas ni codigo. Rama sin cambios de src/scripts/tests respecto de la parte 3. Verificacion no independiente. (89bb871) |
 | tests | Kenni Rodriguez | 2026-11-10 | parte solo documental; aprobacion delegada por la persona |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte 4 solo documental (docs/dataset.md): sin pruebas ni codigo. Rama sin cambios de src/scripts/tests respecto de la parte 3. Verificacion no independiente. (9b2bc15) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | parte solo documental; aprobacion delegada por la persona |
