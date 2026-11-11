@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-10-2-estados-y-cierre
 **Verificación IA:** verificacion aac1cd9
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; comprobación de pruebas omitida: 2 fallos TLS ajenos preexistentes (test_tls_cableado) y flujo.py falla con stdout None al capturar pytest en Windows |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 3: con Redis 7 real (docker, puerto 6390) la prueba concurrente falló 1/17 (doble cierre y PROCESSING sobrescribiendo estado terminal: bug de mi implementación). Corregido: set_state con WATCH rechaza escrituras sobre estado terminal y devuelve bool; ReportSubtask no cierra si no se aplicó. 40/40 corridas concurrentes verdes; 74 pruebas del módulo verdes, 462 del coordinador verdes; +2 pruebas unitarias. Redis ajeno con contraseña no se usó (2e9198b) |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 3: con Redis 7 real (docker, puerto 6390) la prueba concurrente falló 1/17 (doble cierre y PROCESSING sobrescribiendo estado terminal: bug de mi implementación). Corregido: set_state con WATCH rechaza escrituras sobre estado terminal y devuelve bool; ReportSubtask no cierra si no se aplicó. 40/40 corridas concurrentes verdes; 74 pruebas del módulo y 462 del coordinador verdes; +2 unitarias; aserciones queued->processing en tests/test_coordinator.py. Redis ajeno con contraseña no se usó (aac1cd9) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; pruebas rápidas solo fallan por TLS ajeno (test_tls_cableado, test_tls_cableado_qa), sin relación con F-10 |
