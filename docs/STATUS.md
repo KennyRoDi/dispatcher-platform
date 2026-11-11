@@ -12,7 +12,7 @@
 | F-07 | hecha |
 | F-08 | hecha |
 | F-09 | hecha |
-| F-10 | en-pr |
+| F-10 | hecha |
 | F-11 | pendiente |
 | F-12 | hecha |
 | F-13 | hecha |
@@ -25,7 +25,7 @@
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
-| F-23 | en-pr |
+| F-23 | tests |
 | F-24 | pendiente |
 | F-25 | pendiente |
 | F-26 | hecha |
