@@ -620,3 +620,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Merge 1d268ff: validacion NUL y rutas multiplataforma, produce compartido, pruebas Windows y deteccion de privilegio symlink |
 | Validado / corregido / descartado | Conflictos resueltos conservando correcciones de main y F19; PR mergeable, sin fusionar |
 | Cómo se validó | Suite completa Windows 1689 passed 10 skipped 8 deselected 3 xfailed; conformidad 0 problemas; GitHub sin conflictos |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-1-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) como orquestador, con subagentes arquitecto, developer, QA y documentador |
+| Componente | F-04 |
+| Propósito | F-04 parte 1: comparador de aciertos y errores por categoria (src/domain/ground_truth.py, 92 lineas), con SPEC, pruebas, hallazgos de QA y registro de AD-31, SUP-26 y SUP-27. |
+| Consulta resumida | Pedido por rol y fase: SPEC de F-04, pruebas en rojo, implementacion minima, intento de romper el comparador y registros en ARQUITECTURA y REQUERIMIENTOS. |
+| Resultado obtenido | ground_truth.py (92 lineas), test_ground_truth.py y test_ground_truth_qa.py (2 xfail estrictos); AD-31, SUP-26 y SUP-27 (provisional). Suite: 1649 passed, 7 skipped, 5 xfailed; conformidad 0 problemas. |
+| Validado / corregido / descartado | El orquestador ejecuto test_ground_truth y test_arquitectura tras la implementacion, conformidad.py en documentacion y comparo diffs. Los datos de prueba son dobles, no mediciones. SUP-27 sigue provisional. Las fases se aprobaron con --excepcion por delegacion de la persona, que no leyo cada fase. |
+| Cómo se validó | No se repitio la prueba de 200000 elementos del QA ni la suite completa tras documentacion. |
+| Error de la IA | El developer añadio el campo exact_matches a Comparison y definio accuracy por coincidencia exacta del conjunto sin que el SPEC lo declarara (SPEC decia Comparison(scores, total)); se detecto en la verificacion y se corrigio el SPEC. QA hallo en la implementacion que Comparison.accuracy lanza ZeroDivisionError con total 0 (el SPEC pide None) y que _require_unique da TypeError con ids de tipos mezclados en vez de ValueError; ambos quedan como xfail estricto. |
