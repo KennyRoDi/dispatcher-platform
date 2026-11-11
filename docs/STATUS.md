@@ -16,7 +16,7 @@
 | F-11 | pendiente |
 | F-12 | hecha |
 | F-13 | hecha |
-| F-14 | en-pr |
+| F-14 | hecha |
 | F-15 | pendiente |
 | F-16 | hecha |
 | F-17 | hecha |
