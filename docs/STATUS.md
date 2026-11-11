@@ -15,7 +15,7 @@
 | F-10 | pendiente |
 | F-11 | pendiente |
 | F-12 | hecha |
-| F-13 | documentacion |
+| F-13 | revision |
 | F-14 | pendiente |
 | F-15 | pendiente |
 | F-16 | hecha |
