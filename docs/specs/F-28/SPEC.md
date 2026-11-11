@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-28-2-cifrado-en-reposo
 **Verificación IA:** implementacion 6a4b7ac
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -174,3 +174,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: tras DecryptionError el siguiente read devuelve claro como valido (media); read(n) cuadratico; sin readinto; read tras close devuelve datos y close no usa try/finally |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de puntos 1-4 de QA; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa: 1974 passed, 8 skipped, 15 xfailed (1 corrida). (6a4b7ac) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
