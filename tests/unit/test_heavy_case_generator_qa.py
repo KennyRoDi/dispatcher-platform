@@ -102,10 +102,10 @@ def test_dos_semillas_dan_semillas_de_ruido_distintas(tmp_path):
     assert noise(first) != noise(second)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un nombre de caso con '..' escribe fuera del directorio de salida")
-def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path):
+@pytest.mark.parametrize("nombre", ["../escape", r"..\escape"])
+def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path, nombre):
     out_dir = tmp_path / "salida"
-    plan = _plan_with_heavy_name("../escape")
+    plan = _plan_with_heavy_name(nombre)
 
     try:
         generate_heavy_cases(plan, out_dir, SparseRunner())
@@ -115,7 +115,6 @@ def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path):
     assert not (tmp_path / "escape").exists()
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un nombre de caso absoluto escribe fuera del directorio de salida")
 def test_un_nombre_de_caso_absoluto_no_escribe_fuera_del_destino(tmp_path):
     outside = tmp_path / "fuera"
     plan = _plan_with_heavy_name(str(outside))

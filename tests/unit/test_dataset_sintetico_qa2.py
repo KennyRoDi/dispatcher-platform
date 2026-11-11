@@ -43,7 +43,10 @@ def test_validar_detecta_duplicados_con_otra_grafia_de_la_ruta(reduced, variante
 
 
 @pytest.mark.xfail(strict=True, reason="QA: un archivo sin permiso de lectura provoca PermissionError en el validador")
-@pytest.mark.skipif(os.geteuid() == 0, reason="root ignora los permisos")
+@pytest.mark.skipif(
+    os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
+    reason="Windows no aplica chmod como permisos POSIX y root ignora los permisos",
+)
 def test_validar_reporta_un_archivo_ilegible_sin_traza(reduced):  # noqa: F811
     imagen = next(r for r in _rows(reduced) if r["kind"] == "imagen")
     archivo = reduced / imagen["path"]
