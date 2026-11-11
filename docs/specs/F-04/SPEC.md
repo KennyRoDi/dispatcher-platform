@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-04-1-verdad-de-referencia-y-procedencia
-**Verificación IA:** revision bb7a2ce
+**Verificación IA:** tests 20a2779
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -145,3 +145,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO con observaciones. Hallazgo medio (AD-31 usado por la rama de F-12) reproducido con grep en todas las ramas remotas: AD-32 libre; renumerado en ARQUITECTURA y SPEC. conformidad 0 problemas. Revisor ejecuto pytest 1649 passed/5 xfailed (no repetido tras el cambio de texto). (bb7a2ce) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests/unit/test_provenance.py (mas log del SPEC); pytest da error de coleccion ModuleNotFoundError src.domain.provenance (rojo por falta del modulo). Decisiones del developer: origen en blanco se rechaza; una fuente con dos defectos da un mensaje por defecto. test_acepta_el_manifiesto_que_genera_f03 queda para la parte 3. (20a2779) |
