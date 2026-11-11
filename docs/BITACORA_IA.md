@@ -1047,3 +1047,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
 | Cómo se validó | Revision del diff contra el SPEC |
 | Error de la IA | el QA halló que el 503 de /alerts filtraba host y puerto de Redis, que una entrada con bytes no UTF-8 tiraba toda la ruta, que ResponseError daba 500 y 3 defectos menores (emitted_at sin zona, recent(0), maxlen no positivo) |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`feat/F-14-3-alertas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-14 |
+| Propósito | Documentar F-14 parte 3 (cierre protegido, prueba A, evidencia) |
+| Consulta resumida | Limites de la parte 3 en AD-39, prueba A y aviso de F-26 |
+| Resultado obtenido | AD-39 actualizado |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
+| Cómo se validó | Revision del diff contra el SPEC |
+| Error de la IA | el QA halló que el log del cierre usaba %s con un case_id controlado por el cliente (inyección de líneas) y tres defectos previos de rutas_subtareas.py amplificados por la alerta |
