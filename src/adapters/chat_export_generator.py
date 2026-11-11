@@ -1,10 +1,11 @@
 import json
 import random
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from src.domain.chat_message import ChatMessage
-from src.domain.dataset_plan import DatasetPlan
+from src.domain.dataset_plan import DatasetPlan, checked_case_name
 
 SYNTHETIC_SENDERS = ("Alma Sintética", "Bruno Sintético", "Carla Sintética", "Dario Sintético")
 ATTACHMENT_TEXT = "<Multimedia omitido>"
@@ -45,6 +46,8 @@ TELEGRAM_SUFFIX = ".json"
 
 
 def generate_chat(seed: int, count: int, threat_ratio: float = THREAT_RATIO) -> list[ChatMessage]:
+    if not 0 <= threat_ratio <= 1:
+        raise ValueError(f"threat_ratio debe estar entre 0 y 1, no {threat_ratio}")
     rng = random.Random(seed)
     threat_positions = set(rng.sample(range(count), round(count * threat_ratio)))
     instants = _increasing_minutes(rng, count)
@@ -81,13 +84,13 @@ def export_plan_chats(plan: DatasetPlan, destination: Path) -> dict[str, Path]:
             continue
         messages = generate_chat(plan.seed * SEED_STRIDE + index, case.messages)
         suffix, render = _style_for(index)
-        path = destination / f"{case.name}-chat{suffix}"
+        path = destination / f"{checked_case_name(case.name)}-chat{suffix}"
         path.write_bytes(render(messages).encode("utf-8"))
         files[case.name] = path
     return files
 
 
-def _style_for(index: int):
+def _style_for(index: int) -> tuple[str, Callable[[list[ChatMessage]], str]]:
     if index % 2 == 0:
         return WHATSAPP_SUFFIX, render_whatsapp
     return TELEGRAM_SUFFIX, render_telegram
@@ -115,13 +118,13 @@ def _regular_text(rng: random.Random) -> str:
 
 
 def _whatsapp_entry(message: ChatMessage) -> str:
-    moment = message.timestamp_utc
+    moment = message.timestamp_utc.astimezone(timezone.utc)
     header = f"{moment.day}/{moment.month}/{moment:%y}, {moment:%H:%M} - {message.sender}: "
     return header + message.text
 
 
 def _telegram_entry(identifier: int, message: ChatMessage) -> dict:
-    moment = message.timestamp_utc
+    moment = message.timestamp_utc.astimezone(timezone.utc)
     return {
         "id": identifier,
         "type": "message",
