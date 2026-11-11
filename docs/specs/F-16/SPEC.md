@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** documentacion b8e2690
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La revisión final detectó un conteo desactualizado en docs/modulo-M1-memoria.md: QA-parte-2 final registra 1162 aprobadas, pero la ficha dice 1161. Corregir solo el conteo y verificar. |
 | verificación IA de documentacion | Codex | 2026-11-10 | Revisión documental mínima tras hallazgo final: commit b8e2690 cambia únicamente el conteo de QA en ficha M1 de 1161 a 1162, coincidente con QA-parte-2 y SPEC. git show --check limpio, árbol limpio. No repetí pruebas; cambio solo documental. (b8e2690) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
