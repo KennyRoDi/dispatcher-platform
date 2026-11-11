@@ -1,7 +1,7 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido
 **Verificación IA:** revision 872ab48
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
