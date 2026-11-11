@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion b13b64c
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -221,3 +221,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; sin subagente: verificacion no independiente) | 2026-11-10 | Generacion completa real: PYTHONPATH=. python -m scripts.dataset_sintetico --seed 1 --out dataset/sintetico (173 s, rc 0, 490 archivos, 1,9 GB; dato del artefacto, no medicion de SO) y --validar: 'cumple los minimos de B.3'. Recuento desde manifest.json: 40 casos, 300 imagenes, 150 audios, 25 texto, 10 documentos, 5 videos, 5 casos con archivo >=200 MiB (219512832 bytes), licencia MIT y origen sintetico en las 490 filas. sha256 de manifest.json 30bbba45...a73a0c6. Carpeta ignorada por .gitignore (arbol limpio). (f5e196d) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | verificacion hecha por el orquestador sin QA independiente: parte solo documental (autorizado por la persona) |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff desde la verificacion: docs/dataset.md, ARQUITECTURA (AD-25), SPEC y solo la cadena reason de un xfail. Recontados desde manifest.json: audio 80 ruido/70 tono, 5 casos livianos, 5 pesados y 30 no heterogeneos, 5 videos; AD-25 presente antes de AD-26; Drive marcado pendiente sin URL; sha256 del manifiesto coincide. No verifique la cifra de mensajes (el doc solo cita el minimo del validador). (b13b64c) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso; verificacion del orquestador hecha |
