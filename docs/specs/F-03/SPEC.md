@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-03-6-dataset-sintetico
-**Verificación IA:** revision 4d96edc
+**Verificación IA:** tests 0638cef
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -192,3 +192,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes; 5 menores. Verifique: arbol limpio, sin commits nuevos desde b2f65c2, import de _produce en heavy_case_generator.py:6 y checked_case_name en dominio. Reporte de pytest 1576 passed/9 xfailed coincide con mi ejecucion previa; no lo repeti. (4d96edc) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff contra la parte 6 solo toca tests/ y SPEC; sin xfail restantes; ejecute pytest: 16 failed por funcionalidad ausente (NUL, PermissionError, no enteros, padres, directorio previo, symlink, produce inexistente), resto verde. (0638cef) |
