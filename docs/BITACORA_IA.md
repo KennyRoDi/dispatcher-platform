@@ -646,3 +646,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador ejecuto la suite completa tras la implementacion, test_provenance y _qa tras QA y conformidad.py en documentacion. Las fases se aprobaron con --excepcion por delegacion de la persona, que no leyo cada fase y debe revisarlo al volver. SUP-27 sigue provisional. |
 | Cómo se validó | No se reprodujeron las observaciones de QA sin xfail ni se corrigieron los defectos: quedan declarados en el SPEC y en pendientes. |
 | Error de la IA | La implementacion de la IA acepto origen o licencia no str con AttributeError opaco en vez de un defecto con la ruta (5 casos), dejo pasar como licencia valida un relleno con espacios interiores o NBSP (3 casos) y una licencia de solo caracteres invisibles U+200B/U+FEFF (3 casos). QA lo detecto con 11 xfail estrictos; no se corrigio en esta parte. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-18 (`feat/F-18-1-deteccion-de-oom`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-18 |
+| Propósito | Clasificar OOM y política de reencolado SUP-14 (parte 1 de F-18) |
+| Consulta resumida | Plan, pruebas en rojo e implementación de classify_exit, OomPolicy y read_memory_events |
+| Resultado obtenido | Dominio puro y lector de memory.events con 44 pruebas en verde |
+| Validado / corregido / descartado | Pruebas unitarias; casos borde -9 sin delta, 137 y max_requeues=0 revisados a mano |
+| Cómo se validó | TDD en fases; subagente haiku para documentación |
+| Error de la IA | Primer intento de editar el SPEC con python en bash falló en silencio (no existía el intérprete) y se detectó al contar los campos pendientes; se repitió con py |
