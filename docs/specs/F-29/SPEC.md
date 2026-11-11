@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-29-1-cadena-de-custodia
 **Verificación IA:** verificacion f1fde64
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -158,3 +158,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de A1-A8 y rendimiento; diff de tests solo quita marcadores xfail (comprobado). Suite completa tras d8c75a7: 1943 passed, 8 skipped, 6 xfailed. Dominio tocado (verify_tail, _check_anchor): tests de custody_chain verdes. A9 no implementado (SPEC exige result==evidence solo en ingreso; helpers de pruebas lo violan): queda xfail y limite. record ya no verifica el log completo: manipulacion de linea intermedia solo la detecta el verificador (parte 3). Warnings ResourceWarning son de src/workers/storage.py (previo). (d8c75a7) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 1726a84: 11 xfail, 8 corregidos; queda A9 (ingreso con result!=evidence se acepta; decision: limite). Costo cuadratico medido por QA (1000 entradas 7,5 s; 4000 entradas 121,4 s acumulado) ya corregido en implementacion (no re-medido por mi). 6 procesos concurrentes sin ruptura segun QA. (f1fde64) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
