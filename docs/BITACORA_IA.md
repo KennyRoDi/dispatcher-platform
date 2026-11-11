@@ -492,3 +492,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | La persona aprobó cada fase y devolvió implementación por los 5 hallazgos de la ronda 1, corregidos en bddb8f1. Quedan 6 defectos menores de la ronda 2 en xfail estricto (tests/unit/test_dataset_sintetico_qa2.py) para la parte 7. Decisiones de la persona: licencia MIT, etiqueta neutro, limpieza de huérfanos (opción C), todo en la parte 7. |
 | Cómo se validó | Pruebas rojas (09f76b6, 8e0a036), implementación (cb9758b, ec1e2fd), QA ronda 1 (d5231b9), corrección (bddb8f1), QA ronda 2 (7cf5d06). pytest -m 'not integration and not acceptance': 1521 passed, 7 skipped, 22 xfailed; integración con ffmpeg real: 1 passed; aceptación sobre el dataset completo: 1 passed. Sin comprobar: lint (ruff no instalado). |
 | Error de la IA | (1) Ni las pruebas ni el SPEC definían la API de composición; la fijó el developer. (2) El SPEC se contradecía: RF-20 y RF-21 pedían categoria, positivo y duracion_s en el manifiesto, pero la lista de campos no los incluía; se detectó en la fase tests y se corrigió (8e0a036). (3) QA ronda 1 halló 5 defectos del developer: filas duplicadas contaban dos veces, tipos por caso sin validar, caso pesado no heterogéneo aceptado, manifiesto corrupto con traza, parámetros negativos aceptados; corregidos en bddb8f1. (4) QA ronda 2 halló 6 defectos menores abiertos en xfail para la parte 7: bytes no entero y case nulo con TypeError, rutas ./x y x/ no detectadas como duplicadas, PermissionError con traza, symlink fuera de --out aceptado, --out que es archivo con NotADirectoryError. |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: validar identidad efectiva del worker (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador, developer y QA) |
+| Componente | M1, F-16 parte 2: validar identidad efectiva del worker |
+| Propósito | Evitar identidad divergente entre hostname del contenedor y NODE_NAME del proceso |
+| Consulta resumida | Corregir hallazgo de revisión que detectó que PowerShell podía sobrescribir NODE_NAME y hostname de forma distinta |
+| Resultado obtenido | validate_config exige NODE_NAME y su igualdad con service.hostname; test_preflight_rechaza_node_name_distinto_del_hostname falla antes del fix y pasa tras el fix; suite final 1162 passed, 2 skipped, 3 deselected |
+| Validado / corregido / descartado | El revisor detectó el hueco; se agregó prueba roja, se implementó la comprobación y QA la reprodujo. B/C/D siguen pendientes por decisión humana; pruebas locales no se presentan como medición de esos nodos. |
+| Cómo se validó | py -m pytest -q tests/unit/test_f16_preflight.py -k node_name_distinto: 1 failed esperado antes del fix; suite completa tras fix: 1162 passed, 2 skipped, 3 deselected. QA-parte-2 actualizado; git diff --check limpio. |
+| Error de la IA | El revisor encontró que la IA no comparó service.hostname con service.environment.NODE_NAME; PowerShell podía hacer divergir la identidad efectiva. Se corrigió exigiendo igualdad y se añadió prueba que falló antes del fix. |
