@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-27-3-tls-entre-nodos
-**Verificación IA:** verificacion c879d58
+**Verificación IA:** documentacion 689196c
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -218,3 +218,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código |
 | verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte solo de prueba de aceptacion saltada y docs; captura real pendiente de la persona con sudo (c879d58) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs de la ficha M4 y guion revisados por el orquestador contra el SPEC (pila fila 4): resultados pendiente, sin datos inventados, M4 max 2; sin subagente revisor, verificacion no independiente (689196c) |
