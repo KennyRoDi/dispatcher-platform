@@ -141,3 +141,24 @@ def test_el_error_de_ffmpeg_expone_su_stderr(monkeypatch):
 
     with pytest.raises(Exception, match="Unknown encoder"):
         run_ffmpeg(["ffmpeg"])
+
+
+def test_heavy_bytes_que_no_cabe_en_el_timeout_se_rechaza_antes_de_ejecutar(tmp_path):
+    from src.adapters.heavy_case_generator import MAX_HEAVY_BYTES
+
+    plan = plan_dataset(7, dataclasses.replace(PARAMS, heavy_bytes=MAX_HEAVY_BYTES + 1))
+    runner = SparseRunner()
+
+    with pytest.raises(ValueError, match="heavy_bytes"):
+        generate_heavy_cases(plan, tmp_path, runner)
+
+    assert runner.calls == []
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_heavy_bytes_en_el_tope_se_acepta(tmp_path):
+    from src.adapters.heavy_case_generator import MAX_HEAVY_BYTES
+
+    plan = plan_dataset(7, dataclasses.replace(PARAMS, heavy_bytes=MAX_HEAVY_BYTES))
+
+    assert generate_heavy_cases(plan, tmp_path, SparseRunner(size=MAX_HEAVY_BYTES))

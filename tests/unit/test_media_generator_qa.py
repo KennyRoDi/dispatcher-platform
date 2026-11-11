@@ -257,3 +257,24 @@ def test_el_error_de_ffmpeg_en_texto_expone_su_stderr_decodificado(monkeypatch):
 
     with pytest.raises(Exception, match="No such file or directory"):
         run_ffmpeg(["ffmpeg"])
+
+
+@pytest.mark.parametrize("ratio", [-0.1, 1.5, float("nan")])
+def test_ratio_de_positivos_fuera_de_rango_se_rechaza_sin_dejar_archivos(ratio, tmp_path):
+    plan = plan_dataset(7, PARAMS)
+    ratios = {**plan.image_positive_ratio, IMAGE_CATEGORIES[0]: ratio}
+
+    with pytest.raises(ValueError, match="image_positive_ratio"):
+        generate_media(dataclasses.replace(plan, image_positive_ratio=ratios), tmp_path, Recorder())
+
+    assert [p for p in tmp_path.rglob("*") if p.is_file()] == []
+
+
+def test_produce_informa_el_minimo_en_bytes_cuando_es_menor_que_una_mib(tmp_path):
+    path = tmp_path / "caso" / "video.mpg"
+
+    def runner(args):
+        path.write_bytes(b"x")
+
+    with pytest.raises(ValueError, match="1024 bytes"):
+        media_generator.produce(runner, ["ffmpeg"], path, min_bytes=1024)
