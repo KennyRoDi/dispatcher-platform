@@ -66,6 +66,8 @@ def exigir_cifrado(
         return
     if coordinator_url is not None:
         _require_secure_url(coordinator_url, "https://", "la URL del coordinador")
+        if urlsplit(coordinator_url).username or urlsplit(coordinator_url).password:
+            raise TlsConfigError("la URL del coordinador no puede llevar usuario ni clave embebidos")
     if redis_url is not None:
         _require_secure_url(redis_url, "rediss://", "la URL de Redis")
         if any(key.lower().startswith("ssl") for key, _ in _query_pairs(redis_url)):

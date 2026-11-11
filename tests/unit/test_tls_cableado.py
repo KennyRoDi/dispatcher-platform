@@ -294,9 +294,11 @@ def test_check_coordinator_sin_tls_conserva_la_verificacion_de_siempre(envios):
     assert kwargs["verify"] is True
 
 
-def test_check_minio_con_tls_y_minio_secure_apagado_no_arranca(tls_activo, minio_falso):
-    with pytest.raises(TlsConfigError):
-        check_connectivity.check_minio(settings_con(MINIO_SECURE="false"))
+def test_check_minio_con_tls_y_minio_secure_apagado_informa_el_rechazo(tls_activo, minio_falso):
+    ok, mensaje = check_connectivity.check_minio(settings_con(MINIO_SECURE="false"))
+
+    assert ok is False
+    assert minio_falso.llamadas == []
 
 
 # scripts/submit_case.py

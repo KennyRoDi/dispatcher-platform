@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 import uuid
@@ -28,6 +29,10 @@ def check_redis(settings: Settings, client=None) -> tuple[bool, str]:
         return False, f"Redis en {settings.redis_host}:{settings.redis_port} no responde: {e}"
 
 
+def _masked(url: str) -> str:
+    return re.sub(r"//[^/@]*@", "//***@", url)
+
+
 def check_coordinator(settings: Settings, get=None) -> tuple[bool, str]:
     url = f"{settings.coordinator_url}/openapi.json"
     try:
@@ -37,16 +42,19 @@ def check_coordinator(settings: Settings, get=None) -> tuple[bool, str]:
             get = requests_session(tls).get
         resp = get(url, timeout=5)
         if resp.status_code == 200:
-            return True, f"Coordinador OK en {settings.coordinator_url}"
-        return False, f"Coordinador respondio HTTP {resp.status_code} en {url}"
+            return True, f"Coordinador OK en {_masked(settings.coordinator_url)}"
+        return False, f"Coordinador respondio HTTP {resp.status_code} en {_masked(url)}"
     except TlsConfigError as e:
         return False, f"Configuracion TLS rechazada: {e}"
     except requests.RequestException as e:
-        return False, f"No se pudo conectar al coordinador en {url}: {e}"
+        return False, f"No se pudo conectar al coordinador en {_masked(url)}: {e}"
 
 
 def check_minio(settings: Settings, storage=None, create_buckets: bool = False) -> tuple[bool, str]:
-    storage = storage if storage is not None else Storage(settings)
+    try:
+        storage = storage if storage is not None else Storage(settings)
+    except TlsConfigError as e:
+        return False, f"Configuracion TLS rechazada: {e}"
     if create_buckets:
         try:
             storage.ensure_buckets()
@@ -130,7 +138,7 @@ def config_summary(settings: Settings) -> str:
         f"concurrency={settings.worker_concurrency} "
         f"threads_per_job={settings.threads_per_job()} "
         f"redis={settings.redis_host}:{settings.redis_port} "
-        f"coordinator_url={settings.coordinator_url} "
+        f"coordinator_url={_masked(settings.coordinator_url)} "
         f"minio_endpoint={settings.minio_endpoint}"
     )
 

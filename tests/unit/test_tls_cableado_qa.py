@@ -63,7 +63,6 @@ def settings_con(**env) -> Settings:
 
 # (1) Funciones de biblioteca de submit_case: solo main() exige cifrado; llamadas directas viajan en claro
 
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (media): las funciones publicas de submit_case no llaman a exigir_cifrado; con TLS activo envian a http:// en claro")
 @pytest.mark.parametrize("operacion", ["submit_case", "cancel_case", "fetch_report", "poll_case"])
 def test_con_tls_las_funciones_de_submit_case_no_envian_a_http(tls_activo, envios, operacion):
     url = "http://nodo-a:8000"
@@ -84,7 +83,6 @@ def test_con_tls_las_funciones_de_submit_case_no_envian_a_http(tls_activo, envio
 
 # (1) Scripts y modulos que siguen fuera de tls.py (requests plano)
 
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (media): fetch_results.main usa el modulo requests plano; ignora la CA y acepta http:// con TLS activo")
 def test_fetch_results_no_usa_el_modulo_requests_como_sesion_por_defecto():
     import inspect
 
@@ -100,7 +98,6 @@ PLANOS = {
 
 
 @pytest.mark.parametrize("archivo", sorted(PLANOS))
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (media): script con cliente HTTP plano; no pasa por tls.py y acepta http:// con TLS activo")
 def test_script_no_crea_clientes_http_planos(archivo):
     assert re.search(PLANOS[archivo], (RAIZ / archivo).read_text(encoding="utf-8")) is None
 
@@ -114,14 +111,12 @@ def test_check_redis_con_tls_sin_ca_informa_en_vez_de_lanzar(tls_sin_ca):
     assert "TLS" in mensaje
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (baja): check_minio no atrapa TlsConfigError con MINIO_SECURE=false y TLS activo")
 def test_check_minio_con_tls_y_minio_inseguro_informa_en_vez_de_lanzar(tls_activo):
     ok, mensaje = check_connectivity.check_minio(settings_con(MINIO_SECURE="false"))
 
     assert ok is False
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (baja): submit_case.main construye Storage fuera del try; TlsConfigError sale como traza")
 def test_submit_case_main_con_minio_inseguro_sale_con_error_limpio(tls_activo, monkeypatch, tmp_path, capsys):
     (tmp_path / "a.mp4").write_bytes(b"x")
     monkeypatch.setenv("COORDINATOR_URL", "https://nodo-a:8443")
@@ -181,7 +176,6 @@ def test_importar_conexion_con_ca_valida_no_abre_conexion(ca_pem):
 
 # (7) Credenciales en mensajes
 
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (baja): una URL con usuario:clave se imprime tal cual en config_summary y en check_coordinator")
 def test_config_summary_no_imprime_credenciales_de_la_url():
     resumen = check_connectivity.config_summary(
         settings_con(COORDINATOR_URL="https://usuario:SECRETO@nodo-a:8443")
@@ -190,7 +184,6 @@ def test_config_summary_no_imprime_credenciales_de_la_url():
     assert "SECRETO" not in resumen
 
 
-@pytest.mark.xfail(strict=True, reason="QA F-27 p2 (baja): exigir_cifrado acepta una URL del coordinador con usuario:clave embebidos")
 def test_exigir_cifrado_rechaza_credenciales_en_la_url_del_coordinador(tls_activo):
     from src.infrastructure.tls import exigir_cifrado
 

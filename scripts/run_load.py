@@ -22,7 +22,6 @@ import requests
 
 from scripts.submit_case import FINISHED_STATUSES, build_case_payload
 from scripts.submit_case import resolve_session
-from src.infrastructure.tls import TlsSettings, exigir_cifrado
 from src.workers.config import Settings, make_redis
 from src.workers.storage import Storage, StorageError
 
@@ -380,8 +379,7 @@ def render_md(config: dict, m: dict, timed_out: bool, workers_seen: bool) -> str
 
 def run_load(args, settings: Settings, session=None, storage=None, redis_client=None,
              sleep=time.sleep, clock=time.monotonic, stamp: str | None = None) -> tuple[int, Path]:
-    exigir_cifrado(TlsSettings.from_env(), coordinator_url=settings.coordinator_url)
-    session = resolve_session(session)
+    session = resolve_session(settings.coordinator_url, session)
     dataset = Path(args.dataset)
     manifest, cases_doc = load_dataset(dataset)
 

@@ -101,20 +101,22 @@ def upload_plan(storage, plan: list[tuple[Path, str]], prefix: str, bucket: str)
     return keys_ops
 
 
-def resolve_session(session=None) -> requests.Session:
-    return session if session is not None else requests_session(TlsSettings.from_env())
+def resolve_session(coordinator_url: str, session=None) -> requests.Session:
+    tls = TlsSettings.from_env()
+    exigir_cifrado(tls, coordinator_url=coordinator_url)
+    return session if session is not None else requests_session(tls)
 
 
 def submit_case(coordinator_url: str, keys_ops: list[tuple[str, str]], session=None, priority: str = "normal") -> dict:
     payload = build_case_payload(keys_ops, priority=priority)
-    resp = resolve_session(session).post(f"{coordinator_url}/cases", json=payload, timeout=10)
+    resp = resolve_session(coordinator_url, session).post(f"{coordinator_url}/cases", json=payload, timeout=10)
     resp.raise_for_status()
     return resp.json()
 
 
 def cancel_case(coordinator_url: str, case_id: str, session=None) -> dict | None:
     try:
-        resp = resolve_session(session).post(f"{coordinator_url}/cases/{case_id}/cancel", timeout=10)
+        resp = resolve_session(coordinator_url, session).post(f"{coordinator_url}/cases/{case_id}/cancel", timeout=10)
         resp.raise_for_status()
         return resp.json()
     except requests.RequestException as e:
@@ -132,7 +134,7 @@ def count_subtasks(subtasks: list[dict]) -> tuple[int, int]:
 
 def fetch_report(coordinator_url: str, case_id: str, session=None) -> dict | None:
     try:
-        resp = resolve_session(session).get(f"{coordinator_url}/cases/{case_id}/report", timeout=10)
+        resp = resolve_session(coordinator_url, session).get(f"{coordinator_url}/cases/{case_id}/report", timeout=10)
         resp.raise_for_status()
         return resp.json()
     except (requests.RequestException, ValueError) as e:
@@ -188,7 +190,7 @@ def poll_case(
     sleep=time.sleep,
     now=time.monotonic,
 ) -> dict:
-    session = resolve_session(session)
+    session = resolve_session(coordinator_url, session)
     start = now()
     deadline = start + timeout
     last_status = None
@@ -257,15 +259,15 @@ def main(argv: list[str] | None = None) -> int:
 
     settings = Settings.from_env()
     try:
-        exigir_cifrado(TlsSettings.from_env(), coordinator_url=settings.coordinator_url)
+        resolve_session(settings.coordinator_url)
+        storage = None if args.no_upload else Storage(settings)
     except TlsConfigError as e:
         print(f"Error: {e}")
         return 1
 
-    if args.no_upload:
+    if storage is None:
         keys_ops = [(f"{prefix}/{path.name}", op) for path, op in plan]
     else:
-        storage = Storage(settings)
         try:
             keys_ops = upload_plan(storage, plan, prefix, settings.dataset_bucket)
         except StorageError as e:
