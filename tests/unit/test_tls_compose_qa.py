@@ -212,8 +212,9 @@ def test_insecure_solo_aparece_en_el_healthcheck_de_minio_hacia_localhost():
         texto = yaml.safe_dump(servicio)
         if "--insecure" in texto or "verify=False" in texto or "CERT_NONE" in texto:
             assert nombre == "minio"
-            assert "--insecure" in " ".join(map(str, servicio["healthcheck"]["test"]))
-            assert "local" in servicio["healthcheck"]["test"]
+            prueba = " ".join(map(str, servicio["healthcheck"]["test"]))
+            assert "--insecure" in prueba
+            assert " ready local " in prueba and "https://localhost:9000" in prueba
 
 
 def test_env_example_no_trae_secretos_ni_certificados():

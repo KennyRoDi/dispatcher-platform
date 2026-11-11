@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: la única salida real de F-27 es una prueba local en una sola máquina, que no acredita M4. **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: no hay salidas reales de nodos en este documento; la única de F-27 es una prueba local en una sola máquina, que no acredita M4. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
