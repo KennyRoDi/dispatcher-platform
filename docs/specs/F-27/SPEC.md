@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-27-3-tls-entre-nodos
 **Verificación IA:** revision 12c2c90
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -221,3 +221,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Docs de la ficha M4 y guion revisados por el orquestador contra el SPEC (pila fila 4): resultados pendiente, sin datos inventados, M4 max 2; sin subagente revisor, verificacion no independiente (689196c) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código; revisión sin subagente |
 | verificación IA de revision | orquestador | 2026-11-11 | Revision del diff de la parte 4 contra el SPEC (fila 4 de la pila): prueba de aceptacion saltada por diseno, ficha M4 con resultados pendiente, 0 lineas de src; sin subagente revisor, verificacion no independiente (12c2c90) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin subagente revisor |
