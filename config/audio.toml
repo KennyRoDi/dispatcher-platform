@@ -1,0 +1,12 @@
+# Valores provisionales (SUP-17); compute_type int8 es la variante que compara M5 frente a float32.
+# Modelo faster-whisper `base` (SYSTRAN, MIT), conversión de los pesos de Whisper de OpenAI (MIT).
+# La revisión es el campo `sha` de https://huggingface.co/api/models/Systran/faster-whisper-base.
+# Los pesos se descargan a la caché de Hugging Face en la primera carga, fuera del repositorio.
+[modelo]
+nombre = "base"
+revision = "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66"
+idioma = "es"
+compute_type = "int8"
+beam_size = 5
+# 0 deja que CTranslate2 elija el número de hilos.
+hilos = 0

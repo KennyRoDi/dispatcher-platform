@@ -13,7 +13,8 @@ from pathlib import Path
 
 import requests
 
-from scripts.submit_case import build_case_payload
+from scripts.submit_case import build_case_payload, resolve_session
+from src.infrastructure.tls import TlsConfigError
 from src.workers.config import OPERATIONS, Settings
 from src.workers.storage import Storage, StorageError
 
@@ -231,7 +232,13 @@ def main() -> int:
 
     interval = float(os.environ.get("DEMO_INTERVAL", "8"))
     max_cases = int(os.environ.get("DEMO_MAX_CASES", "0"))
-    run(settings, requests, Storage(settings), random.Random(), sleep=interruptible_sleep,
+    try:
+        session = resolve_session(settings.coordinator_url)
+        storage = Storage(settings)
+    except TlsConfigError as e:
+        logger.error("configuracion TLS rechazada: %s", e)
+        return 1
+    run(settings, session, storage, random.Random(), sleep=interruptible_sleep,
         max_cases=max_cases, interval=interval, stop=stop)
     logger.info("feeder detenido")
     return 0

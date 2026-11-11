@@ -1,7 +1,7 @@
 import dataclasses
 import threading
 import time
-from pathlib import PurePosixPath
+from pathlib import Path
 
 import fakeredis
 import pytest
@@ -75,7 +75,7 @@ class Env:
 
 
 @pytest.fixture
-def env(tmp_path, monkeypatch):
+def env(tmp_path, monkeypatch, sin_autorizacion):
     fake = fakeredis.FakeRedis(decode_responses=True)
     monkeypatch.setattr(conexion, "redis_client", fake)
     return Env(tmp_path, fake, TestClient(main.app), FakeStorage())
@@ -99,7 +99,7 @@ def test_heterogeneous_case_end_to_end(env):
 
     case = env.client.get(f"/cases/{case_id}").json()
     assert case["case"]["status"] == "completed"
-    subtasks = {PurePosixPath(s["file_path"]).name: s for s in case["subtasks"]}
+    subtasks = {Path(s["file_path"]).name: s for s in case["subtasks"]}
     assert len(subtasks) == 3
     for st in subtasks.values():
         assert st["status"] == "completed"
@@ -126,7 +126,7 @@ def test_failed_subtask_yields_partially_completed(env):
     case_id = resp.json()["case_id"]
 
     def fail_on_bad(call):
-        if PurePosixPath(call["src"]).name == "bad.mp4":
+        if Path(call["src"]).name == "bad.mp4":
             raise make_fake_processor().CorruptInputError("corrupt")
 
     worker = env.make_worker(make_fake_processor(fail_on_bad))
@@ -230,7 +230,7 @@ def test_queue_items_are_parseable_by_worker(env):
 # v4 flows: queued state, priority, cancel, retrying, dashboard endpoints
 # ---------------------------------------------------------------------------
 def _names(calls):
-    return [PurePosixPath(c["src"]).name for c in calls]
+    return [Path(c["src"]).name for c in calls]
 
 
 def test_lifecycle_queued_processing_completed(env):
@@ -540,7 +540,7 @@ def test_metadata_round_trip_and_totals_by_type_and_operation(env):
     report = env.report(case_id)
     assert report["metadata"] == {"owner": "kenny", "batch": 7}
     by_name = {
-        PurePosixPath(e["file_path"]).name: e
+        Path(e["file_path"]).name: e
         for entries in report["subtasks_by_operation"].values()
         for e in entries
     }

@@ -1,0 +1,11 @@
+# Dependencias del analizador de audio (F-09). Aparte de requirements-dev.txt para que CI no instale torch.
+# El audio también usa los modelos de texto de F-07; torch solo CPU, antes que el resto:
+#   pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-audio.txt
+-r requirements-texto.txt
+# faster-whisper de SYSTRAN, licencia MIT (https://github.com/SYSTRAN/faster-whisper).
+faster-whisper==1.2.1
+# faster-whisper 1.2.1 declara av>=11 sin tope y llama av.open(..., metadata_errors="ignore") (faster_whisper/audio.py:46).
+# Medido: con PyAV 19.0.2 falla con TypeError (open() got an unexpected keyword argument 'metadata_errors');
+# con 18.1.0, 17.1.0, 16.1.0 y 15.1.0 funciona. La corrida real usó 18.1.0.
+av==18.1.0

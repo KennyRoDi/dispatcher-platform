@@ -6,6 +6,8 @@ CLAUDE.md
 
 # Heredado del I Proyecto
 .env
+*.key
+jwt.secret
 .venv/
 __pycache__/
 *.pyc
@@ -19,3 +21,23 @@ tasks.db
 resultados_worker/
 tasks_viejo*.db
 servidor_central.log
+
+# Pesos de modelos: se descargan aparte y se verifican por sha256 (F-08)
+*.pt
+
+# Certificados y llaves de TLS (F-27): se generan fuera del repo con deploy/tls/generar_certs.sh
+*.pem
+*.key
+*.crt
+*.srl
+certs/
+.ms-certs/
+
+# Llaves de cifrado en reposo (F-28): nunca versionar
+*.kek
+kek*
+
+dataset/sintetico/
+
+# Llave de custodia (F-29): nunca versionar
+*.custody-key
