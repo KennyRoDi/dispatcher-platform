@@ -1,6 +1,6 @@
 # SPEC F-36: Cancelación en curso
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-36-1-cancelacion-en-curso
 **Verificación IA:** implementacion d993579
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
@@ -99,3 +99,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; la parte 2 es un escenario sin TDD estricto: la integración y la aceptación ya pasan o se omiten, solo las unitarias del escenario están en rojo |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Verificación no independiente: tests/unit 1278 passed en Docker Linux; integración cancelación en curso 2 passed; test_cancel_heavy 14 en verde; scenarios/cancel_heavy.py ~80 líneas. (288ab50) |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Verificación no independiente: unit 1278 en verde en Docker Linux; integración 2 passed; test de aceptación renombrado por basename duplicado. (d993579) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
