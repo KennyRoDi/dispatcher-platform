@@ -118,7 +118,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 |---|---|---|
 | 1 | `feat(F-26): matriz de permisos por rol en el dominio` | `src/domain/rbac.py` (`Role`, `Action`, `can`); registro de AD-33, SUP-28 y SUP-29 en `docs/ARQUITECTURA.md` y `docs/REQUERIMIENTOS.md`. Aprox. 60 líneas de código. |
 | 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas estimadas; reales 224 sin pruebas. |
-| 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas. |
+| 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas estimadas; reales 141 en src y scripts. |
 
 ## Riesgos y preguntas abiertas
 
