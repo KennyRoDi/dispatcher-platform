@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-14-1-alertas
 **Verificación IA:** tests 3682776
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -132,3 +132,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 1: 103 lineas src, dominio puro, AD-39 y SUP-35 coinciden con codigo; 2 menores no bloqueantes anotados en CLAUDE.md local (b2766af) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y dobles (3682776); src intacto; test_redis_alert_stream y test_rutas_alertas fallan en coleccion con ModuleNotFoundError (rojo); se modifico FakeAlertPublisher(reloj=None) en dobles.py (compatible); integracion validada con redis:7-alpine local por el developer con implementacion desechable (3682776) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
