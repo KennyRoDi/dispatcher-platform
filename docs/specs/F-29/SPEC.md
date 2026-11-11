@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 6b32b10
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -149,3 +149,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs (ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31, SPEC). Numeros presentes (grep) y sin uso en otras ramas remotas (git grep). Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (fc8adef) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: codigo cumple diseño, sin llaves fijas, capas, limites coinciden con codigo; pytest segun revisor 1879 passed/5 xfailed. Menor 1 corregido por mi en el SPEC (solo si el patron coincidio; ver diff). Menor 2: AD-35/SUP-31 no mencionan tolerancia de una entrada (declarada en SPEC). (6b32b10) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
