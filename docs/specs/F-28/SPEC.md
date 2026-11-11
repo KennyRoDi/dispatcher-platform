@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 86fcb73
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 4 hallazgos QA en envelope_cipher.py (134 lineas). Diff de tests solo quita 3 marcadores xfail (comprobado). Suite completa tras ffdd5de: 1825 passed, 8 skipped, 6 xfailed. (ffdd5de) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA e928ff8: 8 xfail, 3 corregidos y desmarcados tras ffdd5de; quedan 3 desviaciones declaradas (decrypt entrega chunks previos, encrypt generador, SHA en mayusculas no se normaliza). Sin llaves en trazas. Memoria 32 MiB: pico <8 chunks segun QA (no reproducido por mi). Suite 1825 passed. (86fcb73) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
