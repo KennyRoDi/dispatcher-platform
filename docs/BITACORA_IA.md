@@ -1165,3 +1165,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Campo | Contenido |
 |---|---|
 | Uso de IA | No se usó IA en F-37. |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-37 (`feat/F-37-1-saturacion-de-memoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-37 |
+| Propósito | F-37 parte 1: ficha de evidencia del escenario de saturación de memoria |
+| Consulta resumida | Lectura de scenarios/memory_saturation.py, tests de F-37, SPEC (sección de tests y evidencia) y ficha F-36 como formato |
+| Resultado obtenido | docs/evidencia/F-37_saturacion_de_memoria.md con qué cubre, comandos, pruebas unitarias y límites; mediciones marcadas Medición pendiente |
+| Validado / corregido / descartado | Validado |
+| Cómo se validó | Pruebas unitarias ejecutadas: 22 pasan (el enunciado de la tarea decía 26; se documenta el número medido) |
