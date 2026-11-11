@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import json
 import logging
+import os
 import shutil
 import signal
 import threading
@@ -12,8 +13,10 @@ from pathlib import Path
 
 import redis.exceptions
 
+from src.domain.admission import FootprintTable, admits
+from src.infrastructure.cgroup_resources import CgroupResourceReader
 from src.workers.cancelacion import SubprocesosPorCaso, escuchar_cancelaciones
-from src.workers.config import Settings, make_redis
+from src.workers.config import Settings, load_admission_config, make_redis
 from src.workers.heartbeat import Heartbeat, WorkerStats
 from src.workers.recovery import ACTIVE_STATES, recover_subtask
 from src.workers.reporter import Reporter
@@ -39,8 +42,14 @@ class Worker:
         heartbeat_enabled: bool = True,
         ffmpeg_info: tuple[str, str] | None = None,
         supervisor=None,
+        resource_reader=None,
+        footprints: FootprintTable | None = None,
+        admission_margin: int | None = None,
     ):
         self.settings = settings
+        self.resource_reader = resource_reader
+        self.footprints = footprints
+        self.admission_margin = admission_margin
         self.redis = redis_client if redis_client is not None else make_redis(settings)
         self.storage = storage if storage is not None else Storage(settings)
         if processor is None:
@@ -178,7 +187,24 @@ class Worker:
             except Exception:
                 logger.exception("error al vaciar reportes pendientes")
 
+    def _fits_in_memory(self) -> bool:
+        try:
+            usage = self.resource_reader.read()
+            footprint = self.footprints.minimum(self.settings.worker_queues)
+            return admits(
+                current=usage.memory_current,
+                max=usage.memory_max,
+                footprint=footprint,
+                margin=self.admission_margin,
+            )
+        except Exception:
+            logger.exception("no se pudo evaluar la admisión; no se consume")
+            return False
+
     def poll_once(self, timeout: int = 1) -> bool:
+        if self.resource_reader is not None and not self._fits_in_memory():
+            self.stop_event.wait(timeout)
+            return False
         item = self.redis.blpop(self.settings.queue_keys(), timeout=timeout)
         if item is None:
             return False
@@ -398,7 +424,15 @@ def main() -> None:
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(threadName)s %(name)s: %(message)s",
     )
-    Worker(Settings.from_env()).run_forever()
+    settings = Settings.from_env()
+    footprints, margin = load_admission_config(os.environ, settings.worker_queues)
+    reader = CgroupResourceReader(
+        cgroup_path=os.environ.get("CGROUP_PATH", "/sys/fs/cgroup"),
+        worker_id=settings.worker_id,
+    )
+    Worker(
+        settings, resource_reader=reader, footprints=footprints, admission_margin=margin
+    ).run_forever()
 
 
 if __name__ == "__main__":

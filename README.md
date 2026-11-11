@@ -65,7 +65,7 @@ pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-texto.txt
 ```
 
-Incluye el modelo de spaCy `es_core_news_sm` 3.8.0 (Explosion AI, GPL-3.0). Los modelos `pysentimiento/robertuito-sentiment-analysis` y `pysentimiento/robertuito-hate-speech` (Pérez et al., github.com/pysentimiento/pysentimiento) se descargan de HuggingFace con la revisión fijada en `config/texto.toml`; se entrenaron con datasets de uso no comercial, admitido solo por el uso académico del proyecto. Referencias R11 y R12 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
+Incluye el modelo de spaCy `es_core_news_sm` 3.8.0 (Explosion AI, GPL-3.0). Los modelos `pysentimiento/robertuito-sentiment-analysis` y `pysentimiento/robertuito-hate-speech` (Pérez et al., github.com/pysentimiento/pysentimiento) se descargan de HuggingFace con la revisión fijada en `config/texto.toml`; se entrenaron con datasets de uso no comercial, admitido solo por el uso académico del proyecto. La licencia MIT cubre el código y el dataset sintético del repositorio, no los modelos de terceros, que conservan sus licencias. Referencias R11 y R12 de [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §10.
 
 La primera carga descarga unos 870 MB de HuggingFace y necesita red. Para generar la tabla de aciertos, desde la raíz del repositorio:
 
@@ -127,6 +127,8 @@ pytest -m acceptance tests/acceptance/test_audio_transcripcion.py
 ### Instalación y despliegue en tres nodos
 
 *Pendiente.*
+
+Para workers, configure `WORKER_MEM_LIMIT` en el `.env` local con un límite por worker medido para ese nodo; no hay un valor predeterminado. Desde la raíz del repositorio, valide presupuesto y arranque con `python scripts/start_worker.py`. En el nodo GPU use `python scripts/start_worker.py --gpu`. El wrapper ejecuta el preflight antes de `docker compose up`; también puede ejecutarse por separado con `python scripts/preflight.py [--gpu]`. El preflight obtiene `MemTotal` del daemon Linux de Docker con `docker info --format '{{.MemTotal}}'`; en B/C/D, Docker Desktop consulta su entorno WSL2 aunque Python corra desde PowerShell. Consulte el procedimiento de tres arranques y lecturas de cgroups en [la ficha M1](docs/modulo-M1-memoria.md). Las mediciones reales de límites en nodos siguen pendientes.
 
 ### Uso
 
