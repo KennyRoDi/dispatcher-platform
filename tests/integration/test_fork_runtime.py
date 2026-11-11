@@ -72,6 +72,7 @@ from src.infrastructure.model_loader import ModelLoader
 
 
 @pytest.mark.integration
+@pytest.mark.skipif(os.name != "posix", reason="requiere ForkProcessRuntime POSIX")
 def test_whisper_real_es_compatible_entre_cargas_compartidas_y_por_proceso():
     from src.adapters.whisper_transcriber import WhisperTranscriber
 
