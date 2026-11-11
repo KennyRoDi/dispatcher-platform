@@ -32,6 +32,7 @@ import sys
 import tempfile
 import threading
 import time
+import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable, Optional
@@ -42,6 +43,8 @@ logger = logging.getLogger(__name__)
 # ---------- Excepciones ----------
 class ProcessingError(Exception):
     """Base de todos los errores del procesador. El worker captura solo esta."""
+
+    exit_code: int | None = None
 
 
 class UnsupportedFormatError(ProcessingError):
@@ -202,6 +205,7 @@ def process(
     on_progress: Optional[Callable[[float], None]] = None,
     threads: Optional[int] = None,
     timeout: Optional[float] = None,
+    supervisor=None,
 ) -> ProcessResult:
     """Ejecuta `operation` sobre `src` (ruta local) y deja los resultados en `out_dir` (ruta local).
     Lanza una subclase de ProcessingError si algo falla."""
@@ -253,7 +257,7 @@ def process(
             )
             try:
                 cmd = _build_command(operation, str(src_path), str(dst), params, threads, media_info, encoder)
-                _run(cmd, _timeout_for(operation, media_duration, encoder, timeout), name, tracker)
+                _run(cmd, _timeout_for(operation, media_duration, encoder, timeout), name, tracker, supervisor)
             except CorruptInputError as exc:
                 # Respaldo GPU -> CPU: solo si falló NVENC (no el archivo). Un timeout
                 # no es CorruptInputError, así que nunca dispara el respaldo.
@@ -263,7 +267,7 @@ def process(
                 _remove_quietly(dst)
                 encoder = "libx264"
                 cmd = _build_command(operation, str(src_path), str(dst), params, threads, media_info, encoder)
-                _run(cmd, _timeout_for(operation, media_duration, encoder, timeout), name, tracker)
+                _run(cmd, _timeout_for(operation, media_duration, encoder, timeout), name, tracker, supervisor)
         _verify_output(dst, name)
     except BaseException:
         _remove_quietly(dst)
@@ -543,7 +547,9 @@ class _ProgressTracker:
         _notify(self.on_progress, round(percent, 1))
 
 
-def _run(cmd: list[str], timeout: float, name: str, tracker: Optional[_ProgressTracker] = None) -> str:
+def _run(
+    cmd: list[str], timeout: float, name: str, tracker: Optional[_ProgressTracker] = None, supervisor=None
+) -> str:
     """Ejecuta FFmpeg como proceso hijo y espera a que termine.
 
     - stdout es un PIPE por el que FFmpeg escribe su progreso (`-progress pipe:1`).
@@ -558,6 +564,8 @@ def _run(cmd: list[str], timeout: float, name: str, tracker: Optional[_ProgressT
       CorruptInputError con la cola del stderr; el stderr completo queda en el
       atributo `stderr` de la excepción (sirve para detectar fallos de NVENC).
     """
+    if supervisor is not None:
+        return _run_supervised(cmd, timeout, name, tracker or _ProgressTracker(None, None), supervisor)
     # -progress pipe:1: bloques "clave=valor" por stdout (out_time_us, speed, progress=end...).
     # -nostats: quita la línea de estado que FFmpeg escribe en stderr.
     cmd = [cmd[0], "-progress", "pipe:1", "-nostats", *cmd[1:]]
@@ -606,8 +614,67 @@ def _run(cmd: list[str], timeout: float, name: str, tracker: Optional[_ProgressT
             f"{name}: FFmpeg falló (código {returncode}): {_stderr_tail(stderr)}"
         )
         error.stderr = stderr
+        error.exit_code = returncode
         raise error
     return stderr
+
+
+def _run_supervised(cmd, timeout, name, tracker, supervisor) -> str:
+    """Como _run, pero el proceso lo lanza el supervisor (grupo propio, cancelable).
+
+    El runner no expone stdout, así que el progreso se lee de un archivo en el scratch.
+    """
+    scratch = Path(tempfile.gettempdir()) / f"ffmpeg-{uuid.uuid4().hex}"
+    progress_file = scratch / "progress.txt"
+    argv = [cmd[0], "-progress", str(progress_file), "-nostats", *cmd[1:]]
+    offset = 0
+
+    def feed_new_lines() -> None:
+        nonlocal offset
+        try:
+            with open(progress_file, "rb") as handle:
+                handle.seek(offset)
+                data = handle.read()
+        except FileNotFoundError:
+            return
+        complete = data[: data.rfind(b"\n") + 1]
+        offset += len(complete)
+        for raw_line in complete.splitlines():
+            tracker.feed(raw_line.decode("utf-8", errors="replace"))
+
+    try:
+        try:
+            pid = supervisor.start(argv, scratch=scratch)
+        except FileNotFoundError as exc:
+            raise FFmpegNotAvailableError("ffmpeg no está instalado o no está en el PATH") from exc
+        except OSError as exc:
+            raise ProcessingError(f"{name}: no se pudo iniciar FFmpeg ({exc})") from exc
+        deadline = time.monotonic() + timeout
+        timed_out = False
+        try:
+            while (returncode := supervisor.poll(pid)) is None:
+                feed_new_lines()
+                if time.monotonic() >= deadline:
+                    timed_out = True
+                    supervisor.cancel(pid)
+                    returncode = supervisor.poll(pid)
+                    break
+                time.sleep(0.1)
+        except BaseException:
+            supervisor.cancel(pid)
+            raise
+        feed_new_lines()
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+    if timed_out and returncode != 0:
+        raise ProcessingTimeoutError(f"{name}: FFmpeg superó el tiempo límite de {timeout:g} s")
+    if returncode != 0:
+        error = CorruptInputError(f"{name}: FFmpeg falló (código {returncode})")
+        error.stderr = ""
+        error.exit_code = returncode
+        raise error
+    return ""
 
 
 def _timeout_for(
