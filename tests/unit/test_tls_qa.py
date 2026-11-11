@@ -123,7 +123,7 @@ def test_exigir_cifrado_rechaza_esquemas_de_redis_raros(activo, url):
         exigir_cifrado(activo, redis_url=url)
 
 
-@pytest.mark.parametrize("url", ["HTTPS://h:8443", "https://[::1]:8443/", "https://u:p@h/", "rediss://[::1]:6380/0", "RedisS://h"])
+@pytest.mark.parametrize("url", ["HTTPS://h:8443", "https://[::1]:8443/", "rediss://[::1]:6380/0", "RedisS://h"])
 def test_exigir_cifrado_acepta_variantes_validas(activo, url):
     exigir_cifrado(activo, coordinator_url=url) if url.lower().startswith("https") else exigir_cifrado(activo, redis_url=url)
 

@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (parte 1). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (partes 1 y 2). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
@@ -58,7 +58,7 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 
 **Responsable:** Kenni Rodriguez. Decisión: AD-37 y SUP-33 en [ARQUITECTURA](ARQUITECTURA.md) §8 y [REQUERIMIENTOS](REQUERIMIENTOS.md). Diseño: `docs/specs/F-27/SPEC.md`.
 
-Parte 1:
+**Parte 1.**
 
 - `src/infrastructure/tls.py`: `TlsSettings.from_env` (`TLS_ENABLED`, `TLS_CA_FILE`; falla cerrado si falta la CA o no es legible), `client_context` (TLS 1.3 mínimo, `CERT_REQUIRED`, verificación de hostname), `exigir_cifrado` (rechaza `http://`, `redis://` y `MINIO_SECURE=false` con TLS activo) y constructores `redis_kwargs`, `requests_session` y `minio_http_client`.
 - `requests_session` usa `trust_env=False` y `verify` fijo a la CA del equipo, de modo que `REQUESTS_CA_BUNDLE`, proxies y `.netrc` no lo alteran, y rechaza redirecciones de https a un esquema en claro.
@@ -70,6 +70,13 @@ Parte 1:
 - Módulo `ssl` de Python, `openssl`, `redis-py`, `minio-py` y `requests`.
 - `trustme` 1.2.1, solo desarrollo (`requirements-dev.txt`): licencia MIT o Apache-2.0 según `pip show trustme`; https://github.com/python-trio/trustme.
 - RFC 8446 (TLS 1.3); RFC 6125 y RFC 9525 (verificación de identidad del servidor).
+
+**Parte 2: cómo se activa.**
+
+- `TLS_ENABLED=true` y `TLS_CA_FILE=<ruta a ca.pem>`; sin CA legible el arranque falla.
+- Coordinador y scripts: URLs `https://`. Redis: `rediss://`. MinIO: `MINIO_SECURE=true`.
+- Con TLS activo, una URL `http://` o `redis://`, o `MINIO_SECURE=false`, se rechaza al arrancar, sin degradar a texto claro.
+- Salidas reales de un arranque con TLS y de un rechazo: pendiente (sin captura ni ejecución medida).
 
 ## 2. Concepto de Sistemas Operativos
 

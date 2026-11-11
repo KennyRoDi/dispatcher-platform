@@ -1,8 +1,8 @@
 # SPEC F-27: TLS entre nodos
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 6bd4d8a
+**Base:** feat/F-27-1-tls-entre-nodos
+**Verificación IA:** revision 92fa984
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -144,6 +144,20 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - Las pruebas `test_repo_sin_llaves_ni_certificados`, `test_gitignore_cubre_certs` y la del script `generar_certs.sh` van en la parte 3, cuando existan el script y el `.gitignore`.
 - Con TLS activo por defecto, los workers de José, el coordinador de Nahúm y el dashboard de Melany fallan hasta tener `ca.pem` y URLs `https`: coordinar antes de fusionar la parte 3.
 
+## Límites declarados de la parte 2
+
+- `Storage` con cliente inyectado no comprueba TLS (`xfail`). `Reporter` rechaza `http` aunque se inyecte una sesión.
+- El alcance se amplió a `fetch_results`, `demo_feeder` y `generate_dataset`. `generate_dataset` solo se ejecuta con `python -m scripts.generate_dataset` y rechaza `http` después de `--dry-run`.
+- `dashboard/ui.py:56` (Melany) sigue en claro: necesita `REQUESTS_CA_BUNDLE` o un cambio propio.
+- El healthcheck `http://localhost:8000` de `deploy/docker-compose.local.yml` queda para la parte 3.
+- Archivos de otros dueños tocados, avisar antes de fusionar: `config.py`, `reporter.py` y `storage.py` (José); `conexion.py` (Nahúm); los scripts `submit_case`, `run_load`, `check_connectivity`, `fetch_results`, `demo_feeder` y `generate_dataset`.
+- `tests/conftest.py` (`TLS_ENABLED=false` autouse) también lo crea la rama de F-26 parte 3: habrá conflicto al fusionar.
+- Se editaron dos pruebas existentes de la parte 1 (`test_tls_cableado`, `test_tls_qa`) por los hallazgos 3 y 5.
+- Redis y MinIO reales no se probaron: solo handshake contra un servidor TLS stub de stdlib (dato del QA).
+- Las URLs del coordinador con `usuario:clave` se rechazan.
+
+Menores de la revisión de la parte 2 (no corregidos): `src/coordinator/conexion.py` crea el cliente Redis al importar, de modo que con TLS activo y sin `TLS_CA_FILE` importar el coordinador lanza `TlsConfigError` (a considerar en la parte 3); `submit_case`, `cancel_case` y `fetch_report` crean una `Session` por llamada sin cerrarla y `from_env` registra el aviso «TLS desactivado» en cada una; `run_load.main`, `reaper.py` y `seed_minio.py` no atrapan `TlsConfigError` y salen con traza; `scripts/run_load.py:23-24` duplica un import; `tls.py:69` llama dos veces a `urlsplit`.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
@@ -164,4 +178,17 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (ARQUITECTURA AD-37, REQUERIMIENTOS SUP-33, modulo-M4 nuevo borrador, SPEC); rama alineada con origen. Aviso: modulo-M4-seguridad.md se crea tambien en las ramas de F-26/F-28/F-29?/F-30: habra conflicto al fusionar (resolver al fusionar). Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (493999b) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: tls.py cumple diseño, sin llaves ni certificados versionados, trustme solo en dev; pytest segun revisor 1864 passed/3 xfailed, integracion TLS 25 passed/3 xfailed. Menores: estimacion de lineas (128 vs 110), conflicto de modulo-M4 con otras ramas al fusionar. (6bd4d8a) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (test_tls_cableado.py, tests/conftest.py nuevo) y SPEC; src y scripts intactos. Ejecute test_tls_cableado: ver resultado arriba (fallos por razon correcta segun developer: 23 fallan, 8 pasan de TLS apagado/cliente inyectado). Aviso: tests/conftest.py tambien lo crea la rama de F-26 parte 3: conflicto al fusionar. Sin cubrir: demo_feeder, fetch_results, seed_minio, generate_dataset. Implementacion tocara archivos de Jose (config.py, reporter.py, storage.py), conexion.py (Nahum) y 3 scripts: avisar antes de fusionar. (30fcac4) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: 7 archivos de src/scripts (+67/-22), tests intactos. Suite completa tras 5be25e1: 1895 passed, 8 skipped, 3 xfailed. Toca archivos de Jose (config, reporter, storage), conexion.py (Nahum) y 3 scripts: avisar. Limites: Reporter rechaza http con TLS activo aunque se inyecte sesion; Storage no comprueba con cliente inyectado; demo_feeder, fetch_results, seed_minio, generate_dataset quedan en claro. Sin prueba real contra servicios. (5be25e1) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: submit_case/cancel_case/fetch_report/poll_case envian en claro con TLS activo; fetch_results, demo_feeder y generate_dataset fuera de tls.py (media); TlsConfigError sin atrapar; credenciales en config_summary |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de hallazgos QA. Suite completa tras 98aa38f: 1909 passed, 8 skipped, 4 xfailed. Diff de tests: se editaron 2 tests existentes con cambio de asercion, comprobado por diff: test_tls_cableado (check_minio con MINIO_SECURE=false ahora afirma (False,msg) en vez de raises) y test_tls_qa de la parte 1 (se quita https://u:p@h/ de URLs validas porque ahora se rechaza); ambos justificados por los hallazgos 3 y 5. Alcance ampliado: fetch_results, demo_feeder, generate_dataset ahora usan resolve_session. Queda: Storage con cliente inyectado sin comprobar (xfail) y 3 xfail de la parte 1. (98aa38f) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 24a04cf: 12 xfail, 11 corregidos y desmarcados; queda 1 declarado como limite (Storage con cliente inyectado). Sin defectos altos. Redis/MinIO reales NO probados (sin Docker, por orden de una historia a la vez); handshake probado con servidor TLS stub de stdlib segun QA. Puntos en claro restantes: dashboard/ui.py:56 y healthcheck http://localhost:8000 del compose (parte 3). (cdc8c52) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC y modulo-M4); rama alineada con origen. Salidas pendientes, sin inventar. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (1a041d5) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: todo punto de conexion pasa por tls.py (grep del revisor), sin cambio con TLS apagado, conftest no oculta defectos, 2 pruebas editadas justificadas; pytest segun revisor 1909 passed/4 xfailed. Menores declarados por mi en el SPEC (import de conexion.py con TLS activo sin CA, sesiones sin cerrar, TlsConfigError sin atrapar en run_load/reaper/seed_minio). (92fa984) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
