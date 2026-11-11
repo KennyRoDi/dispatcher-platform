@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-22-3-medicion-throughput
-**Verificación IA:** verificacion ef54219
+**Verificación IA:** documentacion 6ae487b
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -224,3 +224,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó continuar sin aprobación humana; pruebas 6/6 y conformidad 0; la medición de sistema no se ejecuta porque no están disponibles el archivo de 200 MiB y los nodos reales, no se estima evidencia. |
 | verificación IA de verificacion | Codex | 2026-11-11 | QA del runner M3 F-22: pruebas del parser y suite de chunks/rutas/cliente en verde; conformidad 0. No se corren mediciones: falta archivo sintético >=200 MiB, coordinador accesible y clúster real de nodos; F-38 local es simulación y no sirve como evidencia. Verificación no independiente. (ef54219) |
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo. Evidencia de rendimiento debe ser medida y no hay dataset de medios ni nodos reales; se registra la limitación sin valores estimados. |
+| verificación IA de documentacion | Codex | 2026-11-11 | Documentación M3 describe el runner, fórmula y bloqueo real; no inventa resultados. Bitácora intentada por el comando oficial. (6ae487b) |
