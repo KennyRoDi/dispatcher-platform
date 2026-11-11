@@ -1,7 +1,7 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** pr
-**Base:** feat/F-19-1-estrategias-de-carga
+**Fase:** tests
+**Base:** main
 **Verificación IA:** revision a5a3aa6
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
