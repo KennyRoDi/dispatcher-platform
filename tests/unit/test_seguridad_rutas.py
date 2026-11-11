@@ -11,11 +11,13 @@ ESPERADO = {
     ("GET", "/cases/"): Action.CONSULTAR_CASO,
     ("GET", "/cases/{case_id}"): Action.CONSULTAR_CASO,
     ("GET", "/cases/{case_id}/report"): Action.CONSULTAR_CASO,
+    ("GET", "/cases/{case_id}/consolidated-report"): Action.CONSULTAR_CASO,
     ("GET", "/subtasks/{subtask_id}"): Action.CONSULTAR_CASO,
     ("POST", "/cases/{case_id}/cancel"): Action.CANCELAR_CASO,
     ("GET", "/workers"): Action.VER_MONITOREO,
     ("GET", "/stats"): Action.VER_MONITOREO,
     ("GET", "/hardware"): Action.VER_MONITOREO,
+    ("GET", "/alerts"): Action.VER_MONITOREO,
     ("POST", "/subtasks/report"): Action.REPORTAR_SUBTAREA,
 }
 DOCUMENTACION = {"/docs", "/docs/oauth2-redirect", "/redoc", "/openapi.json"}

@@ -9,7 +9,7 @@ def configuracion(estrategia, procesos):
     )
 
 
-@pytest.mark.parametrize("estrategia", ["por_proceso", "fork_compartido"])
+@pytest.mark.parametrize("estrategia", ["por_proceso", "workers_compartidos"])
 @pytest.mark.parametrize("procesos", [1, 2, 7])
 def test_configuracion_elige_estrategia(estrategia, procesos):
     config = configuracion(estrategia, procesos)
@@ -20,7 +20,7 @@ def test_configuracion_elige_estrategia(estrategia, procesos):
 
 @pytest.mark.parametrize(
     "estrategia",
-    [None, "", "spawn", "mmap", "POR_PROCESO", " por_proceso", "fork_compartido ", 1, True, []],
+    [None, "", "spawn", "mmap", "POR_PROCESO", " por_proceso", "workers_compartidos ", 1, True, []],
 )
 def test_estrategia_invalida_se_rechaza_sin_elegir_otra(estrategia):
     with pytest.raises(ValueError):
@@ -28,7 +28,7 @@ def test_estrategia_invalida_se_rechaza_sin_elegir_otra(estrategia):
 
 
 @pytest.mark.parametrize("procesos", [None, 0, -1, 1.0, 1.5, "2", True, False, []])
-@pytest.mark.parametrize("estrategia", ["por_proceso", "fork_compartido"])
+@pytest.mark.parametrize("estrategia", ["por_proceso", "workers_compartidos"])
 def test_numero_de_procesos_debe_ser_entero_positivo(estrategia, procesos):
     with pytest.raises(ValueError):
         configuracion(estrategia, procesos)

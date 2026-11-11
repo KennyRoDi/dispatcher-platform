@@ -1,8 +1,8 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision c445152
+**Fase:** cerrada
+**Base:** feat/F-18-1-deteccion-de-oom
+**Verificación IA:** revision 8647f04
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
 
 ## Objetivo
@@ -70,4 +70,14 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code | 2026-11-10 | Documentación: sin cambios necesarios (SUP-14 y ARQUITECTURA ya cubren); bitácora publicada (6a6122d) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code | 2026-11-10 | Revisión: diff coincide con SPEC parte 1 (oom_policy, read_memory_events, pruebas); APROBADO; no independiente (c445152) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | Claude Code | 2026-11-10 | 5 pruebas nuevas en rojo, sin código; no independiente (3c99142) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code | 2026-11-10 | 5 pruebas OOM y 134 del worker/procesador/arquitectura en verde; no independiente (a6484aa) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code | 2026-11-10 | QA: suite completa 1720 en verde; OOM real en contenedor y M1 pendientes de nodos WSL2/Docker, no medidos; no independiente (7c75071) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code | 2026-11-10 | Documentación: AD-30 ampliada, bitácora publicada; no independiente (adc6432) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de revision | Claude Code | 2026-11-10 | Revisión: diff coincide con SPEC parte 2 (exit_code, worker, reserva); APROBADO; no independiente (8647f04) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |

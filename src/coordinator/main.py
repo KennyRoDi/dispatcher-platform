@@ -45,7 +45,7 @@ from collections.abc import Mapping
 
 from fastapi import Depends, FastAPI
 
-from src.coordinator import rutas_casos, rutas_monitoreo, rutas_subtareas
+from src.coordinator import rutas_alertas, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
 from src.coordinator.seguridad import AutenticacionPrevia, autorizar
 
 logging.basicConfig(
@@ -72,7 +72,14 @@ def crear_app(env: Mapping[str, str] | None = None) -> FastAPI:
         ),
     )
     dependencias = [Depends(autorizar)] if protegida else []
-    for router in (rutas_casos.router, rutas_subtareas.router, rutas_monitoreo.router):
+    routers = (
+        rutas_casos.router,
+        rutas_subtareas.router,
+        rutas_monitoreo.router,
+        rutas_alertas.router,
+        rutas_reporte.router,
+    )
+    for router in routers:
         app.include_router(router, dependencies=dependencias)
     if protegida:
         app.add_middleware(AutenticacionPrevia)

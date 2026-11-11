@@ -47,9 +47,9 @@ Solo acciones de rutas que existen hoy en `src/coordinator/`.
 | Acción | Ruta | analista | supervisor | administrador | servicio |
 |---|---|---|---|---|---|
 | `crear_caso` | `POST /cases` | sí | no | sí | no |
-| `consultar_caso` | `GET /cases`, `/cases/{id}`, `/cases/{id}/report`, `/subtasks/{id}` | sí | sí | sí | no |
+| `consultar_caso` | `GET /cases`, `/cases/{id}`, `/cases/{id}/report`, `/cases/{id}/consolidated-report` (F-13), `/subtasks/{id}` | sí | sí | sí | no |
 | `cancelar_caso` | `POST /cases/{id}/cancel` | no | sí | sí | no |
-| `ver_monitoreo` | `GET /workers`, `/stats`, `/hardware` | no | sí | sí | no |
+| `ver_monitoreo` | `GET /workers`, `/stats`, `/hardware`, `/alerts` (F-14) | no | sí | sí | no |
 | `reportar_subtarea` | `POST /subtasks/report` | no | no | no | sí |
 | (pública) | `GET /health` | sin token | sin token | sin token | sin token |
 

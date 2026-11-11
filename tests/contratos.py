@@ -1,10 +1,11 @@
 """Pruebas de conformidad: todo adaptador real de un puerto debe pasarlas, igual que su doble."""
 import io
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from src.application.ports import ResourceReader
+from src.application.ports import AlertPublisher, ResourceReader
+from src.domain.alert_policy import StoredAlert
 from src.domain.finding import EvidenceRef, Finding, Severity
 from src.domain.priority import Priority
 from src.domain.resources import ResourceUsage
@@ -68,6 +69,45 @@ def comprobar_resource_reader(lector, esperado):
     assert type(uso.memory_current) is int and uso.memory_current >= 0
     assert type(uso.memory_max) is int and uso.memory_max > 0
     assert uso.memory_available == max(uso.memory_max - uso.memory_current, 0)
+
+
+def comprobar_alert_publisher(publicador):
+    assert isinstance(publicador, AlertPublisher)
+    assert publicador.publish("incidencia_alta", "c1", '{"categoria": "amenaza"}') is None
+    assert publicador.publish("caso_finalizado", "c1", '{"estado": "completed"}') is None
+
+
+def comprobar_alert_reader(publicador, lector, reloj):
+    """`publicador` y `lector` comparten el mismo canal; `reloj` es el que usa el publicador."""
+    from src.application.ports import AlertReader  # puerto nuevo de F-14 parte 2
+
+    assert isinstance(lector, AlertReader)
+    assert lector.recent(10) == []
+    inicio = reloj.now()
+    publicador.publish("incidencia_alta", "c1", '{"categoria": "amenaza"}')
+    reloj.advance(timedelta(minutes=5))
+    publicador.publish("caso_finalizado", "c2", '{"estado": "completed"}')
+    ultima, primera = lector.recent(10)
+    assert isinstance(ultima, StoredAlert) and isinstance(primera, StoredAlert)
+    assert (primera.kind, primera.case_id, primera.detail) == ("incidencia_alta", "c1", '{"categoria": "amenaza"}')
+    assert (ultima.kind, ultima.case_id, ultima.detail) == ("caso_finalizado", "c2", '{"estado": "completed"}')
+    assert primera.emitted_at == inicio
+    assert ultima.emitted_at == inicio + timedelta(minutes=5)
+    assert primera.emitted_at.utcoffset() == timedelta(0)
+    assert isinstance(primera.alert_id, str) and primera.alert_id
+    assert primera.alert_id != ultima.alert_id
+    assert lector.recent(1) == [ultima]
+
+
+def comprobar_case_catalog(crear):
+    """`crear(caso)` devuelve un catálogo que contiene solo ese `CaseInfo`."""
+    from src.domain.consolidated_report import CaseInfo, CaseSource
+
+    instante = datetime(2026, 11, 3, tzinfo=timezone.utc)
+    caso = CaseInfo("c1", "completed", instante, instante, (CaseSource("a" * 64, "a.txt", "texto", "completed"),))
+    catalogo = crear(caso)
+    assert catalogo.case("c1") == caso
+    assert catalogo.case("inexistente") is None
 
 
 def comprobar_token_verifier(verificador, token_valido, identidad, tokens_invalidos):
