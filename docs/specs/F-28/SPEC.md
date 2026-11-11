@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 06a431a
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-28 sin campos pendientes (grep 0), diff contra main solo el SPEC, commit empujado. AD-34 y SUP-30 sin uso en docs de ramas remotas (git grep). Diseño (AES-256-GCM por chunks, nonce prefijo+contador, KEK por archivo) es propuesta del arquitecto; no verifique la cita NIST SP 800-38D. 8 preguntas abiertas al final del SPEC con decision provisional: aceptar y declarar adaptador MinIO pendiente de F-23. (06a431a) |
