@@ -56,6 +56,8 @@ class MediaFile:
 def run_ffmpeg(args: list[str]) -> None:
     try:
         subprocess.run(args, check=True, capture_output=True, timeout=FFMPEG_TIMEOUT_SECONDS)
+    except FileNotFoundError as error:
+        raise RuntimeError(f"ffmpeg no esta instalado o no esta en el PATH: {error}") from error
     except subprocess.CalledProcessError as error:
         detail = (error.stderr or b"").decode(errors="replace").strip()
         raise RuntimeError(f"{error}: {detail}" if detail else str(error)) from error

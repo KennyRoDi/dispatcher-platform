@@ -41,6 +41,7 @@ MULTILINE_PROBABILITY = 0.10
 CHAT_START = datetime(2025, 1, 6, 8, 0, tzinfo=timezone.utc)
 MAX_MINUTES_BETWEEN_MESSAGES = 7
 SEED_STRIDE = 1_000_003
+CHAT_FILE_MARK = "-chat"
 WHATSAPP_SUFFIX = ".txt"
 TELEGRAM_SUFFIX = ".json"
 
@@ -78,16 +79,24 @@ def render_telegram(messages: list[ChatMessage]) -> str:
 
 def export_plan_chats(plan: DatasetPlan, destination: Path) -> dict[str, Path]:
     destination.mkdir(parents=True, exist_ok=True)
+    _remove_previous_chats(destination)
     files: dict[str, Path] = {}
     for index, case in enumerate(plan.cases):
         if case.messages == 0:
             continue
         messages = generate_chat(plan.seed * SEED_STRIDE + index, case.messages)
         suffix, render = _style_for(index)
-        path = destination / f"{checked_case_name(case.name)}-chat{suffix}"
+        path = destination / f"{checked_case_name(case.name)}{CHAT_FILE_MARK}{suffix}"
         path.write_bytes(render(messages).encode("utf-8"))
         files[case.name] = path
     return files
+
+
+def _remove_previous_chats(destination: Path) -> None:
+    for suffix in (WHATSAPP_SUFFIX, TELEGRAM_SUFFIX):
+        for stale in destination.glob(f"*{CHAT_FILE_MARK}{suffix}"):
+            if stale.is_file() and not stale.is_symlink():
+                stale.unlink()
 
 
 def _style_for(index: int) -> tuple[str, Callable[[list[ChatMessage]], str]]:

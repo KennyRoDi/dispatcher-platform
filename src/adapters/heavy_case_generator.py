@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from src.adapters.media_generator import BITEXACT, FFMPEG_BASE, LICENSE_NAME, ORIGIN, Runner, produce, run_ffmpeg
-from src.domain.dataset_plan import MIB, DatasetPlan, checked_case_name
+from src.domain.dataset_plan import MAX_HEAVY_BYTES, DatasetPlan, checked_case_name
 
 VIDEO_KIND = "video"
 VIDEO_EXTENSION = "mpg"
@@ -13,8 +13,6 @@ VIDEO_FPS = 25
 VIDEO_BITRATE_BPS = 40_000_000
 VIDEO_MARGIN_SECONDS = 2
 NOISE_SEED_LIMIT = 2**31
-# La duracion crece con heavy_bytes; con 4 GiB el video dura unos 15 minutos y ffmpeg lo codifica muy por debajo de FFMPEG_TIMEOUT_SECONDS (209 MiB en 1,1 s).
-MAX_HEAVY_BYTES = 4 * 1024 * MIB
 # mpeg2video con minrate=maxrate rellena hasta el bitrate fijo: el tamano depende de la duracion, no del contenido.
 _BITRATE = str(VIDEO_BITRATE_BPS)
 VIDEO_CODEC = ["-c:v", "mpeg2video", "-b:v", _BITRATE, "-minrate", _BITRATE, "-maxrate", _BITRATE, "-bufsize", _BITRATE, "-an"]

@@ -1,4 +1,5 @@
 import random
+from numbers import Integral
 from dataclasses import dataclass
 from enum import Enum
 
@@ -13,6 +14,13 @@ MIN_CASES = 40
 MIN_MESSAGES = 20_000
 MIN_IMAGES = 300
 MIN_AUDIOS = 150
+MAX_CASES = 10_000
+MAX_MESSAGES = 10_000_000
+MAX_IMAGES = 100_000
+MAX_AUDIOS = 100_000
+# Con 4 GiB el video dura unos 15 minutos y ffmpeg lo codifica muy por debajo de FFMPEG_TIMEOUT_SECONDS (209 MiB en 1,1 s).
+MAX_HEAVY_BYTES = 4 * 1024 * MIB
+MAXIMUMS = {"cases": MAX_CASES, "messages": MAX_MESSAGES, "images": MAX_IMAGES, "audios": MAX_AUDIOS, "heavy_bytes": MAX_HEAVY_BYTES}
 
 
 class Level(str, Enum):
@@ -38,10 +46,13 @@ class DatasetParams:
 
     def __post_init__(self) -> None:
         for name, value in vars(self).items():
-            if isinstance(value, bool) or not isinstance(value, int):
+            if isinstance(value, bool) or not isinstance(value, Integral):
                 raise ValueError(f"{name} debe ser un entero: {value!r}")
+            object.__setattr__(self, name, int(value))
             if value < 0:
                 raise ValueError(f"{name} no puede ser negativo: {value}")
+            if value > MAXIMUMS.get(name, value):
+                raise ValueError(f"{name} no puede superar {MAXIMUMS[name]}: {value}")
         if self.cases < 1:
             raise ValueError("cases debe ser al menos 1")
 

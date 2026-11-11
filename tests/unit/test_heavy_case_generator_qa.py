@@ -146,7 +146,9 @@ def test_el_error_de_ffmpeg_expone_su_stderr(monkeypatch):
 def test_heavy_bytes_que_no_cabe_en_el_timeout_se_rechaza_antes_de_ejecutar(tmp_path):
     from src.adapters.heavy_case_generator import MAX_HEAVY_BYTES
 
-    plan = plan_dataset(7, dataclasses.replace(PARAMS, heavy_bytes=MAX_HEAVY_BYTES + 1))
+    plan = plan_dataset(7, dataclasses.replace(PARAMS, heavy_bytes=MAX_HEAVY_BYTES))
+    cases = tuple(dataclasses.replace(c, heavy_bytes=MAX_HEAVY_BYTES + 1) if c.heavy_bytes else c for c in plan.cases)
+    plan = dataclasses.replace(plan, cases=cases)
     runner = SparseRunner()
 
     with pytest.raises(ValueError, match="heavy_bytes"):
