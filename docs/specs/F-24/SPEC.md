@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 9d2249d2
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -108,3 +108,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | devuelta de verificacion | Melany Vindas | 2026-11-11 | QA: H1 WATCH daba 503 por contencion con la cola lejos del limite; H2 config invalida daba 500; H3 caso mas grande que el limite recibia 503 |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Arreglo de devuelta QA: admision con script Lua atomico en vez de WATCH (0 % de 503 lejos del limite, antes 7-25 %), QueueLimit validado al arrancar, CaseTooLarge da 422. Suite 3778 verde en Linux, integracion 5/5. (9d2249d2) |
+| implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude (3778 verde); en Windows falla test_generar_certs, ajena a F-24. |
