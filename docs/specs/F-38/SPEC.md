@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** revision 97219bd
+**Verificación IA:** tests 4d3d79b
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -218,3 +218,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-05 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), orquestador; revisor en subagente | 2026-11-05 | Verificacion de revision sobre 97219bd. Revisor: DEVUELTO en la primera ronda con 6 hallazgos de documentos, todos confirmados por mi; corregidos por el documentador; APROBADO en la segunda ronda. Lei el delta de SPEC, DECISIONES_DISENO y la lista 5.6 de la guia; el resto del diff lo lei en las fases previas. Suite: 682 passed, 3 skipped, 1 deselected; conformidad: 0 problemas. Quedan para Kenni: python3.13 en el venv, cifra de lineas de la bitacora, hallazgos preexistentes. Sin comprobar: Docker, Compose, imagen, PowerShell, Tailscale, run_load real; US-38 y RNF-01 quedan para la Parte 2. (97219bd) |
 | revision | Kenni Rodriguez | 2026-11-05 |  |
+| verificación IA de tests | orquestador | 2026-11-11 | Simulacion local corrida por agente; evidencia en docs/evidencia/F-38_tres_nodos_simulacion_local_2026-11-11.md (4d3d79b); 0 contenedores restantes; sin pruebas nuevas (SPEC fila 2) (4d3d79b) |
