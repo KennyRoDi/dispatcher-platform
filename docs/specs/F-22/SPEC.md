@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-22-3-medicion-throughput
 **Verificación IA:** tests 0c25562
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -219,3 +219,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) devolvio dos veces y aprobo los arreglos 1, 2 y 5: receive en run_in_threadpool (no bloquea el event loop, B.5 M3 intacto), KeyError del ObjectStore ya no se disfraza de 404, separador eliminado. Su segunda revision hallo una carrera previa en received() (is_dir y luego iterdir) que daba 500 en 4/25; arreglada por el orquestador con prueba determinista, 0/25 fallos (verificacion no independiente de ese punto). Anotado: discard borra sin renombrar si rename falla con OSError. Diff 226 lineas en src y scripts. Suite 1144 verde. (a7c8e59) |
 | revision | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Codex | 2026-11-11 | F-22 parte 3, fase tests: pruebas de parseo de tamaños binarios y rechazo de tamaños inválidos/duplicados; import falla en rojo esperado porque el runner aún no existe. Sin código de producción; verificación no independiente. (0c25562) |
+| tests | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó el avance autónomo; suite de pruebas nueva falla por la función/runner aún ausente como se espera en TDD. |
