@@ -90,4 +90,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
-| verificación IA de plan | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | SPEC F-10 completo sin campos …, 3 partes, criterios copiados del backlog (62abaae) |
+| verificación IA de plan | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | SPEC F-10 completo sin campos pendientes, 3 partes, criterios copiados del backlog (62abaae) |
