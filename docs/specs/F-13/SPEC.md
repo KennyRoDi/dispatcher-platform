@@ -1,6 +1,6 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion b1adfc1
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA 14 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (3b22114) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | AD-38 y SUP-34 añadidos (provisionales), limites en AD-38, bitacora en estado; sin cambios de codigo (b1adfc1) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
