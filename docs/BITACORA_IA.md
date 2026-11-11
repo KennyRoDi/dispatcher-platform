@@ -544,3 +544,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador reejecuto pytest en cada fase; la reproduccion con ffmpeg real (seed 7, diff -r identico) es dato del QA. La persona aprobo cada fase. |
 | Cómo se validó | No se verifico el manejo de SIGTERM (fuera de alcance, declarado en el SPEC). |
 | Error de la IA | La primera implementacion (c6a400b) dejo 6 casos borde sin resolver en _generate y _check_row (QA 153e182); se corrigieron 3 tras devolver la fase (3cbe56f) y 3 quedan como pendientes aceptados. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-1-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex con subagentes y verificacion independiente |
+| Componente | F-19 |
+| Propósito | Diseñar y construir seleccion de estrategia y protocolo inyectable de carga para F-19 parte 1, sin acreditar procesos ni memoria reales |
+| Consulta resumida | Trabajar F-19 segun US-19/RF-27: plan, pruebas en rojo, implementacion, QA y documentacion de parte 1 |
+| Resultado obtenido | SPEC en tres partes; LoadingConfig y ModelLoader, 83 lineas producto; 46 pruebas inicialmente rojas por implementacion ausente y 6 casos QA adicionales. QA registro 56 pruebas aprobadas incluyendo arquitectura y 6/6 mutaciones detectadas. Ficha M1 actualizada con mediciones pendientes |
+| Validado / corregido / descartado | Seleccion pura, carga por hijo o precarga y recoleccion con runtime inyectado. SUP-24 colisionaba con reserva F-16 y se corrigio a SUP-25. Sin atribuir a dobles resultados Whisper, CoW, senales, ausencia real de zombies ni PSS/RSS. Suite general no verde; fallos previos documentados y excepciones de implementacion/verificacion autorizadas |
+| Cómo se validó | Revision contra SPEC, US-19 y RF-27; pytest focal mas arquitectura: 56 passed; mutaciones: 6/6; conformidad repo: 0 problemas; diff check. QA-parte-1 registra limites y comandos. Suite general bloqueada en Windows por os.geteuid; fallos complementarios reproducidos sobre 887f2c7 |
+| Error de la IA | El plan asigno SUP-24 a F-19 pero ese identificador ya pertenecia a reserva F-16. Se detecto al cotejar la ficha M1 y se corrigio la propuesta a SUP-25; no cambio el supuesto de reserva |
