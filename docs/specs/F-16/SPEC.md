@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** revision c6aea61
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -126,3 +126,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Codex | 2026-11-10 | Revisión independiente aprobada sobre b8e2690: conteo 1162 coincide entre ficha M1, QA y SPEC; cambios desde la revisión son metadatos de flujo en SPEC. git diff --check feat/F-16-1-limites-por-worker...HEAD limpio. B/C/D, calibración bajo carga y GPU runtime siguen pendientes conforme a excepción humana registrada; no hubo cambios de producto ni se repitió suite. (0eb2efd) |
 | verificación IA de revision | Codex | 2026-11-10 | Revisión independiente aprobada sobre b8e2690 y registrada en c6aea61: el conteo 1162 coincide entre ficha M1, QA y SPEC; diff limpio. B/C/D, calibración bajo carga y GPU runtime siguen pendientes conforme a excepción humana; no hubo cambios de producto ni repetición de suite. (c6aea61) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
