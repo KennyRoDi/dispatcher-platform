@@ -20,7 +20,7 @@ Cada módulo se desarrolla de principio a fin sin esperar a otro. Los módulos s
 | `ConversationParser` | Nahúm, F-02 | José Andrés, F-07 |
 | `Analyzer` | José Andrés, F-07 a F-09; conformidad: `comprobar_analyzer` en `tests/contratos.py` | Workers |
 | `WorkQueue` | Nahúm, F-06; Melany agrega el límite, F-24 | M2, M1 (reencolar), workers |
-| `ObjectStore` | Melany, F-23; Kenni lo envuelve con cifrado, F-28 | Coordinador, workers |
+| `ObjectStore` | Melany, F-23; Kenni lo envuelve con cifrado, F-28; conformidad: `comprobar_object_store` en `tests/contratos.py`. `put` no confirma el objeto si la lectura de `content` lanza una excepción, y `open` de una clave inexistente lanza `KeyError` | Coordinador, workers |
 | `ChunkStaging` | Melany, F-22; conformidad: `comprobar_chunk_staging` en `tests/contratos.py` | Recepción por chunks (M3) |
 | `FindingStore` | Kenni, F-13 | Workers (escribe), reporte (lee) |
 | `CaseCatalog`, `CaseInfo` | Kenni, F-13; conformidad: `comprobar_case_catalog` en `tests/contratos.py` | Reporte consolidado (lee); Nahúm y José no cambian código |
