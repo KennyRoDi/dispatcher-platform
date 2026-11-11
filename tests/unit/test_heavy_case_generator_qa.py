@@ -102,9 +102,10 @@ def test_dos_semillas_dan_semillas_de_ruido_distintas(tmp_path):
     assert noise(first) != noise(second)
 
 
-def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path):
+@pytest.mark.parametrize("nombre", ["../escape", r"..\escape"])
+def test_un_nombre_de_caso_malicioso_no_escribe_fuera_del_destino(tmp_path, nombre):
     out_dir = tmp_path / "salida"
-    plan = _plan_with_heavy_name("../escape")
+    plan = _plan_with_heavy_name(nombre)
 
     try:
         generate_heavy_cases(plan, out_dir, SparseRunner())

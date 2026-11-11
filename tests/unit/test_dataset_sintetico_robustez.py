@@ -39,7 +39,7 @@ def test_validar_reporta_un_manifiesto_que_no_es_una_lista_de_filas(tmp_path, ca
     assert capsys.readouterr().out.strip()
 
 
-@pytest.mark.parametrize("ruta", ["../fuera", "/etc/passwd", 5])
+@pytest.mark.parametrize("ruta", ["../fuera", "/etc/passwd", r"C:\fuera", r"..\fuera", 5])
 def test_validar_rechaza_rutas_que_salen_del_directorio(reduced, ruta):  # noqa: F811
     rows = _rows(reduced)
     rows[0]["path"] = ruta
