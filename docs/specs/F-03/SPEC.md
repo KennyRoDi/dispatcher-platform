@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 151205f
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
