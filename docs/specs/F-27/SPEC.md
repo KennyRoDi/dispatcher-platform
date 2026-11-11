@@ -1,7 +1,7 @@
 # SPEC F-27: TLS entre nodos
 
 **Fase:** plan
-**Base:** feat/F-38-1-despliegue-en-tres-nodos
+**Base:** main
 **Verificación IA:** pendiente
 **Historia:** US-27 · **Requisitos:** … · **Responsable:** K
 
