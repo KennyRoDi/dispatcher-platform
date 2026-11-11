@@ -117,6 +117,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 7. **Credenciales de MinIO por defecto en `deploy/docker-compose.local.yml`** (`minioadmin`): son de desarrollo local y la búsqueda de RNF-08 podría marcarlas. ¿Se aceptan como valores de demo declarados o se retiran?
 8. **Dedup (AD-11).** Cifrar con nonce y DEK distintos impide deduplicar sobre el cifrado; se mantiene la clave SHA-256 del claro, que revela objetos iguales. Riesgo ya aceptado en AD-11.
 
+## Límites declarados de la parte 1
+
+Hallazgos de QA que se aceptan y se declaran:
+- `decrypt` entrega los chunks previos al alterado antes de lanzar `DecryptionError`; el consumidor debe descartar lo recibido si el flujo falla.
+- `encrypt` es un generador: un error en la lectura del primer chunk aparece en el primer `next`, no al llamarlo.
+- El SHA-256 en hexadecimal en mayúsculas no se normaliza; cifrar y descifrar deben usar la misma forma.
+- `kek` y `dek` son variables locales: Sentry con `include_local_variables` las mostraría; no activar esa opción.
+- Cifrar no oculta el tamaño del objeto (AD-11 ya revela objetos iguales).
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
