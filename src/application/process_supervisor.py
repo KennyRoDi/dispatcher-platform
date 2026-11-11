@@ -8,6 +8,7 @@ from src.application.ports import Clock, ProcessRunner
 
 POLL_SECONDS = 0.1
 SIGKILL = getattr(signal, "SIGKILL", 9)
+GRACE_SECONDS = 10.0
 
 
 class ProcessSupervisor:
@@ -16,7 +17,7 @@ class ProcessSupervisor:
         runner: ProcessRunner,
         clock: Clock,
         sleep: Callable[[float], None],
-        grace_seconds: float = 10.0,
+        grace_seconds: float = GRACE_SECONDS,
     ):
         self._runner = runner
         self._clock = clock
@@ -30,7 +31,12 @@ class ProcessSupervisor:
         self._scratch[pid] = scratch
         return pid
 
+    def poll(self, pid: int) -> int | None:
+        return self._runner.poll(pid)
+
     def cancel(self, pid: int) -> None:
+        if pid not in self._scratch:
+            return
         try:
             self._terminate(pid)
         finally:
