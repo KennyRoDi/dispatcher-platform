@@ -905,3 +905,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas y revisión de subagentes; aprobaciones de fase delegadas por la persona, sin verificación humana independiente |
 | Cómo se validó | Subagentes con verificación del orquestador |
 | Error de la IA | El primer arreglo de A2 (tolerar 1 entrada sin ancla) permitía truncar un log largo a su primera entrada y borrar el ancla sin detección; lo halló el revisor y se reemplazó por un ancla génesis. Además el developer detectó una carrera al crear el log (1 fallo en 60 corridas), corregida con _create_log. |
+
+## 2026-11-11 · Kenni Rodriguez · F-30 (`feat/F-30-1-workers-sin-privilegios`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-30 |
+| Propósito | Configuracion de workers sin root, raiz de solo lectura y sin capacidades |
+| Consulta resumida | Endurecer workers sin privilegios (F-30): AD-36, SUP-32, ficha M4 borrador, limites del SPEC |
+| Resultado obtenido | Compose, Dockerfile y verificador de configuracion; QA corrigio dos fallos |
+| Validado / corregido / descartado | Pruebas unitarias y docker compose config; worker real no ejecutado |
+| Cómo se validó | Subagentes developer, qa-tester y documentador bajo un orquestador; aprobaciones delegadas y sin verificacion humana independiente. Mediciones de SO pendientes (tres nodos reales). |
+| Error de la IA | La primera version del compose local dejaba las 3 replicas compartiendo un volumen scratch que el arranque de cada worker vacia (QA lo detecto), y el verificador dejaba pasar privileged:true y user 10001:0. |
