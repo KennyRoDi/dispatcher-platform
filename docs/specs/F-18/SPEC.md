@@ -1,6 +1,6 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-18-1-deteccion-de-oom
 **Verificación IA:** revision 8647f04
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
@@ -80,3 +80,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code | 2026-11-10 | Documentación: AD-30 ampliada, bitácora publicada; no independiente (adc6432) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code | 2026-11-10 | Revisión: diff coincide con SPEC parte 2 (exit_code, worker, reserva); APROBADO; no independiente (8647f04) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
