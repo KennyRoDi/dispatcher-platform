@@ -737,3 +737,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Sí: pruebas unitarias, prueba de arquitectura y revisión de José delegada |
 | Cómo se validó | Ejecución de pytest; la integración con faster_whisper no corrió (no instalado); sin datos medidos |
 | Error de la IA | Ninguno detectado en esta parte |
+
+## 2026-11-10 · Kenni Rodriguez · F-26 (`feat/F-26-2-autenticacion-y-roles`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) con subagentes developer y QA |
+| Componente | F-26 |
+| Propósito | F-26 parte 2: verificación de JWT HS256, dependencia 401/403 y mapa ruta-acción |
+| Consulta resumida | Implementar TokenVerifier, jwt_tokens.py y seguridad.py según el SPEC; QA adversarial; corregir hallazgos |
+| Resultado obtenido | Código y pruebas en verde (1947 pasan, 5 xfail declarados); QA halló exp/iat NaN, sub vacío, secreto no UTF-8 que filtraba bytes al log y verificador sin caché |
+| Validado / corregido / descartado | Sí: el orquestador leyó el diff, corrió pytest y conformidad; aprobaciones delegadas por la persona (modo autónomo) y sin segundo QA tras las correcciones |
+| Cómo se validó | Revisión del diff, pytest -q y scripts/conformidad.py; el hallazgo de JSON antes de autenticar queda abierto como xfail |
+| Error de la IA | El developer inicial aceptó exp/iat NaN o infinito, sub vacío y leyó JWT_SECRET_FILE sin acotar (FIFO) ni controlar UTF-8; lo detectó QA y se corrigió en 03bc4b2 |
