@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 722c524
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -92,3 +92,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | SPEC F-10 completo sin campos pendientes, 3 partes, criterios copiados del backlog (62abaae) |
 | verificación IA de plan | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | SPEC F-10 completo, 3 partes, criterios copiados del backlog (722c524) |
+| plan | José Andrés Loría Herrera | 2026-11-11 |  |
