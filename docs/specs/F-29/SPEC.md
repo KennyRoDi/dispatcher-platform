@@ -96,6 +96,18 @@ Concretado:
 
 No aplica. F-29 aporta evidencia de ejecución a la ficha M4, no mediciones de SO M1–M5: la salida del verificador antes y después de manipular (backlog: «ficha M4: salida del verificador antes y después»). Se registra con el comando exacto en `docs/modulo-M4-seguridad.md`; la ficha y la prueba A quedan **pendiente** hasta ejecutarlas en la demo, y sin ellas el módulo M4 tiene máximo 2. El costo de HMAC por entrada no se mide aquí.
 
+## Límites declarados de la parte 1
+
+- La llave vacía o corta se acepta en el dominio (QA-6); el adaptador exigirá 32 bytes.
+- `verify_chain` devuelve solo la primera violación de la cadena y no revisa el ancla si hay una.
+- Ancla atrasada una entrada: se tolera sin aviso (el aviso «ancla atrasada» del diseño no se emite); atrasada más de una, o adelantada, se rechaza como violación `ancla`.
+- Los lectores de JSONL deben partir solo por `\n`, no por separadores Unicode de línea.
+- HMAC simétrico: quien tenga la llave puede forjar la cadena.
+- Un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta (SUP-31).
+- Log vacío sin ancla pasa.
+- Rendimiento (dato del QA, no medición de SO): 100000 entradas en 4,8 s con `tracemalloc`.
+- Evidencia alterada y linaje se prueban en la parte 3.
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
