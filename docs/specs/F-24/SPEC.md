@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 15e0f8a2
+**Verificación IA:** documentacion 067568fe
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -113,3 +113,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude (3778 verde); en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) APROBADO contra Redis 7 real: cero 503 lejos del limite con workers, limite nunca superado, rechazos sin rastro, H2 y H3 cerrados, estado Lua identico al pipeline, 6/7 mutantes (el restante es equivalente). Hallazgos bajos H4, H5 y H6. Suite 3778 verde en Linux. (15e0f8a2) |
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: SPEC actualizado al diseno con Lua (alcance, diseno, pruebas, decisiones) y riesgos H4 y H5 de QA. Sin ficha: la medicion es la parte 3. Bitacora con 3 errores reales de la IA. (067568fe) |
