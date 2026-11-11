@@ -815,3 +815,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | pytest tests/unit/test_comparar_carga.py -q: 9 passed; pytest tests/unit/test_model_memory.py -q: 8 passed; pytest tests/unit/test_whisper_transcriber.py -q: 42 passed; integración POSIX omitida en Windows (3 skipped); git diff --check limpio; verificación no independiente. |
 | Cómo se validó | Diseño y código existentes; análisis de resultados medidos, evidencia JSON, actualización de QA-parte-3, ficha M1 y AD-07. |
 | Error de la IA | Primer preflight reveló TypeError por resultados anidados en modo por proceso; corregido en 8eecde5. Primera medición no inició: pip usó /.local no escribible; reintentada con HOME=/tmp y dependencias en /tmp. En trabajo previo, literal bytes con caracteres no ASCII impedía compilar; corregido antes de esta medición. |
+
+## 2026-11-10 · Kenni Rodriguez · F-28 (`feat/F-28-2-cifrado-en-reposo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5); subagentes developer, qa-tester y documentador |
+| Componente | F-28 |
+| Propósito | F-28 parte 2: proveedor de KEK por archivo o variable |
+| Consulta resumida | Implementar FileKeyProvider, probarlo, verificarlo y documentarlo |
+| Resultado obtenido | Proveedor con KEK_FILE y KEK, falla cerrado; 3 xfail y limites declarados en el SPEC |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificacion humana independiente |
+| Cómo se validó | Orquestador reviso el diff y ejecuto pruebas tras cada fase |
+| Error de la IA | La primera implementacion dejaba un descriptor abierto si KEK_FILE era un directorio y aceptaba modos 0500/0700; lo detecto QA y se corrigio en b2aef68 |
