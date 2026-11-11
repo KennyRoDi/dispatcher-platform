@@ -80,12 +80,14 @@ Se agrega su doble `FakeChunkStaging` a `tests/dobles.py` y `comprobar_chunk_sta
 
 | Método y ruta | Cuerpo | Respuesta |
 |---|---|---|
-| `POST /uploads` | JSON `{sha256, size, chunk_size}` | 201 `{upload_id, chunk_count}`; 422 si `chunk_size` excede el máximo o los datos no son válidos |
-| `PUT /uploads/{id}/chunks/{index}` | Bytes del chunk; cabecera `X-Chunk-SHA256` | 204; 422 si el hash no coincide o el tamaño no corresponde al índice; 404 si la subida no existe |
-| `GET /uploads/{id}` | — | 200 `{received, missing}`, para que el cliente reenvíe |
-| `POST /uploads/{id}/complete` | — | 201 `{sha256, size}`; 409 con `missing`; 422 si el SHA-256 total no coincide |
+| `POST /uploads` | JSON `{sha256, size, chunk_size}` | 201 `{upload_id, chunk_count}`; 422 si `chunk_size` excede 64 MiB, si la subida tendría más de 100 000 chunks o si los datos no son válidos |
+| `PUT /uploads/{id}/chunks/{index}` | Bytes del chunk; cabecera `X-Chunk-SHA256` | 204; 413 si el cuerpo supera el tamaño esperado del chunk, sin leerlo completo; 422 si el hash no coincide, el chunk es más corto o el índice está fuera de rango; 404 si la subida no existe, sin leer el cuerpo |
+| `GET /uploads/{id}` | — | 200 `{received, missing}`, para que el cliente reenvíe; 404 si no existe o ya se completó |
+| `POST /uploads/{id}/complete` | — | 201 `{sha256, size}`; 409 con `missing`; 422 si el SHA-256 total no coincide; 404 si no existe o la completó otra petición concurrente |
 
-Reenviar un chunk ya recibido con el mismo hash es idempotente.
+Reenviar un chunk ya recibido con el mismo hash es idempotente. Mientras no haya `ObjectStore` configurado (F-23), todas las rutas responden 503.
+
+El PUT reserva un único buffer del tamaño esperado y lo llena por partes, sin copia final: nunca hay más de un chunk en memoria por petición [B.5 M3]. El tope de 100 000 chunks acota los índices que `status` y `complete` materializan; con chunks de 4 MiB equivale a unos 390 GiB.
 
 ### Flujo
 
@@ -177,7 +179,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 6. **Doble escritura en disco** (staging y luego MinIO): puede bajar el throughput medido. Se reporta en la ficha; si pesa demasiado, se revisa AD-28.
 7. **Prueba entre nodos** depende de que F-38 (despliegue en tres nodos) esté disponible.
 8. **`put` aborta por excepción (desviación aceptada en verificación).** QA encontró que leer el staging dos veces, una para el hash y otra para el `put`, permitía que un chunk cambiado entre ambas pasadas llegara a `ObjectStore` bajo un SHA-256 ajeno (H1). Ahora el hash se calcula sobre el mismo flujo que lee `put`, y si no coincide la lectura lanza `IntegrityMismatch` antes del último byte. Por eso `put` sí se llama, pero termina en excepción. **Requisito para F-23 (MinIO) y F-28 (cifrado):** el adaptador de `ObjectStore` no debe confirmar el objeto si la lectura de `content` lanza una excepción. Falta llevarlo al contrato en `docs/CONTRATOS.md` y a `comprobar_object_store`, en una PR aparte según «Cambiar un contrato». Aprobado por Melany Vindas.
-9. **Carrera entre `receive` y `discard` (H2, baja).** Un `receive` concurrente que llega después de `discard` vuelve a crear la carpeta de la subida con un chunk y sin manifiesto. Se resuelve en la parte 2, junto con las subidas abandonadas de la pregunta 4.
+9. **Carrera entre `receive` y `discard` (H2, baja). Resuelta en la parte 2.** `put_chunk` exige el manifiesto y ya no crea la carpeta; `discard` renombra la carpeta de forma atómica antes de borrarla, para que un `put_chunk` concurrente no deje restos. Lo cubre una prueba de estrés de 200 rondas. La pregunta 4 (subidas abandonadas) sigue abierta: no hay `DELETE` ni expiración.
+10. **El servidor drena el cuerpo tras un error (H7, informativa).** Después de responder 413, 404 o 422, uvicorn sigue leyendo y descartando el resto del cuerpo para conservar la conexión *keep-alive*. No ocupa memoria, solo red y CPU.
 
 ## Aprobaciones
 
