@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-26-2-autenticacion-y-roles
-**Verificación IA:** verificacion aeaf130
+**Verificación IA:** documentacion 92deb88
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -198,3 +198,4 @@ Límites declarados de la parte 3 (QA `aeaf130`, 14 `xfail` en `tests/unit/test_
 - `scripts/submit_case.py` y `scripts/run_load.py` no envían token.
 - Los workers necesitan un token con rol `servicio` (responsable: José).
 - El dashboard necesita un token de supervisor (responsable: Melany).
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff aeaf130..92deb88 solo docs (modulo-M4 borrador y SPEC). Salidas curl marcadas pendientes, sin datos inventados. Bitacora publicada en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (92deb88) |
