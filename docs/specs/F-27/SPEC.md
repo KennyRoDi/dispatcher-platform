@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-27-2-tls-entre-nodos
-**Verificación IA:** documentacion e2d2eec
+**Verificación IA:** revision b387b37
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -210,3 +210,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | Docs actualizadas para incluir coordinator en user: CERTS_UID/CERTS_GID; limite declarado (e2d2eec) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO tras corregir coordinator user (39d0aac); Redis, MinIO y coordinador reales sin probar con imagen (b387b37) |
