@@ -82,4 +82,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
-| verificación IA de plan | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | SPEC sin campos pendientes (grep …=0); 2 PR de pila; cubre puntos abiertos de F-12 (supervisor inerte, main sin cablear, KeyError en doble cancel, gracia 10 s < stop_grace_period 31m); medicion B.6 marcada Medicion pendiente (nodos reales). Rama con origin/main fusionado. (d2cbae0) |
+| verificación IA de plan | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | SPEC sin campos pendientes (sin marcadores); 2 PR de pila; cubre puntos abiertos de F-12 (supervisor inerte, main sin cablear, KeyError en doble cancel, gracia 10 s < stop_grace_period 31m); medicion B.6 marcada Medicion pendiente (nodos reales). Rama con origin/main fusionado. (d2cbae0) |
