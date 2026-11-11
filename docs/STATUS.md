@@ -32,7 +32,7 @@
 | F-27 | pendiente |
 | F-28 | en-pr |
 | F-29 | en-pr |
-| F-30 | pendiente |
+| F-30 | plan |
 | F-31 | en-pr |
 | F-32 | en-pr |
 | F-33 | pendiente |
