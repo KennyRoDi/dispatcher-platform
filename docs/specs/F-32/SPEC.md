@@ -70,4 +70,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
-| verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-32 completo sin campos …, plan de 1 PR, medición pendiente anotada (8d1fabe) |
+| verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-32 completo sin campos pendientes, plan de 1 PR, medición pendiente anotada (8d1fabe) |
