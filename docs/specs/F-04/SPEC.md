@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-04-3-verdad-de-referencia-y-procedencia
 **Verificación IA:** verificacion d1b6d10
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -195,3 +195,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte 4 solo documental (docs/dataset.md): sin pruebas ni codigo. Rama sin cambios de src/scripts/tests respecto de la parte 3. Verificacion no independiente. (9b2bc15) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | parte solo documental; aprobacion delegada por la persona |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; sin subagente: verificacion no independiente) | 2026-11-10 | Ejecute PYTHONPATH=. python -m scripts.dataset_verdad procedencia --manifiesto dataset/sintetico/manifest.json: '490 fuentes cumplen la procedencia', rc 0. Recuento del manifiesto: 490 filas con origen sintetico y licencia MIT (300 imagenes, 150 audios, 25 textos, 10 documentos, 5 videos). Caso negativo con una copia del manifiesto sin licencia en la primera fila: rc 1 y se imprime el defecto (salida guardada). No hay salidas reales de analisis: la tabla de aciertos queda pendiente. (d1b6d10) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | verificacion del orquestador sin QA independiente: parte solo documental; aprobacion delegada por la persona |
