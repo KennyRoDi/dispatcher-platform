@@ -14,7 +14,7 @@
 | F-09 | hecha |
 | F-10 | pendiente |
 | F-11 | pendiente |
-| F-12 | en-pr |
+| F-12 | hecha |
 | F-13 | pendiente |
 | F-14 | pendiente |
 | F-15 | pendiente |
