@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** tests e448419
+**Verificación IA:** implementacion c6e5b6a
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -152,3 +152,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (test_jsonl_custody_log.py, dobles.py, contratos.py); src intacto. Ejecute: error de coleccion ModuleNotFoundError src.adapters.jsonl_custody_log (rojo). Decision: la llave entra como key: bytes (F-28 no esta en esta rama); lectura de CUSTODY_KEY_FILE con FileKeyProvider queda para la parte 3. Asume modo 0600 y flock (decisiones del developer no fijadas en SPEC). No valida el log completo, solo ultimo eslabon + ancla. (e448419) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: src/adapters/jsonl_custody_log.py (125 lineas), .gitignore, SPEC; tests intactos. Suite completa tras c6e5b6a: 1923 passed, 8 skipped, 5 xfailed. Desviacion declarada: verifica el log completo en cada record (O(n), costo total cuadratico; el SPEC decia leer solo el ultimo eslabon). (c6e5b6a) |
