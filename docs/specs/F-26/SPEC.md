@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-26-2-autenticacion-y-roles
-**Verificación IA:** documentacion 92deb88
+**Verificación IA:** revision eb08072
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -200,3 +200,4 @@ Límites declarados de la parte 3 (QA `aeaf130`, 14 `xfail` en `tests/unit/test_
 - El dashboard necesita un token de supervisor (responsable: Melany).
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff aeaf130..92deb88 solo docs (modulo-M4 borrador y SPEC). Salidas curl marcadas pendientes, sin datos inventados. Bitacora publicada en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (92deb88) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: cableado de 3 routers, middleware sin fugas, sin secretos, capas verdes, limites coinciden con 14 xfail; pytest segun revisor 2049 passed/17 xfailed. Menor corregido por mi (cifra real en SPEC). Quedan: salto por dependency_overrides declarado como olor de diseño. (eb08072) |
