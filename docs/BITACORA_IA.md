@@ -995,3 +995,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Orquestador con aprobaciones delegadas; verificación no independiente de la persona |
 | Cómo se validó | Pruebas unitarias, QA sobre el parser y revisión del diff contra el SPEC |
 | Error de la IA | el QA halló 14 defectos del parser de posiciones y del orden de la línea temporal (isdigit acepta «²», OverflowError en marcas, TypeError con marca sin zona, empates no deterministas, marca falsa en source_ref que sobrescribía la real) |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`feat/F-13-2-reporte-consolidado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-13 |
+| Propósito | F-13 parte 2: reporte consolidado (aplicación) |
+| Consulta resumida | Subagentes por fase con verificación del orquestador; aprobaciones delegadas por la persona (verificación humana delegada) |
+| Resultado obtenido | build_report y report_json con pruebas; límites en AD-38 |
+| Validado / corregido / descartado | Pruebas en verde y revisión del orquestador |
+| Cómo se validó | Aprobaciones delegadas |
+| Error de la IA | el QA halló que un ObjectStore.exists que lanza tumbaba todo el reporte, que el extracto de audio copiaba el metadato completo del segmento y 5 defectos menores (sin tope de extracto, sin UTC, sha vacío enlazaba, surrogates, N+1 exists) |
