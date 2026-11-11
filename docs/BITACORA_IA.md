@@ -351,3 +351,712 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | José Andrés autorizó instalar faster-whisper y luego torch, spaCy y transformers, aprobó cada fase y devolvió la fase a tests tras la revisión (d55073c). Quedan pendientes en el SPEC: Python 3.13, duración de las notas (4 de 5 duran 4,26 a 4,94 s), normalización numérica, límites de texto fijo, que un fallo en una nota pierde la corrida, la copia estática de los 100 códigos de idioma, descartar segmentos sin letras, la licencia CC BY 4.0 propuesta por la IA y no confirmada, y renombrar las notas WhatsApp Ptt |
 | Cómo se validó | El revisor devolvió la parte 3 con 1 bloqueante, 4 importantes y 4 menores, y el orquestador reprodujo el bloqueante. La corrida real con el entorno confirmó 6 pruebas de integración y aceptación, de las cuales 4 antes se saltaban. QA recalculó a mano los 5 WER y probó casos reales con audio sintético de ffmpeg. py -3 -m pytest -q -m 'not integration and not acceptance': 1261 passed, 4 skipped. tests/unit/test_conformidad.py: 28 passed. Sin comprobar: Python 3.13, lint (ruff no instalado) y la licencia |
 | Error de la IA | (1) La prueba de aceptación pasaba solo la versión de faster-whisper a generar_markdown y lanzaba KeyError con el modelo real. Lo detectó el revisor leyendo el código, porque la prueba se saltaba sin faster-whisper, y lo reprodujo el orquestador. (2) La prueba de integración exigía una holgura de duración de 0.1 s que el modelo real incumple (fin de 5.00 s para 4.86 s de audio). Se detectó en la primera corrida real. (3) requirements-audio.txt dejaba av sin tope y faster-whisper 1.2.1 falla con av 19. Ninguna prueba con dobles podía detectarlo; se encontró en la primera corrida real. (4) El orquestador y el developer afirmaron antes, sin medir, que cierta asignación de guiones y la procedencia de la transcripción real eran correctas. La corrida real lo confirmó, pero se escribió antes de medir. (5) generar_markdown lanzaba KeyError si faltaba una versión. Se corrigió con prueba roja en 0b4bec3 y corrección en 089815b |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-16 (`feat/F-16-1-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex, orquestador y subagente arquitecto |
+| Componente | F-16 |
+| Propósito | Delimitar la lectura de cgroups y el presupuesto de arranque sin invadir admisión, OOM ni despliegue ajeno |
+| Consulta resumida | Diseñar F-16 contra los puertos existentes y dividir implementación pura y cableado Docker/WSL2 en PR pequeñas |
+| Resultado obtenido | SPEC con dos partes, criterios y protocolo de medición; AD-29 y SUP-23 |
+| Validado / corregido / descartado | Plan aprobado por José Andrés. Corregidas la afirmación de un comprobador inexistente y la omisión inicial del registro ADD/SUP. Descartado dar por existente el comprobador; se planificó agregarlo |
+| Cómo se validó | Orquestador contrastó SPEC con US-16, RF-24, B.5 M1, AD-05 y contratos; inspeccionó `tests/contratos.py` y ejecutó `git diff origin/main...HEAD --check`. Evidencia en aprobaciones del SPEC sobre `94fc871` |
+| Error de la IA | El plan afirmaba que existía `comprobar_resource_reader` cuando no estaba en `tests/contratos.py`. La inspección independiente del orquestador detectó el error; el diseño se corrigió para incorporarlo / El diseño introducía decisiones sin su registro ADD/SUP. El orquestador detectó la omisión y se agregaron AD-29 y SUP-23 antes de aprobar el plan |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-16 (`feat/F-16-1-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex, orquestador y subagentes developer |
+| Componente | F-16 |
+| Propósito | Probar primero presupuesto y lectura estricta; implementar lo necesario conservando puertos |
+| Consulta resumida | Cubrir suma, reserva, réplicas, configuración inválida y cgroups temporales; luego lograr verde sin modificar las pruebas aprobadas |
+| Resultado obtenido | Pruebas unitarias y comprobador de contrato; `node_budget.py` y `cgroup_resources.py`, 52 líneas de producto |
+| Validado / corregido / descartado | Fases tests e implementación aprobadas por José Andrés. No se agregaron CLI de arranque, cambios de workers ni Compose; pertenecen a parte 2 |
+| Cómo se validó | `py -m pytest -q tests/unit/test_node_budget.py tests/unit/test_cgroup_resources.py --tb=short`: 50 fallos esperados por módulos ausentes y 3 pruebas del doble aprobadas en rojo. `py -m pytest -q tests/unit/test_contratos.py`: 9 aprobadas. Tras implementar, `py -m pytest -q -m "not integration and not acceptance"`: 1138 aprobadas, 2 omitidas y 3 deseleccionadas. Diff de tests desde aprobación vacío y `git diff --check` correcto; evidencia en SPEC, producto `c19dc26` Incidencia: Un comando de aprobación del flujo en Windows falló por codificación de salida. Se resolvió usando `PYTHONIOENCODING`; no implicó corregir el producto ni se presenta como fallo de lógica encontrado por QA |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-16 (`feat/F-16-1-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex, orquestador, subagente QA y subagente documentador |
+| Componente | F-16 |
+| Propósito | Intentar romper las garantías y documentar resultados reales con límites explícitos de evidencia |
+| Consulta resumida | Revisar aceptación y sensibilidad de pruebas; preparar ficha de cinco elementos y bitácora sin atribuir datos sintéticos al SO |
+| Resultado obtenido | `QA-parte-1.md`, ficha `docs/modulo-M1-memoria.md`, actualización de AD-29/SUP-23 con aprobación de diseño ya registrada y este borrador |
+| Validado / corregido / descartado | QA no encontró fallos reproducibles de producción en parte 1; fase verificación aprobada por José Andrés. Documentación entregada para verificación del orquestador y aprobación humana. Mediciones Docker/WSL2, integración y aceptación de arranque permanecen pendientes para parte 2 |
+| Cómo se validó | QA ejecutó la suite: 1138 aprobadas, 2 omitidas y 3 deseleccionadas; detectó seis mutaciones y comprobó nueve bordes exploratorios. Orquestador reprodujo 57 pruebas de presupuesto, lector y arquitectura y una mutación que permite todo presupuesto, detectada. Documentador contrastó ficha y borrador con implementación, SPEC, QA y anexos 2/3; `git diff --check`. Evidencia detallada en `QA-parte-1.md` y aprobaciones del SPEC |
+
+## 2026-11-10 · Kenni Rodriguez · Generador de imágenes y audio sintéticos (F-03 parte 3) (`feat/F-03-3-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Sonnet 5.5; orquestador y subagentes por rol (developer, QA tester, documentador) |
+| Componente | Generador de imágenes y audio sintéticos (F-03 parte 3) |
+| Propósito | Generar con ffmpeg las 300 imágenes y 150 audios sintéticos del dataset de B.3, con etiqueta de verdad asignada por el generador, origen sintetico y reproducibles por semilla. |
+| Consulta resumida | Pedir pruebas rojas e implementación de media_generator a partir de DatasetPlan, con etiquetas positivo o neutro en imágenes y tono o ruido en audio; pedir al QA que intentara romperlo con ffmpeg real. |
+| Resultado obtenido | src/adapters/media_generator.py y sus pruebas (tests/unit/test_media_generator*.py, tests/integration/test_media_generator_ffmpeg.py). La IA generó el código y la lógica de etiquetas y colores. Plan completo medido por QA con carga en paralelo: 450 archivos, 720 MB en 166,8 s. |
+| Validado / corregido / descartado | Verificación IA de cada fase y aprobación humana explícita. Pruebas unitarias 788 passed, 3 skipped, 10 xfailed sin XPASS; integración con ffmpeg real 2 passed. |
+| Cómo se validó | El QA ejecutó ffmpeg real y comparó hashes entre corridas con distinto PYTHONHASHSEED: 450 sha256 idénticos con la misma semilla. Con ffmpeg real: 160 de 160 png y 140 de 140 jpg únicos. El orquestador reejecutó pytest en cada fase. Quedan 2 xfail abiertos de media_generator: un archivo previo oculta un ejecutor que no produjo nada, y el reparto de formatos se reinicia por caso. Decisiones de la persona: licencia provisional 'generado por el equipo, uso academico' (el repo no tiene LICENSE) y ampliar la variación de color; ajuste del SPEC a etiqueta neutro en vez de negativo (555c21d). |
+| Error de la IA | QA: las imágenes colisionaban (160 png daban 102 hashes únicos y 140 jpg daban 92) por color en rango pequeño; corregido en b846164 a petición de la persona, y una línea de una prueba de QA pasó de gris puro a dispersión de canales <= 16. |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: presupuesto, Compose y arranque (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador y developer) |
+| Componente | M1, F-16 parte 2: presupuesto, Compose y arranque |
+| Propósito | Aplicar el presupuesto al arranque sin inventar límites por worker ni confundir pruebas con mediciones de SO |
+| Consulta resumida | Implementar preflight y wrapper CPU/GPU, validar hostname, dirección IP, límites configurados y reserva derivada de memoria WSL2 antes de compose up |
+| Resultado obtenido | scripts/preflight.py y scripts/start_worker.py; WORKER_MEM_LIMIT obligatorio como mem_limit y memswap_limit; SUP-24 provisional; suite informada: 1149 passed, 2 skipped, 3 deselected |
+| Validado / corregido / descartado | QA halló que NODE_IP aceptaba texto no IP; se corrigió con ipaddress.ip_address y pruebas IPv4/IPv6. WORKER_MEM_LIMIT queda pendiente de medición por nodo. No se ejecutó Docker/Compose real ni se midieron nodos; no hubo reutilización del I Proyecto. |
+| Cómo se validó | QA-parte-2.md documenta cobertura estática y que su intento de suite no inició; el orquestador informó 11 pruebas focalizadas y suite completa 1149/2/3. No se afirma medición de SO ni ejecución Compose. |
+| Error de la IA | La implementación inicial aceptaba NODE_IP con cualquier texto no vacío. QA detectó el error; se corrigió validando IPv4/IPv6 con ipaddress.ip_address y agregando pruebas de IPv6 válido y texto inválido. |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: verificación y documentación (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador, QA y documentador) |
+| Componente | M1, F-16 parte 2: verificación y documentación |
+| Propósito | Registrar los resultados de QA y separar evidencia de software de mediciones reales |
+| Consulta resumida | Intentar romper configuración y preflight; documentar ficha M1, instrucciones de arranque y limitaciones de medición |
+| Resultado obtenido | QA-parte-2.md, ficha M1 actualizada, README y borrador de bitácora revisados |
+| Validado / corregido / descartado | La documentación coincide con scripts, Compose y QA; WORKER_MEM_LIMIT y datos B/C/D siguen pendientes. No se ejecutaron Docker/Compose ni cgroups reales. |
+| Cómo se validó | Se contrastó el diff con SPEC, scripts y QA-parte-2.md. Los conteos 1149/2/3 están atribuidos al orquestador/informe de QA. Mediciones memory.max y memory.swap.max tres veces por nodo siguen pendientes. |
+| Error de la IA | QA detectó el error real de validación de NODE_IP descrito en la entrada anterior; quedó corregido con pruebas. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-17 (`feat/F-17-1-control-de-admision`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-17 |
+| Propósito | Plan, pruebas, implementación, QA y documentación de F-17 (control de admisión por huella de memoria) |
+| Consulta resumida | Diseño de admits, tabla de huellas, compuerta antes de blpop en poll_once y AD-30 |
+| Resultado obtenido | admits, FootprintTable, load_admission_config, compuerta en el worker, AD-30 y ficha M1 con medición pendiente |
+| Validado / corregido / descartado | 69 pruebas en verde, revisión humana de cada fase; la medición M1 no se hizo (sin nodos WSL2 ni F-16 parte 2) |
+| Cómo se validó | TDD con pruebas rojas primero; QA intentó romper valores bool, negativos y no ASCII |
+| Error de la IA | En QA, CgroupResourceReader lanza ValueError con memory.max=max y el worker nunca admite; detectado y reportado, no corregido por estar fuera de alcance (F-16) |
+
+## 2026-11-10 · Melany Vindas · F-22 (`feat/F-22-1-chunks-verificados`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) en claude.ai: orquestador y subagentes arquitecto, developer, QA tester y documentador, en una sesion que leia el repositorio. La sesion no tenia permiso de escritura: Melany aplico cada cambio con parches git am e hizo el push |
+| Componente | F-22 |
+| Propósito | Transferir archivos grandes en chunks verificados por SHA-256 (RF-31, AD-10): dominio, puerto ChunkStaging, caso de uso y staging en disco, sin rutas HTTP ni mediciones |
+| Consulta resumida | Escribir el SPEC de F-22 con su plan de tres PR y registrar AD-28. Hacer las pruebas en rojo de la parte 1 y luego implementar UploadManifest y verify_chunk, el puerto ChunkStaging con su doble y su conformidad, ChunkedUpload y DiskChunkStaging; verificar por QA |
+| Resultado obtenido | src/domain/chunks.py, ChunkStaging en ports.py, src/application/chunked_upload.py con reensamblado por flujo verificado y chunk maximo de 64 MiB, src/adapters/disk_chunk_staging.py con escritura atomica, FakeChunkStaging y comprobar_chunk_staging; test_chunks 44/44. AD-28 provisional y CONTRATOS actualizados. US-22 aun no esta cumplida: faltan rutas, cliente e integracion (parte 2) y la ficha M3 con datos medidos (parte 3) |
+| Validado / corregido / descartado | Aceptado tras corregir H1. Melany Vindas aprobo cada fase con flujo.py aprobar. Riesgo 8 aceptado: ObjectStore no debe confirmar el objeto si la lectura lanza; pendiente llevarlo al contrato en una PR aparte. H2 (carrera entre receive y discard) queda para la parte 2 |
+| Cómo se validó | pytest -q -m 'not integration and not acceptance': test_chunks 44/44 y suite 1086 passed. QA ataco el flujo con 14 lectores, chunks alterados en disco y concurrencia con hilos, sin ningun objeto con contenido distinto a su clave. Conformidad del repositorio: 0 problemas. Sin comprobar: subida real entre nodos y throughput, de las partes 2 y 3 |
+| Error de la IA | (1) H1: la primera implementacion del developer calculaba el SHA-256 total en una pasada y releia el staging para put; un chunk cambiado entre las dos pasadas llegaba a ObjectStore con un SHA-256 ajeno. Lo detecto QA con una prueba en rojo; se devolvio a implementacion y se corrigio en 9e5b2b4 calculando el hash sobre el mismo flujo que lee put. (2) La primera verificacion de implementacion no fue independiente (el orquestador hizo el rol sin subagente) y no detecto H1. (3) Las pruebas iniciales del developer dejaban 5 mutantes vivos; QA las reforzo y en la segunda verificacion agrego pruebas que detectaron 3 mutantes mas. (4) La verificacion de la fase 4 se registro antes de aplicar las 12 pruebas de QA (cd0d180) porque un git am quedo a medias: el resumen decia 44/44 y la rama tenia 32. Se corrigio aplicando el parche despues |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 (`feat/F-03-4-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5), orquestador y subagentes arquitecto, developer, QA y documentador |
+| Componente | F-03 |
+| Propósito | Generar los archivos grandes de los casos pesados del dataset sintetico de F-03 (video mpeg2 de 40 Mbit/s hasta >= 200 MiB) en src/adapters/heavy_case_generator.py |
+| Consulta resumida | SPEC de la parte, pruebas rojas, implementacion (4b6b32f) y pruebas de QA (77faa7c); la IA redacto el modulo y sus pruebas |
+| Resultado obtenido | Modulo, 10 pruebas unitarias y 12 de QA (4 xfail). Todo caso pesado sale en video por decision de la persona; el SPEC admite video o documento |
+| Validado / corregido / descartado | La persona aprobo cada fase. pytest: 806 passed, 14 xfailed. Un caso real con ffmpeg dio 209,34 MiB con sha256 reproducible |
+| Cómo se validó | El orquestador reejecuto pytest y reprodujo el caso real sin fiarse de los subagentes; la persona leyo cada informe |
+| Error de la IA | El SPEC no definia la API del modulo: el developer la fijo en las pruebas y la persona la aprobo. El developer duplico _produce por el bug del archivo previo de media_generator. QA hallo fallos no cubiertos por el developer: case.name con ../ o absoluto escapa de out_dir, directorio vacio tras fallo y stderr de ffmpeg ausente |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: compatibilidad Windows y límites Compose (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador, developer y QA) |
+| Componente | M1, F-16 parte 2: compatibilidad Windows y límites Compose |
+| Propósito | Verificar lectura de RAM desde el daemon Docker, límites Compose y aplicación local de cgroups sin atribuirlos a nodos no medidos |
+| Consulta resumida | Corregir lectura /proc/meminfo en Windows, aceptar límites Compose normalizados como strings, verificar preflight y cgroups locales; dejar B/C/D pendientes |
+| Resultado obtenido | docker info reportó MemTotal local 16728616960; preflight sintético aprobó; tres contenedores efímeros reportaron memory.max 1073741824, memory.swap.max 0 y UID 1000; QA reporta 1161 passed, 2 skipped, 3 deselected |
+| Validado / corregido / descartado | QA encontró y se corrigieron dos errores: host Windows no tiene /proc/meminfo; Compose entrega límites como cadenas decimales. La prueba local no corresponde a B/C/D ni a carga B.3; B/C/D, calibración y runtime GPU siguen pendientes por falta de acceso remoto. No se reutilizó código del I Proyecto. |
+| Cómo se validó | Suite completa reproducida por el orquestador; 76 focalizadas reproducidas. Docker Compose CPU/GPU config normalizó 4g a 4294967296; runtime CPU local verificado tres veces con configuración 1g sintética y cgroups; runtime GPU y nodos reales no verificados. |
+| Error de la IA | La IA asumió que Python en Windows podía leer /proc/meminfo y que Compose JSON entregaría límites como enteros. QA detectó ambos errores; se corrigieron con docker info del daemon Linux y parseo estricto de enteros/cadenas decimales ASCII positivos. |
+
+## 2026-11-10 · Kenni Rodriguez · Composición del dataset sintético, documentos livianos, manifiesto y validador (F-03 parte 5) (`feat/F-03-5-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Sonnet 5.5; orquestador y subagentes por rol (developer, QA tester, documentador) |
+| Componente | Composición del dataset sintético, documentos livianos, manifiesto y validador (F-03 parte 5) |
+| Propósito | Componer los casos heterogéneos del dataset de B.3 con documentos livianos sintéticos (src/adapters/document_generator.py), un manifiesto de 13 campos y una CLI de generación y validación (scripts/dataset_sintetico.py), sin datos reales. |
+| Consulta resumida | Pedir al developer pruebas rojas (composición, manifiesto, CLI, documentos, campos categoria, positivo y duracion_s) y su implementación mínima; pedir al QA dos rondas para intentar romper el validador y la CLI. Tras la ronda 1 la persona devolvió la fase a implementación. |
+| Resultado obtenido | document_generator.py (51 líneas) y scripts/dataset_sintetico.py: build_manifest, validate_manifest, --validar y carga de --params validada. Dataset de QA con semilla 1: 490 archivos, 1,8 GiB, unos 154,6 s con carga en paralelo, sha256 de manifest.json 4a6aad92d8ec7a7630f48601a0f77568876cb2b757f51150cf64a8b66f45b47d. Son datos del medio generado, no mediciones de SO. La IA redactó las plantillas de los documentos sintéticos. |
+| Validado / corregido / descartado | La persona aprobó cada fase y devolvió implementación por los 5 hallazgos de la ronda 1, corregidos en bddb8f1. Quedan 6 defectos menores de la ronda 2 en xfail estricto (tests/unit/test_dataset_sintetico_qa2.py) para la parte 7. Decisiones de la persona: licencia MIT, etiqueta neutro, limpieza de huérfanos (opción C), todo en la parte 7. |
+| Cómo se validó | Pruebas rojas (09f76b6, 8e0a036), implementación (cb9758b, ec1e2fd), QA ronda 1 (d5231b9), corrección (bddb8f1), QA ronda 2 (7cf5d06). pytest -m 'not integration and not acceptance': 1521 passed, 7 skipped, 22 xfailed; integración con ffmpeg real: 1 passed; aceptación sobre el dataset completo: 1 passed. Sin comprobar: lint (ruff no instalado). |
+| Error de la IA | (1) Ni las pruebas ni el SPEC definían la API de composición; la fijó el developer. (2) El SPEC se contradecía: RF-20 y RF-21 pedían categoria, positivo y duracion_s en el manifiesto, pero la lista de campos no los incluía; se detectó en la fase tests y se corrigió (8e0a036). (3) QA ronda 1 halló 5 defectos del developer: filas duplicadas contaban dos veces, tipos por caso sin validar, caso pesado no heterogéneo aceptado, manifiesto corrupto con traza, parámetros negativos aceptados; corregidos en bddb8f1. (4) QA ronda 2 halló 6 defectos menores abiertos en xfail para la parte 7: bytes no entero y case nulo con TypeError, rutas ./x y x/ no detectadas como duplicadas, PermissionError con traza, symlink fuera de --out aceptado, --out que es archivo con NotADirectoryError. |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: validar identidad efectiva del worker (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador, developer y QA) |
+| Componente | M1, F-16 parte 2: validar identidad efectiva del worker |
+| Propósito | Evitar identidad divergente entre hostname del contenedor y NODE_NAME del proceso |
+| Consulta resumida | Corregir hallazgo de revisión que detectó que PowerShell podía sobrescribir NODE_NAME y hostname de forma distinta |
+| Resultado obtenido | validate_config exige NODE_NAME y su igualdad con service.hostname; test_preflight_rechaza_node_name_distinto_del_hostname falla antes del fix y pasa tras el fix; suite final 1162 passed, 2 skipped, 3 deselected |
+| Validado / corregido / descartado | El revisor detectó el hueco; se agregó prueba roja, se implementó la comprobación y QA la reprodujo. B/C/D siguen pendientes por decisión humana; pruebas locales no se presentan como medición de esos nodos. |
+| Cómo se validó | py -m pytest -q tests/unit/test_f16_preflight.py -k node_name_distinto: 1 failed esperado antes del fix; suite completa tras fix: 1162 passed, 2 skipped, 3 deselected. QA-parte-2 actualizado; git diff --check limpio. |
+| Error de la IA | El revisor encontró que la IA no comparó service.hostname con service.environment.NODE_NAME; PowerShell podía hacer divergir la identidad efectiva. Se corrigió exigiendo igualdad y se añadió prueba que falló antes del fix. |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 parte 6, fix(F-03): corregir defectos menores, licencia MIT y limpieza de huerfanos (`feat/F-03-6-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagentes developer, QA y documentador, general-purpose) |
+| Componente | F-03 parte 6, fix(F-03): corregir defectos menores, licencia MIT y limpieza de huerfanos |
+| Propósito | Cerrar los xfail estrictos y defectos menores de las partes 1 a 5 (recorte de casos, validacion de parametros, constantes MIN_*, UTC en chats, validacion de case.name y threat_ratio, _produce unificado, reparto de formatos, stderr de ffmpeg, validador robusto), añadir la licencia MIT y la limpieza de huerfanos (opcion C). |
+| Consulta resumida | Fila 6 del plan de pila del SPEC. Fases con subagentes: pruebas rojas (42e68c1, 4278f03, d4cef31), implementacion (5 commits fix), QA (91debbf), documentacion (b2f65c2). |
+| Resultado obtenido | La IA escribio las pruebas, el codigo de 5 commits fix, el LICENSE (MIT, 2026, Grupo 3) y los textos del SPEC y README. QA añadio 6 hallazgos menores como xfail estrictos en tests/unit/test_dataset_parte6_qa.py. Desviacion del SPEC no pedida: run_ffmpeg lanza RuntimeError en vez de CalledProcessError. |
+| Validado / corregido / descartado | pytest unitarias 1576 passed, 7 skipped, 9 xfailed; integracion con ffmpeg real 3 passed; codigo 144+/64- (<400); la persona aprobo cada fase. |
+| Cómo se validó | No se verifico linea por linea el script ni la opcion C ante señal fatal (declarado en el SPEC). |
+| Error de la IA | Prueba heredada test_validar_rechaza_origen_o_licencia_distintos[licencia-MIT] quedo invalida al pasar a MIT; la corrigio el orquestador a GPL (40ab507). El commit 9fc5937 cambio LICENSE_NAME a MIT sin mencionarlo en su mensaje. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-12 (`feat/F-12-1-cancelacion-real`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-12 |
+| Propósito | Supervisor de procesos con SIGTERM/SIGKILL (F-12 parte 1) |
+| Consulta resumida | Diseñar tests y supervisor con dobles y runner POSIX |
+| Resultado obtenido | ProcessSupervisor, ProcessRunner y PosixProcessRunner con 6 tests deterministas y 4 POSIX |
+| Validado / corregido / descartado | Pruebas deterministas en verde; los 4 tests POSIX reales no se ejecutaron en Windows, pendientes en WSL2/Linux |
+| Cómo se validó | Revisión humana de cada fase |
+| Error de la IA | cancel(pid, scratch=None) no coincidía con los tests; se cambió a cancel(pid) guardando el scratch por pid |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 (`feat/F-03-7-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagentes developer, QA tester y documentador, general-purpose) |
+| Componente | F-03 |
+| Propósito | F-03 parte 7: cerrar los 9 xfail de QA de la parte 6 y 2 menores del revisor (validador, DatasetParams, limpieza de _generate, API publica produce), mas 3 hallazgos de la QA de la propia parte 7. |
+| Consulta resumida | Pruebas en rojo (0638cef, 16 fallaban), implementacion (c6a400b), QA con 6 xfail (153e182), fase devuelta, correcciones (3cbe56f) y QA breve sin defectos nuevos. |
+| Resultado obtenido | pytest unitarias 1591 passed, 7 skipped, 3 xfailed; integracion 3 passed. Quedan 3 pendientes aceptados con xfail estricto declarados en el SPEC (--out con .., mkdir a mitad de cadena, symlink ajeno a casos) y DatasetParams sin tope superior. |
+| Validado / corregido / descartado | El orquestador reejecuto pytest en cada fase; la reproduccion con ffmpeg real (seed 7, diff -r identico) es dato del QA. La persona aprobo cada fase. |
+| Cómo se validó | No se verifico el manejo de SIGTERM (fuera de alcance, declarado en el SPEC). |
+| Error de la IA | La primera implementacion (c6a400b) dejo 6 casos borde sin resolver en _generate y _check_row (QA 153e182); se corrigieron 3 tras devolver la fase (3cbe56f) y 3 quedan como pendientes aceptados. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-1-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex con subagentes y verificacion independiente |
+| Componente | F-19 |
+| Propósito | Diseñar y construir seleccion de estrategia y protocolo inyectable de carga para F-19 parte 1, sin acreditar procesos ni memoria reales |
+| Consulta resumida | Trabajar F-19 segun US-19/RF-27: plan, pruebas en rojo, implementacion, QA y documentacion de parte 1 |
+| Resultado obtenido | SPEC en tres partes; LoadingConfig y ModelLoader, 83 lineas producto; 46 pruebas inicialmente rojas por implementacion ausente y 6 casos QA adicionales. QA registro 56 pruebas aprobadas incluyendo arquitectura y 6/6 mutaciones detectadas. Ficha M1 actualizada con mediciones pendientes |
+| Validado / corregido / descartado | Seleccion pura, carga por hijo o precarga y recoleccion con runtime inyectado. SUP-24 colisionaba con reserva F-16 y se corrigio a SUP-25. Sin atribuir a dobles resultados Whisper, CoW, senales, ausencia real de zombies ni PSS/RSS. Suite general no verde; fallos previos documentados y excepciones de implementacion/verificacion autorizadas |
+| Cómo se validó | Revision contra SPEC, US-19 y RF-27; pytest focal mas arquitectura: 56 passed; mutaciones: 6/6; conformidad repo: 0 problemas; diff check. QA-parte-1 registra limites y comandos. Suite general bloqueada en Windows por os.geteuid; fallos complementarios reproducidos sobre 887f2c7 |
+| Error de la IA | El plan asigno SUP-24 a F-19 pero ese identificador ya pertenecia a reserva F-16. Se detecto al cotejar la ficha M1 y se corrigio la propuesta a SUP-25; no cambio el supuesto de reserva |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 (`feat/F-03-8-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose para la fase documentacion) |
+| Componente | F-03 |
+| Propósito | Documentar el dataset sintetico de F-03 (parte 8): crear docs/dataset.md, registrar AD-25 en ARQUITECTURA §8, ajustar el SPEC, corregir la razon de un xfail y excluir dataset/sintetico/ en .gitignore. |
+| Consulta resumida | Generacion real con PYTHONPATH=. python -m scripts.dataset_sintetico --seed 1 --out dataset/sintetico y validacion con --validar; luego redaccion de los documentos a partir del codigo y del manifest.json. |
+| Resultado obtenido | Generacion rc 0 en 173 s, 490 archivos, 1,9 GB; el validador imprimio 'cumple los minimos de B.3'. Recuento desde manifest.json: 40 casos, 300 imagenes, 150 audios, 25 textos, 10 documentos, 5 videos, 5 casos con archivo >= 200 MiB. pytest: 1637 passed, 7 skipped, 3 xfailed. |
+| Validado / corregido / descartado | El orquestador recontó desde manifest.json (audio ruido/tono, casos livianos/pesados, videos), AD-25 y el sha256 del manifiesto. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por autorizacion de la persona (parte solo documental); la verificacion fue del orquestador, sin QA independiente; el enlace de Drive de los casos pesados queda pendiente: lo aporta la persona. |
+| Cómo se validó | No se verifico la cifra exacta de mensajes ni el enlace de Drive (no existe aun). Las aprobaciones de fase las dio el orquestador por delegacion de la persona, que no estuvo presente. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-1-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Desbloquear cierre F-19 en Windows por solicitud explicita de la persona |
+| Consulta resumida | Arreglar permisos temporales y fallos de compatibilidad que impedian probar y abrir PR |
+| Resultado obtenido | Commit 5e5cbc8: omision POSIX en Windows, rechazo de rutas POSIX y Windows y nombres de caso no simples; PR 52 abierta sobre main |
+| Validado / corregido / descartado | Suite general y cierre pasaron en Windows. No se omitieron validaciones de cierre. Los limites de procesos reales y mediciones siguen pendientes |
+| Cómo se validó | Suite requerida: 1624 passed, 5 skipped, 8 deselected, 19 xfailed; 8 casos dirigidos despues de ampliar parametros; conformidad 0 problemas; flujo cierre exitoso |
+| Error de la IA | La primera ejecucion uso temporales del sandbox y produjo errores de entorno; se corrigio ejecutando con acceso normal a temporales y se verifico la suite completa |
+
+## 2026-11-10 · Kenni Rodriguez · F-40 (`feat/F-40-1-matriz-historial-y-bitacora`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Sonnet 5.5 (orquestador); subagentes arquitecto y documentador con Claude Sonnet 5.5 |
+| Componente | F-40 |
+| Propósito | Actualizar docs/responsabilidades.md de F-40 con filas por modulo y componente, comandos de verificacion con salida real y limites del historial, sin rellenar decisiones abiertas. |
+| Consulta resumida | Plan de F-40 (arquitecto), captura de git shortlog y git log por ruta con fecha (documentador) y verificacion con conformidad.py. |
+| Resultado obtenido | docs/responsabilidades.md con M1 a M5, cinco filas de componentes y secciones Verificacion, Limites del historial y Bitacora de IA. conformidad.py: 0 problemas; pytest: 1637 passed, 7 skipped, 3 xfailed. |
+| Validado / corregido / descartado | El orquestador reprodujo shortlog en main, el recuento de la bitacora en estado (45 entradas) y conformidad.py. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por autorizacion de la persona (feature solo documental); la verificacion fue del orquestador sin QA independiente; las aprobaciones fueron delegadas. |
+| Cómo se validó | Apoyo por modulo, filas no modulo, .mailmap, Nahum Murillo y bitacoras de M2, M4 y M5 quedan como pendientes de decision del equipo; no se verifico la autoria por persona mas alla del conteo de git. |
+| Error de la IA | El SPEC propuso SUP-23 y SUP-24 para decisiones nuevas, pero esos numeros ya existian en REQUERIMIENTOS.md y ARQUITECTURA.md (F-16 y preflight); se detecto al revisar el repositorio y se corrigio el SPEC. Ademas, un primer recuento de commits por dia con git log --since dio cifras menores que las reales (Kenni 8 en vez de 42 el 03/nov) por filtrar por fecha de commit; se repitio con awk sobre la fecha de autor. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-12 (`feat/F-12-2-cancelacion-real`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5; documentación con Haiku 5.5) |
+| Componente | F-12 |
+| Propósito | Cancelación real en el worker (F-12 parte 2): SIGTERM, SIGKILL, limpieza de /scratch |
+| Consulta resumida | Implementar y probar cancelación con ProcessSupervisor; documentar en AD-30 |
+| Resultado obtenido | cancelacion.py, worker_node.py, rutas_casos.py; 49 pruebas en Linux; demo con 3 procesos antes y 0 después |
+| Validado / corregido / descartado | Pruebas @posix en Docker y demo con ps/ls; puntos abiertos: process y main() sin supervisor, gracia menor que stop_grace_period (F-16), KeyError en segunda cancelación |
+| Cómo se validó | Ejecución real en contenedor Linux y revisión del diff |
+| Error de la IA | signal.SIGKILL no existe en Windows (corregido con getattr); desajuste de firma de cancel; ps no instalado en la imagen (se instaló procps) |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-1-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Resolver conflictos PR52 con main |
+| Consulta resumida | Integrar cambios recientes y continuar controles |
+| Resultado obtenido | Merge 1d268ff: validacion NUL y rutas multiplataforma, produce compartido, pruebas Windows y deteccion de privilegio symlink |
+| Validado / corregido / descartado | Conflictos resueltos conservando correcciones de main y F19; PR mergeable, sin fusionar |
+| Cómo se validó | Suite completa Windows 1689 passed 10 skipped 8 deselected 3 xfailed; conformidad 0 problemas; GitHub sin conflictos |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-1-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) como orquestador, con subagentes arquitecto, developer, QA y documentador |
+| Componente | F-04 |
+| Propósito | F-04 parte 1: comparador de aciertos y errores por categoria (src/domain/ground_truth.py, 92 lineas), con SPEC, pruebas, hallazgos de QA y registro de AD-31, SUP-26 y SUP-27. |
+| Consulta resumida | Pedido por rol y fase: SPEC de F-04, pruebas en rojo, implementacion minima, intento de romper el comparador y registros en ARQUITECTURA y REQUERIMIENTOS. |
+| Resultado obtenido | ground_truth.py (92 lineas), test_ground_truth.py y test_ground_truth_qa.py (2 xfail estrictos); AD-31, SUP-26 y SUP-27 (provisional). Suite: 1649 passed, 7 skipped, 5 xfailed; conformidad 0 problemas. |
+| Validado / corregido / descartado | El orquestador ejecuto test_ground_truth y test_arquitectura tras la implementacion, conformidad.py en documentacion y comparo diffs. Los datos de prueba son dobles, no mediciones. SUP-27 sigue provisional. Las fases se aprobaron con --excepcion por delegacion de la persona, que no leyo cada fase. |
+| Cómo se validó | No se repitio la prueba de 200000 elementos del QA ni la suite completa tras documentacion. |
+| Error de la IA | El developer añadio el campo exact_matches a Comparison y definio accuracy por coincidencia exacta del conjunto sin que el SPEC lo declarara (SPEC decia Comparison(scores, total)); se detecto en la verificacion y se corrigio el SPEC. QA hallo en la implementacion que Comparison.accuracy lanza ZeroDivisionError con total 0 (el SPEC pide None) y que _require_unique da TypeError con ids de tipos mezclados en vez de ValueError; ambos quedan como xfail estricto. |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-2-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5) con subagentes developer, qa-tester y documentador (general-purpose) |
+| Componente | F-04 |
+| Propósito | F-04 parte 2: pruebas en rojo, implementacion y verificacion del validador de origen y licencia (src/domain/provenance.py, SUP-27) y declaracion de sus limites en el SPEC. |
+| Consulta resumida | Pruebas rojas de validate_provenance, implementacion minima en dominio puro, QA que intento romperlo y documentacion de los limites. |
+| Resultado obtenido | Commits 20a2779 (pruebas), 0f8345e (provenance.py, 61 lineas), 99b0f6f (11 xfail estrictos de QA) y abcaf2a (limites en el SPEC). Suite: 1669 passed, 7 skipped, 5 xfailed antes de los xfail de QA; conformidad 0 problemas. Sin mediciones de SO. |
+| Validado / corregido / descartado | El orquestador ejecuto la suite completa tras la implementacion, test_provenance y _qa tras QA y conformidad.py en documentacion. Las fases se aprobaron con --excepcion por delegacion de la persona, que no leyo cada fase y debe revisarlo al volver. SUP-27 sigue provisional. |
+| Cómo se validó | No se reprodujeron las observaciones de QA sin xfail ni se corrigieron los defectos: quedan declarados en el SPEC y en pendientes. |
+| Error de la IA | La implementacion de la IA acepto origen o licencia no str con AttributeError opaco en vez de un defecto con la ruta (5 casos), dejo pasar como licencia valida un relleno con espacios interiores o NBSP (3 casos) y una licencia de solo caracteres invisibles U+200B/U+FEFF (3 casos). QA lo detecto con 11 xfail estrictos; no se corrigio en esta parte. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-18 (`feat/F-18-1-deteccion-de-oom`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-18 |
+| Propósito | Clasificar OOM y política de reencolado SUP-14 (parte 1 de F-18) |
+| Consulta resumida | Plan, pruebas en rojo e implementación de classify_exit, OomPolicy y read_memory_events |
+| Resultado obtenido | Dominio puro y lector de memory.events con 44 pruebas en verde |
+| Validado / corregido / descartado | Pruebas unitarias; casos borde -9 sin delta, 137 y max_requeues=0 revisados a mano |
+| Cómo se validó | TDD en fases; subagente haiku para documentación |
+| Error de la IA | Primer intento de editar el SPEC con python en bash falló en silencio (no existía el intérprete) y se detectó al contar los campos pendientes; se repitió con py |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-3-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5) con subagentes developer, qa-tester y documentador (general-purpose) |
+| Componente | F-04 |
+| Propósito | F-04 parte 3: pruebas rojas, implementacion de los lectores (src/adapters/dataset_truth_files.py) y la CLI de procedencia y comparacion (scripts/dataset_verdad.py), verificacion de QA y documentacion de limites. |
+| Consulta resumida | Delegacion por fase con el SPEC; las pruebas fijaron la API (read_*, sample_from_manifest, render_*, main). |
+| Resultado obtenido | dataset_truth_files.py (131 lineas) y dataset_verdad.py (79); 2 pruebas unitarias y 1 de aceptacion; 4 xfail estrictos de QA. Suite: 1800 passed, 7 skipped, 16 xfailed; aceptacion 2 passed. Dato de QA no repetido: procedencia sobre dataset/sintetico (490 fuentes) cumplida. |
+| Validado / corregido / descartado | El orquestador ejecuto la suite completa y la aceptacion tras la implementacion y conformidad.py en documentacion. Las fases se aprobaron con --excepcion por delegacion de la persona, sin lectura humana por fase. |
+| Cómo se validó | Desviacion aceptada: el developer no reutilizo dataset_sintetico (privado) y duplico ~4 lineas de validacion de ruta, declarado en el SPEC. Hallazgos de QA no corregidos: quedan como limites declarados. |
+| Error de la IA | QA detecto en la implementacion 4 defectos (xfail f80a91b): --salida sobrescribe la muestra o las salidas, RecursionError con JSON muy anidado sin atrapar y render_markdown sin escapar / ni saltos de linea. Ademas, por mutacion, QA hallo pruebas debiles que no fijan el formato numerico ni el separador markdown. Ademas, la edicion del documentador con un script de Python corrompio el SPEC (261 mil lineas); se revirtio con git checkout antes de hacer commit. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-18 (`feat/F-18-2-deteccion-de-oom`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-18 |
+| Propósito | Reencolado por OOM en el worker (parte 2 de F-18) |
+| Consulta resumida | Pruebas en rojo e integración en worker_node con exit_code, memory.events y reserva en admisión |
+| Resultado obtenido | Reencolado con reserva x1.5 sin gastar intentos, falla con causa oom tras 2; suite completa en verde |
+| Validado / corregido / descartado | Suite completa 1720 en verde; OOM real en contenedor pendiente de nodos |
+| Cómo se validó | TDD en fases; subagente haiku para documentación |
+| Error de la IA | Mi prueba en rojo olvidaba vaciar la cola sembrada y duplicaba el id; la implementación estaba bien y se corrigió la prueba |
+
+## 2026-11-10 · Kenni Rodriguez · F-04 (`feat/F-04-4-verdad-de-referencia-y-procedencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) |
+| Componente | F-04 |
+| Propósito | F-04 parte 4: documentar en docs/dataset.md la procedencia y licencia por fuente y la verdad de referencia. |
+| Consulta resumida | Redaccion de dos secciones de docs/dataset.md con el recuento y la salida de procedencia ejecutados por el orquestador, y marca de la fila 4 del SPEC. |
+| Resultado obtenido | Secciones añadidas (+42 lineas) y SPEC actualizado (commit 2dc0c29); conformidad 0 problemas. Salida real: 490 fuentes cumplen la procedencia (rc 0); caso negativo sin licencia rc 1. La tabla de aciertos queda pendiente: no hay salidas reales de analisis sobre la muestra. |
+| Validado / corregido / descartado | El orquestador ejecuto procedencia sobre el manifiesto real y el caso negativo y cotejo el texto. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por delegacion de la persona; la verificacion fue del orquestador sin QA independiente. |
+| Cómo se validó | Sin revision por un segundo agente en esta parte. La tabla de aciertos y SUP-27 siguen pendientes de la persona. |
+| Error de la IA | Ninguno nuevo en esta parte; los errores de F-04 estan en las entradas de las partes 1 a 3. |
+
+## 2026-11-10 · Kenni Rodriguez · F-26 (`feat/F-26-1-autenticacion-y-roles`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5) con subagentes arquitecto, developer, QA y documentador (general-purpose) |
+| Componente | F-26 |
+| Propósito | F-26 parte 1: SPEC, pruebas en rojo y verdes y verificacion de la matriz de permisos por rol (src/domain/rbac.py, 42 lineas), mas registro de AD-33, SUP-28 y SUP-29. |
+| Consulta resumida | Instrucciones por rol del ciclo de AGENTS.md sobre F-26: matriz rol-accion, rol servicio, JWT HS256. |
+| Resultado obtenido | rbac.py con Role, Action, PERMISOS y can (falla cerrado ante tipos ajenos). test_rbac + test_arquitectura: 81 passed. QA sin defectos en rbac.py; hallo rutas sin cubrir en el SPEC (/cases/ con barra, /docs, /openapi.json, scripts sin token), anotadas en el SPEC. |
+| Validado / corregido / descartado | El orquestador ejecuto test_rbac y test_arquitectura y conformidad.py. Los mutantes de QA no se reprodujeron. La matriz es interpretacion del arquitecto, no verificada contra el enunciado (SUP-28 provisional). Las fases se aprobaron con --excepcion por delegacion de la persona; falta revision humana. |
+| Cómo se validó | Verificacion del orquestador por fase sobre el commit exacto, sin fiarse de los informes de subagentes. |
+| Error de la IA | El SPEC de F-26 no cubria la ruta /cases/ con barra final ni las rutas de documentacion de FastAPI (/docs, /openapi.json, /redoc); lo detecto QA y se anoto en las notas de las partes 2 y 3. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-2-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Implementar y verificar F-19 parte 2 |
+| Consulta resumida | Comparar carga por proceso con pesos compartidos por CTranslate2 para Whisper CPU |
+| Resultado obtenido | Fork de modelo cargado agotó timeout; workers_compartidos pasó igualdad real en Linux. 51 unitarias y 5 integraciones pasaron. |
+| Validado / corregido / descartado | QA local no independiente; pruebas Linux con Docker Desktop 29.7.2, Python 3.13.18, faster-whisper 1.2.1 y CTranslate2 4.9.0 |
+| Cómo se validó | ADD, SPEC, runtime aislado, ejecución concurrente y evidencia en QA-parte-2.md |
+| Error de la IA | Edición inicial accidental en el worktree raíz en vez de work/arquitecto-F-19; se revirtió de inmediato y se confirmó la raíz limpia. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-31 (`feat/F-31-1-benchmark-de-inferencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-31 |
+| Propósito | Plan, pruebas, implementación y ficha M5 del benchmark de inferencia (F-31) |
+| Consulta resumida | Agregación de corridas, script m5_bench con reloj y transcriptor inyectados, ficha M5 |
+| Resultado obtenido | domain/benchmark.py, scripts/measure/m5_bench.py, 15 pruebas unitarias en verde, ficha con medición pendiente |
+| Validado / corregido / descartado | Sí: pruebas unitarias, prueba de arquitectura y revisión de José delegada |
+| Cómo se validó | Ejecución de pytest; la integración con faster_whisper no corrió (no instalado); sin datos medidos |
+| Error de la IA | Ninguno detectado en esta parte |
+
+## 2026-11-10 · Kenni Rodriguez · F-26 (`feat/F-26-2-autenticacion-y-roles`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) con subagentes developer y QA |
+| Componente | F-26 |
+| Propósito | F-26 parte 2: verificación de JWT HS256, dependencia 401/403 y mapa ruta-acción |
+| Consulta resumida | Implementar TokenVerifier, jwt_tokens.py y seguridad.py según el SPEC; QA adversarial; corregir hallazgos |
+| Resultado obtenido | Código y pruebas en verde (1947 pasan, 5 xfail declarados); QA halló exp/iat NaN, sub vacío, secreto no UTF-8 que filtraba bytes al log y verificador sin caché |
+| Validado / corregido / descartado | Sí: el orquestador leyó el diff, corrió pytest y conformidad; aprobaciones delegadas por la persona (modo autónomo) y sin segundo QA tras las correcciones |
+| Cómo se validó | Revisión del diff, pytest -q y scripts/conformidad.py; el hallazgo de JSON antes de autenticar queda abierto como xfail |
+| Error de la IA | El developer inicial aceptó exp/iat NaN o infinito, sub vacío y leyó JWT_SECRET_FILE sin acotar (FIFO) ni controlar UTF-8; lo detectó QA y se corrigió en 03bc4b2 |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-32 (`feat/F-32-1-routing-por-tipo-de-nodo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-32 |
+| Propósito | Plan, pruebas, implementacion, verificacion y documentacion de F-32 (routing por tipo de nodo) |
+| Consulta resumida | Disenar RoutingTable con alternativa y tabla validada, pruebas TDD y ficha M5 |
+| Resultado obtenido | RoutingTable, routing_config, config/routing.toml, 22 pruebas, AD-32 y seccion M5 con valores provisionales |
+| Validado / corregido / descartado | Pruebas en verde, verificacion QA, revision de diff por la persona |
+| Cómo se validó | Revision de cada fase y pruebas; medicion en nodos reales pendiente (F-38) |
+| Error de la IA | La IA acepto una ruta pasada como cadena ('cpu') y la expandia a ('c','p','u'); la verificacion QA lo detecto y ahora RoutingTable lanza ValueError (test_ruta_como_cadena_se_rechaza) |
+
+## 2026-11-10 · Kenni Rodriguez · F-26 (`feat/F-26-3-autenticacion-y-roles`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (subagentes developer, qa-tester, documentador) |
+| Componente | F-26 |
+| Propósito | F-26 parte 3: cableado de autenticación y roles, emisor de tokens, documentación |
+| Consulta resumida | Implementar, probar con QA y documentar la parte 3 según el SPEC |
+| Resultado obtenido | Cableado, scripts/emitir_token.py, 14 xfail de QA y borrador de docs/modulo-M4-seguridad.md |
+| Validado / corregido / descartado | Pruebas y QA por subagentes; verificación del orquestador. Las aprobaciones de fase fueron delegadas: no hubo verificación humana independiente. |
+| Cómo se validó | Subagentes por rol (developer, qa-tester, documentador) con verificación del orquestador y aprobaciones delegadas |
+| Error de la IA | El developer puso en producción un salto de verificación que conoce el mecanismo de pruebas (dependency_overrides); QA lo marcó y queda como límite declarado. |
+
+## 2026-11-10 · Kenni Rodriguez · F-28 (`feat/F-28-1-cifrado-en-reposo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5): subagentes developer, qa-tester y documentador |
+| Componente | F-28 |
+| Propósito | Cifrado de sobre AES-256-GCM por chunks (F-28 parte 1) |
+| Consulta resumida | Disenar e implementar EnvelopeCipher, verificar y documentar |
+| Resultado obtenido | EnvelopeCipher, AD-34, SUP-30, ficha M4 borrador |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificacion humana independiente |
+| Cómo se validó | Subagentes developer, qa-tester y documentador; el orquestador verifico con la suite |
+| Error de la IA | La implementacion inicial tomaba read()==None como EOF y cifraba objetos truncados sin error; QA lo detecto y se corrigio |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-3-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Implementar y verificar el lector PSS/cgroup y CLI M1 de F-19 parte 3 |
+| Consulta resumida | Completar comparación de memoria entre por_proceso y workers_compartidos según SPEC/AD-07 |
+| Resultado obtenido | Unitarias focales verdes; no se ejecutaron mediciones M1. Docker no disponible, WSL E_ACCESSDENIED, sin nodo Linux worker/cgroup v2 accesible. |
+| Validado / corregido / descartado | pytest focal 16/16 y 8/8; WhisperTranscriber 42/42; integración POSIX 3 skipped en Windows; docker info y WSL fallaron por daemon/acceso. |
+| Cómo se validó | TDD de parser RSS/PSS/cgroup y equivalencia/CLI; QA-parte-3.md registra comandos M1 pendientes. La fase 4 no se aprobó. |
+| Error de la IA | Escribí inicialmente un literal bytes con carácter no ASCII en un test; corregido a bytes ASCII y las pruebas del módulo pasaron. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-3-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Verificar estrategia de carga y medición M1 en Docker Linux/WSL2; actualizar QA, ficha M1 y AD-07. |
+| Consulta resumida | Completar lectura PSS/RSS/cgroup con Whisper CPU, N=1/2 y cinco repeticiones por estrategia; documentar límites y errores observados. |
+| Resultado obtenido | Preflight válido y 20 corridas completadas; a N=2 workers_compartidos tuvo PSS y memory.current medios menores. JSON crudos en docs/evidencia/F-19; solo representa este contenedor y carga. |
+| Validado / corregido / descartado | pytest tests/unit/test_comparar_carga.py -q: 9 passed; pytest tests/unit/test_model_memory.py -q: 8 passed; pytest tests/unit/test_whisper_transcriber.py -q: 42 passed; integración POSIX omitida en Windows (3 skipped); git diff --check limpio; verificación no independiente. |
+| Cómo se validó | Diseño y código existentes; análisis de resultados medidos, evidencia JSON, actualización de QA-parte-3, ficha M1 y AD-07. |
+| Error de la IA | Primer preflight reveló TypeError por resultados anidados en modo por proceso; corregido en 8eecde5. Primera medición no inició: pip usó /.local no escribible; reintentada con HOME=/tmp y dependencias en /tmp. En trabajo previo, literal bytes con caracteres no ASCII impedía compilar; corregido antes de esta medición. |
+
+## 2026-11-10 · Kenni Rodriguez · F-28 (`feat/F-28-2-cifrado-en-reposo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5); subagentes developer, qa-tester y documentador |
+| Componente | F-28 |
+| Propósito | F-28 parte 2: proveedor de KEK por archivo o variable |
+| Consulta resumida | Implementar FileKeyProvider, probarlo, verificarlo y documentarlo |
+| Resultado obtenido | Proveedor con KEK_FILE y KEK, falla cerrado; 3 xfail y limites declarados en el SPEC |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificacion humana independiente |
+| Cómo se validó | Orquestador reviso el diff y ejecuto pruebas tras cada fase |
+| Error de la IA | La primera implementacion dejaba un descriptor abierto si KEK_FILE era un directorio y aceptaba modos 0500/0700; lo detecto QA y se corrigio en b2aef68 |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-36 (`feat/F-36-1-cancelacion-en-curso`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5, subagente Haiku para docs) |
+| Componente | F-36 |
+| Propósito | Cablear ProcessSupervisor en el worker (F-36 parte 1) y documentarlo |
+| Consulta resumida | Implementar cancelación en curso con TDD y documentar AD-31 |
+| Resultado obtenido | Supervisor cableado en process/_run/main (POSIX), cancel idempotente, poll en puerto, SystemClock; 1731 passed en Docker |
+| Validado / corregido / descartado | Sí |
+| Cómo se validó | Pruebas unitarias y ejecución en Docker Linux; revisión del diff |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-3-estrategias-de-carga-final`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Documentar verificación M1 de F-19 parte 3 en la rama final. |
+| Consulta resumida | Registrar resultados medidos y corregir el nombre de la prueba POSIX, que colisionaba al recolectar pytest con una unitaria de igual basename. |
+| Resultado obtenido | QA-parte-3 referencia tests/integration/test_comparar_carga_posix.py; las 3 pruebas POSIX se omiten en Windows. La evidencia Docker/WSL2 y sus límites constan en JSON y ficha QA. |
+| Validado / corregido / descartado | Corrección documental; pruebas focales ya verificadas, no repetidas. La bitácora se publica mediante flujo.py. |
+| Cómo se validó | Revisión documental y actualización mínima de QA-parte-3. |
+| Error de la IA | El primer preflight reveló TypeError por resultados anidados en modo por proceso; corregido en 8eecde5. La medición inicial no instaló por HOME del contenedor no escribible; corregido usando /tmp. Pytest encontró colisión entre tests/unit/test_comparar_carga.py y tests/integration/test_comparar_carga.py; resuelta al renombrar la prueba POSIX a test_comparar_carga_posix.py. |
+
+## 2026-11-10 · Kenni Rodriguez · F-28 (`feat/F-28-3-cifrado-en-reposo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5), subagentes developer, qa-tester y documentador |
+| Componente | F-28 |
+| Propósito | F-28 parte 3: decorador EncryptedObjectStore, prueba I y búsqueda de llaves en el historial |
+| Consulta resumida | Se pidió a subagentes escribir pruebas, implementar el decorador, verificarlo y documentarlo, con aprobaciones delegadas por la persona |
+| Resultado obtenido | Decorador con 1974 passed y 15 xfail declarados; prueba I no ejecutada contra MinIO real |
+| Validado / corregido / descartado | Aprobaciones delegadas, sin verificación humana independiente |
+| Cómo se validó | El orquestador revisó diffs y ejecutó la suite; los subagentes no son verificación humana |
+| Error de la IA | El lector del decorador devolvía como válido el claro ya descifrado tras un DecryptionError y su read(n) era cuadrático; QA lo detectó y se corrigió |
+
+## 2026-11-10 · Kenni Rodriguez · F-29 (`feat/F-29-1-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (subagentes developer, qa-tester, documentador) |
+| Componente | F-29 |
+| Propósito | Parte 1 de F-29: cadena de custodia HMAC (dominio) |
+| Consulta resumida | Escribir pruebas, implementar custody_chain, atacarla y documentar AD-35 y SUP-31 |
+| Resultado obtenido | Dominio con seal y verify_chain; límites en el SPEC |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente |
+| Cómo se validó | Verificación del orquestador con pytest y revisión de los subagentes |
+| Error de la IA | verify_chain lanzaba RecursionError/UnicodeEncodeError ante líneas manipuladas en vez de reportar violación; lo detectó QA y se corrigió |
+
+## 2026-11-11 · Kenni Rodriguez · F-29 (`feat/F-29-2-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagentes developer, qa-tester, documentador) |
+| Componente | F-29 |
+| Propósito | F-29 parte 2: registro de custodia JSONL de solo anexión |
+| Consulta resumida | Implementar JsonlCustodyLog, ancla atómica y límites de la parte 2 |
+| Resultado obtenido | Adaptador, pruebas y límites documentados en el SPEC; aprobaciones delegadas, sin verificación humana independiente |
+| Validado / corregido / descartado | Verificación del orquestador y QA por subagente; las aprobaciones de fase fueron delegadas por la persona |
+| Cómo se validó | Subagentes por rol; la persona no revisó de forma independiente |
+| Error de la IA | La primera implementación verificaba todo el log en cada record (costo cuadrático, 121 s con 4000 entradas), dejaba el log bloqueado tras un fallo de E/S del ancla y seguía symlinks al escribir el temporal; el QA lo detectó y se corrigió con verify_tail, reintento del ancla y O_NOFOLLOW |
+
+## 2026-11-11 · Kenni Rodriguez · F-29 (`feat/F-29-2-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5; subagentes revisor, developer, QA) |
+| Componente | F-29 |
+| Propósito | Revisión y QA de la parte 2 de F-29: ancla génesis, tolerancia de anclas y carrera al crear el log |
+| Consulta resumida | Revisar el diff contra el SPEC, corregir la tolerancia de 1 entrada sin ancla y cerrar la carrera al crear el log |
+| Resultado obtenido | Ancla génesis en el adaptador; sin ancla con entradas es violación; _create_log; límites declarados en SPEC, AD-35 y SUP-31 |
+| Validado / corregido / descartado | Pruebas y revisión de subagentes; aprobaciones de fase delegadas por la persona, sin verificación humana independiente |
+| Cómo se validó | Subagentes con verificación del orquestador |
+| Error de la IA | El primer arreglo de A2 (tolerar 1 entrada sin ancla) permitía truncar un log largo a su primera entrada y borrar el ancla sin detección; lo halló el revisor y se reemplazó por un ancla génesis. Además el developer detectó una carrera al crear el log (1 fallo en 60 corridas), corregida con _create_log. |
+
+## 2026-11-11 · Kenni Rodriguez · F-30 (`feat/F-30-1-workers-sin-privilegios`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-30 |
+| Propósito | Configuracion de workers sin root, raiz de solo lectura y sin capacidades |
+| Consulta resumida | Endurecer workers sin privilegios (F-30): AD-36, SUP-32, ficha M4 borrador, limites del SPEC |
+| Resultado obtenido | Compose, Dockerfile y verificador de configuracion; QA corrigio dos fallos |
+| Validado / corregido / descartado | Pruebas unitarias y docker compose config; worker real no ejecutado |
+| Cómo se validó | Subagentes developer, qa-tester y documentador bajo un orquestador; aprobaciones delegadas y sin verificacion humana independiente. Mediciones de SO pendientes (tres nodos reales). |
+| Error de la IA | La primera version del compose local dejaba las 3 replicas compartiendo un volumen scratch que el arranque de cada worker vacia (QA lo detecto), y el verificador dejaba pasar privileged:true y user 10001:0. |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-1-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5): orquestador y subagentes developer, qa-tester y documentador |
+| Componente | F-27 |
+| Propósito | Parte 1 de F-27: configuración y contexto TLS de cliente, pruebas, QA y documentación |
+| Consulta resumida | Plan del SPEC de F-27, pruebas en rojo, implementación de src/infrastructure/tls.py, QA que intenta romperlo y documentación (AD-37, SUP-33, ficha M4) |
+| Resultado obtenido | tls.py con TlsSettings, client_context, exigir_cifrado, redis_kwargs, requests_session y minio_http_client; pruebas unitarias e integración con trustme; AD-37, SUP-33 y borrador de la ficha M4 con resultados pendientes |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente de las fases. Verificación IA del orquestador sobre el commit exacto con flujo.py verificar |
+| Cómo se validó | Subagentes developer, qa-tester y documentador; el orquestador comprobó diffs y ejecutó las pruebas de TLS |
+| Error de la IA | La primera versión de requests_session aceptaba un servidor de otra CA si existía REQUESTS_CA_BUNDLE y seguía redirecciones de https a http; el QA lo detectó y se corrigió con trust_env=False, verify fijo y bloqueo de redirección a esquemas en claro |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-2-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (subagentes developer, qa-tester, documentador) |
+| Componente | F-27 |
+| Propósito | Cablear TLS entre nodos en workers, coordinador y scripts (F-27 parte 2) |
+| Consulta resumida | Cableado de tls.py en clientes y scripts, y pruebas de rechazo de http |
+| Resultado obtenido | Cableado con pruebas; QA halló fallos corregidos; Redis y MinIO reales sin probar |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente |
+| Cómo se validó | Subagentes por fase, verificados por el orquestador |
+| Error de la IA | La primera versión del cableado dejaba submit_case, cancel_case, fetch_report y poll_case enviando en claro con TLS activo y tres scripts fuera de tls.py; el QA lo detectó y se corrigió |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-3-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-27 |
+| Propósito | Documentar TLS entre nodos (F-27 parte 3) |
+| Consulta resumida | Subagentes por fase; aprobaciones delegadas por la persona, verificación del orquestador |
+| Resultado obtenido | DEPLOY_WORKERS, DEMO y ficha M4 actualizados. Pendientes de otros dueños: dashboard/app.py:23 y scripts/generate_dataset.py:18,291 apuntan a http/8000 |
+| Validado / corregido / descartado | Pendiente de revisión humana |
+| Cómo se validó | Revisión del diff; sin mediciones |
+| Error de la IA | el QA halló 16 defectos en generar_certs.sh y compose tras la implementación (validación de NODE_IP solo por caracteres, feeder sin TLS_ENABLED=false, CA sin pathlen:0, llaves 0600 ilegibles por UID de redis/MinIO) |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-4-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5) |
+| Componente | F-27 |
+| Propósito | Documentar guion de captura TLS y prueba de aceptación (F-27 parte 4) |
+| Consulta resumida | Redactar sección de captura en docs/modulo-M4-seguridad.md y enlace en DEPLOY_WORKERS |
+| Resultado obtenido | Sección con comandos, variables y resultados pendientes; sin datos medidos |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin QA independiente (parte sin código); la prueba de aceptación solo se verificó con skip |
+| Cómo se validó | Revisión del orquestador contra SPEC e IMPLEMENTACION §5 |
+
+## 2026-11-11 · Kenni Rodriguez · F-38 (`feat/F-38-2-evidencia-tres-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-38 |
+| Propósito | Documentar evidencia de simulacion local de tres nodos (F-38 parte 2) |
+| Consulta resumida | Aprobaciones delegadas por la persona; sin QA independiente; simulacion local autorizada por la persona (no acredita B.2 ni Tailscale) |
+| Resultado obtenido | Evidencia de simulacion local y guia de despliegue corregida con las variables de admision |
+| Validado / corregido / descartado | Aprobaciones delegadas; verificacion no independiente |
+| Cómo se validó | Orquestador con subagentes; ejecucion en contenedores locales |
+| Error de la IA | la guía de despliegue omitía ADMISSION_MARGIN_BYTES y FOOTPRINT_<OP>_BYTES; los workers reiniciaban en bucle y /workers devolvía []; lo reveló la simulación local |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`feat/F-13-1-reporte-consolidado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-13 |
+| Propósito | F-13 parte 1: dominio del reporte consolidado (posiciones y línea temporal) |
+| Consulta resumida | Arquitecto, developer, QA y documentador por subagentes sobre el SPEC de F-13 |
+| Resultado obtenido | Dominio en verde, AD-38 y SUP-34 provisionales |
+| Validado / corregido / descartado | Orquestador con aprobaciones delegadas; verificación no independiente de la persona |
+| Cómo se validó | Pruebas unitarias, QA sobre el parser y revisión del diff contra el SPEC |
+| Error de la IA | el QA halló 14 defectos del parser de posiciones y del orden de la línea temporal (isdigit acepta «²», OverflowError en marcas, TypeError con marca sin zona, empates no deterministas, marca falsa en source_ref que sobrescribía la real) |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`feat/F-13-2-reporte-consolidado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-13 |
+| Propósito | F-13 parte 2: reporte consolidado (aplicación) |
+| Consulta resumida | Subagentes por fase con verificación del orquestador; aprobaciones delegadas por la persona (verificación humana delegada) |
+| Resultado obtenido | build_report y report_json con pruebas; límites en AD-38 |
+| Validado / corregido / descartado | Pruebas en verde y revisión del orquestador |
+| Cómo se validó | Aprobaciones delegadas |
+| Error de la IA | el QA halló que un ObjectStore.exists que lanza tumbaba todo el reporte, que el extracto de audio copiaba el metadato completo del segmento y 5 defectos menores (sin tope de extracto, sin UTC, sha vacío enlazaba, surrogates, N+1 exists) |
+
+## 2026-11-11 · Kenni Rodriguez · F-13 (`feat/F-13-3-reporte-consolidado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-13 |
+| Propósito | Documentar la parte 3 de F-13 (adaptadores Redis, ruta, JSON de ejemplo) |
+| Consulta resumida | Redactar límites, nota del ejemplo y guía de consulta del reporte |
+| Resultado obtenido | Límites en AD-38, nota del ejemplo, consulta en DEMO.md; la parte 3 editó build_report.py de la parte 2 |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificación no independiente en documentación |
+| Cómo se validó | Revisión del diff contra el SPEC |
+| Error de la IA | El QA halló que Redis caído daba 500, que un hallazgo corrupto tumbaba el reporte completo y que la fuente unida por file_path salía con sha256 vacío, más 3 defectos menores (fechas malformadas, bytes no UTF-8, case_id que colisiona con claves) |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`feat/F-14-1-alertas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-14 |
+| Propósito | Alertas de incidencia alta y cierre de caso (F-14 parte 1: dominio y decoradores) |
+| Consulta resumida | Subagentes arquitecto, developer, QA y documentador sobre el SPEC de F-14 |
+| Resultado obtenido | Dominio alert_policy, SafeAlertPublisher y AlertingFindingStore con pruebas; AD-39 y SUP-35 provisionales |
+| Validado / corregido / descartado | Si |
+| Cómo se validó | Aprobaciones delegadas por la persona (modo autonomo); verificacion del orquestador, pytest y revision del diff contra el SPEC |
+| Error de la IA | el QA halló que un generador pasado a add se agotaba y no alertaba, que un publicador sin SafeAlertPublisher perdía alertas tras guardar y 3 defectos menores (TypeError con estado no hashable, inyección de líneas en el log, publicador async perdido) |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`feat/F-14-2-alertas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-14 |
+| Propósito | Documentar F-14 parte 2 (Stream Redis, AlertReader, GET /alerts) |
+| Consulta resumida | Limites de la parte 2 en AD-39 y fila de GET /alerts en DEMO |
+| Resultado obtenido | AD-39 y DEMO.md actualizados |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
+| Cómo se validó | Revision del diff contra el SPEC |
+| Error de la IA | el QA halló que el 503 de /alerts filtraba host y puerto de Redis, que una entrada con bytes no UTF-8 tiraba toda la ruta, que ResponseError daba 500 y 3 defectos menores (emitted_at sin zona, recent(0), maxlen no positivo) |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`feat/F-14-3-alertas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-14 |
+| Propósito | Documentar F-14 parte 3 (cierre protegido, prueba A, evidencia) |
+| Consulta resumida | Limites de la parte 3 en AD-39, prueba A y aviso de F-26 |
+| Resultado obtenido | AD-39 actualizado |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
+| Cómo se validó | Revision del diff contra el SPEC |
+| Error de la IA | el QA halló que el log del cierre usaba %s con un case_id controlado por el cliente (inyección de líneas) y tres defectos previos de rutas_subtareas.py amplificados por la alerta |
