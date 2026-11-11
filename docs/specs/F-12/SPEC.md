@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion fa4b353
+**Verificación IA:** revision 8b9b543
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -69,3 +69,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | git diff --stat; flujo.py verificar | 2026-11-10 | Documentador (haiku) no cambió nada: SPEC dice Mediciones No aplica y Sin decisión nueva (AD-09 ya existe); reutilizacion.md no existe; README sin cambio. Verificación no independiente: solo comprobé árbol limpio y SPEC. (fa4b353) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de revision | pytest tests/unit/test_process_supervisor.py y test_arquitectura; git diff origin/main...HEAD | 2026-11-10 | Revision hecha por el orquestador sin subagente: verificacion NO independiente. Diff de parte 1 (5 archivos, 360 lineas con SPEC y pruebas) releido contra SPEC: supervisor, puerto y adaptador POSIX dentro de alcance. Hallazgo abierto: cancel lanza KeyError en doble cancel o pid desconocido (fuera del SPEC). 4 pruebas POSIX no ejecutadas aqui (Windows). (8b9b543) |
