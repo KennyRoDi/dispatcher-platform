@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 453baf4
+**Verificación IA:** documentacion 2b0ba2c
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J
 
 ## Objetivo
@@ -79,3 +79,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | claude-code | 2026-11-10 | QA: 22 pruebas verdes. Hallazgo: ruta como str se expandia a letras; ahora ValueError con prueba. Tipo desconocido, sin clase viva y orden de clases verificados. (453baf4) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | claude-code | 2026-11-10 | Documentacion: AD-32 y seccion M5 (2 archivos, 11 lineas), bitacora con error-ia publicada. Verificacion no independiente (2b0ba2c) (2b0ba2c) |
