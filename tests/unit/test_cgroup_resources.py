@@ -94,3 +94,25 @@ def test_resource_reader_cumple_contrato_compartido(tmp_path, actual, limite, ad
         escribir_memoria(tmp_path, actual=str(actual), limite=str(limite))
         lector = crear_lector(tmp_path, worker_id=esperado.worker_id)
     comprobar_resource_reader(lector, esperado)
+
+
+def leer_eventos(ruta):
+    return import_module("src.infrastructure.cgroup_resources").read_memory_events(ruta)
+
+
+def test_parsea_memory_events_oom_kill(tmp_path):
+    (tmp_path / "memory.events").write_text(
+        "low 0\nhigh 0\nmax 12\noom 3\noom_kill 2\noom_group_kill 0\n", encoding="utf-8"
+    )
+    assert leer_eventos(tmp_path).oom_kill == 2
+
+
+def test_memory_events_sin_oom_kill_es_cero(tmp_path):
+    (tmp_path / "memory.events").write_text("low 0\nmax 0\n", encoding="utf-8")
+    assert leer_eventos(tmp_path).oom_kill == 0
+
+
+def test_memory_events_corrupto_se_rechaza(tmp_path):
+    (tmp_path / "memory.events").write_text("oom_kill abc\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        leer_eventos(tmp_path)

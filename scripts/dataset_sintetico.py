@@ -4,7 +4,7 @@ import json
 import re
 import sys
 from collections.abc import Callable
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from src.adapters.chat_export_generator import export_plan_chats
 from src.adapters.document_generator import generate_documents
@@ -114,7 +114,10 @@ def _row_defect(row) -> str | None:
     missing = [name for name in MANIFEST_FIELDS if name not in row]
     if missing:
         return f"faltan campos {missing}"
-    if not isinstance(row["path"], str) or "\x00" in row["path"] or Path(row["path"]).is_absolute() or ".." in Path(row["path"]).parts:
+    if not isinstance(row["path"], str) or "\x00" in row["path"] or any(
+        ruta.root or ruta.drive or ".." in ruta.parts
+        for ruta in (PurePosixPath(row["path"]), PureWindowsPath(row["path"]))
+    ):
         return f"ruta invalida {row['path']!r}"
     if not all(value is None or isinstance(value, (str, int, float)) for value in row.values()):
         return "hay valores que no son escalares"
