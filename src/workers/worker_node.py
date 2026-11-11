@@ -6,6 +6,7 @@ import logging
 import os
 import shutil
 import signal
+import sys
 import threading
 import time
 from datetime import datetime, timezone
@@ -488,8 +489,16 @@ def main() -> None:
         worker_id=settings.worker_id,
     )
     cgroup_path = os.environ.get("CGROUP_PATH", "/sys/fs/cgroup")
+    supervisor = None
+    if sys.platform != "win32":
+        from src.adapters.posix_process_runner import PosixProcessRunner
+        from src.application.process_supervisor import ProcessSupervisor
+        from src.infrastructure.clock import SystemClock
+
+        supervisor = ProcessSupervisor(PosixProcessRunner(), SystemClock(), time.sleep)
     Worker(
         settings,
+        supervisor=supervisor,
         resource_reader=reader,
         footprints=footprints,
         admission_margin=margin,
