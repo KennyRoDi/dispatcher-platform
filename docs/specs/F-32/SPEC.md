@@ -1,6 +1,6 @@
 # SPEC F-32: Routing por tipo de nodo
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision e712255
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J
@@ -82,3 +82,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude-code | 2026-11-10 | Documentacion: AD-32 y seccion M5 (2 archivos, 11 lineas), bitacora con error-ia publicada. Verificacion no independiente (2b0ba2c) (2b0ba2c) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de revision | claude-code | 2026-11-10 | Revision: diff cumple SPEC (RoutingTable, config, AD-32, ficha M5); 23 pruebas verdes (e712255) |
+| revision | José Andrés Loría Herrera | 2026-11-10 |  |
