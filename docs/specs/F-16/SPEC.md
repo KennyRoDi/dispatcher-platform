@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** documentacion 5becb97
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -120,3 +120,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Codex | 2026-11-10 | QA final verificada en informe 0a878ef: reproduje 77 pruebas focalizadas, todas pasan. Fix 7d7ce7b exige NODE_NAME == hostname; la regresión falló antes como esperado. Suite completa 1162 passed, 2 skipped, 3 deselected, 1 warning Starlette, reproducida tras fix. QA mantiene tres cgroups locales claramente separados; Tailscale alcanza por ping hp-nahum/magdalena, SSH no responde, faltan .env de nodos; B/C/D y runtime GPU pendientes por excepción humana. git diff --check limpio y árbol limpio. (0a878ef) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | Codex | 2026-11-10 | Verificación documental mínima tras fix 7d7ce7b: revisé el borrador de bitácora en 5becb97. Añade hallazgo NODE_NAME/hostname, prueba roja y fix; conteos finales 1162/2/3; mantiene evidencia B/C/D pendiente y no la sustituye por host local. git show --check limpio y árbol limpio. Solo documentación, no repetí suite. (5becb97) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
