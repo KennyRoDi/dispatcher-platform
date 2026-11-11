@@ -134,6 +134,19 @@ Hallazgos de QA que se aceptan y se declaran:
 - Prueba inestable de la suite completa, 1 vez en 4, sin identificar. Hipótesis sin confirmar: las pruebas que recorren el historial git.
 - La parte 2 no cablea el proveedor al almacén; es la parte 3.
 
+## Límites declarados de la parte 3
+
+- `size` menor al real, con un almacén interno que lee exactamente `size` bytes: guarda un objeto truncado sin error en `put`; `open` falla después con `DecryptionError`.
+- `dek` y `kek` son variables locales en las trazas de `envelope_cipher` (parte 1). No activar `include_local_variables` ni `--showlocals`.
+- `exists` devuelve `True` con un objeto corrupto: solo comprueba presencia.
+- El flujo interno no se cierra al llegar al EOF sino al `close`.
+- `FakeObjectStore.put` usa `setdefault`: no sobrescribe un objeto existente.
+- Prueba I no ejecutada: no hay MinIO local (sin imagen ni binario). Solo se colecta y se salta.
+- `open` descifra el primer chunk al abrir.
+- Prueba inestable de la suite completa: unas 2 de ~8 corridas. Hipótesis sin confirmar: pruebas que leen el historial git justo después de un commit. No identificada.
+
+**Para cerrar F-28 como feature falta:** (1) cablear `EncryptedObjectStore` al adaptador MinIO de F-23 (Melany); (2) ficha M4 con datos medidos; (3) ejecutar la prueba I contra MinIO real y registrar la salida. Hasta entonces el módulo M4 tiene máximo 2.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.

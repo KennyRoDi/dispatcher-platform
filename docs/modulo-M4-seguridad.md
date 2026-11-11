@@ -40,3 +40,34 @@ Implementado en el proveedor de archivo (`FileKeyProvider`).
 - Búsqueda de llaves en el historial: `git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'` (la automatiza `test_historial_sin_llaves`).
 
 **Mediciones:** costo de leer la KEK en cada llamada: pendiente, sin datos medidos.
+
+### Decorador de almacén cifrado (F-28 parte 3)
+
+Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`), decorador de `ObjectStore`.
+
+- `put` cifra el flujo con `EnvelopeCipher` antes de entregarlo al almacén interno; `open` descifra al leer. La clave sigue siendo el SHA-256 del claro (AD-11), por eso `exists` se delega sin cambios.
+- Cifra el contenido del objeto (cabecera, DEK envuelta y chunks con etiqueta). No cifra la clave ni oculta el tamaño.
+- Al almacén interno se le informa el tamaño del objeto cifrado: cabecera + claro + una etiqueta por chunk.
+- `open` descifra el primer chunk al abrir: un objeto corrupto o una KEK errónea fallan en `open`, no en la primera lectura.
+- **El cableado al adaptador MinIO no está hecho.** Ese adaptador es de F-23 (Melany); hoy `src/workers/storage.py` usa el cliente directo. Este decorador aún no se usa en el flujo real.
+
+**Justificación (AD-16, AD-34):** AES-256-GCM en la aplicación protege también contra quien lee MinIO, lo que SSE del lado del servidor no cubre. Una DEK por objeto envuelta por una KEK de archivo `0400` evita reutilizar nonces. Se eligió sobre MinIO SSE, LUKS y Vault por costo operativo con el tiempo disponible. Detalle en `docs/ARQUITECTURA.md` §8.
+
+#### Prueba I contra MinIO real
+
+Archivo: `tests/integration/test_encrypted_object_store_minio.py`. Usa un adaptador mínimo solo de prueba. Sin las variables, se salta.
+
+```bash
+export MINIO_ENDPOINT=<host:puerto> MINIO_ACCESS_KEY=<usuario> MINIO_SECRET_KEY=<clave>
+pytest -q -m integration tests/integration/test_encrypted_object_store_minio.py
+```
+
+**Salida:** pendiente: la prueba I no se ha ejecutado contra MinIO real. Sin datos.
+
+#### Búsqueda de llaves en el historial
+
+Automatizada en `tests/unit/test_historial_sin_llaves.py`. Comando manual: `git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'`.
+
+**Salida:** pendiente: la prueba I no se ha ejecutado contra MinIO real; la búsqueda manual tampoco se ha registrado aquí.
+
+**Mediciones:** costo de CPU del decorador: pendiente, sin datos medidos.
