@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion df42621
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -116,3 +116,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA no independiente: contrato aplicado a FakeObjectStore y EncryptedObjectStore en verde; mutantes (almacen que confirma tras fallo de lectura, open sin KeyError) detectados. Sin mediciones en esta parte. (b8ec62f) |
 | verificacion | Melany Vindas | 2026-11-11 | Suite verde en Linux (3432); en Windows 6 modulos de F-27/F-28/F-29 no cargan por fcntl y os.geteuid, ajenos a F-23. Pruebas del contrato en verde en Windows (41 passed). |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: fila de ObjectStore en CONTRATOS.md con ambas reglas; sin ficha (no hay mediciones en esta parte); bitacora publicada con un error real de la IA. (df42621) |
+| documentacion | Melany Vindas | 2026-11-11 |  |
