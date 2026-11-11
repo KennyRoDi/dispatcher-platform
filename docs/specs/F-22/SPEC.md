@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-22-1-chunks-verificados
 **Verificación IA:** documentacion 5df88a5
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -213,3 +213,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) re-verifico: H3, H4 y H5 cerrados con sondas en uvicorn real (1 GiB sin Content-Length o mentiroso: 413, RAM +6 MiB; 100000 chunks 201, 100001 422; 50 rondas de complete y PUT concurrentes sin 500). Hallazgo H6: copia final dejaba 2 chunks en RAM; arreglado con un buffer reservado sin copia (B.5 M3). 8 pruebas de QA matan 4 mutantes vivos. Suite 1141 verde, integracion 4/4 en 3 corridas. (3810af4) |
 | verificacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. Diff solo en docs/specs/F-22/SPEC.md (protocolo con 413, tope 100000 chunks, 404 concurrente, 503; H2 resuelto, H7 informativa) y AD-28 en ARQUITECTURA. Sin ficha M3: no hay datos medidos (parte 3). README sin cambios: el despliegue no cambio. Bitacora con 4 errores reales de la IA. (5df88a5) |
+| documentacion | Melany Vindas | 2026-11-11 |  |
