@@ -1,8 +1,8 @@
 # SPEC F-14: Alertas
 
-**Fase:** pr
-**Base:** feat/F-14-1-alertas
-**Verificación IA:** revision fca1529
+**Fase:** cerrada
+**Base:** feat/F-14-2-alertas
+**Verificación IA:** revision d9439e3
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -143,4 +143,17 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-39, curl de GET /alerts en DEMO.md, bitacora en estado; sin cambios de codigo (c053c76) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: ~108 lineas src, AlertReader con contrato y doble, 503 fijo, AD-39 coincide con codigo; 4 menores no bloqueantes anotados en CLAUDE.md local (fca1529) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y ayudas (b952465); src intacto; test_cierre_alertas: 11 fallan por asercion (no se publica alerta aun) y 5 de regresion pasan; aceptacion A con reloj sintetico, evidencia solo con F14_EJEMPLO_JSON (b952465) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | pytest + revision | 2026-11-11 | Llamada protegida de cierre en rutas_subtareas.py (7bea224, +12/-2); suite verde; sin ediciones a pruebas; toca archivo de Nahum (7bea224) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: log de alerta usa %s con case_id controlado por el cliente (inyeccion de lineas); previos de Nahum quedan como limites declarados |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Log de alerta con %r (8ee78c6); suite verde; 3 xfail previos de Nahum quedan estrictos con reason actualizado (8ee78c6) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | orquestador | 2026-11-11 | QA: 1 defecto propio corregido; 3 previos a F-14 declarados como limites; sin segundo QA (2abf516) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 3 en AD-39 (AlertingFindingStore sin cablear: verificado con grep), prueba A con reloj sintetico, previos de Nahum declarados; bitacora en estado; sin cambios de codigo (be6051f) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 3: +12/-2 src, respuesta sin cambios, prueba A con FakeClock sin inventar valores, AD-39 honesto (AlertingFindingStore sin cablear); 2 menores no bloqueantes anotados en CLAUDE.md local (d9439e3) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
