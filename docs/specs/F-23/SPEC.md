@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan f769b4c
+**Verificación IA:** tests 8b99f88
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -109,3 +109,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: el orquestador escribio el SPEC, verificacion no independiente. Sin campos pendientes; conformidad 0. Comprobado en codigo: FakeObjectStore y EncryptedObjectStore ya cumplen el contrato nuevo (put fallido no confirma, open inexistente lanza KeyError); minio-py 7.2.20 aborta el multipart ante error de lectura; CaseSource ya referencia por sha256; AD-41 libre (ultima AD-40). Pila de 4 partes: contrato, adaptador MinIO, dedup antes de transferir, medicion. (f769b4c) |
 | plan | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. Parte solo de contrato: comprobar_object_store exige KeyError en open inexistente y que un put cuya lectura falla no deje objeto; fila de ObjectStore en CONTRATOS.md. Pasan con FakeObjectStore y EncryptedObjectStore, como preveia el SPEC. Mutantes: almacen que confirma tras fallo y open sin KeyError, ambos detectados. Suite 3432 verde; 3 fallos preexistentes de main ajenos (process_supervisor, tls_cableado). (8b99f88) |
