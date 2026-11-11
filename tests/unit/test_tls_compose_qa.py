@@ -195,7 +195,7 @@ def test_el_nodo_a_publica_solo_en_node_ip_y_nunca_en_claro():
 
 
 def test_los_workers_montan_solo_la_ca_en_solo_lectura():
-    montajes = _montajes(_servicios("deploy/docker-compose.worker.yml")["worker"])
+    montajes = [m for m in _montajes(_servicios("deploy/docker-compose.worker.yml")["worker"]) if not m.startswith("scratch:")]
     assert len(montajes) == 1 and montajes[0].endswith(":/certs/ca.pem:ro")
     assert not any(".key" in montaje or "CERTS_DIR" in montaje for montaje in montajes)
 

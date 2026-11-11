@@ -219,7 +219,7 @@ def test_worker_no_recibe_llaves_ni_el_directorio_de_certificados(worker):
 
 
 def test_compose_local_apaga_tls_explicitamente_con_servicios_en_claro(local):
-    for nombre in ("coordinator", "reaper", "worker"):
+    for nombre in ("coordinator", "reaper", "worker-1", "worker-2", "worker-3"):
         entorno = _entorno(_servicio(local, nombre))
         assert entorno.get("TLS_ENABLED") == "false", f"{nombre} sin TLS_ENABLED=false"
 
