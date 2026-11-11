@@ -569,3 +569,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Generacion rc 0 en 173 s, 490 archivos, 1,9 GB; el validador imprimio 'cumple los minimos de B.3'. Recuento desde manifest.json: 40 casos, 300 imagenes, 150 audios, 25 textos, 10 documentos, 5 videos, 5 casos con archivo >= 200 MiB. pytest: 1637 passed, 7 skipped, 3 xfailed. |
 | Validado / corregido / descartado | El orquestador recontó desde manifest.json (audio ruido/tono, casos livianos/pesados, videos), AD-25 y el sha256 del manifiesto. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por autorizacion de la persona (parte solo documental); la verificacion fue del orquestador, sin QA independiente; el enlace de Drive de los casos pesados queda pendiente: lo aporta la persona. |
 | Cómo se validó | No se verifico la cifra exacta de mensajes ni el enlace de Drive (no existe aun). Las aprobaciones de fase las dio el orquestador por delegacion de la persona, que no estuvo presente. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-1-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Desbloquear cierre F-19 en Windows por solicitud explicita de la persona |
+| Consulta resumida | Arreglar permisos temporales y fallos de compatibilidad que impedian probar y abrir PR |
+| Resultado obtenido | Commit 5e5cbc8: omision POSIX en Windows, rechazo de rutas POSIX y Windows y nombres de caso no simples; PR 52 abierta sobre main |
+| Validado / corregido / descartado | Suite general y cierre pasaron en Windows. No se omitieron validaciones de cierre. Los limites de procesos reales y mediciones siguen pendientes |
+| Cómo se validó | Suite requerida: 1624 passed, 5 skipped, 8 deselected, 19 xfailed; 8 casos dirigidos despues de ampliar parametros; conformidad 0 problemas; flujo cierre exitoso |
+| Error de la IA | La primera ejecucion uso temporales del sandbox y produjo errores de entorno; se corrigio ejecutando con acceso normal a temporales y se verifico la suite completa |
