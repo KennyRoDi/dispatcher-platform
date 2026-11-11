@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 171ca2b
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests (2 archivos nuevos, be57e0f), src intacto; ambos fallan en coleccion con ModuleNotFoundError (rojo); API asumida declarada (be57e0f) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Dominio y aplicacion implementados (171ca2b, ~90 lineas src, sin ediciones a pruebas); suite verde (171ca2b) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
