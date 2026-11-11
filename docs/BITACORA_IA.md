@@ -582,3 +582,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Suite general y cierre pasaron en Windows. No se omitieron validaciones de cierre. Los limites de procesos reales y mediciones siguen pendientes |
 | Cómo se validó | Suite requerida: 1624 passed, 5 skipped, 8 deselected, 19 xfailed; 8 casos dirigidos despues de ampliar parametros; conformidad 0 problemas; flujo cierre exitoso |
 | Error de la IA | La primera ejecucion uso temporales del sandbox y produjo errores de entorno; se corrigio ejecutando con acceso normal a temporales y se verifico la suite completa |
+
+## 2026-11-10 · Kenni Rodriguez · F-40 (`feat/F-40-1-matriz-historial-y-bitacora`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Sonnet 5.5 (orquestador); subagentes arquitecto y documentador con Claude Sonnet 5.5 |
+| Componente | F-40 |
+| Propósito | Actualizar docs/responsabilidades.md de F-40 con filas por modulo y componente, comandos de verificacion con salida real y limites del historial, sin rellenar decisiones abiertas. |
+| Consulta resumida | Plan de F-40 (arquitecto), captura de git shortlog y git log por ruta con fecha (documentador) y verificacion con conformidad.py. |
+| Resultado obtenido | docs/responsabilidades.md con M1 a M5, cinco filas de componentes y secciones Verificacion, Limites del historial y Bitacora de IA. conformidad.py: 0 problemas; pytest: 1637 passed, 7 skipped, 3 xfailed. |
+| Validado / corregido / descartado | El orquestador reprodujo shortlog en main, el recuento de la bitacora en estado (45 entradas) y conformidad.py. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por autorizacion de la persona (feature solo documental); la verificacion fue del orquestador sin QA independiente; las aprobaciones fueron delegadas. |
+| Cómo se validó | Apoyo por modulo, filas no modulo, .mailmap, Nahum Murillo y bitacoras de M2, M4 y M5 quedan como pendientes de decision del equipo; no se verifico la autoria por persona mas alla del conteo de git. |
+| Error de la IA | El SPEC propuso SUP-23 y SUP-24 para decisiones nuevas, pero esos numeros ya existian en REQUERIMIENTOS.md y ARQUITECTURA.md (F-16 y preflight); se detecto al revisar el repositorio y se corrigio el SPEC. Ademas, un primer recuento de commits por dia con git log --since dio cifras menores que las reales (Kenni 8 en vez de 42 el 03/nov) por filtrar por fecha de commit; se repitio con awk sobre la fecha de autor. |
