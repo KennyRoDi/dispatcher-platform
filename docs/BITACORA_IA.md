@@ -1259,3 +1259,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Salida cruda guardada en docs/evidencia/mediciones-f37-integracion |
 | Cómo se validó | Revisión del diff y de la salida de pytest |
 | Error de la IA | La prueba de integración F-37 se describía como prueba con WorkerNode y Redis, pero solo verifica funciones puras; detectado al leerla y corregido en la ficha |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-23 (`feat/F-23-2-guardar-objetos-por-contenido-en-minio`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-23 |
+| Propósito | F-23 parte 2: adaptador MinIO y pruebas de integración |
+| Consulta resumida | Implementar MinioObjectStore para guardar por SHA-256, deduplicar puts, cerrar respuestas HTTP y validar con MinIO real. |
+| Resultado obtenido | Adaptador y pruebas unitarias/de integración: 4 pruebas con MinIO real; cambios de ruta/import para alinear el archivo de integración al SPEC. |
+| Validado / corregido / descartado | pytest -m integration tests/integration/test_minio_object_store.py: 4 passed; unitarias 23 passed; conformidad 0. |
+| Cómo se validó | Se implementó el adaptador y se comprobó en MinIO efímero local; la verificación del orquestador no fue independiente. |
+| Error de la IA | Una primera ejecución de pruebas en Windows señaló colisión por dos módulos homónimos; se renombró el módulo unitario y se alineó el nombre de integración al SPEC. |
