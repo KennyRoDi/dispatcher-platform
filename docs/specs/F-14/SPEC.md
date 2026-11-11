@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-14-1-alertas
-**Verificación IA:** tests 3682776
+**Verificación IA:** implementacion b0b8803
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y dobles (3682776); src intacto; test_redis_alert_stream y test_rutas_alertas fallan en coleccion con ModuleNotFoundError (rojo); se modifico FakeAlertPublisher(reloj=None) en dobles.py (compatible); integracion validada con redis:7-alpine local por el developer con implementacion desechable (3682776) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | pytest + revision | 2026-11-11 | Adaptador RedisAlertStream, puerto AlertReader y GET /alerts implementados (b0b8803, ~88 lineas src); suite verde; integracion pasa con redis:7-alpine local (reportado por developer); 0 contenedores restantes (b0b8803) |
