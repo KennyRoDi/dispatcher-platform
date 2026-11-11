@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan c37a765
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -136,3 +136,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-26 sin campos pendientes (grep), solo toca el SPEC, commit empujado. AD-33, SUP-28 y SUP-29 sin uso en ninguna rama remota (grep). Preguntas abiertas en CLAUDE.md con decision provisional. Matriz es interpretacion del arquitecto: no verificada contra el enunciado por mi. (c37a765) |
