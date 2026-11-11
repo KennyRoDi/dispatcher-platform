@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-03-6-dataset-sintetico
 **Verificación IA:** implementacion 3cbe56f
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -199,3 +199,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | pytest: 1588 passed, 7 skipped, 6 xfailed. Con --runxfail los 6 xfail de test_dataset_parte7_qa.py fallan. Diff desde la implementacion solo añade esa prueba y el SPEC; src/scripts intactos. Reproduccion ffmpeg real (seed 7, diff -r identico) es dato del QA, no repetido. (153e182) |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA parte 7: corregir hallazgos 1 (sustituto Unicode en _check_row), 4 (--out enlace roto como error de uso) y 5 (rechazo de enlace no borra manifest previo); 2, 3 y 6 quedan como pendientes locales |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | pytest unit: 1591 passed, 7 skipped, 3 xfailed (hallazgos 2,3,6 pendientes); integracion 3 passed. Diff desde QA: scripts/dataset_sintetico.py (8+/7-) y solo 3 lineas xfail quitadas en test_dataset_parte7_qa.py; sin otras pruebas tocadas. (3cbe56f) |
+| implementacion | Kenni Rodriguez | 2026-11-10 |  |
