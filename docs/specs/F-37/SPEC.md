@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-37-1-saturacion-de-memoria
-**Verificación IA:** revision 1dae42e
+**Verificación IA:** tests 3f614b2
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
 
 ## Objetivo
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5) | 2026-11-11 | Diff contra main coincide con SPEC parte 1; AD-41 y SUP-36 a SUP-38 presentes y citados; 22 unitarias verdes. Revision no independiente. (1dae42e) |
 | revision | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
+| verificación IA de tests | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Parte 2 es solo docs/evidencia (SPEC Plan de pila: sin codigo, corrida real pendiente en nodos WSL2). Las pruebas del escenario (unitarias, aceptacion JSON, integracion Linux) ya estan en main desde la parte 1; no hay pruebas nuevas que escribir. Excepcion de la fase tests. (3f614b2) |
