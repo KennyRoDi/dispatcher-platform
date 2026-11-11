@@ -1,12 +1,11 @@
 import fakeredis
 import pytest
-import redis
 from fastapi.testclient import TestClient
 
 import src.coordinator.main as main
-from src.adapters.redis_backpressure import INTENTOS, transaccion_acotada
+from src.adapters.redis_backpressure import transaccion_acotada
 from src.coordinator import conexion
-from src.domain.backpressure import QueueLimit
+from src.domain.backpressure import CaseTooLarge, QueueLimit
 from src.domain.subtask import QueueFull
 
 COLA = "queue:transcode_video"
@@ -62,9 +61,9 @@ def test_transaccion_con_espacio_ejecuta_los_comandos(fake):
 def test_transaccion_sin_espacio_rechaza_y_no_escribe(fake):
     llenar(fake, COLA, 4)
     with pytest.raises(QueueFull):
-        transaccion_acotada(fake, {COLA: 2}, QueueLimit(5, 5), lambda pipe: pipe.set("caso", "1"))
+        transaccion_acotada(fake, {COLA: 2}, QueueLimit(5, 5), lambda pipe: pipe.hset("caso", mapping={"a": 1}))
     assert fake.llen(COLA) == 4
-    assert fake.get("caso") is None
+    assert not fake.exists("caso")
 
 
 def test_basta_una_cola_llena_para_rechazar_todo(fake):
@@ -74,11 +73,14 @@ def test_basta_una_cola_llena_para_rechazar_todo(fake):
     assert fake.llen(COLA) == 0
 
 
-class PipelineQueSiempreCambia:
-    """Simula que otro cliente toca la cola vigilada en cada intento."""
+class RedisQueNoDebeEvaluar:
+    """Con el límite desactivado se usa el pipeline de siempre, sin script ni vigilancia."""
 
     def __init__(self):
-        self.intentos = 0
+        self.ejecutados = 0
+
+    def pipeline(self, transaction=True):
+        return self
 
     def __enter__(self):
         return self
@@ -86,35 +88,29 @@ class PipelineQueSiempreCambia:
     def __exit__(self, *_):
         return False
 
-    def watch(self, *_):
-        self.intentos += 1
-
-    def llen(self, _):
-        return 0
-
-    def multi(self):
-        pass
-
     def execute(self):
-        raise redis.WatchError("cola modificada")
+        self.ejecutados += 1
 
-    def reset(self):
-        pass
-
-
-class RedisQueSiempreCambia:
-    def __init__(self):
-        self.pipe = PipelineQueSiempreCambia()
-
-    def pipeline(self, transaction=True):
-        return self.pipe
+    def eval(self, *_):
+        raise AssertionError("con el límite desactivado no se evalúa el script")
 
 
-def test_reintenta_ante_cambios_concurrentes_y_luego_rechaza():
-    r = RedisQueSiempreCambia()
-    with pytest.raises(QueueFull):
-        transaccion_acotada(r, {COLA: 1}, QueueLimit(5, 5), lambda pipe: None)
-    assert r.pipe.intentos == INTENTOS == 5
+def test_sin_limite_usa_el_pipeline_de_siempre():
+    r = RedisQueNoDebeEvaluar()
+    transaccion_acotada(r, {COLA: 1}, QueueLimit(0, 5), lambda pipe: None)
+    assert r.ejecutados == 1
+
+
+def test_caso_que_no_cabria_ni_con_la_cola_vacia_es_otro_error(fake):
+    with pytest.raises(CaseTooLarge):
+        transaccion_acotada(fake, {COLA: 6}, QueueLimit(5, 5), lambda pipe: pipe.rpush(COLA, "x"))
+    assert fake.llen(COLA) == 0
+
+
+def test_hset_con_valores_no_texto_se_escribe_igual(fake):
+    transaccion_acotada(fake, {COLA: 1}, QueueLimit(5, 5),
+                        lambda pipe: (pipe.hset("caso", mapping={"total": 3, "estado": "queued"}), pipe.rpush(COLA, "a")))
+    assert fake.hgetall("caso") == {"total": "3", "estado": "queued"}
 
 
 @pytest.fixture
@@ -170,3 +166,15 @@ def test_sin_limite_admite_aunque_la_cola_este_muy_llena(api, fake, monkeypatch)
     llenar(fake, COLA, 500)
     assert crear(api).status_code == 201
     assert fake.llen(COLA) == 501
+
+
+def test_caso_mas_grande_que_el_limite_responde_422(api, fake):
+    respuesta = crear(api, "videos/a.mp4", "videos/b.mp4", "videos/c.mp4", "videos/d.mp4")
+    assert respuesta.status_code == 422
+    assert fake.llen(COLA) == 0
+
+
+@pytest.mark.parametrize("env", [{"QUEUE_MAX_DEPTH": "abc"}, {"QUEUE_RETRY_AFTER": "0"}])
+def test_configuracion_invalida_falla_al_arrancar(env):
+    with pytest.raises(ValueError):
+        main.crear_app({**env, "AUTH_ENABLED": "false"})

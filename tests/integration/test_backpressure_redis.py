@@ -101,3 +101,35 @@ def test_productores_concurrentes_nunca_superan_el_limite(r):
     assert max(muestras) <= LIMITE
     assert r.llen(COLA) == LIMITE
     assert r.scard("cases:registry") == LIMITE
+
+
+@pytest.mark.parametrize("consumidores", [0, 4])
+def test_con_espacio_de_sobra_la_contencion_no_produce_503(r, monkeypatch, consumidores):
+    """QA F-24 H1: lejos del límite, ningún productor debe recibir 503 solo por contención de WATCH."""
+    monkeypatch.setenv("QUEUE_MAX_DEPTH", "1000")
+    codigos = []
+    terminado = threading.Event()
+    barrera = threading.Barrier(PRODUCTORES)
+
+    def consumir():
+        while not terminado.is_set():
+            r.lpop(COLA)
+
+    def producir():
+        cliente = TestClient(main.app)
+        barrera.wait()
+        for _ in range(CASOS_POR_PRODUCTOR):
+            codigos.append(cliente.post("/cases", json={"subtasks": [{"task_type": "auto", "file_path": "videos/a.mp4"}]}).status_code)
+
+    workers = [threading.Thread(target=consumir) for _ in range(consumidores)]
+    hilos = [threading.Thread(target=producir) for _ in range(PRODUCTORES)]
+    for hilo in workers + hilos:
+        hilo.start()
+    for hilo in hilos:
+        hilo.join()
+    terminado.set()
+    for hilo in workers:
+        hilo.join()
+
+    assert PRODUCTORES * CASOS_POR_PRODUCTOR < 1000
+    assert codigos.count(503) == 0, f"{codigos.count(503)} de {len(codigos)} rechazados con la cola lejos del límite"
