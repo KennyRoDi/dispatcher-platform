@@ -1,6 +1,6 @@
 # SPEC F-12: Cancelación real
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-12-1-cancelacion-real
 **Verificación IA:** revision 961d56d
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
@@ -80,3 +80,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Diff revisado: AD-30, reutilizacion.md y evidencia medida; verificacion no independiente (594083a) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de revision | Claude Code (Sonnet 5.5) | 2026-11-10 | APROBADO con observaciones: diff cubre criterio, clave cancel, scratch en finally, SIGTERM del worker; multimedia_processor y main() aun sin supervisor (SPEC lo preveia), registrado como punto abierto en AD-30; revision no independiente (961d56d) |
+| revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
