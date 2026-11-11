@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-23-3-deduplicar-antes-de-transferir
 **Verificación IA:** verificacion 29a3d33
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -136,3 +136,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-11 | Implementación F-23 parte 3 validada en el commit 1ceae1e: pruebas focalizadas 115 passed, MinIO real 4 passed, conformidad 0. Composición cifrada y staging persistente; sin dataset no hay medición de M3. QA no independiente. (673e304) |
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó autonomía; pruebas unitarias e integración real en verde, conformidad 0, CI pendiente. |
 | verificación IA de verificacion | Codex | 2026-11-11 | QA F-23: dedup responde antes de staging; test prueba que no se crea manifiesto, cliente no envía chunks; composición minio cifrada siempre, TLS exige secure, volumen de staging montado. 115 unitarias, 4 MinIO real, conformidad 0. Medición M3 pendiente por ausencia de dataset/coordinador; verificación no independiente. (29a3d33) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó autonomía; funcionalidad probada. No se producen cifras de tasa sin dataset completo y entorno MinIO/coordinador con bucket limpio. |
