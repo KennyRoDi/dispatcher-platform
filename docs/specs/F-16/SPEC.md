@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** implementacion 7d7ce7b
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -116,3 +116,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Codex | 2026-11-10 | Hallazgo revisión: contrasté test/unit diff 2776de2, solo agrega regresión NODE_NAME != hostname. Reproduje py -m pytest -q tests/unit/test_f16_preflight.py -k node_name_distinto --tb=short: 1 failed con DID NOT RAISE ValueError, 21 deselected, fallo exacto esperado por hueco. git show --check limpio, árbol limpio. (2776de2) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | Autorización humana: la fase tests se repite tras hallazgo de revisión, pero la rama ya contiene implementación previamente aprobada; la regresión nueva sí quedó aislada y roja antes del fix. |
 | verificación IA de implementacion | Codex | 2026-11-10 | Implementación del hallazgo NODE_NAME: revisé fix 7d7ce7b y fixtures; validate_config exige NODE_NAME presente e igual a service.hostname antes de validar NODE_IP y presupuesto. La prueba roja de revisión detecta mismatch. Reproduje py -m pytest -q -m "not integration and not acceptance": 1162 passed, 2 skipped, 3 deselected, 1 warning preexistente Starlette, 47.17s. git diff --check base...HEAD limpio y árbol limpio. Sin Docker nuevo ni mediciones B/C/D; limitación humana previa sigue vigente. (7d7ce7b) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
