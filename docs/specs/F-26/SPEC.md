@@ -1,6 +1,6 @@
 # SPEC F-26: Autenticación y roles
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-26-2-autenticacion-y-roles
 **Verificación IA:** verificacion aeaf130
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
@@ -183,3 +183,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests. Ejecute suite completa tras f792c68: 2048 passed, 7 skipped, 3 xfailed. 144 lineas añadidas en src/scripts. Desviacion a revisar: middleware AutenticacionPrevia se salta la verificacion si app.dependency_overrides contiene autorizar (codigo de produccion conoce el mecanismo de pruebas); verify corre dos veces por peticion. (f792c68) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | Diff aeaf130 solo tests/unit/test_cableado_qa.py (src intacto). Ejecute el archivo: ver salida de pytest. QA sin bypass de autenticacion; 7 hallazgos bajos (OverflowError en --minutos, sub vacio, root_path, doble verify, sin aviso con AUTH_ENABLED=false, JWT_SECRET no UTF-8 filtra caracter, .gitignore parcial) como xfail strict, a declarar como limites. Salto por dependency_overrides no alcanzable por red (no reproduje yo el analisis). (aeaf130) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
