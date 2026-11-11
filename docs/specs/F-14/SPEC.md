@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** implementacion 171ca2b
+**Verificación IA:** implementacion 3337814
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Dominio y aplicacion implementados (171ca2b, ~90 lineas src, sin ediciones a pruebas); suite verde (171ca2b) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: generador agotado en add, publicador sin Safe propaga, estado no hashable da TypeError, case_id inyecta lineas en log, publicador async se pierde |
+| verificación IA de implementacion | orquestador | 2026-11-11 | 5 hallazgos QA corregidos en 3337814; suite verde; solo se quitaron marcadores xfail (3337814) |
