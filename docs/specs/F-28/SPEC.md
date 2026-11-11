@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-28-1-cifrado-en-reposo
-**Verificación IA:** revision 96b0f6b
+**Verificación IA:** tests c01f1cf
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -147,3 +147,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: diseño=codigo, AD-34 y limites reflejan desviaciones, sin llaves fijas, capas verdes, numeracion libre; pytest segun revisor 1825 passed/6 xfailed. Menor 1 corregido por mi en el SPEC. Cita NIST no verificada. (96b0f6b) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo tests (test_file_key_provider.py, dobles.py, contratos.py); src intacto. Ejecute: test_file_key_provider error de coleccion ModuleNotFoundError (rojo); arquitectura y contratos verdes. Decisiones del developer no fijadas en SPEC: sigue symlinks, rechaza bits de grupo/otros, KEK_FILE gana sobre KEK, KEK base64, sin cache. Exige *.kek y kek* en .gitignore. (c01f1cf) |
