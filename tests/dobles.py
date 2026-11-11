@@ -128,3 +128,14 @@ class FakeAlertPublisher:
 
     def publish(self, kind, case_id, detail):
         self.alertas.append((kind, case_id, detail))
+
+
+class FakeCaseCatalog:
+    def __init__(self, casos=()):
+        self.casos = {caso.case_id: caso for caso in casos}
+
+    def add(self, caso):
+        self.casos[caso.case_id] = caso
+
+    def case(self, case_id):
+        return self.casos.get(case_id)

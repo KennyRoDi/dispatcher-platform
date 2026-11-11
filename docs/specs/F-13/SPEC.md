@@ -1,8 +1,8 @@
 # SPEC F-13: Reporte consolidado
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision 131a892
+**Base:** feat/F-13-1-reporte-consolidado
+**Verificación IA:** revision 3067dd4
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -125,4 +125,17 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | AD-38 y SUP-34 añadidos (provisionales), limites en AD-38, bitacora en estado; sin cambios de codigo (b1adfc1) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 1: dominio 329 lineas src, capas puras, SPEC cumplido, AD-38 y SUP-34 presentes; menores no bloqueantes (f-strings largas, tipos de retorno) (131a892) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y dobles (51cfecb); src intacto; test_build_report.py falla en coleccion con ModuleNotFoundError src.application.build_report (rojo); API asumida declarada (51cfecb) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | pytest + revision | 2026-11-11 | Aplicacion implementada (7a18d66, ~135 lineas src, sin ediciones a pruebas); suite verde (7a18d66) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: exists que lanza tumba el reporte, extracto de audio erroneo, sin tope, sin UTC, sha vacio enlaza, surrogate, N+1 exists |
+| verificación IA de implementacion | orquestador | 2026-11-11 | 7 hallazgos QA corregidos en 1ad0b7f; suite verde; solo se quitaron decoradores xfail; limite: almacen caido sale como objeto_inexistente (1ad0b7f) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | orquestador | 2026-11-11 | QA 7 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (42e198b) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-38 (solo docs/ARQUITECTURA.md); bitacora en estado; sin cambios de codigo (e207627) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: 181 lineas src, capas ok, CaseCatalog con contrato y doble, limites AD-38 coinciden; 4 menores no bloqueantes anotados en CLAUDE.md local (3067dd4) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
