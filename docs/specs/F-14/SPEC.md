@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-14-1-alertas
 **Verificación IA:** revision fca1529
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -143,3 +143,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-39, curl de GET /alerts en DEMO.md, bitacora en estado; sin cambios de codigo (c053c76) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: ~108 lineas src, AlertReader con contrato y doble, 503 fijo, AD-39 coincide con codigo; 4 menores no bloqueantes anotados en CLAUDE.md local (fca1529) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
