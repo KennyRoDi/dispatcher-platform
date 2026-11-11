@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 6bd4d8a
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -164,3 +164,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (ARQUITECTURA AD-37, REQUERIMIENTOS SUP-33, modulo-M4 nuevo borrador, SPEC); rama alineada con origen. Aviso: modulo-M4-seguridad.md se crea tambien en las ramas de F-26/F-28/F-29?/F-30: habra conflicto al fusionar (resolver al fusionar). Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (493999b) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: tls.py cumple diseño, sin llaves ni certificados versionados, trustme solo en dev; pytest segun revisor 1864 passed/3 xfailed, integracion TLS 25 passed/3 xfailed. Menores: estimacion de lineas (128 vs 110), conflicto de modulo-M4 con otras ramas al fusionar. (6bd4d8a) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
