@@ -17,6 +17,8 @@ from src.domain.evidence_position import MessageLocator
 from src.domain.finding import EvidenceRef, Finding, Severity
 from tests.dobles import FakeCaseCatalog, FakeClock, FakeFindingStore, FakeObjectStore
 
+pytestmark = pytest.mark.usefixtures("sin_autorizacion")
+
 SHA = "a" * 64
 INICIO = datetime(2026, 11, 3, 8, 0, tzinfo=timezone.utc)
 AHORA = datetime(2026, 11, 3, 10, 0, tzinfo=timezone.utc)
