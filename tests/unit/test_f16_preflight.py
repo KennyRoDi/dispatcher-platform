@@ -12,7 +12,7 @@ def _config(memory=4 * 1024**3, swap=4 * 1024**3):
         "services": {
             "worker": {
                 "hostname": "node-b",
-                "environment": {"NODE_IP": "100.64.0.2"},
+                "environment": {"NODE_NAME": "node-b", "NODE_IP": "100.64.0.2"},
                 "mem_limit": memory,
                 "memswap_limit": swap,
             }
@@ -75,7 +75,7 @@ def test_preflight_suma_limites_de_todos_los_workers():
     config = _config()
     config["services"]["worker-2"] = {
         "hostname": "node-b",
-        "environment": {"NODE_IP": "100.64.0.2"},
+        "environment": {"NODE_NAME": "node-b", "NODE_IP": "100.64.0.2"},
         "mem_limit": 4 * 1024**3,
         "memswap_limit": 4 * 1024**3,
     }

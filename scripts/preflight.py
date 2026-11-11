@@ -73,10 +73,14 @@ def validate_config(config: dict, node_memory: int) -> None:
             raise ValueError(f"Servicio {name} inválido")
         environment = service.get("environment") or {}
         if "worker" in name.lower():
-            if not service.get("hostname"):
+            hostname = service.get("hostname")
+            node_name = environment.get("NODE_NAME")
+            if not hostname or not node_name:
                 raise ValueError(f"Servicio {name} no define NODE_NAME como hostname")
-            for variable in ("NODE_NAME", "NODE_IP"):
-                value = service.get("hostname") if variable == "NODE_NAME" else environment.get(variable)
+            if hostname != node_name:
+                raise ValueError(f"NODE_NAME debe coincidir con hostname en el servicio {name}")
+            for variable in ("NODE_IP",):
+                value = environment.get(variable)
                 if not value:
                     raise ValueError(f"{variable} es obligatorio para el worker")
                 if variable == "NODE_IP":
