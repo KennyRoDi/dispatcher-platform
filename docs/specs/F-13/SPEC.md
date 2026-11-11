@@ -1,6 +1,6 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-13-1-reporte-consolidado
 **Verificación IA:** implementacion 7a18d66
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
@@ -130,3 +130,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Aplicacion implementada (7a18d66, ~135 lineas src, sin ediciones a pruebas); suite verde (7a18d66) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: exists que lanza tumba el reporte, extracto de audio erroneo, sin tope, sin UTC, sha vacio enlaza, surrogate, N+1 exists |
