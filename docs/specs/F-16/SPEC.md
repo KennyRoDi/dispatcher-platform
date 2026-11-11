@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** revision
+**Fase:** documentacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** documentacion 5becb97
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | Codex | 2026-11-10 | Verificación documental mínima tras fix 7d7ce7b: revisé el borrador de bitácora en 5becb97. Añade hallazgo NODE_NAME/hostname, prueba roja y fix; conteos finales 1162/2/3; mantiene evidencia B/C/D pendiente y no la sustituye por host local. git show --check limpio y árbol limpio. Solo documentación, no repetí suite. (5becb97) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La revisión final detectó un conteo desactualizado en docs/modulo-M1-memoria.md: QA-parte-2 final registra 1162 aprobadas, pero la ficha dice 1161. Corregir solo el conteo y verificar. |
