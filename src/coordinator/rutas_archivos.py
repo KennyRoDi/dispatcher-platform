@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -46,7 +47,7 @@ async def recibir(upload_id: str, index: int, request: Request,
                   x_chunk_sha256: str = Header(...), subidas: ChunkedUpload = Depends(obtener_subidas)) -> Response:
     try:
         datos = await _leer_chunk(request, subidas.expected_size(upload_id, index))
-        subidas.receive(upload_id, index, datos, x_chunk_sha256)
+        await run_in_threadpool(subidas.receive, upload_id, index, datos, x_chunk_sha256)
     except UploadNotFound:
         raise _no_existe(upload_id) from None
     except ChunkRejected as error:
@@ -56,16 +57,18 @@ async def recibir(upload_id: str, index: int, request: Request,
 
 async def _leer_chunk(request: Request, esperado: int) -> memoryview:
     # Un solo buffer reservado de antemano y sin copia final: nunca más de un chunk en memoria [B.5 M3].
+    excedido = HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
     declarado = request.headers.get("content-length")
+    capacidad = esperado
     if declarado and declarado.isdigit():
         if int(declarado) > esperado:
-            raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
-        esperado = int(declarado)
-    buffer = memoryview(bytearray(esperado))
+            raise excedido
+        capacidad = int(declarado)
+    buffer = memoryview(bytearray(capacidad))
     recibidos = 0
     async for parte in request.stream():
-        if recibidos + len(parte) > esperado:
-            raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
+        if recibidos + len(parte) > capacidad:
+            raise excedido
         buffer[recibidos:recibidos + len(parte)] = parte
         recibidos += len(parte)
     return buffer[:recibidos]

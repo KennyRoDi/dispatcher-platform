@@ -56,11 +56,8 @@ class ChunkedUpload:
             # Otro complete pudo descartar la subida entre leer el manifiesto y listar los chunks.
             self._manifest(upload_id)
             raise MissingChunks(faltantes)
-        try:
-            with self._flujo(upload_id, manifest) as flujo:
-                self._object_store.put(manifest.sha256, flujo, manifest.size)
-        except KeyError:
-            raise UploadNotFound(upload_id) from None
+        with self._flujo(upload_id, manifest) as flujo:
+            self._object_store.put(manifest.sha256, flujo, manifest.size)
         self._staging.discard(upload_id)
         return manifest.sha256, manifest.size
 
@@ -111,7 +108,11 @@ class _ChunksVerificados(io.RawIOBase):
     def _leer_en(self, buffer) -> int:
         while True:
             if self._actual is None:
-                self._actual = next(self._pendientes, None)
+                try:
+                    self._actual = next(self._pendientes, None)
+                except KeyError:
+                    # Otro complete concurrente ya descartó la subida.
+                    raise UploadNotFound(self._upload_id) from None
                 if self._actual is None:
                     return 0
             leidos = self._actual.readinto(buffer)
