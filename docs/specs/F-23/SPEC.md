@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-23-3-deduplicar-antes-de-transferir
-**Verificación IA:** tests 1ceae1e
+**Verificación IA:** implementacion 673e304
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar las fases de manera autónoma; revisión del diff contra SPEC y CI verde. |
 | verificación IA de tests | Codex | 2026-11-11 | F-23 parte 3: staging del coordinador desde STAGING_DIR, MinIO cifrado obligatorio con KEK, TLS validado, dedup antes del staging, cliente evita chunks repetidos, volumen local persistente, script M3. Unitarias 115 passed, integración MinIO real 4 passed, conformidad 0. M3 medido pendiente por falta dataset/coordinador; verificación no independiente. (1ceae1e) |
 | tests | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar autónomamente. Las pruebas se verifican en verde; el orden TDD de esta parte se completó en el stash previo y el test de composición añadido después. Se mantiene pendiente no estimada la medición de rendimiento. |
+| verificación IA de implementacion | Codex | 2026-11-11 | Implementación F-23 parte 3 validada en el commit 1ceae1e: pruebas focalizadas 115 passed, MinIO real 4 passed, conformidad 0. Composición cifrada y staging persistente; sin dataset no hay medición de M3. QA no independiente. (673e304) |
