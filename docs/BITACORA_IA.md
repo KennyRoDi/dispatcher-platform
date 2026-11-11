@@ -1184,3 +1184,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Revisado contra el SPEC; sin datos medidos inventados; umbrales marcados Medición pendiente |
 | Cómo se validó | Lectura del diff y flujo.py verificar |
 | Error de la IA | La parte 1 llegó a revisión sin el AD-41 ni los SUP-36 a SUP-38 que el SPEC exigía; la revisión lo detectó y se devolvió a documentación |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-37 (`feat/F-37-2-saturacion-de-memoria`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-37 |
+| Propósito | F-37 parte 2: documentar en la ficha qué está medido y qué es Medición pendiente, con el comando de corrida en nodos y la confirmación SUP-38 |
+| Consulta resumida | Actualizar docs/evidencia/F-37_saturacion_de_memoria.md según el SPEC, sin inventar datos |
+| Resultado obtenido | Ficha con tabla medido/pendiente, comandos exactos y regla SUP-38; sin cifras de nodos |
+| Validado / corregido / descartado | José Andrés Loría Herrera (aprobación delegada en el chat) |
+| Cómo se validó | Se contrastó la ficha con las secciones Mediciones y Plan de pila del SPEC; la redacción la hizo la sesión principal, no un subagente |
