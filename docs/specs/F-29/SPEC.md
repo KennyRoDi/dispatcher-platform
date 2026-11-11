@@ -1,7 +1,7 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-29-1-cadena-de-custodia
 **Verificación IA:** revision 6b32b10
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
