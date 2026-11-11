@@ -466,3 +466,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | La persona aprobo cada fase. pytest: 806 passed, 14 xfailed. Un caso real con ffmpeg dio 209,34 MiB con sha256 reproducible |
 | Cómo se validó | El orquestador reejecuto pytest y reprodujo el caso real sin fiarse de los subagentes; la persona leyo cada informe |
 | Error de la IA | El SPEC no definia la API del modulo: el developer la fijo en las pruebas y la persona la aprobo. El developer duplico _produce por el bug del archivo previo de media_generator. QA hallo fallos no cubiertos por el developer: case.name con ../ o absoluto escapa de out_dir, directorio vacio tras fallo y stderr de ffmpeg ausente |
+
+## 2026-11-10 · José Andrés Loría Herrera · M1, F-16 parte 2: compatibilidad Windows y límites Compose (`feat/F-16-2-limites-por-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex (orquestador, developer y QA) |
+| Componente | M1, F-16 parte 2: compatibilidad Windows y límites Compose |
+| Propósito | Verificar lectura de RAM desde el daemon Docker, límites Compose y aplicación local de cgroups sin atribuirlos a nodos no medidos |
+| Consulta resumida | Corregir lectura /proc/meminfo en Windows, aceptar límites Compose normalizados como strings, verificar preflight y cgroups locales; dejar B/C/D pendientes |
+| Resultado obtenido | docker info reportó MemTotal local 16728616960; preflight sintético aprobó; tres contenedores efímeros reportaron memory.max 1073741824, memory.swap.max 0 y UID 1000; QA reporta 1161 passed, 2 skipped, 3 deselected |
+| Validado / corregido / descartado | QA encontró y se corrigieron dos errores: host Windows no tiene /proc/meminfo; Compose entrega límites como cadenas decimales. La prueba local no corresponde a B/C/D ni a carga B.3; B/C/D, calibración y runtime GPU siguen pendientes por falta de acceso remoto. No se reutilizó código del I Proyecto. |
+| Cómo se validó | Suite completa reproducida por el orquestador; 76 focalizadas reproducidas. Docker Compose CPU/GPU config normalizó 4g a 4294967296; runtime CPU local verificado tres veces con configuración 1g sintética y cgroups; runtime GPU y nodos reales no verificados. |
+| Error de la IA | La IA asumió que Python en Windows podía leer /proc/meminfo y que Compose JSON entregaría límites como enteros. QA detectó ambos errores; se corrigieron con docker info del daemon Linux y parseo estricto de enteros/cadenas decimales ASCII positivos. |
