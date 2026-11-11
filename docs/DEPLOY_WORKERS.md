@@ -93,6 +93,7 @@ Cada máquina tiene su propio `.env` en la raíz del repositorio. **Nunca se ver
 | `NODE_NAME` | Salida de `hostname` de esa máquina. Único entre nodos | No |
 | `NODE_IP` | Salida de `tailscale ip -4` de esa máquina | No |
 | `WORKER_MEM_LIMIT` | Límite de memoria medido para ese worker, en formato admitido por Compose | No |
+| `ADMISSION_MARGIN_BYTES`, `FOOTPRINT_<OP>_BYTES` | **Obligatorias** (F-17), sin valor por defecto: medir según M1 §4.1; sin medir el worker no arranca. `<OP>` en mayúsculas: `TRANSCODE_VIDEO`, `EXTRACT_AUDIO`, `GENERATE_THUMBNAIL`, `CONVERT_AUDIO`, `EXTRACT_METADATA` | Según la medición |
 | `TLS_CA_FILE` | Ruta de `ca.pem` en esa máquina (la copia desde el Nodo A). Obligatorio con TLS activo; con `TLS_ENABLED=false` puede omitirse | Sí |
 | `REDIS_HOST` | `<IP_TAILSCALE_NODO_A>` | Sí |
 | `COORDINATOR_URL` | `https://<IP_TAILSCALE_NODO_A>:8443` | Sí |
@@ -104,6 +105,10 @@ Cada máquina tiene su propio `.env` en la raíz del repositorio. **Nunca se ver
 | `HWACCEL` | Vacío, salvo en un nodo GPU (§8) | Puede variar |
 
 Los contenedores del Nodo A ignoran `REDIS_HOST`, `COORDINATOR_URL` y `MINIO_ENDPOINT`, porque su Compose usa nombres de servicio. Esos valores los usan `run_load` y los demás scripts nativos. En el Nodo A, Compose solo usa `NODE_IP` de la identidad; `NODE_NAME` se llena igual por coherencia. El resto de variables está comentado en `.env.example`.
+
+Si faltan `ADMISSION_MARGIN_BYTES` o alguna `FOOTPRINT_<OP>_BYTES`, el worker falla al leer la configuración (`src/workers/config.py`), el contenedor se reinicia en bucle y `GET /workers` devuelve `[]`. Los valores reales dependen de la medición M1 §4.1, aún pendiente; no se inventan.
+
+`NODE_NAME` va en el `.env` de cada máquina; en una simulación local con varios workers en una misma máquina no se comparte entre ellos. `CLIENT LIST` de Redis no distingue nodos tras un puerto publicado (todos llegan desde la misma IP de la red de Docker); ver la evidencia de simulación local en `docs/evidencia/F-38_tres_nodos_simulacion_local_2026-11-11.md`.
 
 Genera las contraseñas una vez, en el Nodo A, y compártelas por un canal privado del equipo. Hexadecimal evita caracteres que Compose interpretaría, como `$`:
 
