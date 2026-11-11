@@ -129,14 +129,12 @@ def test_exigir_cifrado_acepta_variantes_validas(activo, url):
 
 
 @pytest.mark.parametrize("url", ["https://", "https:///ruta", "https://:8443"])
-@pytest.mark.xfail(strict=True, reason="exigir_cifrado solo mira el prefijo: acepta URL https sin host")
 def test_exigir_cifrado_rechaza_url_https_sin_host(activo, url):
     with pytest.raises(TlsConfigError):
         exigir_cifrado(activo, coordinator_url=url)
 
 
 @pytest.mark.parametrize("url", ["rediss://", "rediss:///0", "rediss://:6380"])
-@pytest.mark.xfail(strict=True, reason="exigir_cifrado solo mira el prefijo: acepta rediss sin host")
 def test_exigir_cifrado_rechaza_rediss_sin_host(activo, url):
     with pytest.raises(TlsConfigError):
         exigir_cifrado(activo, redis_url=url)
@@ -150,33 +148,28 @@ def test_exigir_cifrado_rechaza_rediss_sin_host(activo, url):
         "rediss://h:6380/0?ssl_check_hostname=false",
     ],
 )
-@pytest.mark.xfail(strict=True, reason="la query de la URL de redis-py puede desactivar la verificacion y exigir_cifrado la acepta")
 def test_exigir_cifrado_rechaza_redis_que_desactiva_la_verificacion(activo, url):
     with pytest.raises(TlsConfigError):
         exigir_cifrado(activo, redis_url=url)
 
 
 @pytest.mark.parametrize("valor", [0, "false", "False", "no", ""])
-@pytest.mark.xfail(strict=True, reason="minio_secure solo se rechaza si es exactamente False; 0 o 'false' pasan")
 def test_exigir_cifrado_rechaza_minio_secure_falso_no_booleano(activo, valor):
     with pytest.raises(TlsConfigError):
         exigir_cifrado(activo, minio_secure=valor)
 
 
-@pytest.mark.xfail(strict=True, reason="redis_kwargs con ca_file=None produce ssl_ca_certs='None' en vez de fallar cerrado")
 def test_redis_kwargs_con_tls_activo_sin_ca_falla_cerrado():
     with pytest.raises(TlsConfigError):
         redis_kwargs(TlsSettings(enabled=True, ca_file=None))
 
 
-@pytest.mark.xfail(strict=True, reason="requests_session con ca_file=None deja verify=None (CA del sistema o variable de entorno)")
 def test_requests_session_con_tls_activo_sin_ca_falla_cerrado():
     with pytest.raises(TlsConfigError):
         requests_session(TlsSettings(enabled=True, ca_file=None))
 
 
 @pytest.mark.skipif(os.geteuid() == 0, reason="root ignora los permisos")
-@pytest.mark.xfail(strict=True, reason="from_env solo comprueba is_file: una CA sin permiso de lectura se descubre al primer connect")
 def test_from_env_con_ca_sin_permiso_de_lectura_falla_al_arrancar(tmp_path):
     ca = tmp_path / "ca.pem"
     trustme.CA().cert_pem.write_to_path(ca)
@@ -200,7 +193,6 @@ def test_client_context_con_ca_sin_permiso_de_lectura_falla_cerrado(tmp_path):
         ca.chmod(0o600)
 
 
-@pytest.mark.xfail(strict=True, reason="requests_session y redis_kwargs no validan la CA: una CA corrupta solo falla al primer connect")
 def test_requests_session_con_ca_corrupta_falla_al_construir(tmp_path):
     ca = tmp_path / "ca.pem"
     ca.write_text("basura")
@@ -208,7 +200,6 @@ def test_requests_session_con_ca_corrupta_falla_al_construir(tmp_path):
         requests_session(TlsSettings(enabled=True, ca_file=ca))
 
 
-@pytest.mark.xfail(strict=True, reason="ca_file relativo se guarda tal cual: un chdir posterior (demonio, servicio) rompe la CA")
 def test_ca_relativa_se_resuelve_al_leer_el_entorno(tmp_path, ca_pem, monkeypatch):
     monkeypatch.chdir(tmp_path)
     settings = TlsSettings.from_env({"TLS_CA_FILE": "ca.pem"})

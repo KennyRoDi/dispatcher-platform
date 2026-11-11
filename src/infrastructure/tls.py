@@ -4,6 +4,7 @@ import ssl
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import parse_qsl, urljoin, urlsplit
 
 import requests
 import urllib3
@@ -31,9 +32,13 @@ class TlsSettings:
         raw_path = env.get("TLS_CA_FILE", "").strip()
         if not raw_path:
             raise TlsConfigError("TLS activo: falta TLS_CA_FILE con la ruta de ca.pem")
-        ca_file = Path(raw_path)
+        ca_file = Path(os.path.abspath(raw_path))
         if not ca_file.is_file():
             raise TlsConfigError("TLS_CA_FILE no apunta a un archivo existente")
+        try:
+            ca_file.open("rb").close()
+        except OSError:
+            raise TlsConfigError("TLS_CA_FILE no se puede leer") from None
         return cls(enabled=True, ca_file=ca_file)
 
 
@@ -59,12 +64,34 @@ def exigir_cifrado(
 ) -> None:
     if not settings.enabled:
         return
-    if coordinator_url is not None and not coordinator_url.lower().startswith("https://"):
-        raise TlsConfigError("con TLS activo la URL del coordinador debe usar https://")
-    if redis_url is not None and not redis_url.lower().startswith("rediss://"):
-        raise TlsConfigError("con TLS activo la URL de Redis debe usar rediss://")
-    if minio_secure is False:
+    if coordinator_url is not None:
+        _require_secure_url(coordinator_url, "https://", "la URL del coordinador")
+    if redis_url is not None:
+        _require_secure_url(redis_url, "rediss://", "la URL de Redis")
+        if any(key.lower().startswith("ssl") for key, _ in _query_pairs(redis_url)):
+            raise TlsConfigError("con TLS activo la URL de Redis no puede fijar opciones ssl_ en la query")
+    if minio_secure is not None and minio_secure is not True:
         raise TlsConfigError("con TLS activo MinIO debe usar conexión segura")
+
+
+def _query_pairs(url: str) -> list[tuple[str, str]]:
+    return parse_qsl(urlsplit(url).query, keep_blank_values=True)
+
+
+def _require_secure_url(url: str, prefix: str, name: str) -> None:
+    if not url.lower().startswith(prefix):
+        raise TlsConfigError(f"con TLS activo {name} debe usar {prefix}")
+    try:
+        host = urlsplit(url).hostname
+    except ValueError:
+        host = None
+    if not host:
+        raise TlsConfigError(f"{name} no es una URL válida")
+
+
+def _require_ca(settings: TlsSettings) -> Path:
+    client_context(settings)
+    return settings.ca_file
 
 
 def redis_kwargs(settings: TlsSettings) -> dict:
@@ -72,17 +99,26 @@ def redis_kwargs(settings: TlsSettings) -> dict:
         return {}
     return {
         "ssl": True,
-        "ssl_ca_certs": str(settings.ca_file),
+        "ssl_ca_certs": str(_require_ca(settings)),
         "ssl_cert_reqs": "required",
         "ssl_check_hostname": True,
         "ssl_min_version": ssl.TLSVersion.TLSv1_3,
     }
 
 
+class _HttpsOnlySession(requests.Session):
+    def get_redirect_target(self, resp):
+        target = super().get_redirect_target(resp)
+        if target and urlsplit(urljoin(resp.url, target)).scheme != "https":
+            raise requests.exceptions.InvalidSchema("redirección de https a un esquema en claro rechazada")
+        return target
+
+
 def requests_session(settings: TlsSettings) -> requests.Session:
-    session = requests.Session()
+    session = _HttpsOnlySession() if settings.enabled else requests.Session()
     if settings.enabled:
-        session.verify = str(settings.ca_file)
+        session.trust_env = False
+        session.verify = str(_require_ca(settings))
     return session
 
 

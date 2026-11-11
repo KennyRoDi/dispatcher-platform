@@ -203,7 +203,6 @@ def test_minio_http_client_rechaza_http_plano_sin_fallback(ca_y_ajustes):
     servidor.server_close()
 
 
-@pytest.mark.xfail(strict=True, reason="requests da prioridad a REQUESTS_CA_BUNDLE sobre session.verify: un servidor de la CA del entorno es aceptado")
 def test_requests_session_ignora_requests_ca_bundle_del_entorno(tmp_path, monkeypatch):
     ca_buena, ca_rogue = trustme.CA(), trustme.CA()
     ajustes = settings_con(ca_buena, tmp_path)
@@ -216,7 +215,6 @@ def test_requests_session_ignora_requests_ca_bundle_del_entorno(tmp_path, monkey
             sesion.get(f"https://{HOST}:{puerto}/", timeout=5)
 
 
-@pytest.mark.xfail(strict=True, reason="requests da prioridad a CURL_CA_BUNDLE sobre session.verify")
 def test_requests_session_ignora_curl_ca_bundle_del_entorno(tmp_path, monkeypatch):
     ca_buena, ca_rogue = trustme.CA(), trustme.CA()
     ajustes = settings_con(ca_buena, tmp_path)
@@ -230,7 +228,6 @@ def test_requests_session_ignora_curl_ca_bundle_del_entorno(tmp_path, monkeypatc
             sesion.get(f"https://{HOST}:{puerto}/", timeout=5)
 
 
-@pytest.mark.xfail(strict=True, reason="la sesion conserva trust_env=True: HTTPS_PROXY/ALL_PROXY/netrc del entorno afectan al trafico entre nodos")
 def test_requests_session_no_hereda_proxies_del_entorno(tmp_path, monkeypatch):
     ajustes = settings_con(trustme.CA(), tmp_path)
     monkeypatch.setenv("HTTPS_PROXY", "http://127.0.0.1:9")
@@ -238,7 +235,6 @@ def test_requests_session_no_hereda_proxies_del_entorno(tmp_path, monkeypatch):
     assert requests_session(ajustes).trust_env is False
 
 
-@pytest.mark.xfail(strict=True, reason="la sesion sigue una redireccion 302 de https a http en claro")
 def test_requests_session_no_sigue_redireccion_a_http_plano(tmp_path):
     ca = trustme.CA()
     ajustes = settings_con(ca, tmp_path)
