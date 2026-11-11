@@ -557,3 +557,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Seleccion pura, carga por hijo o precarga y recoleccion con runtime inyectado. SUP-24 colisionaba con reserva F-16 y se corrigio a SUP-25. Sin atribuir a dobles resultados Whisper, CoW, senales, ausencia real de zombies ni PSS/RSS. Suite general no verde; fallos previos documentados y excepciones de implementacion/verificacion autorizadas |
 | Cómo se validó | Revision contra SPEC, US-19 y RF-27; pytest focal mas arquitectura: 56 passed; mutaciones: 6/6; conformidad repo: 0 problemas; diff check. QA-parte-1 registra limites y comandos. Suite general bloqueada en Windows por os.geteuid; fallos complementarios reproducidos sobre 887f2c7 |
 | Error de la IA | El plan asigno SUP-24 a F-19 pero ese identificador ya pertenecia a reserva F-16. Se detecto al cotejar la ficha M1 y se corrigio la propuesta a SUP-25; no cambio el supuesto de reserva |
+
+## 2026-11-10 · Kenni Rodriguez · F-03 (`feat/F-03-8-dataset-sintetico`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose para la fase documentacion) |
+| Componente | F-03 |
+| Propósito | Documentar el dataset sintetico de F-03 (parte 8): crear docs/dataset.md, registrar AD-25 en ARQUITECTURA §8, ajustar el SPEC, corregir la razon de un xfail y excluir dataset/sintetico/ en .gitignore. |
+| Consulta resumida | Generacion real con PYTHONPATH=. python -m scripts.dataset_sintetico --seed 1 --out dataset/sintetico y validacion con --validar; luego redaccion de los documentos a partir del codigo y del manifest.json. |
+| Resultado obtenido | Generacion rc 0 en 173 s, 490 archivos, 1,9 GB; el validador imprimio 'cumple los minimos de B.3'. Recuento desde manifest.json: 40 casos, 300 imagenes, 150 audios, 25 textos, 10 documentos, 5 videos, 5 casos con archivo >= 200 MiB. pytest: 1637 passed, 7 skipped, 3 xfailed. |
+| Validado / corregido / descartado | El orquestador recontó desde manifest.json (audio ruido/tono, casos livianos/pesados, videos), AD-25 y el sha256 del manifiesto. Las fases tests, implementacion y verificacion se aprobaron con --excepcion por autorizacion de la persona (parte solo documental); la verificacion fue del orquestador, sin QA independiente; el enlace de Drive de los casos pesados queda pendiente: lo aporta la persona. |
+| Cómo se validó | No se verifico la cifra exacta de mensajes ni el enlace de Drive (no existe aun). Las aprobaciones de fase las dio el orquestador por delegacion de la persona, que no estuvo presente. |
