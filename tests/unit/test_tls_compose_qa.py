@@ -1,6 +1,6 @@
 """QA de la parte 3 de F-27: intentos de romper generar_certs.sh y los Compose con TLS.
 
-Los xfail(strict=True) fijan defectos reproducidos; al corregirlos, quitar la marca.
+Los xfail(strict=True) fijaron defectos reproducidos; ya corregidos, sus marcas se quitaron.
 Los demás son guardas de lo que no se logró romper.
 """
 
@@ -117,7 +117,6 @@ def test_segunda_ejecucion_reutiliza_la_ca_y_cambia_la_llave_del_servidor(tmp_pa
 
 
 @necesita_openssl
-@pytest.mark.xfail(strict=True, reason="QA: NODE_IP='deadbeef' pasa la regex [0-9A-Fa-f.:]+ y openssl falla tarde; queda server.key nuevo con el server.pem anterior")
 def test_un_fallo_a_mitad_no_deja_llave_y_certificado_desparejados(tmp_path):
     destino = tmp_path / "certs"
     entorno = {"NODE_IP": "10.0.0.1", "NODE_NAME": "nodo", "CERTS_DIR": str(destino)}
@@ -129,7 +128,6 @@ def test_un_fallo_a_mitad_no_deja_llave_y_certificado_desparejados(tmp_path):
 
 @necesita_openssl
 @pytest.mark.parametrize("ip", ["deadbeef", "...", "1.2.3", "::::", "1.2.3.4.5"])
-@pytest.mark.xfail(strict=True, reason="QA: la regex solo mira caracteres; una IP inválida se detecta tras crear CA, llave y .csr")
 def test_ip_invalida_se_rechaza_antes_de_crear_nada(tmp_path, ip):
     destino = tmp_path / "certs"
     resultado = _generar({"NODE_IP": ip, "NODE_NAME": "nodo", "CERTS_DIR": str(destino)}, tmp_path)
@@ -138,7 +136,6 @@ def test_ip_invalida_se_rechaza_antes_de_crear_nada(tmp_path, ip):
 
 
 @necesita_openssl
-@pytest.mark.xfail(strict=True, reason="QA: la CA no lleva pathlen:0 y puede firmar sub-CAs (openssl verify de una sub-CA da OK)")
 def test_la_ca_no_puede_firmar_otras_ca(tmp_path):
     destino = tmp_path / "certs"
     assert _generar({"NODE_IP": "10.0.0.1", "NODE_NAME": "nodo", "CERTS_DIR": str(destino)}, tmp_path).returncode == 0
@@ -147,7 +144,6 @@ def test_la_ca_no_puede_firmar_otras_ca(tmp_path):
 
 
 @necesita_openssl
-@pytest.mark.xfail(strict=True, reason="QA: se reutiliza una CA a punto de vencer y el certificado de 90 días vive más que ella")
 def test_una_ca_por_vencer_no_deja_un_certificado_que_la_sobrevive(tmp_path):
     destino = tmp_path / "certs"
     (destino / "minio").mkdir(parents=True)
@@ -160,7 +156,6 @@ def test_una_ca_por_vencer_no_deja_un_certificado_que_la_sobrevive(tmp_path):
 
 @necesita_openssl
 @pytest.mark.parametrize("nombre", [".", "..", "-x"])
-@pytest.mark.xfail(strict=True, reason="QA: NODE_NAME '.', '..' o que empiece por '-' pasa la regex y da CN y SAN DNS inválidos")
 def test_node_name_que_no_es_un_nombre_de_host_se_rechaza(tmp_path, nombre):
     destino = tmp_path / "certs"
     resultado = _generar({"NODE_IP": "10.0.0.1", "NODE_NAME": nombre, "CERTS_DIR": str(destino)}, tmp_path)
@@ -168,7 +163,6 @@ def test_node_name_que_no_es_un_nombre_de_host_se_rechaza(tmp_path, nombre):
 
 
 @necesita_openssl
-@pytest.mark.xfail(strict=True, reason="QA: nada impide CERTS_DIR dentro del repo (solo lo ocultan .gitignore y el valor por defecto)")
 def test_certs_dir_dentro_del_repo_se_rechaza(tmp_path):
     destino = RAIZ / "zz_qa_certs_tmp"
     try:
@@ -235,7 +229,6 @@ def test_gitignore_ignora_los_artefactos_de_certificados(ruta):
     assert resultado.returncode == 0, ruta
 
 
-@pytest.mark.xfail(strict=True, reason="QA: redis (uid redis, tras su-exec) y MinIO de Chainguard (uid 65532) no pueden leer server.key 0600 de otro uid; sin `user:` ni llave abierta al grupo no arrancan (sin comprobar con las imágenes: no hay Docker con ellas)")
 @pytest.mark.parametrize("servicio", ["redis", "minio"])
 def test_los_servidores_pueden_leer_la_llave_montada(servicio):
     definicion = _servicios("docker-compose.yml")[servicio]
@@ -244,12 +237,10 @@ def test_los_servidores_pueden_leer_la_llave_montada(servicio):
     assert "user" in definicion or llave_abierta, f"{servicio} monta una llave 0600 sin fijar el UID"
 
 
-@pytest.mark.xfail(strict=True, reason="QA: el feeder de docker-compose.demo.yml no apaga TLS; con TLS activo por defecto sale con TlsConfigError y la demo local queda rota")
 def test_el_feeder_de_la_demo_apaga_tls_como_el_resto_del_compose_local():
     entorno = _servicios("deploy/docker-compose.demo.yml")["feeder"]["environment"]
     assert str(entorno.get("TLS_ENABLED")).lower() == "false"
 
 
-@pytest.mark.xfail(strict=True, reason="QA: .env.demo (demo local en claro: http://localhost:8000, MINIO_SECURE=false) no trae TLS_ENABLED=false")
 def test_env_demo_apaga_tls():
     assert re.search(r"^TLS_ENABLED=false$", (RAIZ / ".env.demo").read_text(encoding="utf-8"), re.MULTILINE)
