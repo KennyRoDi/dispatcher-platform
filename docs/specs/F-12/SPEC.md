@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests 5c51d61
+**Verificación IA:** implementacion 2151127
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -63,3 +63,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | pytest tests/unit/test_process_supervisor.py -q | 2026-11-10 | 6 pruebas con dobles fallan por ModuleNotFoundError (falta process_supervisor); 4 con sleep real saltadas en Windows (requieren WSL2), no ejecutadas. Sin código de implementación. Verificación NO independiente: sin subagente. (5c51d61) |
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de implementacion | pytest | 2026-11-10 | pytest tests/unit/test_process_supervisor.py y test_arquitectura: 10 passed, 4 skipped (reales POSIX, sin WSL con Python). Diff de tests/ revisado: solo SIGKILL portable en Windows, sin debilitar. Verificación NO independiente (sin subagente). (2151127) |
