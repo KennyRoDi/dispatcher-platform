@@ -1,7 +1,10 @@
 import json
+import logging
 from collections.abc import Sequence
 
 from src.domain.finding import EvidenceRef, Finding, Severity
+
+logger = logging.getLogger(__name__)
 
 
 class RedisFindingStore:
@@ -16,7 +19,11 @@ class RedisFindingStore:
         pipe.execute()
 
     def list(self, case_id: str) -> list[Finding]:
-        return [_decode(raw) for raw in self._client.lrange(_key(case_id), 0, -1)]
+        decoded = [_decode(raw) for raw in self._client.lrange(_key(case_id), 0, -1)]
+        valid = [finding for finding in decoded if finding is not None]
+        if len(valid) < len(decoded):
+            logger.warning("Caso %s: %d hallazgos ilegibles omitidos", case_id, len(decoded) - len(valid))
+        return valid
 
 
 def _key(case_id: str) -> str:
@@ -37,12 +44,15 @@ def _encode(finding: Finding) -> str:
     )
 
 
-def _decode(raw: str) -> Finding:
-    data = json.loads(raw)
-    return Finding(
-        data["category"],
-        Severity(data["severity"]),
-        data["confidence"],
-        EvidenceRef(data["sha256"], data["position"]),
-        data["detail"],
-    )
+def _decode(raw: str) -> Finding | None:
+    try:
+        data = json.loads(raw)
+        texts = (data["category"], data["sha256"], data["position"], data["detail"])
+        confidence = data["confidence"]
+        if not all(isinstance(text, str) for text in texts) or isinstance(confidence, bool) or not isinstance(confidence, (int, float)):
+            return None
+        return Finding(
+            data["category"], Severity(data["severity"]), confidence, EvidenceRef(data["sha256"], data["position"]), data["detail"]
+        )
+    except (ValueError, TypeError, KeyError):
+        return None

@@ -1,6 +1,10 @@
+import re
 from datetime import datetime
 
 from src.domain.consolidated_report import CaseInfo, CaseSource
+
+# Los ids de caso son uuid; restringir el formato evita que un id colisione con claves de lista (`c1:findings`).
+CASE_ID_FORMAT = re.compile(r"[A-Za-z0-9_-]{1,128}")
 
 
 class RedisCaseCatalog:
@@ -8,6 +12,15 @@ class RedisCaseCatalog:
         self._client = client
 
     def case(self, case_id: str) -> CaseInfo | None:
+        if not CASE_ID_FORMAT.fullmatch(case_id):
+            return None
+        try:
+            return self._read(case_id)
+        except UnicodeDecodeError:
+            # Bytes no UTF-8 en el hash: el caso no es legible, se trata como inexistente.
+            return None
+
+    def _read(self, case_id: str) -> CaseInfo | None:
         case = self._client.hgetall(f"case:{case_id}")
         if not case:
             return None
@@ -39,4 +52,7 @@ def _source(subtask: dict) -> CaseSource:
 
 
 def _instant(value: str | None) -> datetime | None:
-    return datetime.fromisoformat(value) if value else None
+    try:
+        return datetime.fromisoformat(value) if value else None
+    except ValueError:
+        return None
