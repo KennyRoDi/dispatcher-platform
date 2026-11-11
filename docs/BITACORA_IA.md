@@ -1060,3 +1060,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
 | Cómo se validó | Revision del diff contra el SPEC |
 | Error de la IA | el QA halló que el log del cierre usaba %s con un case_id controlado por el cliente (inyección de líneas) y tres defectos previos de rutas_subtareas.py amplificados por la alerta |
+
+## 2026-11-11 · Kenni Rodriguez · F-04 (`fix/F-04-pendientes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5) |
+| Componente | F-04 |
+| Propósito | Corregir defectos de QA pendientes de F-04 (comparador, procedencia, CLI de verdad de referencia) |
+| Consulta resumida | Corregir los xfail de QA de F-04: accuracy sin elementos, ids mezclados, origen o licencia no texto, validación de tipos de la política, --salida que pisa entradas, JSON anidado, escape de markdown, Ctrl-C y BrokenPipe |
+| Resultado obtenido | Corrección en dataset_verdad.py, dataset_truth_files.py, ground_truth.py y provenance.py; se retiraron los xfail corregidos |
+| Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
+| Cómo se validó | Revisión del diff contra los hallazgos de QA anotados en la bitácora local; los xfail restantes (rellenos y Unicode) quedan por decisión SUP-27 |
