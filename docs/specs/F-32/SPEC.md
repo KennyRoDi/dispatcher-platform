@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 81647ef
+**Verificación IA:** verificacion 453baf4
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J
 
 ## Objetivo
@@ -77,3 +77,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de implementacion | Claude Code (misma sesion, no independiente) | 2026-11-10 | 22 pruebas en verde (routing, integracion, arquitectura); 3 archivos de codigo ~50 lineas (81647ef) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | claude-code | 2026-11-10 | QA: 22 pruebas verdes. Hallazgo: ruta como str se expandia a letras; ahora ValueError con prueba. Tipo desconocido, sin clase viva y orden de clases verificados. (453baf4) |
