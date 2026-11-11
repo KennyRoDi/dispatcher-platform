@@ -1,6 +1,6 @@
 # SPEC F-12: Cancelación real
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-12-1-cancelacion-real
 **Verificación IA:** revision 961d56d
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
