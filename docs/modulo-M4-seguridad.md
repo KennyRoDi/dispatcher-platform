@@ -136,7 +136,7 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 
 ### F-29 Cadena de custodia
 
-Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. Parte 2: `JsonlCustodyLog` en `src/adapters/jsonl_custody_log.py`, log JSONL de solo-anexión (`O_APPEND`, `fsync`, `flock`, modo 0600) que implementa `CustodyLog.record`, escribe el ancla de forma atómica y un ancla génesis al crear el log; `record` verifica solo las últimas 2 líneas y el ancla, y el verificador completo detecta una línea intermedia manipulada. La llave entra como bytes; el verificador con evidencia y linaje, la CLI y la lectura de `CUSTODY_KEY_FILE` llegan en la parte 3.
+Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. Parte 2: `JsonlCustodyLog` en `src/adapters/jsonl_custody_log.py`, log JSONL de solo-anexión (`O_APPEND`, `fsync`, `flock`, modo 0600) que implementa `CustodyLog.record`, escribe el ancla de forma atómica y un ancla génesis al crear el log; `record` verifica solo las últimas 2 líneas y el ancla, y el verificador completo detecta una línea intermedia manipulada. La llave entra como bytes. Parte 3: `verify_custody` (cadena, ancla, evidencia y linaje) y la CLI `scripts/verify_custody.py`, que lee la llave de `CUSTODY_KEY_FILE` con `FileKeyProvider` (F-28); sale con 0 sin violaciones, 1 con violaciones y 2 si no pudo verificar.
 
 ## 2. Concepto de Sistemas Operativos
 
@@ -258,7 +258,7 @@ Comandos de la prueba local de los servidores: en la [evidencia local](evidencia
 
 ### F-29 Cadena de custodia
 
-No aplica como medición de SO M1 a M5: F-29 aporta evidencia de ejecución. El comando previsto, que se ejecuta en la demo con un log y una evidencia sintéticos, antes y después de manipularlos, es `PYTHONPATH=. python -m scripts.verify_custody --log <log.jsonl> --anchor <log.jsonl.head> [--store <dir>]`, con la llave en `CUSTODY_KEY_FILE` (32 bytes aleatorios, fuera del repositorio, distinta de la KEK de F-28). Pendiente: la CLI llega en una parte posterior de la pila.
+No aplica como medición de SO M1 a M5: F-29 aporta evidencia de ejecución. El comando previsto, que se ejecuta en la demo con un log y una evidencia sintéticos, antes y después de manipularlos, es `PYTHONPATH=. python -m scripts.verify_custody --log <log.jsonl> --anchor <log.jsonl.head> [--store <dir>]`, con la llave en `CUSTODY_KEY_FILE` (32 bytes aleatorios, fuera del repositorio, distinta de la KEK de F-28). Entorno de la ejecución local sintética: una sola máquina, log y objetos generados para la ocasión, llave aleatoria de 32 bytes con permisos 0600. Códigos de salida: 0 íntegro, 1 con violaciones, 2 no se pudo verificar.
 
 ## 4. Resultados
 
@@ -309,7 +309,7 @@ Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de l
 
 ### F-29 Cadena de custodia
 
-Pendiente: sin salida del verificador antes y después de manipular un log y una evidencia.
+Salida real de una ejecución local sintética (una sola máquina, datos sintéticos) en [`docs/evidencia/F-29_prueba_A_local_sintetica_2026-11-11.md`](evidencia/F-29_prueba_A_local_sintetica_2026-11-11.md): cadena íntegra exit 0; alteración, borrado, reordenamiento, truncado, ancla borrada, cadena recalculada sin llave, evidencia alterada y evidencia borrada exit 1 con la posición; llave con permisos 0644, de 16 bytes o ausente exit 2. No acredita la prueba A en la demo ni en nodos: la columna de la tabla sigue pendiente para ellos.
 
 | Prueba | Esperado | Salida medida |
 |---|---|---|
@@ -340,4 +340,4 @@ Pendiente. La prueba local respalda que los servidores arrancan con TLS y UID pr
 
 ### F-29 Cadena de custodia
 
-Pendiente. Las pruebas unitarias respaldan la lógica de sellado y detección, no la demostración con manipulación real. Límites declarados (SUP-31): quien posea la llave puede forjar la cadena (HMAC simétrico) y un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta mientras el ancla viva en el mismo disco. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Parcial. La ejecución local sintética muestra que el verificador detecta cada manipulación probada y que falla cerrado con llave inválida o ausente; no demuestra la prueba A en nodos reales. Las pruebas unitarias respaldan la lógica de sellado y detección. Límites declarados (SUP-31): el verificador carga todo el log en memoria; quien posea la llave puede forjar la cadena (HMAC simétrico) y un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta mientras el ancla viva en el mismo disco. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].

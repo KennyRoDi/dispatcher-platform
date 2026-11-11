@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-27-3-tls-entre-nodos
 **Verificación IA:** revision 12c2c90
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
