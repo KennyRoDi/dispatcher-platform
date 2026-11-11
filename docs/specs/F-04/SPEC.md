@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
 **Verificación IA:** tests c43864a
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -163,3 +163,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor DEVUELTO por un limite falso en SPEC:75 (None da TypeError); reproducido: ProvenancePolicy(admitted_origins=(None,)) admite origen vacio sin error; SPEC corregido. Revisor reprodujo pytest 1669 passed/16 xfailed y conformidad 0 problemas; resto de limites veraces. (725a9d2) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo 3 archivos de pruebas nuevos (2 unitarios, 1 aceptacion) y log del SPEC; src y scripts intactos. pytest: 3 errores de coleccion por ModuleNotFoundError (rojo por falta de modulos). API asumida fijada por las pruebas (read_*, sample_from_manifest, render_*, main). Acceptance usa dobles declarados. (c43864a) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
