@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-28-2-cifrado-en-reposo
-**Verificación IA:** verificacion 4e31d97
+**Verificación IA:** documentacion 27d7c87
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -190,3 +190,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA bc0c549: 11 xfail, 5 corregidos y desmarcados; quedan 6 (size menor al real guarda objeto truncado sin error en put; dek/kek en locales de traza de envelope_cipher) a declarar como limites. Prueba I con MinIO real NO corrio (sin imagen ni binario minio). Sin parcial tras fallo en put. (4e31d97) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs (modulo-M4 y SPEC); push comprobado (rama alineada con origen). Prueba I y busqueda marcadas pendientes, sin datos inventados. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (27d7c87) |
