@@ -17,6 +17,10 @@ log = logging.getLogger(__name__)
 ACCIONES_POR_RUTA = MappingProxyType(
     {
         ("POST", "/cases"): Action.CREAR_CASO,
+        ("POST", "/uploads"): Action.CREAR_CASO,
+        ("PUT", "/uploads/{upload_id}/chunks/{index}"): Action.CREAR_CASO,
+        ("GET", "/uploads/{upload_id}"): Action.CONSULTAR_CASO,
+        ("POST", "/uploads/{upload_id}/complete"): Action.CREAR_CASO,
         ("POST", "/cases/"): Action.CREAR_CASO,
         ("GET", "/cases"): Action.CONSULTAR_CASO,
         ("GET", "/cases/"): Action.CONSULTAR_CASO,

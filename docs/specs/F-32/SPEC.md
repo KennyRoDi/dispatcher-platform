@@ -1,6 +1,6 @@
 # SPEC F-32: Routing por tipo de nodo
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision e712255
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J

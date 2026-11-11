@@ -39,6 +39,7 @@ def test_emitir_respeta_los_minutos_de_expiracion(reloj):
         verificar(token, reloj)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_emitir_lee_el_secreto_del_archivo_antes_que_de_la_variable(tmp_path, reloj):
     archivo = tmp_path / "jwt.key"
     archivo.write_text(SECRETO + "\n")

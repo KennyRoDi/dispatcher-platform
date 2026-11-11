@@ -37,7 +37,7 @@ def _log():
     return logging.getLogger("test.alerting_qa")
 
 
-@pytest.mark.parametrize("texto", TEXTOS_HOSTILES)
+@pytest.mark.parametrize("texto", TEXTOS_HOSTILES, ids=[f"hostil-{i}" for i in range(len(TEXTOS_HOSTILES))])
 def test_detail_es_json_valido_ascii_y_conserva_el_texto(texto):
     alerta = high_incident_alerts("c", [_alto(categoria=texto, posicion=texto, sha=texto)])[0]
     alerta.detail.encode("utf-8")

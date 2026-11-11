@@ -1,6 +1,6 @@
 # Módulo M5: cómputo y benchmark de inferencia
 
-Estado: implementado y con pruebas unitarias en verde. **Medición pendiente**: no hay cifras medidas en este documento.
+Estado: implementado y con pruebas unitarias en verde. Medido en CPU el 2026-11-11 en un único host Docker Desktop (sección 4). **Medición pendiente**: GPU, nodos reales (F-38) y valores de routing (F-32).
 
 ## 1. Qué se implementó
 
@@ -42,34 +42,40 @@ Antes de dar por válido un resultado, la persona que mide debe confirmar que la
 
 ## 4. Resultados
 
-**Medición pendiente.** Los valores los toma la persona en su máquina o en los nodos cuando F-38 lo permita. Esta fase no estima ni inventa cifras.
+**Medido el 2026-11-11** en un único host (Windows 11, Docker Desktop 29.7.2, contenedor `python:3.13`, 16 CPU lógicas Ryzen 7 5700X, ~16 GB), no en nodos separados. faster-whisper 1.2.1, CTranslate2 4.9.0, PyAV 18.1.0, modelo `base`, un clip público de 11.372 s (jfk.flac, repo MIT de faster-whisper, idioma `en`), 5 repeticiones tras calentamiento. Comando exacto, salida cruda y limitaciones en [F-31_m5_bench_2026-11-11.md](evidencia/F-31_m5_bench_2026-11-11.md). **Medición pendiente**: nodos WSL2 reales (F-38), audios largos y GPU.
 
 | Configuración | Latencia media (s) | Latencia p95 (s) | Throughput (x tiempo real) | Memoria pico (MB) | Repeticiones |
 |---|---|---|---|---|---|
-| cpu-float32-h1 | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente |
-| cpu-float32-h2 | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente |
-| cpu-float32-h4 | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente |
-| cpu-int8-h1 | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente |
-| cpu-int8-h2 | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente |
-| cpu-int8-h4 | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente | Medición pendiente |
-| gpu-float16 | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) |
+| cpu-float32-h1 | 2.310 | 2.505 | 4.922 | 488 | 5 |
+| cpu-float32-h2 | 1.611 | 1.653 | 7.057 | 470 | 5 |
+| cpu-float32-h4 | 1.321 | 1.367 | 8.612 | 519 | 5 |
+| cpu-int8-h1 | 1.954 | 2.233 | 5.821 | 317 | 5 |
+| cpu-int8-h2 | 1.049 | 1.187 | 10.841 | 343 | 5 |
+| cpu-int8-h4 | 0.828 | 0.947 | 13.727 | 345 | 5 |
+| gpu-float16 | Medición pendiente (requiere GPU; esta máquina no se usó con GPU) | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) | Medición pendiente (requiere GPU) |
 
 ## 5. Interpretación
 
-Sin mediciones no hay conclusiones. Las preguntas que el benchmark debe responder cuando existan datos son:
+Lectura de la medición del 2026-11-11 (un host, un clip de 11 s; no generalizar a los nodos):
+
+- Hilos: de 1 a 2 hilos la latencia media baja ~30 % en float32 (2.310 a 1.611 s) y ~46 % en int8 (1.954 a 1.049 s); de 2 a 4 baja menos (float32 1.611 a 1.321 s; int8 1.049 a 0.828 s). No se midió más allá de 4 hilos, así que no se sabe dónde se estanca.
+- int8 frente a float32: memoria pico 317-345 MB frente a 470-519 MB, y throughput 1.2 a 1.6 veces mayor con el mismo número de hilos.
+- Todas las configuraciones superan el tiempo real (throughput > 4.9).
+
+Las preguntas que el benchmark debe seguir respondiendo con nodos reales son:
 
 - ¿Mejora la latencia al pasar de 1 a 2 y de 2 a 4 hilos, o el beneficio se estanca? Si se estanca, el exceso de hilos compite por los núcleos disponibles.
 - ¿Cuánta memoria se ahorra con `int8` frente a `float32`, y cuánto cambia el throughput?
 - ¿Qué configuración conviene en cada tipo de nodo? Este punto alimenta el enrutamiento de F-32.
 
-Las cifras de F-32 (routing por tipo de nodo) y F-41 (fichas de evidencia) dependen de esta medición. Hasta que exista, cualquier afirmación sobre el mejor número de hilos o el ahorro de memoria es una hipótesis y no un resultado.
+Las cifras de F-32 (routing por tipo de nodo) y F-41 (fichas de evidencia) dependen de esta medición. Las afirmaciones sobre hilos y memoria valen solo para la medición de la sección 4; para otros nodos siguen siendo hipótesis.
 
 ## 6. Routing por tipo de nodo (F-32)
 
 **Justificación.** B.5 M5 pide dirigir cada tipo de sub-tarea a la clase de nodo que la ejecuta mejor. La política es una tabla estática tipo → clases en `config/routing.toml` (`[rutas]`), implementada por `RoutingTable` (`src/domain/routing.py`) y validada al arranque. Decisión registrada en AD-32 de `docs/ARQUITECTURA.md`.
 
-**Valores provisionales.** Medición pendiente. Audio prefiere `gpu` y cae a `cpu`; texto e imagen van a `cpu`. Ningún valor sale de datos medidos. La referencia de cada uno está en `[evidencia]` de `config/routing.toml`.
+**Valores provisionales.** Medición pendiente: F-31 midió solo CPU en un único host, así que no hay datos por clase de nodo (`gpu` frente a `cpu`) con los que cambiar la tabla. Audio prefiere `gpu` y cae a `cpu`; texto e imagen van a `cpu`. Ningún valor sale de datos medidos. La referencia de cada uno está en `[evidencia]` de `config/routing.toml`.
 
 **Medición que los sustituye.** F-31: `python scripts/measure/m5_bench.py --model whisper-base --compute cpu-float32,cpu-int8 --threads 1,2,4 --reps 5 --audio benchmark_set/`. Sus resultados (sección 4) fijan el orden de clases.
 
-**Pendiente.** Valores en nodos WSL2 reales (depende de F-38) y variante GPU, que queda pendiente hasta tener GPU.
+**Pendiente (no medible en un solo host).** Comparar clases de nodo exige nodos WSL2 separados (F-38) y GPU; la medición de la sección 4 no distingue clases, por lo que `config/routing.toml` no se modificó.

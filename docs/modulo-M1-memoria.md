@@ -103,6 +103,26 @@ La comparación de parte 3 usó Whisper CPU, Python 3.13.18, faster-whisper 1.2.
 
 Las pruebas respaldan el cálculo de presupuesto, la validación estática del cableado y la lectura estricta de archivos con el contrato actual. La medición F-19 confirma el límite configurado por el cgroup del contenedor en el entorno WSL2; no permite concluir que los nodos desplegados soporten la carga. AD-29 tiene aprobación de diseño; SUP-24 sigue siendo supuesto pendiente de validación y la calibración de límites sigue pendiente según SUP-17.
 
-La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D bajo la carga definida y decidir `WORKER_MEM_LIMIT` por nodo. La validación local con 1 GiB sintético no acredita esos valores. Los demás productos obligatorios de M1 siguen pendientes por feature: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM provocado y recuperación; F-19, huella RSS/PSS por modelo y comparación de estrategias de carga. F-37 cubre saturación del nodo (B.6).
+La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D bajo la carga definida y decidir `WORKER_MEM_LIMIT` por nodo. La validación local con 1 GiB sintético no acredita esos valores. Los demás productos obligatorios de M1 siguen pendientes por feature: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM provocado y recuperación (medido solo en un contenedor, ver más abajo; falta en nodos WSL2); F-19, huella RSS/PSS por modelo y comparación de estrategias de carga. F-37 cubre saturación del nodo (B.6).
 
 F-19 partes 1–3 respaldan el protocolo, la compatibilidad con Whisper y la comparación medida en el entorno indicado. A N=2, `workers_compartidos` presentó menor PSS y `memory.current` promedio que `por_proceso`; mantener esta estrategia es provisional y acotado a esa carga. La medición no demuestra ahorro para otros modelos, ausencia general de zombies ni desempeño de workers desplegados. La aprobación de SUP-25 fija el alcance experimental y sus parámetros iniciales.
+
+## M1 de F-18: OOM provocado en contenedor aislado (2026-11-11)
+
+**Entorno real:** un único host Docker Desktop 29.7.2 (Linux, cgroup v2, 16 CPU, ~15,6 GB) en Windows 11, commit `63f6b62`, contenedor `python:3.13-slim` con `--memory 128m --memory-swap 128m`, usuario 10001 (no root). **No son tres nodos WSL2.** Arnés: [medir_f18.py](evidencia/mediciones-f18/medir_f18.py) (usa `read_memory_events`, `classify_exit` y `OomPolicy` reales con la secuencia de `handle_subtask`; no es `WorkerNode`, sin Redis).
+
+```bash
+docker run --rm --memory 128m --memory-swap 128m --user 10001 -v "${PWD}:/app" -w /app -e PYTHONPATH=/app f18-medicion python docs/evidencia/mediciones-f18/medir_f18.py 128 256 64
+```
+
+Un hijo reserva y toca 256 MiB bajo un `memory.max` de 134217728 B; 3 repeticiones ([rep1](evidencia/mediciones-f18/F-18_corrida_rep1_2026-11-11.json), [rep2](evidencia/mediciones-f18/F-18_corrida_rep2_2026-11-11.json), [rep3](evidencia/mediciones-f18/F-18_corrida_rep3_2026-11-11.json)).
+
+| Medido (idéntico en las 3 repeticiones) | Resultado |
+|---|---|
+| Salida del hijo y delta de `oom_kill` | -9 y +1 en cada intento |
+| Clasificación | `oom` en los 3 intentos |
+| Decisión (reserva inicial 64 MiB) | reencola con 96 MiB, reencola con 144 MiB, luego `giveup:oom` (2 reencolados, SUP-14) |
+| Control: SIGKILL externo sin OOM | -9, delta 0, clasificado `killed` |
+| `memory.events` final | `oom_kill 3`; el proceso supervisor siguió vivo |
+
+Cumple el criterio del SPEC en cuanto a detección, política y supervisor vivo. **Sigue pendiente:** `docker inspect .State.OOMKilled` (se usó `--rm`, no se capturó); OOM con audio largo real vía `WorkerNode` y Redis, y la repetición en los nodos WSL2 con su `mem_limit`: Medición pendiente, requiere esos nodos.

@@ -62,6 +62,7 @@ def test_rechazar_un_enlace_no_borra_el_manifiesto_previo(tmp_path):
     assert (out / MANIFEST_NAME).read_text(encoding="utf-8") == "[]"
 
 
+@pytest.mark.skipif(os.name == "nt", reason="los enlaces simbólicos exigen privilegios")
 def test_un_enlace_ajeno_a_los_casos_dentro_de_out_se_rechaza_sin_tocar_nada(tmp_path):
     outside = tmp_path / "fuera"
     outside.mkdir()

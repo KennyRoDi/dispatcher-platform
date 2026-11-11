@@ -1,3 +1,4 @@
+import os
 import base64
 import hashlib
 import hmac
@@ -55,6 +56,7 @@ def test_sub_vacio_se_rechaza(secreto, reloj, sujeto):
         JwtTokenVerifier(secreto, reloj).verify(token)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="os.O_NONBLOCK y permisos de archivo")
 def test_archivo_de_secreto_no_utf8_no_filtra_bytes_al_log(tmp_path, monkeypatch, caplog):
     ruta = tmp_path / "llave"
     ruta.write_bytes(b"\xa7" + secrets.token_bytes(40))

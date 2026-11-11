@@ -1,6 +1,8 @@
 import os
 
 import pytest
+
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
 import trustme
 
 from src.infrastructure.tls import (

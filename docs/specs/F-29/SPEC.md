@@ -1,8 +1,8 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** pr
-**Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** revision 8578c42
+**Fase:** cerrada
+**Base:** main
+**Verificación IA:** revision 26baec0
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -124,6 +124,21 @@ No aplica. F-29 aporta evidencia de ejecución a la ficha M4, no mediciones de S
 - Antes de anexar se reintenta el ancla atrasada (`_catch_up_anchor`); si falla la escritura o el `fsync` del anexo, se hace `ftruncate` al tamaño previo.
 - Sin tope de tamaño de campo (QA: un `actor` de 50 MiB tarda 0,36 s por `record`; dato del QA).
 
+## Límites declarados de la parte 3
+
+- La llave se lee con `FileKeyProvider` (F-28) desde `CUSTODY_KEY_FILE`; esto cierra el pendiente de la parte 2. Una llave de 32 ceros se acepta.
+- `verify_custody.py` declara un `Protocol KeyProvider` local porque `ports.py` no lo expone (ajustar si F-28 lo mueve).
+- El hash de los objetos se calcula con `hashlib` en el caso de uso, porque la capa de aplicación no importa adaptadores; no se usa `sha256_de_archivo`.
+- Un ingreso exige que el objeto exista. El resultado de una transformación ausente se omite; con otro hash es violación `evidencia`.
+- Un ancla ilegible se trata como `Anchor(seq=-1)` y produce violación `ancla`.
+- El adaptador `DirectoryStore` vive en el script.
+- Códigos de salida: 0 sin violaciones, 1 con violaciones, 2 si no se pudo verificar.
+- QA-1 (UTF-8 inválido) y QA-2 (ancla leída antes que el log) corregidos: UTF-8 inválido da `utf8_invalido` y exit 1.
+- QA-3 (el mensaje de error de llave nombra `KEK_FILE`, viene de `FileKeyProvider` de F-28) y QA-4 (un objeto ilegible aborta con exit 2 y oculta violaciones de cadena) quedan con xfail estricto.
+- Un nombre de objeto de más de 255 caracteres da exit 2.
+- El verificador carga todo el log en memoria. Dato del QA bajo `tracemalloc`, no medición de SO: 200000 entradas, 81,5 MB de log, pico de 324 MiB.
+- Prueba A local sintética en `docs/evidencia/F-29_prueba_A_local_sintetica_2026-11-11.md`: una sola máquina; no acredita la prueba A en nodos ni M4.
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
@@ -136,7 +151,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 ## Riesgos y preguntas abiertas
 
-1. **Orden frente a F-28.** El backlog no declara dependencia, pero reutilizar `FileKeyProvider` exige que la parte 2 de F-28 esté en `main` (hoy en PR). ¿Se apila la parte 2 de F-29 sobre F-28, o se espera la fusión? La parte 1 no depende.
+1. **Orden frente a F-28 (resuelta: F-28 ya está en `main`; la parte 3 usa `FileKeyProvider`).** El backlog no declara dependencia, pero reutilizar `FileKeyProvider` exige que la parte 2 de F-28 esté en `main` (hoy en PR). ¿Se apila la parte 2 de F-29 sobre F-28, o se espera la fusión? La parte 1 no depende.
 2. **Dónde vive el ancla.** En el mismo disco que el log, quien lo escribe puede reponer un ancla antigua y truncar a ese punto. ¿Se acepta el límite (SUP-31) o se copia el ancla a otro nodo en F-38?
 3. **Llave simétrica.** Quien verifica puede forjar. ¿Se acepta HMAC, o se prefiere Ed25519 (verificador sin poder de forjar, más gestión)?
 4. **Escritor único.** Workers en tres nodos deberían enviar sus registros al coordinador; hoy no hay endpoint. ¿Lo crea quien cablea el puerto (rutas de subtareas) o se anota como límite?
@@ -186,3 +201,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: hueco de truncado cerrado con ancla genesis (casos concretos comprobados por el revisor), adaptador cumple SPEC, limites coinciden con los 4 xfail y A9; pytest segun revisor 1966 passed/10 xfailed. Menores: wording SPEC l.63 vs l.119, _write_anchor envoltorio para parchear en tests, costo de record tras la correccion sin re-medir. (8578c42) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | pytest | 2026-11-11 | 51 pruebas nuevas en rojo por ModuleNotFoundError; sin codigo en src ni scripts (6ffc9b4) |
+| tests | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de implementacion | pytest | 2026-11-11 | 55 pruebas de custodia y arquitectura en verde (unit, integration, acceptance); 153 lineas en src y scripts; suite completa 3156 passed segun el developer; Protocol KeyProvider local porque main no lo expone en ports.py (2d1447a) |
+| implementacion | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de verificacion | pytest | 2026-11-11 | QA: 4 hallazgos; QA-1 y QA-2 corregidos (commit 62a009e), QA-3 y QA-4 xfail estricto declarados como limites; 3158 passed segun developer; prueba A local sintetica con 12 escenarios, no nodos reales (62a009e) |
+| verificacion | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de documentacion | conformidad | 2026-11-11 | SPEC con limites de la parte 3, ficha M4 con 5 secciones, evidencia local sintetica rotulada, .env.example con CUSTODY_KEY_FILE, bitacora publicada; conformidad 0 problemas (4bd975d) |
+| documentacion | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de revision | revisor | 2026-11-11 | Revisor APROBADO, 0 bloqueantes, 2 menores (posicion base 0 en utf8_invalido; orden de validacion en DirectoryStore.exists); 42 passed 2 xfailed, conformidad 0 (26baec0) |
+| revision | Kenni Rodriguez | 2026-11-11 |  |

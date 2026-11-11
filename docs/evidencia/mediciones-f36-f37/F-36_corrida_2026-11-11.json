@@ -1,0 +1,26 @@
+{
+  "megabytes": 316,
+  "antes": {
+    "etiqueta": "antes",
+    "pids_subtareas": [
+      76
+    ],
+    "scratch": [
+      "ffmpeg-1750497d36cb47a8ad77972624cb97ac"
+    ],
+    "memory_current": 1051451392
+  },
+  "despues": {
+    "etiqueta": "despues",
+    "pids_subtareas": [],
+    "scratch": [],
+    "memory_current": 354623488
+  },
+  "estado_caso": "cancelled",
+  "hilo_resultado": "CorruptInputError",
+  "tiempo_liberacion_s": 0.1,
+  "veredicto": {
+    "cumple": true,
+    "problemas": []
+  }
+}

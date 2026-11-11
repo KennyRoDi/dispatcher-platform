@@ -45,7 +45,7 @@ from collections.abc import Mapping
 
 from fastapi import Depends, FastAPI
 
-from src.coordinator import rutas_alertas, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
+from src.coordinator import rutas_alertas, rutas_archivos, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
 from src.coordinator.seguridad import AutenticacionPrevia, autorizar
 
 logging.basicConfig(
@@ -76,6 +76,7 @@ def crear_app(env: Mapping[str, str] | None = None) -> FastAPI:
         rutas_casos.router,
         rutas_subtareas.router,
         rutas_monitoreo.router,
+        rutas_archivos.router,
         rutas_alertas.router,
         rutas_reporte.router,
     )

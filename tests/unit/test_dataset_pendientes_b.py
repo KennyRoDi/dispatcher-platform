@@ -149,6 +149,7 @@ def test_la_cli_informa_el_timeout_de_ffmpeg_y_limpia(tmp_path, capsys):
     assert not (tmp_path / "a").exists()
 
 
+@pytest.mark.skipif(os.name == "nt", reason="los enlaces simbólicos exigen privilegios")
 def test_los_enlaces_en_out_se_rechazan_con_error_de_uso_y_sin_traza(tmp_path, capsys):
     out = tmp_path / "out"
     out.mkdir()
@@ -189,6 +190,7 @@ class TermAl(FakeRunner):
             os.kill(os.getpid(), signal.SIGTERM)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="SIGTERM termina el proceso de pytest")
 def test_sigterm_sale_con_143_limpia_lo_creado_y_restaura_el_manejador(tmp_path):
     previo = signal.getsignal(signal.SIGTERM)
     out = tmp_path / "a" / "out"

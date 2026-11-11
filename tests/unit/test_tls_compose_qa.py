@@ -18,7 +18,10 @@ RAIZ = Path(__file__).resolve().parents[2]
 SCRIPT = RAIZ / "deploy" / "tls" / "generar_certs.sh"
 COMPOSES = ["docker-compose.yml", "deploy/docker-compose.worker.yml", "deploy/docker-compose.local.yml", "deploy/docker-compose.demo.yml"]
 
-necesita_openssl = pytest.mark.skipif(shutil.which("openssl") is None, reason="openssl no está instalado")
+necesita_openssl = pytest.mark.skipif(
+    shutil.which("openssl") is None or os.name == "nt",
+    reason="requiere openssl y un bash POSIX; en Windows bash es el lanzador de WSL",
+)
 
 
 def _generar(entorno: dict, tmp_path: Path) -> subprocess.CompletedProcess:

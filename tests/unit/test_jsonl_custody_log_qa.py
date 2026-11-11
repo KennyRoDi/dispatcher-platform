@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 import src.adapters.jsonl_custody_log as modulo
 from src.adapters.jsonl_custody_log import CustodyCorrupted, JsonlCustodyLog
 from src.domain.custody_chain import Anchor, verify_chain
