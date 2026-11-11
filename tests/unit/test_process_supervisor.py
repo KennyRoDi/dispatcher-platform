@@ -8,6 +8,7 @@ import pytest
 
 from tests.dobles import FakeClock
 
+SIGKILL = getattr(signal, "SIGKILL", 9)
 posix = pytest.mark.skipif(sys.platform == "win32", reason="requiere señales POSIX; en Windows usar WSL2")
 
 
@@ -31,7 +32,7 @@ class RunnerFalso:
         self.eventos.append(("signal", pid, sig))
         if self.ya_termino:
             raise ProcessLookupError
-        if sig == signal.SIGKILL or not self.ignora_sigterm:
+        if sig == SIGKILL or not self.ignora_sigterm:
             self._vivo = False
 
     def reap(self, pid, block=False):
@@ -75,7 +76,7 @@ def test_hijo_que_ignora_sigterm_recibe_sigkill_tras_la_gracia(reloj, dormir, tm
 
     sup.cancel(pid)
 
-    assert senales(runner) == [signal.SIGTERM, signal.SIGKILL]
+    assert senales(runner) == [signal.SIGTERM, SIGKILL]
     assert reloj.now() - inicio >= timedelta(seconds=5)
     assert runner.eventos[-1] == ("reap", pid, True)
 
