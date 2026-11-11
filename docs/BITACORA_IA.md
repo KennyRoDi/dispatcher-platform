@@ -672,3 +672,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador ejecuto la suite completa y la aceptacion tras la implementacion y conformidad.py en documentacion. Las fases se aprobaron con --excepcion por delegacion de la persona, sin lectura humana por fase. |
 | Cómo se validó | Desviacion aceptada: el developer no reutilizo dataset_sintetico (privado) y duplico ~4 lineas de validacion de ruta, declarado en el SPEC. Hallazgos de QA no corregidos: quedan como limites declarados. |
 | Error de la IA | QA detecto en la implementacion 4 defectos (xfail f80a91b): --salida sobrescribe la muestra o las salidas, RecursionError con JSON muy anidado sin atrapar y render_markdown sin escapar / ni saltos de linea. Ademas, por mutacion, QA hallo pruebas debiles que no fijan el formato numerico ni el separador markdown. Ademas, la edicion del documentador con un script de Python corrompio el SPEC (261 mil lineas); se revirtio con git checkout antes de hacer commit. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-18 (`feat/F-18-2-deteccion-de-oom`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-18 |
+| Propósito | Reencolado por OOM en el worker (parte 2 de F-18) |
+| Consulta resumida | Pruebas en rojo e integración en worker_node con exit_code, memory.events y reserva en admisión |
+| Resultado obtenido | Reencolado con reserva x1.5 sin gastar intentos, falla con causa oom tras 2; suite completa en verde |
+| Validado / corregido / descartado | Suite completa 1720 en verde; OOM real en contenedor pendiente de nodos |
+| Cómo se validó | TDD en fases; subagente haiku para documentación |
+| Error de la IA | Mi prueba en rojo olvidaba vaciar la cola sembrada y duplicaba el id; la implementación estaba bien y se corrigió la prueba |
