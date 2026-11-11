@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 151205f
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -223,3 +223,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff desde la verificacion: docs/dataset.md, ARQUITECTURA (AD-25), SPEC y solo la cadena reason de un xfail. Recontados desde manifest.json: audio 80 ruido/70 tono, 5 casos livianos, 5 pesados y 30 no heterogeneos, 5 videos; AD-25 presente antes de AD-26; Drive marcado pendiente sin URL; sha256 del manifiesto coincide. No verifique la cifra de mensajes (el doc solo cita el minimo del validador). (b13b64c) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso; verificacion del orquestador hecha |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO, 0 bloqueantes, 3 menores; los 3 corregidos por mi en docs/dataset.md y AD-25 (1,96 GB, reproducibilidad con ffmpeg, aprobacion de plantillas). Revisor reprodujo pytest 1637 passed, validador y recuentos desde manifest.json. Solo cambio texto desde su revision. (151205f) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
