@@ -1146,3 +1146,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Corregido: QA devolvio dos veces (H3-H6) y se arreglo antes de aprobar |
 | Cómo se validó | pytest en la maquina de Melany (1110 verde), integracion repetida, sondas de memoria y 7 mutantes detectados por QA |
 | Error de la IA | 1) El primer arreglo de H2 dejaba 88/200 carpetas huerfanas con put y discard concurrentes: se cambio a renombrado atomico con prueba de estres. 2) El PUT leia el cuerpo entero en RAM (H3) y luego copiaba 2 chunks (H6), incumpliendo B.5 M3: se paso a un buffer unico reservado. 3) No acoto size (H4) ni la carrera entre dos complete (H5). 4) La IA afirmo sin ResourceWarning, pero hay avisos sqlite ajenos a F-22. |
+
+## 2026-11-11 · Melany Vindas · F-23 (`feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) |
+| Componente | F-23 |
+| Propósito | F-23 parte 1: llevar al contrato de ObjectStore la regla del put pendiente de F-22 |
+| Consulta resumida | Ampliar comprobar_object_store y documentar la regla en CONTRATOS.md |
+| Resultado obtenido | Dos reglas nuevas: put fallido no confirma y open inexistente lanza KeyError |
+| Validado / corregido / descartado | Validado |
+| Cómo se validó | Contrato en verde con el doble y EncryptedObjectStore; dos mutantes detectados |
+| Error de la IA | La IA propuso AD-35 en el SPEC, que ya existia (la ultima era AD-40); se detecto al verificar y se corrigio a AD-41. |
