@@ -20,7 +20,7 @@
 | F-15 | pendiente |
 | F-16 | hecha |
 | F-17 | hecha |
-| F-18 | revision |
+| F-18 | en-pr |
 | F-19 | implementacion |
 | F-20 | pendiente |
 | F-21 | pendiente |
