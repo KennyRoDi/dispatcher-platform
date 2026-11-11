@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-22-1-chunks-verificados
-**Verificación IA:** documentacion 5df88a5
+**Verificación IA:** revision a7c8e59
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -214,3 +214,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. Diff solo en docs/specs/F-22/SPEC.md (protocolo con 413, tope 100000 chunks, 404 concurrente, 503; H2 resuelto, H7 informativa) y AD-28 en ARQUITECTURA. Sin ficha M3: no hay datos medidos (parte 3). README sin cambios: el despliegue no cambio. Bitacora con 4 errores reales de la IA. (5df88a5) |
 | documentacion | Melany Vindas | 2026-11-11 |  |
+| verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) devolvio dos veces y aprobo los arreglos 1, 2 y 5: receive en run_in_threadpool (no bloquea el event loop, B.5 M3 intacto), KeyError del ObjectStore ya no se disfraza de 404, separador eliminado. Su segunda revision hallo una carrera previa en received() (is_dir y luego iterdir) que daba 500 en 4/25; arreglada por el orquestador con prueba determinista, 0/25 fallos (verificacion no independiente de ese punto). Anotado: discard borra sin renombrar si rename falla con OSError. Diff 226 lineas en src y scripts. Suite 1144 verde. (a7c8e59) |
