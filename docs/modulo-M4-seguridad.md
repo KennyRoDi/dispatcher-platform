@@ -68,6 +68,6 @@ pytest -q -m integration tests/integration/test_encrypted_object_store_minio.py
 
 Automatizada en `tests/unit/test_historial_sin_llaves.py`. Comando manual: `git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'`.
 
-**Salida:** pendiente: la prueba I no se ha ejecutado contra MinIO real; la búsqueda manual tampoco se ha registrado aquí.
+**Salida:** pendiente: la búsqueda manual en el historial no se ha registrado aquí. La prueba automática `tests/unit/test_historial_sin_llaves.py` sí corre en la suite y pasa.
 
 **Mediciones:** costo de CPU del decorador: pendiente, sin datos medidos.
