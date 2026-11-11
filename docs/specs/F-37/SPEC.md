@@ -1,4 +1,4 @@
-# SPEC F-37: Saturación de memoria
+﻿# SPEC F-37: Saturación de memoria
 
 **Fase:** cerrada
 **Base:** feat/F-37-1-saturacion-de-memoria
@@ -85,7 +85,7 @@ TDD aplica a la lógica de `scenarios/` (Parte 1). La corrida en nodos no lleva 
 
 ## Mediciones
 
-M1 y B.6, a cargo de la persona en los nodos WSL2 de F-38. **Medición pendiente:** hoy no hay datos.
+Medido el 2026-11-11 en un contenedor Docker aislado (`memory.max` 256 MiB): 3 repeticiones con admisión, 1 sin admisión (SUP-38 cumplida) e integración y aceptación con Redis real; ver la ficha. **Medición pendiente:** corrida M1 y B.6 en tres nodos WSL2 separados de F-38 (no posible en la máquina de desarrollo) y una prueba con `WorkerNode` real, que ninguna prueba actual ejercita.
 
 1. Con la ficha M1 vigente (huella y límite medidos): `py -m scenarios.memory_saturation --salida docs/evidencia/F-37_<fecha>.json`.
 2. Tres repeticiones; se reporta cada una, no solo la mejor.
@@ -104,7 +104,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 ## Riesgos y preguntas abiertas
 
-- **Corrida real:** requiere nodos WSL2 y a la persona. Hasta entonces la Parte 2 queda «Medición pendiente» y no se inventan cifras.
+- **Corrida real:** hecha en contenedor aislado (PR 105). La de tres nodos WSL2 sigue «Medición pendiente» y no se inventan cifras.
 - **Huella:** el cupo depende de la huella por operación (ficha M1, AD-30). Sin esa medición, el plan usa valores de configuración declarados provisionales.
 - **Umbrales provisionales:** el factor 2 (SUP-36) y la tolerancia de 3 intervalos (SUP-37) son criterio propio; confirmar con quien aprueba.
 - **Comparación sin admisión:** puede disparar un OOM del cgroup; se aísla en un solo worker (AD-05) y la persona decide si se hace (SUP-38).
