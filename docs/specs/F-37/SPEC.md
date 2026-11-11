@@ -1,6 +1,6 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-37-1-saturacion-de-memoria
 **Verificación IA:** revision e6f67d2
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
@@ -140,3 +140,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Ficha F-37 contrastada con SPEC (Mediciones y Plan de pila): medido solo unitarias; corrida en nodos, aceptacion, grafico y comparacion sin admision quedan Medicion pendiente con comando exacto y regla SUP-38; sin cifras inventadas; bitacora publicada (0244db6) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | parte 2 sin código; aprobación delegada por José en el chat |
 | verificación IA de revision | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Diff vs main solo ficha y SPEC; coincide con Plan de pila parte 2 (sin codigo). Ficha sin cifras inventadas: todo lo no corrido es Medicion pendiente. AD-41 y SUP-36 a SUP-38 existen. Nota: referencia en M1 queda pendiente con la corrida (e6f67d2) |
+| revision | José Andrés Loría Herrera | 2026-11-11 | parte 2 sin código; aprobación delegada por José en el chat |
