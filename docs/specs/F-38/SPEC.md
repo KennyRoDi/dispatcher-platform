@@ -1,6 +1,6 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision a545358
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
@@ -227,3 +227,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Docs revisadas: variables F-17 en .env.example y DEPLOY_WORKERS (nombres coinciden con config.py:196, env_file las pasa al worker), sin valores inventados; bitacora en estado (10adc18) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | orquestador | 2026-11-11 | Revision del diff contra el SPEC (fila 2 de la pila): evidencia marcada simulacion local, no acredita B.2 ni Tailscale; correcciones de guia; sin subagente revisor, verificacion no independiente (a545358) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin subagente revisor |
