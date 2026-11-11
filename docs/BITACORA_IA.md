@@ -776,3 +776,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas y QA por subagentes; verificación del orquestador. Las aprobaciones de fase fueron delegadas: no hubo verificación humana independiente. |
 | Cómo se validó | Subagentes por rol (developer, qa-tester, documentador) con verificación del orquestador y aprobaciones delegadas |
 | Error de la IA | El developer puso en producción un salto de verificación que conoce el mecanismo de pruebas (dependency_overrides); QA lo marcó y queda como límite declarado. |
+
+## 2026-11-10 · Kenni Rodriguez · F-28 (`feat/F-28-1-cifrado-en-reposo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5): subagentes developer, qa-tester y documentador |
+| Componente | F-28 |
+| Propósito | Cifrado de sobre AES-256-GCM por chunks (F-28 parte 1) |
+| Consulta resumida | Disenar e implementar EnvelopeCipher, verificar y documentar |
+| Resultado obtenido | EnvelopeCipher, AD-34, SUP-30, ficha M4 borrador |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificacion humana independiente |
+| Cómo se validó | Subagentes developer, qa-tester y documentador; el orquestador verifico con la suite |
+| Error de la IA | La implementacion inicial tomaba read()==None como EOF y cifraba objetos truncados sin error; QA lo detecto y se corrigio |
