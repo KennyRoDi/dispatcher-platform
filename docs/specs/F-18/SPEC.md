@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-18-1-deteccion-de-oom
-**Verificación IA:** verificacion 7c75071
+**Verificación IA:** documentacion adc6432
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
 
 ## Objetivo
@@ -77,3 +77,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code | 2026-11-10 | QA: suite completa 1720 en verde; OOM real en contenedor y M1 pendientes de nodos WSL2/Docker, no medidos; no independiente (7c75071) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code | 2026-11-10 | Documentación: AD-30 ampliada, bitácora publicada; no independiente (adc6432) |
