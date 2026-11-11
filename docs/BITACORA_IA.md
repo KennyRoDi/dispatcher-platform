@@ -1272,3 +1272,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | pytest -m integration tests/integration/test_minio_object_store.py: 4 passed; unitarias 23 passed; conformidad 0. |
 | Cómo se validó | Se implementó el adaptador y se comprobó en MinIO efímero local; la verificación del orquestador no fue independiente. |
 | Error de la IA | Una primera ejecución de pruebas en Windows señaló colisión por dos módulos homónimos; se renombró el módulo unitario y se alineó el nombre de integración al SPEC. |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-22 (`feat/F-22-4-medir-throughput-por-tamano-de-chunk`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-22 |
+| Propósito | F-22 parte 3: runner de throughput por tamaño de chunk |
+| Consulta resumida | Preparar la medición reproducible entre nodos con 4 tamaños y 5 repeticiones, sin sustituir los datos medidos por estimaciones. |
+| Resultado obtenido | Runner m3_chunks.py con CSV crudo y estadísticas; documentación M3 deja resultados pendientes al no haber dataset multimedia ni nodos reales. |
+| Validado / corregido / descartado | Pruebas F-22 focalizadas 93 passed; conformidad 0; compileall y diff-check limpios. No se ejecutó benchmark. |
+| Cómo se validó | Comando documentado según SPEC; el objeto se retira después de cada repetición para evitar que la deduplicación contamine throughput. |
+| Error de la IA | Inicialmente propuse ejecutar el benchmark sobre los tres contenedores locales de F-38; comprobé que esa evidencia es solo una simulación en una máquina y la descarté para no atribuirle mediciones entre nodos. |
