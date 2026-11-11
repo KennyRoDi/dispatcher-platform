@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan e190b38
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
 
 ## Objetivo
@@ -59,3 +59,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Code | 2026-11-10 | SPEC completo, plan de pila en 2 partes; verificación no independiente (e190b38) |
