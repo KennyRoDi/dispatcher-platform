@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-27-3-tls-entre-nodos
 **Verificación IA:** verificacion c879d58
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -217,3 +217,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | orquestador | 2026-11-11 | Parte sin codigo (0 lineas en src); suite sin cambios 2014 passed, 9 skipped, 4 xfailed (44fba43) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código |
 | verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte solo de prueba de aceptacion saltada y docs; captura real pendiente de la persona con sudo (c879d58) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
