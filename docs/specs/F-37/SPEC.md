@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** documentacion 3bb36e2
+**Verificación IA:** documentacion d02861f
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
 
 ## Objetivo
@@ -127,3 +127,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (verificación no independiente) | 2026-11-11 | Ficha F-37 revisada: sin datos inventados, mediciones marcadas Medición pendiente (3bb36e2) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-11 | Faltan AD-41 en ARQUITECTURA.md §8 y SUP-36 a SUP-38 en REQUERIMIENTOS.md, que el SPEC exige registrar en la Parte 1 |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5) | 2026-11-11 | AD-41 y SUP-36..38 registrados; sin datos inventados; verificacion no independiente (d02861f) |
