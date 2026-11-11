@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -98,6 +99,15 @@ def upload_plan(storage, plan: list[tuple[Path, str]], prefix: str, bucket: str)
         storage.upload_file(bucket, key, path)
         keys_ops.append((key, op))
     return keys_ops
+
+
+def sesion_autenticada(env=None):
+    token = (os.environ if env is None else env).get("API_TOKEN", "").strip()
+    if not token:
+        return requests
+    sesion = requests.Session()
+    sesion.headers["Authorization"] = f"Bearer {token}"
+    return sesion
 
 
 def submit_case(coordinator_url: str, keys_ops: list[tuple[str, str]], session=requests, priority: str = "normal") -> dict:
@@ -262,11 +272,12 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     coordinator_url = settings.coordinator_url
+    session = sesion_autenticada()
 
     try:
         with ThreadPoolExecutor(max_workers=max(1, args.repeat)) as pool:
             futures = [
-                pool.submit(submit_case, coordinator_url, keys_ops, requests, args.priority)
+                pool.submit(submit_case, coordinator_url, keys_ops, session, args.priority)
                 for _ in range(args.repeat)
             ]
             cases = [fut.result() for fut in futures]
@@ -277,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cancel_after is not None:
         time.sleep(max(0.0, args.cancel_after))
         for c in cases:
-            cancelled = cancel_case(coordinator_url, c["case_id"])
+            cancelled = cancel_case(coordinator_url, c["case_id"], session)
             if cancelled:
                 print(
                     f"Cancelado {c['case_id']}: estado={cancelled.get('status')} "
@@ -288,7 +299,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         with ThreadPoolExecutor(max_workers=max(1, len(cases))) as pool:
             futures = {
-                pool.submit(poll_case, coordinator_url, c["case_id"], args.poll, args.timeout): c for c in cases
+                pool.submit(poll_case, coordinator_url, c["case_id"], args.poll, args.timeout, session): c for c in cases
             }
             for fut in as_completed(futures):
                 results.append(fut.result())
@@ -298,7 +309,7 @@ def main(argv: list[str] | None = None) -> int:
 
     for r in results:
         if not r.get("_timed_out"):
-            report = fetch_report(coordinator_url, r["case_id"])
+            report = fetch_report(coordinator_url, r["case_id"], session)
             if report:
                 print_report(r["case_id"], report)
 
