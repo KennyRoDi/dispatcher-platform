@@ -24,7 +24,7 @@
 | F-19 | hecha |
 | F-20 | pendiente |
 | F-21 | pendiente |
-| F-22 | implementacion |
+| F-22 | documentacion |
 | F-23 | en-pr |
 | F-24 | pendiente |
 | F-25 | pendiente |
