@@ -350,3 +350,14 @@ def test_un_nombre_de_caso_no_escribe_fuera_del_destino(tmp_path):
         pass
 
     assert not (tmp_path / "escape-chat.txt").exists()
+
+
+@pytest.mark.parametrize("ratio", [-0.1, 1.5, float("nan")])
+def test_threat_ratio_fuera_de_cero_a_uno_da_un_error_claro(ratio):
+    with pytest.raises(ValueError, match="threat_ratio"):
+        generate_chat(seed=1, count=10, threat_ratio=ratio)
+
+
+@pytest.mark.parametrize("ratio", [0.0, 1.0])
+def test_threat_ratio_en_los_limites_se_acepta(ratio):
+    assert len(generate_chat(seed=1, count=10, threat_ratio=ratio)) == 10

@@ -183,3 +183,77 @@ def test_la_fuente_de_ruido_fija_su_semilla_para_que_el_contenido_sea_reproducib
 
     assert noise
     assert all("seed=" in source for source in noise)
+
+
+def test_produce_se_niega_a_dejar_un_archivo_menor_que_min_bytes(tmp_path):
+    path = tmp_path / "caso" / "video.mpg"
+
+    def runner(args):
+        path.write_bytes(b"x" * 10)
+
+    with pytest.raises(ValueError):
+        media_generator._produce(runner, ["ffmpeg"], path, min_bytes=11)
+
+    assert not path.exists()
+
+
+def test_produce_acepta_un_archivo_que_alcanza_min_bytes(tmp_path):
+    path = tmp_path / "caso" / "video.mpg"
+
+    def runner(args):
+        path.write_bytes(b"x" * 11)
+
+    media_generator._produce(runner, ["ffmpeg"], path, min_bytes=11)
+
+    assert path.stat().st_size == 11
+
+
+def test_produce_borra_el_archivo_previo_antes_de_ejecutar(tmp_path):
+    path = tmp_path / "caso" / "audio.wav"
+    path.parent.mkdir()
+    path.write_bytes(b"previo")
+    visto = []
+
+    def runner(args):
+        visto.append(path.exists())
+        path.write_bytes(b"nuevo")
+
+    media_generator._produce(runner, ["ffmpeg"], path)
+
+    assert visto == [False]
+
+
+def test_heavy_case_generator_reutiliza_el_produce_de_media_generator():
+    from src.adapters import heavy_case_generator
+
+    assert getattr(heavy_case_generator, "_produce", None) is media_generator._produce
+
+
+def test_audio_durations_corta_da_un_error_claro_y_no_deja_archivos(tmp_path):
+    plan = plan_dataset(7, PARAMS)
+    corto = dataclasses.replace(plan, audio_durations=plan.audio_durations[:-1])
+
+    with pytest.raises(ValueError, match="audio_durations"):
+        generate_media(corto, tmp_path, Recorder())
+
+    assert [p for p in tmp_path.rglob("*") if p.is_file()] == []
+
+
+def test_run_ffmpeg_sin_stderr_igual_propaga_el_fallo(monkeypatch):
+    def fake_run(args, **kwargs):
+        raise subprocess.CalledProcessError(1, args, stderr=None)
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    with pytest.raises(Exception):
+        run_ffmpeg(["ffmpeg"])
+
+
+def test_el_error_de_ffmpeg_en_texto_expone_su_stderr_decodificado(monkeypatch):
+    def fake_run(args, **kwargs):
+        raise subprocess.CalledProcessError(1, args, stderr="No such file or directory".encode())
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    with pytest.raises(Exception, match="No such file or directory"):
+        run_ffmpeg(["ffmpeg"])
