@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-27-3-tls-entre-nodos
-**Verificación IA:** revision b387b37
+**Verificación IA:** tests 20d5104
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -212,3 +212,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO tras corregir coordinator user (39d0aac); Redis, MinIO y coordinador reales sin probar con imagen (b387b37) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Prueba de aceptacion creada (commit 20d5104), 2 skipped por diseno; src intacto; sin resultados inventados (20d5104) |
