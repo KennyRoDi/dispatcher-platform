@@ -18,7 +18,7 @@ def subtarea(kind):
         case_id="c1",
         kind=kind,
         source_sha256="0" * 64,
-        priority=Priority.from_name("high"),
+        priority=Priority.from_name("alta"),
         enqueued_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
     )
 
