@@ -33,10 +33,14 @@ class DirectoryStore:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        anchor = _read_anchor(args.anchor)
         lines = _read_lines(args.log)
         key_provider = FileKeyProvider(os.environ.get(KEY_ENV) or _unset())
         store = DirectoryStore(args.store) if args.store else None
-        report = verify_custody(lines, _read_anchor(args.anchor), key_provider, store)
+        report = verify_custody(lines, anchor, key_provider, store)
+    except _InvalidUtf8 as error:
+        print(f"posicion {error.position}: utf8_invalido: la linea no es UTF-8 valido")
+        return EXIT_TAMPERED
     except (KeyUnavailable, OSError) as error:
         print(f"no se pudo verificar: {error}", file=sys.stderr)
         return EXIT_CLOSED
@@ -60,9 +64,21 @@ def _unset() -> str:
     raise KeyUnavailable(f"falta la variable {KEY_ENV}")
 
 
+class _InvalidUtf8(Exception):
+    def __init__(self, position: int) -> None:
+        super().__init__(position)
+        self.position = position
+
+
 def _read_lines(path: Path) -> list[str]:
     # No se usa splitlines: parte en separadores Unicode que no delimitan entradas.
-    lines = path.read_bytes().decode("utf-8", errors="replace").split("\n")
+    raw_lines = path.read_bytes().split(b"\n")
+    lines = []
+    for position, raw in enumerate(raw_lines):
+        try:
+            lines.append(raw.decode("utf-8"))
+        except UnicodeDecodeError:
+            raise _InvalidUtf8(position) from None
     return lines[:-1] if lines[-1] == "" else lines
 
 

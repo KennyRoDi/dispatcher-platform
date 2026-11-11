@@ -48,11 +48,6 @@ def ejecutar(capsys, *argumentos):
     return codigo, captura.out + captura.err
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA-1 (baja): _read_lines decodifica con errors='replace'; bytes UTF-8 inválidos (FF) que decodifican "
-    "a U+FFFD igual al texto sellado pasan como 'ok' y el escritor (CustodyCorrupted: no es UTF-8) rechaza ese log",
-)
 def test_un_log_con_bytes_utf8_invalidos_no_pasa(tmp_path, llave, monkeypatch, capsys):
     monkeypatch.setenv("CUSTODY_KEY_FILE", str(escribir_llave(tmp_path / "k.custody-key", llave)))
     log = tmp_path / "log.jsonl"
@@ -65,12 +60,6 @@ def test_un_log_con_bytes_utf8_invalidos_no_pasa(tmp_path, llave, monkeypatch, c
     assert codigo not in (0, None)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA-2 (media): main lee el log antes que el ancla; un anexo legítimo entre ambas lecturas deja el ancla "
-    "adelantada y se informa 'truncado' (falso positivo con el coordinador escribiendo); leer el ancla primero "
-    "la dejaría atrasada una entrada, que se tolera",
-)
 def test_un_anexo_legitimo_durante_la_verificacion_no_es_truncado(entorno, llave, capsys, monkeypatch):
     log, ancla, _ = entorno
     leer = cli._read_lines
