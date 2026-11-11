@@ -1221,3 +1221,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Salida cruda y JSON guardados en docs/evidencia; cifras copiadas de la salida |
 | Cómo se validó | Comparé la tabla del documento con la salida del script |
 | Error de la IA | Primer intento falló: PyAV 19 sin pin rompe faster-whisper (ya documentado en requirements-audio.txt); la IA no lo aplicó al inicio y se corrigió con av==18.1.0. También un config con BOM de PowerShell rompió tomllib. |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-36/F-37 mediciones (`docs/medicion-f36-f37`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-36/F-37 mediciones |
+| Propósito | Escribir arnés y ejecutar mediciones reales de F-36 y F-37 en Docker |
+| Consulta resumida | Arnés medir_f36.py y medir_f37.py sobre componentes reales; corridas en contenedor aislado |
+| Resultado obtenido | F-36 cumple (1 repetición); F-37 cumple con admisión (3 rep) y sufre OOM sin admisión |
+| Validado / corregido / descartado | JSON crudos revisados y aceptación pasa sobre ellos; datos no estimados |
+| Cómo se validó | Revisión de los JSON y de los comandos reproducibles en docs/evidencia/mediciones-f36-f37 |
+| Error de la IA | Primer arnés F-36 usó la operación 'transcode' (inexistente, es transcode_video): el hilo falló al instante sin ffmpeg en curso. Se detectó por el assert; el test de integración test_cancelacion_en_curso_linux.py usa el mismo nombre y su except lo oculta (no se corrigió: fuera de alcance) |
