@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-28-2-cifrado-en-reposo
-**Verificación IA:** implementacion 6a4b7ac
+**Verificación IA:** verificacion 4e31d97
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -175,3 +175,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: tras DecryptionError el siguiente read devuelve claro como valido (media); read(n) cuadratico; sin readinto; read tras close devuelve datos y close no usa try/finally |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de puntos 1-4 de QA; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa: 1974 passed, 8 skipped, 15 xfailed (1 corrida). (6a4b7ac) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA bc0c549: 11 xfail, 5 corregidos y desmarcados; quedan 6 (size menor al real guarda objeto truncado sin error en put; dek/kek en locales de traza de envelope_cipher) a declarar como limites. Prueba I con MinIO real NO corrio (sin imagen ni binario minio). Sin parcial tras fallo en put. (4e31d97) |
