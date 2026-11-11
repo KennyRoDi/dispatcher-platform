@@ -284,11 +284,6 @@ class _Raw:
         return part
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA media: read() devuelve None en un flujo no bloqueante y _read_exact lo toma "
-    "como fin de datos: encrypt cifra un objeto truncado sin error (fuga silenciosa de datos)",
-)
 def test_flujo_que_devuelve_none_no_trunca_en_silencio():
     data = os.urandom(5 * CHUNK)
     cipher = _cipher()
@@ -316,11 +311,6 @@ def test_un_objeto_truncado_no_entrega_ningun_byte_antes_de_fallar():
     assert entregado == []
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA baja: una KEK que no es bytes pero mide 32 (str) pasa la validacion y AESGCM "
-    "lanza TypeError en vez de KeyUnavailable",
-)
 @pytest.mark.parametrize("kek", ["k" * 32, None])
 def test_kek_que_no_es_bytes_lanza_key_unavailable(kek):
     with pytest.raises(KeyUnavailable):
@@ -331,11 +321,6 @@ def _cipher_con(kek) -> EnvelopeCipher:
     return EnvelopeCipher(_Kek(kek), chunk_size=CHUNK)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA baja: chunk_size float o bool pasa el rango y falla despues con TypeError "
-    "opaco al leer (o se acepta True como 1 byte)",
-)
 @pytest.mark.parametrize("chunk_size", [1.5, True])
 def test_chunk_size_que_no_es_entero_se_rechaza_al_construir(chunk_size):
     with pytest.raises((ValueError, TypeError)):

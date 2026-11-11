@@ -39,7 +39,7 @@ class EnvelopeCipher:
     HEADER_SIZE = FIXED_HEADER.size + NONCE_SIZE + KEY_SIZE + TAG_SIZE
 
     def __init__(self, key_provider: _KeyProvider, chunk_size: int = DEFAULT_CHUNK_SIZE):
-        if not 0 < chunk_size <= MAX_CHUNK_SIZE:
+        if type(chunk_size) is not int or not 0 < chunk_size <= MAX_CHUNK_SIZE:
             raise ValueError(f"chunk_size fuera de rango: {chunk_size}")
         self._keys = key_provider
         self.chunk_size = chunk_size
@@ -69,7 +69,7 @@ class EnvelopeCipher:
 
     def _kek_cipher(self) -> AESGCM:
         kek = self._keys.kek()
-        if len(kek) != KEY_SIZE:
+        if not isinstance(kek, (bytes, bytearray)) or len(kek) != KEY_SIZE:
             raise KeyUnavailable(f"la KEK debe tener {KEY_SIZE} bytes")
         return AESGCM(kek)
 
@@ -120,18 +120,13 @@ def _chunk_context(fixed: bytes, sha256_hex: str, index: int, last: bool) -> tup
     return nonce, aad
 
 
-def count() -> Iterator[int]:
-    index = 0
-    while True:
-        yield index
-        index += 1
-
-
 def _read_exact(stream: BinaryIO, size: int) -> bytes:
     parts: list[bytes] = []
     remaining = size
     while remaining:
         part = stream.read(remaining)
+        if part is None:
+            raise OSError("flujo no bloqueante sin datos disponibles")
         if not part:
             break
         parts.append(part)
