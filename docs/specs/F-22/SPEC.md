@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-22-1-chunks-verificados
 **Verificación IA:** implementacion 844fe4e
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -204,3 +204,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Melany Vindas | 2026-11-11 |  |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: orquestador implemento y verifico, verificacion no independiente. Rutas /uploads (201/204/409/422/404, 503 sin almacen), cliente scripts/subir_por_chunks.py y H2: put_chunk exige manifiesto y no recrea la carpeta. Error de IA detectado: el primer arreglo de H2 dejaba 88/200 carpetas huerfanas con put y discard concurrentes; discard ahora renombra atomico antes de borrar y una prueba de estres lo cubre (falla sin el arreglo, 8/8 verde con el). Suite 1129 verde sin ResourceWarning; integracion 3/3 con subida real de 200 MiB. Riesgo: el chunk se lee completo en memoria antes de validar tamano. Conformidad: solo falta docs/dataset.md de F-04, ajeno a esta rama. (844fe4e) |
 | implementacion | Melany Vindas | 2026-11-11 |  |
+| devuelta de verificacion | Melany Vindas | 2026-11-11 | QA: H3 PUT lee el cuerpo entero en RAM (B.5 M3), H4 size sin tope agota memoria, H5 complete concurrente da 500 |
