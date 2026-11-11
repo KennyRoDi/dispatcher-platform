@@ -2,6 +2,8 @@ import os
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from src.application.ports import KeyUnavailable
 from src.application.verify_custody import verify_custody
 from src.domain.custody_chain import GENESIS_HASH, seal, make_anchor

@@ -1,3 +1,4 @@
+import os
 import dataclasses
 import subprocess
 from pathlib import Path
@@ -159,6 +160,7 @@ def test_heavy_bytes_que_no_cabe_en_el_timeout_se_rechaza_antes_de_ejecutar(tmp_
     assert list(tmp_path.iterdir()) == []
 
 
+@pytest.mark.skipif(os.name == "nt", reason="NTFS no crea archivos dispersos por defecto y el tope llena el disco")
 def test_heavy_bytes_en_el_tope_se_acepta(tmp_path):
     from src.adapters.heavy_case_generator import MAX_HEAVY_BYTES
 

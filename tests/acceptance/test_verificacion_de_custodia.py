@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from tests.ayudas_custodia import (
     CONTENIDO_A,
     CONTENIDO_B,

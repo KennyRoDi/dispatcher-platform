@@ -1,3 +1,4 @@
+import os
 import hashlib
 import json
 from pathlib import Path
@@ -124,7 +125,7 @@ def test_lee_las_salidas_del_analisis(tmp_path):
         (read_observed, {"path": "a.png", "categorias": []}),
     ],
 )
-@pytest.mark.parametrize("path", ["/etc/passwd", "../escape.png", "imagenes/../../escape.png", "a\x00b.png", 7, None])
+@pytest.mark.parametrize("path", [pytest.param("/etc/passwd", marks=pytest.mark.skipif(os.name == "nt", reason="en Windows una ruta con / inicial no es absoluta")), "../escape.png", "imagenes/../../escape.png", "a\x00b.png", 7, None])
 def test_lectores_rechazan_rutas_peligrosas(tmp_path, reader, valid_row, path):
     with pytest.raises(ValueError):
         reader(_write(tmp_path, [{**valid_row, "path": path}]))

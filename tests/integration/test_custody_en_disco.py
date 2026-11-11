@@ -5,6 +5,8 @@ import stat
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from src.adapters.file_key_provider import FileKeyProvider
 from src.adapters.jsonl_custody_log import JsonlCustodyLog
 from src.application.ports import KeyUnavailable

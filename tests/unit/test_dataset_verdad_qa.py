@@ -1,3 +1,4 @@
+import os
 import json
 
 import pytest
@@ -50,6 +51,7 @@ def test_markdown_no_rompe_la_tabla_con_barra_o_salto_en_la_categoria():
     assert all(line.count("|") == header_columns for line in table[:3])
 
 
+@pytest.mark.skipif(os.name == "nt", reason="los enlaces simbólicos exigen privilegios")
 def test_salida_enlace_simbolico_a_la_muestra_no_la_sobrescribe(tmp_path, capsys):
     sample = _write(tmp_path / "muestra.json", SAMPLE)
     observed = _write(tmp_path / "salidas.json", OBSERVED)
