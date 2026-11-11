@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan f3b5abe
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -95,3 +95,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Codex | 2026-11-10 | Revision independiente del diff f3b5abe contra US-19, RF-27 y B.5 M1; SPEC sin campos pendientes, contratos conservados y pila de hasta 400 lineas. git diff --check HEAD^ HEAD limpio; python -m scripts.conformidad repo: 0 problemas; arbol limpio y HEAD igual a upstream. Solo documentos; no se ejecutaron inferencias ni mediciones. Compatibilidad real de fork pendiente para parte 2. Corregida colision SUP-24 usando SUP-25. (f3b5abe) |
+| plan | José Andrés Loría Herrera | 2026-11-10 |  |
