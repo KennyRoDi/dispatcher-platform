@@ -1,0 +1,10 @@
+# Tabla provisional: se calibra con la medición de F-31 (ficha M5).
+[rutas]
+text = ["cpu"]
+image = ["cpu"]
+audio = ["gpu", "cpu"]
+
+[evidencia]
+text = "Medición pendiente"
+image = "Medición pendiente"
+audio = "Medición pendiente: docs/modulo-M5-computo.md"

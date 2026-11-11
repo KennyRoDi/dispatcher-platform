@@ -1,0 +1,7 @@
+# Dependencias del detector de imagen (F-08). Aparte de requirements-dev.txt para que CI no instale torch.
+# torch solo CPU, antes que el resto:
+#   pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-imagen.txt
+torch==2.15.0
+# Ultralytics, licencia AGPL-3.0 (https://docs.ultralytics.com).
+ultralytics==8.4.208
