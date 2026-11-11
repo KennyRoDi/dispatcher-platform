@@ -42,6 +42,35 @@ def comprobar_object_store(almacen):
     assert almacen.open("abc").read() == b"hola"
     almacen.put("abc", io.BytesIO(b"hola"), 4)
     assert almacen.open("abc").read() == b"hola"
+    with pytest.raises(KeyError):
+        almacen.open("inexistente")
+    # F-22 verifica el SHA-256 mientras `put` lee y aborta con excepción: el objeto no debe quedar.
+    with pytest.raises(_LecturaFallida):
+        almacen.put("roto", _ContenidoQueFalla(b"inicio", 64), 64)
+    assert not almacen.exists("roto")
+
+
+class _LecturaFallida(Exception):
+    pass
+
+
+class _ContenidoQueFalla(io.RawIOBase):
+    """Entrega `prefijo` y luego falla, como el flujo verificado de F-22 ante un hash ajeno."""
+
+    def __init__(self, prefijo, tamano):
+        self._pendiente = memoryview(prefijo)
+        self.tamano = tamano
+
+    def readable(self):
+        return True
+
+    def readinto(self, buffer):
+        if not self._pendiente:
+            raise _LecturaFallida("lectura interrumpida")
+        leidos = min(len(buffer), len(self._pendiente))
+        buffer[:leidos] = self._pendiente[:leidos]
+        self._pendiente = self._pendiente[leidos:]
+        return leidos
 
 
 def comprobar_finding_store(almacen):
