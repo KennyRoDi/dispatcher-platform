@@ -47,6 +47,8 @@ from fastapi import Depends, FastAPI
 
 from src.coordinator import rutas_alertas, rutas_archivos, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
 from src.coordinator.seguridad import AutenticacionPrevia, autorizar
+from src.coordinator import rutas_archivos
+from src.infrastructure.object_store import crear_subidas
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,6 +64,14 @@ def auth_habilitada(env: Mapping[str, str]) -> bool:
 
 def crear_app(env: Mapping[str, str] | None = None) -> FastAPI:
     env = os.environ if env is None else env
+    if all(env.get(nombre, "").strip() for nombre in ("MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY")):
+        try:
+            rutas_archivos.configurar(crear_subidas(env))
+        except (ValueError, OSError) as error:
+            logging.getLogger(__name__).error("no se pudo configurar el almacén de objetos: %s", error)
+            rutas_archivos.configurar(None)
+    else:
+        rutas_archivos.configurar(None)
     protegida = auth_habilitada(env)
     app = FastAPI(
         title="Nodo Coordinador — Plataforma Distribuida de Procesamiento Multimedia",
@@ -79,6 +89,7 @@ def crear_app(env: Mapping[str, str] | None = None) -> FastAPI:
         rutas_archivos.router,
         rutas_alertas.router,
         rutas_reporte.router,
+        rutas_archivos.router,
     )
     for router in routers:
         app.include_router(router, dependencies=dependencias)
