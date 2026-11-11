@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from src.adapters.jsonl_custody_log import CustodyCorrupted, JsonlCustodyLog
 from src.application.ports import CustodyLog
 from src.domain.custody_chain import GENESIS_HASH, Anchor, make_anchor, verify_chain

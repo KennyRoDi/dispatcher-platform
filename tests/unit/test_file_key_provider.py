@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("fcntl", reason="requiere POSIX: fcntl y os.geteuid")
+
 from src.adapters.envelope_cipher import EnvelopeCipher
 from src.adapters.file_key_provider import FileKeyProvider
 from src.application.ports import DecryptionError, KeyUnavailable
