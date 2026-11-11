@@ -38,7 +38,7 @@ Concretado:
 2. Sin alteraciones, `verify` devuelve `ok` y exit 0 (también con el log vacío y con una sola entrada).
 3. Alterar cualquier campo de una entrada (hash, operación, actor, fecha, `seq`) hace fallar `verify` y reporta la posición de esa entrada (número de línea, base 1) y el motivo.
 4. Borrar, insertar, duplicar o reordenar líneas se detecta en la posición donde se rompe el enlace.
-5. Truncar el final del log (quitar una o más entradas) se detecta por el ancla, con la posición esperada del último eslabón; quitar la entrada final y el ancla también se detecta como ancla ausente.
+5. Truncar el final del log (quitar una o más entradas) se detecta por el ancla, con la posición esperada del último eslabón; quitar la entrada final y el ancla también se detecta como ancla ausente (sin ancla con entradas es violación; el ancla génesis cubre el log recién creado).
 6. Recalcular toda la cadena con SHA-256 sin la llave no pasa la verificación: el HMAC no coincide en la primera entrada tocada.
 7. Alterar el contenido de una evidencia en el almacén (su SHA-256 recalculado difiere del registrado) o borrarla hace fallar `verify` y reporta la posición de la entrada de ingreso o de transformación afectada y el hash esperado. Si falta la llave, `verify` falla cerrado (exit 2) y no declara la cadena válida.
 8. Una transformación cuya evidencia de origen no fue ingresada ni es resultado de una entrada previa se reporta como violación de linaje en su posición.
@@ -60,7 +60,7 @@ Concretado:
 
 **Formato de la entrada (AD-35, provisional).** Una línea JSON con claves ordenadas y UTF-8 por entrada: `seq` (desde 0), `ts` (UTC, ISO 8601), `evidence_sha256`, `operation` (`ingreso` o el nombre de la transformación), `result_sha256` (igual a `evidence_sha256` en `ingreso`), `actor`, `prev_hash` y `entry_hash`. La primera entrada usa `prev_hash = "0" * 64`. `entry_hash = HMAC-SHA256(key, prev_hash ‖ JSON canónico de los demás campos)`, con el JSON canónico en claves ordenadas y sin espacios, para que no dependa del formato.
 
-**Ancla del último eslabón.** Archivo `<log>.head` con `{"seq", "entry_hash", "mac"}` donde `mac = HMAC-SHA256(key, "head" ‖ seq ‖ entry_hash)`. Se reescribe (archivo temporal, `fsync`, `rename`, `fsync` del directorio) tras cada anexo y después del `fsync` del log. Si el proceso muere entre ambos pasos, el ancla queda una entrada atrás: el verificador lo acepta si la cadena es válida y tolera un ancla atrasada una entrada sin aviso y rechaza como violación `ancla` la atrasada más de una (ver «Límites declarados de la parte 1»); si el ancla está por delante del log, es truncamiento.
+**Ancla del último eslabón.** Archivo `<log>.head` con `{"seq", "entry_hash", "mac"}` donde `mac = HMAC-SHA256(key, "head" ‖ seq ‖ entry_hash)`. Se reescribe (archivo temporal, `fsync`, `rename`, `fsync` del directorio) tras cada anexo y después del `fsync` del log. Si el proceso muere entre ambos pasos, el ancla queda una entrada atrás: el verificador lo acepta si la cadena es válida (el adaptador escribe un ancla génesis al crear el log, y sin ancla con entradas es violación) y tolera un ancla atrasada una entrada sin aviso y rechaza como violación `ancla` la atrasada más de una (ver «Límites declarados de la parte 1»); si el ancla está por delante del log, es truncamiento.
 
 **Verificador.** Recorre el log en orden. Para cada línea comprueba: JSON válido, `seq` consecutivo desde 0, `prev_hash` igual al `entry_hash` anterior y HMAC correcto. Se detiene en el primer eslabón roto: `position` es su número de línea (base 1), porque los eslabones siguientes ya no son confiables. Luego compara el último eslabón con el ancla (`mac` válido, mismo `seq` y `entry_hash`). Después comprueba el linaje (toda `operation` distinta de `ingreso` parte de un `evidence_sha256` ya ingresado o resultado de una entrada previa) y, por cada objeto, que `sha256(open(sha))` coincida con el registrado y que exista; esta parte se ejecuta sobre las entradas anteriores al eslabón roto y reporta todas las evidencias alteradas, cada una con la posición de su entrada. Cada hallazgo es `Violation(position, kind, detail)` con `kind` en `entrada`, `enlace`, `sello`, `truncado`, `ancla`, `linaje`, `evidencia`.
 
@@ -84,7 +84,7 @@ Concretado:
 | Unitaria | `test_borrar_insertar_o_reordenar_detecta_posicion` | Rotura de enlace con su posición |
 | Unitaria | `test_truncar_log_se_detecta` (una y varias entradas, y ancla borrada) | El ancla delata el truncamiento |
 | Unitaria | `test_recalcular_cadena_sin_llave_no_pasa` | El HMAC impide la reescritura completa |
-| Unitaria | `test_ancla_atrasada_no_falla_y_adelantada_si` | Tolerancia exacta a una caída entre log y ancla |
+| Unitaria | `test_ancla_atrasada_no_falla_y_adelantada_si` | Tolerancia exacta a una caída entre log y ancla; sin ancla con entradas es violación |
 | Unitaria | `test_alterar_evidencia_se_detecta` y `test_evidencia_ausente_se_detecta` con `FakeObjectStore` | El SHA-256 recalculado difiere; posición de la entrada |
 | Unitaria | `test_linaje_sin_ingreso_se_detecta` | Una transformación de evidencia no ingresada falla |
 | Unitaria | `test_falla_cerrado_sin_llave` y `test_no_extiende_cadena_alterada` | Sin llave no hay veredicto; no se anexa sobre un log roto |
@@ -116,7 +116,11 @@ No aplica. F-29 aporta evidencia de ejecución a la ficha M4, no mediciones de S
 - A9: un ingreso con `result_sha256 != evidence_sha256` se acepta (xfail estricto; las pruebas existentes lo usan). Decisión pendiente.
 - Un reloj sin zona se trata como UTC.
 - Archivos con modo 0600. `flock` sobre archivo local (no NFS).
-- Un log de 1 entrada sin ancla se tolera (cambio en el dominio: `verify_tail` y `_check_anchor`).
+- Ancla génesis: al crear el log el adaptador escribe un ancla con `seq` 0, `entry_hash = GENESIS_HASH` y MAC, antes del primer anexo. Un log sin ancla y con entradas es siempre violación `ancla` (ya no se tolera «1 entrada sin ancla»). Se tolera el ancla atrasada una entrada; con ancla génesis, un log de 0 o 1 entradas.
+- La ancla génesis es determinista por llave: una copia de ella oculta el truncado de un log de N entradas a 0 o 1 (ampliación de SUP-31; alternativa no hecha: atarla a un nonce del log).
+- Con el log ausente y un ancla ilegible o falsa, el mensaje de error es engañoso (QA, xfail).
+- Carrera al crear el log corregida con `_create_log`: 1 fallo en 60 corridas antes; 0 en 100 corridas con 8 procesos o hilos, según QA (dato del QA, no medición de SO).
+- Reloj sin zona = UTC: decisión ya existente, sin cambio.
 - Antes de anexar se reintenta el ancla atrasada (`_catch_up_anchor`); si falla la escritura o el `fsync` del anexo, se hace `ftruncate` al tamaño previo.
 - Sin tope de tamaño de campo (QA: un `actor` de 50 MiB tarda 0,36 s por `record`; dato del QA).
 
