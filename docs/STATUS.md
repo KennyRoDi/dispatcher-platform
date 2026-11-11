@@ -14,14 +14,14 @@
 | F-09 | hecha |
 | F-10 | pendiente |
 | F-11 | pendiente |
-| F-12 | en-pr |
+| F-12 | tests |
 | F-13 | pendiente |
 | F-14 | pendiente |
 | F-15 | pendiente |
 | F-16 | hecha |
 | F-17 | hecha |
 | F-18 | pendiente |
-| F-19 | verificacion |
+| F-19 | documentacion |
 | F-20 | pendiente |
 | F-21 | pendiente |
 | F-22 | en-pr |
