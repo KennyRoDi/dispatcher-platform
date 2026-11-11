@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-12-1-cancelacion-real
-**Verificación IA:** implementacion 8c85862
+**Verificación IA:** verificacion f952e04
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -75,3 +75,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), sin subagente: verificación NO independiente | 2026-11-10 | Releí SPEC y diff. pytest test_coordinator, test_worker_cancelacion, test_worker_node, test_arquitectura: 86 passed. git diff de tests/ vacío (sin debilitar). Nuevo src/workers/cancelacion.py; +26 líneas en worker_node y rutas_casos. No verificado: ffmpeg real vía supervisor ni main() cableado. (8c85862) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), sin subagente: verificación NO independiente | 2026-11-10 | Docker python:3.13-slim (Linux): pytest test_process_supervisor + test_worker_cancelacion + test_coordinator = 49 passed, incluidos los 4 @posix de la parte 1 (nunca corridos en Windows). Demo ps/ls en contenedor con supervisor real: antes 3 procesos 'sleep 60' (shell ignora SIGTERM + 2 hijos) y /scratch/t1; despues 0 procesos, sin zombies, /scratch vacio. Diff src parte 2 = ~102 lineas (<=400). (f952e04) |
