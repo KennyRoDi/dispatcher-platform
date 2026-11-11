@@ -1,6 +1,6 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 7b0f5ac
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
@@ -62,3 +62,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code | 2026-11-10 | SPEC completo, plan de pila en 2 partes; verificación no independiente (e190b38) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Claude Code | 2026-11-10 | Pruebas nuevas en rojo (ModuleNotFound/ImportError), sin código; verificación no independiente (7b0f5ac) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
