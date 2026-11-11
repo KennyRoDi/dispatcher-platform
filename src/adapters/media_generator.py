@@ -28,7 +28,7 @@ NEUTRAL_MAX_SPREAD = 16
 # Sin bitexact los muxers estampan datos no deterministas (p. ej. el serial aleatorio de ogg).
 BITEXACT = ["-fflags", "+bitexact", "-flags:a", "+bitexact"]
 
-# Codecs tomados de AUDIO_*/ffmpeg_args de scripts/build_dataset.py (I Proyecto); no se importa desde scripts/.
+# Codecs tomados de ffmpeg_args de scripts/build_dataset.py (I Proyecto); no se importa desde scripts/.
 AUDIO_CODECS = {
     "mp3": ["-c:a", "libmp3lame", "-b:a", "96k"],
     "wav": ["-c:a", "pcm_s16le", "-ac", "1"],
@@ -64,6 +64,9 @@ def run_ffmpeg(args: list[str]) -> None:
 def generate_media(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg) -> list[MediaFile]:
     if len(plan.audio_durations) < sum(case.audios for case in plan.cases):
         raise ValueError("audio_durations tiene menos duraciones que audios en el plan")
+    for category, ratio in plan.image_positive_ratio.items():
+        if not 0 <= ratio <= 1:
+            raise ValueError(f"image_positive_ratio de {category} debe estar en [0, 1]: {ratio!r}")
     rng = random.Random(plan.seed)
     image_slots = iter(_image_slots(plan, rng))
     durations = iter(plan.audio_durations)
@@ -86,7 +89,15 @@ def generate_media(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg
     return files
 
 
-def _media(plan, case, kind, path, etiqueta, categoria=None, duration=None) -> MediaFile:
+def _media(
+    plan: DatasetPlan,
+    case: str,
+    kind: str,
+    path: Path,
+    etiqueta: str,
+    categoria: str | None = None,
+    duration: int | None = None,
+) -> MediaFile:
     return MediaFile(case, kind, path, etiqueta, categoria, duration, ORIGIN, LICENSE_NAME, plan.seed)
 
 
@@ -151,12 +162,16 @@ def produce(runner: Runner, args: list[str], path: Path, min_bytes: int = 0) -> 
         if not path.is_file():
             raise FileNotFoundError(f"ffmpeg no produjo {path}")
         if path.stat().st_size < min_bytes:
-            raise ValueError(f"{path} mide {path.stat().st_size} bytes y no alcanza {min_bytes // MIB} MiB")
+            raise ValueError(f"{path} mide {path.stat().st_size} bytes y no alcanza {_size_label(min_bytes)}")
     except BaseException:
         path.unlink(missing_ok=True)
         if not parent_existed:
             _remove_if_empty(path.parent)
         raise
+
+
+def _size_label(size: int) -> str:
+    return f"{size // MIB} MiB" if size >= MIB else f"{size} bytes"
 
 
 def _remove_if_empty(directory: Path) -> None:
