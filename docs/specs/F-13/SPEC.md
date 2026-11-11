@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-13-2-reporte-consolidado
-**Verificación IA:** verificacion 4d3eaa2
+**Verificación IA:** documentacion eba8f45
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -148,3 +148,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA 14 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (4d3eaa2) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 3 en AD-38, nota del ejemplo, curl en DEMO.md, SPEC corregido a docs/ejemplos; bitacora en estado; sin cambios de codigo (eba8f45) |
