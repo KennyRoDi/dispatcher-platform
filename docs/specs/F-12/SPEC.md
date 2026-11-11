@@ -1,8 +1,8 @@
 # SPEC F-12: Cancelación real
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision 8b9b543
+**Fase:** cerrada
+**Base:** feat/F-12-1-cancelacion-real
+**Verificación IA:** revision 961d56d
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -71,3 +71,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | pytest tests/unit/test_process_supervisor.py y test_arquitectura; git diff origin/main...HEAD | 2026-11-10 | Revision hecha por el orquestador sin subagente: verificacion NO independiente. Diff de parte 1 (5 archivos, 360 lineas con SPEC y pruebas) releido contra SPEC: supervisor, puerto y adaptador POSIX dentro de alcance. Hallazgo abierto: cancel lanza KeyError en doble cancel o pid desconocido (fuera del SPEC). 4 pruebas POSIX no ejecutadas aqui (Windows). (8b9b543) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | pytest tests/test_coordinator.py tests/test_worker_cancelacion.py -k cancel | 2026-11-10 | 5 pruebas nuevas fallan por falta de funcionalidad (sin clave/PUBLISH en cancel; Worker sin supervisor), no por errores de prueba; sin codigo de implementacion. SIGTERM del worker ya existe (_handle_signal), sin prueba nueva. Verificacion NO independiente: sin subagente. (aebee8a) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), sin subagente: verificación NO independiente | 2026-11-10 | Releí SPEC y diff. pytest test_coordinator, test_worker_cancelacion, test_worker_node, test_arquitectura: 86 passed. git diff de tests/ vacío (sin debilitar). Nuevo src/workers/cancelacion.py; +26 líneas en worker_node y rutas_casos. No verificado: ffmpeg real vía supervisor ni main() cableado. (8c85862) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), sin subagente: verificación NO independiente | 2026-11-10 | Docker python:3.13-slim (Linux): pytest test_process_supervisor + test_worker_cancelacion + test_coordinator = 49 passed, incluidos los 4 @posix de la parte 1 (nunca corridos en Windows). Demo ps/ls en contenedor con supervisor real: antes 3 procesos 'sleep 60' (shell ignora SIGTERM + 2 hijos) y /scratch/t1; despues 0 procesos, sin zombies, /scratch vacio. Diff src parte 2 = ~102 lineas (<=400). (f952e04) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Diff revisado: AD-31, reutilizacion.md y evidencia medida; verificacion no independiente (594083a) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de revision | Claude Code (Sonnet 5.5) | 2026-11-10 | APROBADO con observaciones: diff cubre criterio, clave cancel, scratch en finally, SIGTERM del worker; multimedia_processor y main() aun sin supervisor (SPEC lo preveia), registrado como punto abierto en AD-31; revision no independiente (961d56d) |
+| revision | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
