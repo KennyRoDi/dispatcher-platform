@@ -1096,3 +1096,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | Pruebas rojas y corrección en alerting, alert_policy, redis_alert_stream y rutas_alertas; SPEC alineado |
 | Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
 | Cómo se validó | Revisión del diff contra la lista de menores de la revisión de las partes 1 a 3 de F-14 |
+
+## 2026-11-11 · Kenni Rodriguez · F-03 (`fix/F-03-pendientes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5) |
+| Componente | F-03 |
+| Propósito | Corregir pendientes menores del dataset sintético de F-03 anotados por QA y revisión |
+| Consulta resumida | Corregir: mínimos por nivel, ratio validado, tope de heavy_bytes y tipos en los generadores; en chats, CLI y validador: SIGTERM, topes, limpieza, UTC y dominio de campos |
+| Resultado obtenido | Pruebas rojas (test_dataset_pendientes_b.py y ampliaciones) y corrección en dataset_plan, media_generator, heavy_case_generator, chat_export_generator y dataset_sintetico; se retiraron xfail corregidos |
+| Validado / corregido / descartado | pytest -q -m 'not integration and not acceptance' en verde y conformidad con 0 problemas. Aprobación delegada por la persona; sin verificación independiente (sin subagente en esta PR) |
+| Cómo se validó | Revisión del diff contra la lista de menores de F-03 anotada en la bitácora local; quedan pendientes la licencia formal y el enlace de Drive de los casos pesados |
