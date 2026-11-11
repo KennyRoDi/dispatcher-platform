@@ -641,3 +641,76 @@ def test_recover_own_inflight_cancelled_case_marks_subtask_cancelled(tmp_path):
     assert counts == {"requeued": 0, "failed": 0, "cleaned": 1}
     assert redis_client.hget("subtask:sid-left", "status") == "cancelled"
     assert redis_client.lrange("queue:transcode_video", 0, -1) == []
+
+
+def make_admission_worker(tmp_path, redis_client, uso, margin=100, footprint=300):
+    from dobles import FakeResourceReader
+
+    from src.domain.admission import FootprintTable
+
+    worker = make_worker(tmp_path, redis_client=redis_client, WORKER_QUEUES="extract_audio")[0]
+    worker.resource_reader = FakeResourceReader(uso)
+    worker.footprints = FootprintTable({"extract_audio": footprint})
+    worker.admission_margin = margin
+    return worker
+
+
+def test_poll_once_no_consume_si_no_cabe(tmp_path):
+    from src.domain.resources import ResourceUsage
+
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    redis_client.rpush("queue:extract_audio", "s1")
+    uso = ResourceUsage("w1", memory_current=800, memory_max=1000)
+    worker = make_admission_worker(tmp_path, redis_client, uso)
+
+    assert worker.poll_once(timeout=1) is False
+    assert redis_client.lrange("queue:extract_audio", 0, -1) == ["s1"]
+
+
+def test_poll_once_consume_si_cabe(tmp_path):
+    from src.domain.resources import ResourceUsage
+
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    storage = FakeStorage()
+    seed_subtask(redis_client, storage, "s1", operation="extract_audio")
+    uso = ResourceUsage("w1", memory_current=100, memory_max=1000)
+    worker = make_admission_worker(tmp_path, redis_client, uso)
+    worker.storage = storage
+
+    assert worker.poll_once(timeout=1) is True
+    assert redis_client.llen("queue:extract_audio") == 0
+
+
+def test_poll_once_error_de_lectura_no_consume(tmp_path):
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    redis_client.rpush("queue:extract_audio", "s1")
+
+    class LectorRoto:
+        def read(self):
+            raise OSError("cgroup ilegible")
+
+    worker = make_admission_worker(tmp_path, redis_client, None)
+    worker.resource_reader = LectorRoto()
+
+    assert worker.poll_once(timeout=1) is False
+    assert redis_client.lrange("queue:extract_audio", 0, -1) == ["s1"]
+
+
+def test_dos_workers_con_limite_bajo_dejan_la_subtarea_al_otro(tmp_path):
+    from src.domain.resources import ResourceUsage
+
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    storage = FakeStorage()
+    seed_subtask(redis_client, storage, "s1", operation="extract_audio")
+    lleno = make_admission_worker(
+        tmp_path / "a", redis_client, ResourceUsage("a", memory_current=900, memory_max=1000)
+    )
+    libre = make_admission_worker(
+        tmp_path / "b", redis_client, ResourceUsage("b", memory_current=0, memory_max=1000)
+    )
+    libre.storage = storage
+
+    assert lleno.poll_once(timeout=1) is False
+    assert redis_client.llen("queue:extract_audio") == 1
+    assert libre.poll_once(timeout=1) is True
+    assert redis_client.llen("queue:extract_audio") == 0

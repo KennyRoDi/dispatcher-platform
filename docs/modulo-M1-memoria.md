@@ -13,6 +13,8 @@ La parte 2 agrega `scripts/preflight.py`, que combina el Compose efectivo (CPU o
 
 Estas comprobaciones de configuración y presupuesto no acreditan ejecución real de Docker/Compose ni aplicación del límite en cgroups. `NODE_IP` se valida como IPv4 o IPv6. Compose mantiene un worker por nodo, sin `--scale`.
 
+F-17 añade control de admisión en el worker. `src/domain/admission.py` define `admits` y `FootprintTable`; `src/workers/config.py` expone `load_admission_config`, que exige `FOOTPRINT_<OP>_BYTES` y `ADMISSION_MARGIN_BYTES` sin valores predeterminados; `src/workers/worker_node.py` coloca la compuerta en `poll_once`, antes de `blpop`. Decisión: AD-30 en [ARQUITECTURA](ARQUITECTURA.md) §8.
+
 ## 2. Concepto de Sistemas Operativos
 
 Un cgroup v2 contabiliza memoria y permite que el kernel imponga un límite por grupo. Leer un límite no demuestra por sí solo que se haya configurado correctamente al arrancar. El presupuesto previo compara capacidades declaradas; no garantiza memoria libre futura ni reemplaza el control de admisión.
@@ -59,6 +61,22 @@ Comparar `memory.max` con `mem_limit` y verificar que `memory.swap.max` coincida
 **Validación local complementaria, no atribuida a B/C/D.** El 2026-11-10, en el host `DESKTOP-796L2A2`, contexto Docker `desktop-linux`, `docker info --format '{{.MemTotal}}'` devolvió `16728616960` bytes. Con configuración sintética (`NODE_NAME=qa-local`, `NODE_IP=127.0.0.1`, `WORKER_MEM_LIMIT=1g`), el preflight pasó y tres contenedores efímeros de Compose CPU reportaron `memory.max=1073741824`, `memory.swap.max=0` y UID/GID `1000(appuser)`. No se inició el worker de larga duración ni se ejecutó carga B.3; este dato solo comprueba el cableado local del límite en cgroups v2. Los IDs, comandos y salidas están en [QA-parte-2.md](specs/F-16/QA-parte-2.md).
 
 La evidencia de software es distinta de esta tabla: [QA-parte-1.md](specs/F-16/QA-parte-1.md) registra 1138 pruebas aprobadas, 2 omitidas y 3 deseleccionadas; seis regresiones introducidas en copias temporales fueron detectadas. [QA-parte-2.md](specs/F-16/QA-parte-2.md) informa la suite final con 1162 aprobadas, 2 omitidas y 3 deseleccionadas. Estos conteos no sustituyen las tres lecturas de B/C/D ni la calibración de límites bajo carga real. No hay cifras sintéticas presentadas como mediciones de B/C/D.
+
+### 4.1 F-17: huella por operación y ráfaga
+
+Sin medir. Requiere nodos WSL2 reales y F-16 parte 2 (arranque con límites).
+
+| Operación | Huella (`FOOTPRINT_<OP>_BYTES`) | Pico observado (`memory.peak`) | Repeticiones |
+|---|---|---|---|
+| transcode_video | pendiente | pendiente | pendiente (0 de 5) |
+| extract_audio | pendiente | pendiente | pendiente (0 de 5) |
+| generate_thumbnail | pendiente | pendiente | pendiente (0 de 5) |
+| convert_audio | pendiente | pendiente | pendiente (0 de 5) |
+| extract_metadata | pendiente | pendiente | pendiente (0 de 5) |
+
+Gráfico de memoria por worker durante ráfaga: pendiente (requiere nodos WSL2 reales y F-16 parte 2).
+
+Método, aún sin ejecutar: `docker exec <id> cat /sys/fs/cgroup/memory.current` y `docker exec <id> cat /sys/fs/cgroup/memory.peak`, antes, durante y después de cada tipo de operación, con 5 repeticiones. Ráfaga: muestrear `memory.current` por worker cada 1 s con cola superior a la capacidad.
 
 ## 5. Interpretación
 
