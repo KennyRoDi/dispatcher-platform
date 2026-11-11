@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-12-1-cancelacion-real
-**Verificación IA:** revision 8b9b543
+**Verificación IA:** tests aebee8a
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -71,3 +71,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | pytest tests/unit/test_process_supervisor.py y test_arquitectura; git diff origin/main...HEAD | 2026-11-10 | Revision hecha por el orquestador sin subagente: verificacion NO independiente. Diff de parte 1 (5 archivos, 360 lineas con SPEC y pruebas) releido contra SPEC: supervisor, puerto y adaptador POSIX dentro de alcance. Hallazgo abierto: cancel lanza KeyError en doble cancel o pid desconocido (fuera del SPEC). 4 pruebas POSIX no ejecutadas aqui (Windows). (8b9b543) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | pytest tests/test_coordinator.py tests/test_worker_cancelacion.py -k cancel | 2026-11-10 | 5 pruebas nuevas fallan por falta de funcionalidad (sin clave/PUBLISH en cancel; Worker sin supervisor), no por errores de prueba; sin codigo de implementacion. SIGTERM del worker ya existe (_handle_signal), sin prueba nueva. Verificacion NO independiente: sin subagente. (aebee8a) |
