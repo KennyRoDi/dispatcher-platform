@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido
 **Verificación IA:** revision 3cbadc3
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -130,3 +130,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-11 | Documentación de F-23 parte 2 revisada; bitácora publicada con resultados verificables de MinIO real y error real de IA; conformidad 0. Sin cambios posteriores a pruebas. (6d8793a) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó el avance autónomo. Documentación inspeccionada y bitácora oficial publicada. |
 | verificación IA de revision | Codex | 2026-11-11 | Revisión contra SPEC F-23 parte 2: MinioObjectStore implementa exists/put/open, deduplica SHA-256, valida claves inseguras, libera conexión al cerrar y preserva el contrato de put fallido. Integración MinIO real 4/4, unitarias 23/23, sin secretos. QA del revisor no independiente. (3cbadc3) |
+| revision | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar las fases de manera autónoma; revisión del diff contra SPEC y CI verde. |
