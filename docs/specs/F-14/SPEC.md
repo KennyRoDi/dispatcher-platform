@@ -1,7 +1,7 @@
 # SPEC F-14: Alertas
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-14-1-alertas
 **Verificación IA:** revision b2766af
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
