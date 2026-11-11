@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import json
+import os
 import logging
 import uuid
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 
+from src.adapters.redis_backpressure import transaccion_acotada
 from src.coordinator import conexion
 from src.coordinator.apoyo import (
     TERMINAL_CASE_STATUSES,
@@ -20,6 +22,8 @@ from src.coordinator.apoyo import (
 )
 from src.coordinator.modelos import CaseRequest, SubtaskRequest
 from src.coordinator.router import classify, queue_key, resolve_task_type
+from src.domain.backpressure import QueueLimit
+from src.domain.subtask import QueueFull
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -77,44 +81,48 @@ def create_case(case_req: CaseRequest) -> dict:
         subtask_id_list.append(sid)
 
     # --- atomic transaction ---
-    pipe = conexion.redis_client.pipeline(transaction=True)
-
-    # Case metadata hash
-    pipe.hset(case_key, mapping={
-        "case_id": case_id,
-        "status": "queued",
-        "total_subtasks": total,
-        "pending_subtasks": total,
-        "created_at": created_at,
-        "priority": priority,
-        "metadata": case_metadata_json,
-        "retries": "0",
-    })
-    # Register in global set
-    pipe.sadd("cases:registry", case_id)
-    # Pre-create done set as empty (ensures key exists for SADD checks)
-    # We don't need to create it explicitly; SADD will create it on first use.
-
-    for sid, op, q, st, params_json, metadata_json, queue_payload in entries:
-        # Subtask hash (fields read by the worker)
-        pipe.hset(f"subtask:{sid}", mapping={
-            "subtask_id": sid,
+    def escribir(pipe) -> None:
+        # Case metadata hash
+        pipe.hset(case_key, mapping={
             "case_id": case_id,
-            "operation": op,       # field the worker reads
-            "task_type": op,       # coordinator-side query field
-            "file_path": st.file_path,
-            "status": "pending",
-            "params": params_json,
-            "metadata": metadata_json,
+            "status": "queued",
+            "total_subtasks": total,
+            "pending_subtasks": total,
+            "created_at": created_at,
             "priority": priority,
+            "metadata": case_metadata_json,
+            "retries": "0",
         })
-        # [FIX 3] Append subtask ID to per-case list (O(1) lookup, no SCAN needed)
-        pipe.rpush(case_subtasks_key, sid)
-        # Enqueue full JSON payload
-        pipe.rpush(q, queue_payload)
-        subtask_ids.append(sid)
+        # Register in global set
+        pipe.sadd("cases:registry", case_id)
+        # Pre-create done set as empty (ensures key exists for SADD checks)
+        # We don't need to create it explicitly; SADD will create it on first use.
 
-    pipe.execute()  # atomic: all or nothing
+        for sid, op, q, st, params_json, metadata_json, queue_payload in entries:
+            # Subtask hash (fields read by the worker)
+            pipe.hset(f"subtask:{sid}", mapping={
+                "subtask_id": sid,
+                "case_id": case_id,
+                "operation": op,       # field the worker reads
+                "task_type": op,       # coordinator-side query field
+                "file_path": st.file_path,
+                "status": "pending",
+                "params": params_json,
+                "metadata": metadata_json,
+                "priority": priority,
+            })
+            # [FIX 3] Append subtask ID to per-case list (O(1) lookup, no SCAN needed)
+            pipe.rpush(case_subtasks_key, sid)
+            # Enqueue full JSON payload
+            pipe.rpush(q, queue_payload)
+
+    limite = QueueLimit.from_env(os.environ)
+    try:
+        transaccion_acotada(conexion.redis_client, Counter(q for _, _, q in resolved), limite, escribir)
+    except QueueFull:
+        raise HTTPException(503, "cola llena: reintente más tarde",
+                            headers={"Retry-After": str(limite.retry_after)}) from None
+    subtask_ids.extend(subtask_id_list)
 
     logger.info(
         "Caso creado: %s | subtareas: %d | ops: %s",
