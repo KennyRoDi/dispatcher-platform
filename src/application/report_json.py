@@ -3,6 +3,21 @@ from src.domain.evidence_position import BoxLocator, MessageLocator, SegmentLoca
 
 
 def report_to_dict(report: ConsolidatedReport) -> dict:
+    return _utf8_safe(_report(report))
+
+
+def _utf8_safe(value):
+    # Un surrogate suelto pasa json.dumps pero rompe .encode("utf-8") de la respuesta.
+    if isinstance(value, str):
+        return value.encode("utf-8", "replace").decode("utf-8")
+    if isinstance(value, dict):
+        return {key: _utf8_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_utf8_safe(item) for item in value]
+    return value
+
+
+def _report(report: ConsolidatedReport) -> dict:
     return {
         "case_id": report.case_id,
         "status": report.status,

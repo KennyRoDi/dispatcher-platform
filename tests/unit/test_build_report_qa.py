@@ -50,11 +50,6 @@ def a_json(reporte):
 # --- Defectos ---
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="media: el extracto de un segmento es finding.detail completo; en una amenaza de audio "
-    "('segmentos 1,4 t=...') es el metadato '1 t=..; 4 t=..' repetido en cada fragmento, no el texto del segmento",
-)
 def test_extracto_de_amenaza_en_audio_no_repite_el_detalle_entero_en_cada_segmento():
     detalle = "1 t=0.00-1.00s; 4 t=3.00-4.00s"
     h = hallazgo("amenaza", Severity.ALTA, SHA_A, "segmentos 1,4 t=0.00-1.00s,3.00-4.00s", detalle)
@@ -63,52 +58,29 @@ def test_extracto_de_amenaza_en_audio_no_repite_el_detalle_entero_en_cada_segmen
     assert all(f.excerpt != detalle for f in fragmentos)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="baja: el extracto no tiene tope; una transcripcion de 5 MB viaja entera en el reporte (JSON de MB por hallazgo)",
-)
 def test_extracto_enorme_se_limita():
     h = hallazgo("transcripcion", Severity.BAJA, SHA_A, "segmento 0 t=0.00-1.00s", "palabra " * 700_000)
     fragmento = construir([h], caso([fuente(SHA_A, "audio")])).findings[0].fragments[0]
     assert len(fragmento.excerpt) <= 10_000
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="baja: generado_en no se normaliza a UTC si el Clock devuelve otra zona (AGENTS: datos en UTC)",
-)
 def test_generado_en_sale_en_utc_aunque_el_reloj_use_otra_zona():
     reloj = FakeClock(datetime(2026, 11, 3, 12, 0, tzinfo=timezone(timedelta(hours=2))))
     datos = report_to_dict(construir([], caso([]), reloj=reloj))
     assert datos["generado_en"] == "2026-11-03T10:00:00+00:00"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="baja: un sha256 vacio (hallazgo mal formado) se une a la primera fuente sin sha256 (las que el "
-    "adaptador deja con '' mientras Nahum no agregue source_sha256): enlace falso en vez de evidencia_sin_fuente",
-)
 def test_sha_vacio_no_se_une_a_una_fuente_sin_sha():
     info = caso([CaseSource("", "otro-archivo.txt", "texto", "completed")])
     reporte = construir([hallazgo("amenaza", Severity.BAJA, "", "mensajes 1")], info)
     assert reporte.findings[0].fragments[0].source is None
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="baja: surrogate suelto en el texto (transcripcion, source_ref, file_path) pasa el serializador y "
-    "rompe .encode('utf-8') de la respuesta; el reporte no normaliza a UTF-8 valido",
-)
 def test_surrogate_suelto_no_impide_codificar_el_json_en_utf8():
     h = hallazgo("transcripcion", Severity.BAJA, SHA_A, "segmento 0 t=0.00-1.00s", "hola \ud800 mundo")
     a_json(construir([h], caso([fuente(SHA_A, "audio")]))).encode("utf-8")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="media: ObjectStore.exists que lanza (almacen caido) tumba todo el reporte en vez de marcar "
-    "el objeto como no verificable; un hallazgo sin evidencia (lote) tambien consulta el almacen",
-)
 def test_almacen_que_falla_no_impide_reportar_hallazgos_de_lote():
     class AlmacenCaido(FakeObjectStore):
         def exists(self, sha256):
@@ -119,11 +91,6 @@ def test_almacen_que_falla_no_impide_reportar_hallazgos_de_lote():
     assert len(reporte.findings) == 1
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="baja: exists se llama una vez por hallazgo (N+1 contra MinIO) aunque el sha se repita o el "
-    "hallazgo no tenga fragmentos",
-)
 def test_exists_se_consulta_una_vez_por_sha_y_solo_si_hay_fragmentos():
     class Contador(FakeObjectStore):
         llamadas = []
