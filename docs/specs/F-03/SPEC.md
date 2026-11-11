@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests d4cef31
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -180,3 +180,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (subagente revisor, general-purpose; orquestador Sonnet 5.5) | 2026-11-10 | Revisión de la parte 5: APROBADO sin bloqueantes. Comprobé en el código las observaciones citadas (imports de scripts/dataset_sintetico.py, orden por case en las líneas 101-102, semilla en document_generator.py:32). Árbol limpio, commit empujado, pruebas en verde en la fase anterior (1521 passed, 22 xfailed). No re-ejecuté pytest en esta fase. (48e5326) |
 | revision | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff main..HEAD solo toca tests/ y SPEC; sin xfail restantes (grep). Ejecute pytest: 53 failed, 1523 passed, 7 skipped; fallos por funcionalidad ausente (MIN_*, _produce min_bytes, UTC, huerfanos, MIT, validacion de manifiesto), sin errores de prueba. Aserciones previas solo cambiadas para licencia MIT. Desviacion: ORIGIN se queda 'sintetico'. (d4cef31) |
+| tests | Kenni Rodriguez | 2026-11-10 |  |
