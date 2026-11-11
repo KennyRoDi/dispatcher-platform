@@ -1311,3 +1311,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Persona revisa cada fase; pruebas unitarias y casos borde de QA |
 | Cómo se validó | Revisión de código y pytest; verificación no independiente |
 | Error de la IA | Sin error real de la IA detectado en esta parte; Barrier(0) cierra de inmediato y final_state(0,0)=completed, comportamiento de borde documentado, no un defecto |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-10 (`feat/F-10-2-estados-y-cierre`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-10 |
+| Propósito | F-10 parte 2: puerto CaseStateStore y caso de uso ReportSubtask |
+| Consulta resumida | Seguir SPEC F-10 en fases: pruebas rojas, implementación, verificación |
+| Resultado obtenido | Puerto, ReportSubtask, doble FakeCaseStateStore y contrato; 24 pruebas verdes; sin cambios en CONTRATOS ni AD/SUP nuevos |
+| Validado / corregido / descartado | Pruebas unitarias y de arquitectura; verificación no independiente |
+| Cómo se validó | Ejecución de pytest y revisión del diff contra el SPEC |
+| Error de la IA | En test_caso_cancelado la aserción de historial era errónea (el fixture ya añade PROCESSING), error de la prueba no del código; además el agente aprobó la fase verificacion con --excepcion sin necesidad |
