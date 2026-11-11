@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-27-3-tls-entre-nodos
-**Verificación IA:** tests 20d5104
+**Verificación IA:** implementacion 44fba43
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -214,3 +214,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | orquestador | 2026-11-11 | Prueba de aceptacion creada (commit 20d5104), 2 skipped por diseno; src intacto; sin resultados inventados (20d5104) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada; la prueba de aceptación se salta sin captura real (sudo), no puede estar en rojo |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Parte sin codigo (0 lineas en src); suite sin cambios 2014 passed, 9 skipped, 4 xfailed (44fba43) |
