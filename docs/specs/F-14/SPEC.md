@@ -1,8 +1,8 @@
 # SPEC F-14: Alertas
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision b2766af
+**Base:** feat/F-14-1-alertas
+**Verificación IA:** revision fca1529
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -130,4 +130,17 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | AD-39 y SUP-35 provisionales registrados con limites de la parte 1; bitacora en estado; sin cambios de codigo (492fceb) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 1: 103 lineas src, dominio puro, AD-39 y SUP-35 coinciden con codigo; 2 menores no bloqueantes anotados en CLAUDE.md local (b2766af) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests y dobles (3682776); src intacto; test_redis_alert_stream y test_rutas_alertas fallan en coleccion con ModuleNotFoundError (rojo); se modifico FakeAlertPublisher(reloj=None) en dobles.py (compatible); integracion validada con redis:7-alpine local por el developer con implementacion desechable (3682776) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | pytest + revision | 2026-11-11 | Adaptador RedisAlertStream, puerto AlertReader y GET /alerts implementados (b0b8803, ~88 lineas src); suite verde; integracion pasa con redis:7-alpine local (reportado por developer); 0 contenedores restantes (b0b8803) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: 503 filtra host y puerto, bytes no UTF-8 tiran la ruta, ResponseError da 500, emitted_at sin zona, recent(0) DataError, maxlen no positivo |
+| verificación IA de implementacion | orquestador | 2026-11-11 | 6 hallazgos QA corregidos en c0fa551; suite verde; integracion pasa con redis:7-alpine; limite: relectura en crudo ante bytes no UTF-8 solo probada con fakeredis (c0fa551) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | orquestador | 2026-11-11 | QA 6 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (2353fd7) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-39, curl de GET /alerts en DEMO.md, bitacora en estado; sin cambios de codigo (c053c76) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: ~108 lineas src, AlertReader con contrato y doble, 503 fijo, AD-39 coincide con codigo; 4 menores no bloqueantes anotados en CLAUDE.md local (fca1529) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
