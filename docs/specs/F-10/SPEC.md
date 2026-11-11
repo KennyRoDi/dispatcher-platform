@@ -3,37 +3,69 @@
 **Fase:** plan
 **Base:** main
 **Verificación IA:** pendiente
-**Historia:** US-10 · **Requisitos:** … · **Responsable:** N
+**Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
 
-… Qué cambia para quién y por qué, citando el enunciado.
+Que el analista tenga un estado de caso confiable: los siete estados del enunciado B.4 (`queued`, `processing`, `completed`, `partially_completed`, `failed`, `retrying`, `cancelled`), transiciones validadas y un cierre tipo barrier/join que ocurre una sola vez, con el estado final que corresponde, aunque lleguen reportes duplicados o concurrentes. Hoy la lógica vive mezclada con Redis en `src/coordinator/apoyo.py` y `rutas_subtareas.py` y no hay tabla de transiciones; esta feature la extrae a dominio puro y la prueba.
 
 ## Alcance
 
-**Incluye:** …
+**Incluye:**
+- `CaseState` y tabla de transiciones permitidas en dominio; `InvalidTransition` ante una no permitida.
+- Cálculo del estado final por combinación de sub-tareas completadas/fallidas (`final_state`).
+- Barrier idempotente en dominio (`Barrier`): un reporte repetido de una sub-tarea no se cuenta dos veces y el cierre se produce una sola vez.
+- Puerto `CaseStateStore` y caso de uso `ReportSubtask` en aplicación.
+- Adaptador Redis con `SADD case:{id}:done` y historial de estados por caso (evidencia de la historia), y cableado en `POST /subtasks/report`.
+- Prueba de frontera de `import` del dominio.
 
-**No incluye:** …
+**No incluye:**
+- Política de reintentos y cuándo se pasa a `retrying` (F-11); aquí `retrying` solo existe como estado y transición válida.
+- Cancelación del trabajo en curso (F-12/F-36) ni alertas de cierre (F-33..F-35); solo se respeta que `cancelled` es terminal.
+- Reporte consolidado (F-13), cambios de la API pública o del panel.
 
 ## Criterios de aceptación
 
-… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
+- **Dado** un caso con sub-tareas exitosas y fallidas
+- **Cuando** todas terminan, incluso con reportes duplicados
+- **Entonces** cierra una sola vez, con el estado que corresponde; una transición no permitida se rechaza
+
+Complementos de RF-09/RF-10: los 7 estados se alcanzan en pruebas; el caso solo pasa a estado final cuando todas sus sub-tareas terminaron, sin doble conteo.
 
 ## Diseño
 
-… Contratos de `docs/CONTRATOS.md` que implementa y que usa. Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+**Contratos:** implementa el estado y cierre del caso del coordinador (B.4); usa `Clock` de `src/application/ports.py`. No cambia `WorkQueue` ni `FindingStore`.
+
+**Dominio (`src/domain/case_state.py`, puro, sin E/S):**
+- `CaseState(Enum)` con los 7 valores.
+- Transiciones permitidas: `queued→{processing, cancelled}`; `processing→{completed, partially_completed, failed, retrying, cancelled}`; `retrying→{processing, failed, cancelled}`; `completed`, `partially_completed`, `failed` y `cancelled` son terminales (sin salida). `transition(actual, destino)` devuelve el destino o lanza `InvalidTransition`.
+- `final_state(completed, failed)`: sin fallidas → `completed`; solo fallidas → `failed`; mezcla → `partially_completed`. Un caso `cancelled` no cambia de estado (conserva la regla del código heredado).
+- `Barrier(expected: int)`: `report(subtask_id, outcome)` devuelve si el reporte es nuevo (idempotente por `subtask_id`); `is_closed()` cuando los ids únicos recibidos igualan `expected`.
+
+**Aplicación (`src/application/report_subtask.py`):** puerto `CaseStateStore` en `ports.py` con `mark_reported(case_id, subtask_id) -> bool` (equivale a `SADD`: `True` solo la primera vez), `counts(case_id)`, `state(case_id)`, `set_state(case_id, nuevo, at)` e historial `history(case_id)`. El caso de uso aplica el barrier, calcula el estado final y transiciona; el cierre ocurre una sola vez.
+
+**Adaptadores / infraestructura:** `src/adapters/redis_case_state.py` implementa el puerto con `SADD case:{id}:done`, el hash `case:{id}` y la lista `case:{id}:state_history`. `rutas_subtareas.py` delega en el caso de uso en lugar de calcular el cierre en línea; `apoyo.final_state` heredado se retira al moverse. Prueba de contrato en `tests/contratos.py` y doble en `tests/dobles.py`.
+
+**Decisiones:** reutiliza AD de barrier idempotente con `SADD` (ARQUITECTURA §4, «Funciona / Reutilizar»). Se propone una decisión nueva, **AD-XX tabla de transiciones de `CaseState`**, a registrar en `docs/ARQUITECTURA.md` §8 en la fase de documentación.
+
+**Código del I Proyecto que reutiliza:** la regla de `final_case_status`, el `SADD` por `case:{id}:done` y la guarda de caso cancelado.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | … | … |
-| Integración | … | … |
-| Aceptación | … | … |
+| Unitaria | `test_transicion_invalida_se_rechaza` | Una transición fuera de la tabla lanza `InvalidTransition`; los terminales no tienen salida |
+| Unitaria | `test_barrier_no_cuenta_dos_veces` | Un reporte duplicado no avanza el conteo ni reabre el cierre |
+| Unitaria | `test_estado_final_por_combinacion` | Todas OK, todas falla y mezcla dan `completed`, `failed`, `partially_completed`; `cancelled` no cambia |
+| Unitaria | `test_dominio_no_importa_capas_externas` | Frontera de `import` del dominio (`tests/unit/test_arquitectura.py`) |
+| Unitaria | `test_caso_de_uso_cierra_una_sola_vez` | Con doble de `CaseStateStore`, el cierre se aplica una vez y queda historial |
+| Integración | `test_reportes_concurrentes_cierran_una_vez` (Redis) | N hilos con ids repetidos: un único cierre y conteo exacto |
+| Contrato | `CaseStateStore` en `tests/contratos.py` | Doble y adaptador Redis se comportan igual |
+| Aceptación | `test_los_siete_estados_se_alcanzan` | Cada estado se alcanza por un camino del flujo real |
 
 ## Mediciones
 
-… Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
+No aplica. Es lógica de dominio; no hay medición M1–M5 ni B.6.
 
 ## Plan de pila
 
@@ -41,11 +73,16 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-10): …` | … |
+| 1 | `feat(F-10): máquina de estados y barrier en dominio` | `case_state.py`: `CaseState`, transiciones, `final_state`, `Barrier`; pruebas unitarias y de frontera |
+| 2 | `feat(F-10): caso de uso de reporte y puerto de estado` | `CaseStateStore`, `ReportSubtask`, doble y prueba de contrato |
+| 3 | `feat(F-10): adaptador Redis, historial y cableado del reporte` | `redis_case_state.py`, historial de estados, `rutas_subtareas.py` delega, prueba I concurrente y A de los 7 estados |
 
 ## Riesgos y preguntas abiertas
 
-… Lo que la persona que aprueba debe decidir.
+- F-10 es de N (Nahúm) y se toma como apoyo; la persona responsable debe poder defenderlo.
+- La prueba de integración con Redis necesita Redis disponible en CI; si no lo hay, se marca `integration` y se corre localmente.
+- Decisión a confirmar: se asume que `retrying→processing` es válida y que `queued→cancelled` también; el enunciado no define la tabla completa (se registrará como `SUP-XX` si se aprueba).
+- La parte 3 toca `src/coordinator/` heredado, posiblemente compartido con otros módulos; coordinar con quien lo edite en paralelo.
 
 ## Aprobaciones
 
