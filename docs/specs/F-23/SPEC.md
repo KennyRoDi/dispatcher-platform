@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-23-3-deduplicar-antes-de-transferir
 **Verificación IA:** revision 08e4f8e
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -140,3 +140,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-11 | Documentación M3, variables, volumen y decisión AD-43 revisadas; bitácora F-23 publicada. Conformidad 0; faltan solo datos medidos del dataset real. (bf5e115) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo; documentación contrastada con código, SPEC y resultado de pruebas. |
 | verificación IA de revision | Codex | 2026-11-11 | Corrección: crear OBJECTS_BUCKET al iniciar si falta, igual que otros adaptadores de almacenamiento. Prueba de composición lo verifica; 3 pruebas unitarias, conformidad 0. QA no independiente. (08e4f8e) |
+| revision | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó la ejecución autónoma; el requisito de crear bucket queda probado y la medición real sigue pendiente. |
