@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 40ab507
+**Verificación IA:** verificacion 91debbf
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -183,3 +183,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Ejecute pytest unit: 1576 passed, 7 skipped; integracion con ffmpeg real: 3 passed. tests/ sin cambios del developer en esta fase (git diff d4cef31..HEAD); unica correccion mia: valor 'MIT' del parametro de licencia pasa a 'GPL' porque MIT ya es valida. Codigo 144+/64- (<400), 2 comentarios nuevos, ambos de caso borde. Capas ok. No verifique linea por linea el script ni la cobertura de la opcion C ante señal fatal. (40ab507) |
 | implementacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | Ejecute pytest: 1576 passed, 7 skipped, 9 xfailed. Con --runxfail los 9 xfail de test_dataset_parte6_qa.py fallan por el defecto descrito (PermissionError, ValueError NUL, DID NOT RAISE x4, huerfanos, directorio previo). Diff 40ab507..HEAD solo toca esa prueba y el SPEC (log de flujo); src/scripts intactos. No reproduje yo la generacion completa de 1,9 GB ni SIGINT real: son datos del QA. (91debbf) |
