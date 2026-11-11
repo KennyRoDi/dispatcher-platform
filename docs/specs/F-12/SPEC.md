@@ -1,6 +1,6 @@
 # SPEC F-12: Cancelación real
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan 767ac98
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
@@ -60,3 +60,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code | 2026-11-10 | SPEC sin campos pendientes; 2 PR; verificación no independiente (sin subagente) (767ac98) |
+| plan | José Andrés Loría Herrera | 2026-11-10 |  |
