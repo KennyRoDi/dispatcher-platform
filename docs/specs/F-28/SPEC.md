@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-28-2-cifrado-en-reposo
 **Verificación IA:** verificacion 4e31d97
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -176,3 +176,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de puntos 1-4 de QA; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa: 1974 passed, 8 skipped, 15 xfailed (1 corrida). (6a4b7ac) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA bc0c549: 11 xfail, 5 corregidos y desmarcados; quedan 6 (size menor al real guarda objeto truncado sin error en put; dek/kek en locales de traza de envelope_cipher) a declarar como limites. Prueba I con MinIO real NO corrio (sin imagen ni binario minio). Sin parcial tras fallo en put. (4e31d97) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
