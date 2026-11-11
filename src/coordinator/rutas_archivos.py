@@ -54,17 +54,21 @@ async def recibir(upload_id: str, index: int, request: Request,
     return Response(status_code=204)
 
 
-async def _leer_chunk(request: Request, esperado: int) -> bytes:
-    # Se corta apenas el cuerpo supera el chunk esperado: nunca más de un chunk en memoria [B.5 M3].
+async def _leer_chunk(request: Request, esperado: int) -> memoryview:
+    # Un solo buffer reservado de antemano y sin copia final: nunca más de un chunk en memoria [B.5 M3].
     declarado = request.headers.get("content-length")
-    if declarado and declarado.isdigit() and int(declarado) > esperado:
-        raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
-    datos = bytearray()
-    async for parte in request.stream():
-        datos += parte
-        if len(datos) > esperado:
+    if declarado and declarado.isdigit():
+        if int(declarado) > esperado:
             raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
-    return bytes(datos)
+        esperado = int(declarado)
+    buffer = memoryview(bytearray(esperado))
+    recibidos = 0
+    async for parte in request.stream():
+        if recibidos + len(parte) > esperado:
+            raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
+        buffer[recibidos:recibidos + len(parte)] = parte
+        recibidos += len(parte)
+    return buffer[:recibidos]
 
 
 @router.get("/{upload_id}")
