@@ -1,8 +1,8 @@
 # SPEC F-37: Saturación de memoria
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision 1dae42e
+**Fase:** cerrada
+**Base:** feat/F-37-1-saturacion-de-memoria
+**Verificación IA:** revision e6f67d2
 **Historia:** US-37 · **Requisitos:** RF-46, RNF-09; [B.5 M1], [B.6 Saturación de memoria] · **Responsable:** J
 
 ## Objetivo
@@ -131,3 +131,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5) | 2026-11-11 | Diff contra main coincide con SPEC parte 1; AD-41 y SUP-36 a SUP-38 presentes y citados; 22 unitarias verdes. Revision no independiente. (1dae42e) |
 | revision | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat |
+| verificación IA de tests | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Parte 2 es solo docs/evidencia (SPEC Plan de pila: sin codigo, corrida real pendiente en nodos WSL2). Las pruebas del escenario (unitarias, aceptacion JSON, integracion Linux) ya estan en main desde la parte 1; no hay pruebas nuevas que escribir. Excepcion de la fase tests. (3f614b2) |
+| tests | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; parte 2 sin código ni pruebas nuevas (solo evidencia de corrida real en nodos) |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Parte 2 sin código por SPEC: git diff origin/main sin cambios en src/ ni scenarios/. Corrida real en nodos: Medición pendiente (ff70e25) |
+| implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; parte 2 es solo evidencia, sin código que implementar; corrida en nodos queda Medición pendiente |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | pytest test_memory_saturation + test_arquitectura: 26 verdes; parte 2 sin código (diff solo SPEC). Corrida real en tres nodos WSL2 (F-38 ajena, ficha M1 medida) no ejecutable aquí: Medición pendiente, sin cifras inventadas (a52ea78) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | parte 2 sin código; corrida en nodos queda Medición pendiente. Aprobación delegada por José en el chat |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Ficha F-37 contrastada con SPEC (Mediciones y Plan de pila): medido solo unitarias; corrida en nodos, aceptacion, grafico y comparacion sin admision quedan Medicion pendiente con comando exacto y regla SUP-38; sin cifras inventadas; bitacora publicada (0244db6) |
+| documentacion | José Andrés Loría Herrera | 2026-11-11 | parte 2 sin código; aprobación delegada por José en el chat |
+| verificación IA de revision | Claude Code (Sonnet 5.5), no independiente | 2026-11-11 | Diff vs main solo ficha y SPEC; coincide con Plan de pila parte 2 (sin codigo). Ficha sin cifras inventadas: todo lo no corrido es Medicion pendiente. AD-41 y SUP-36 a SUP-38 existen. Nota: referencia en M1 queda pendiente con la corrida (e6f67d2) |
+| revision | José Andrés Loría Herrera | 2026-11-11 | parte 2 sin código; aprobación delegada por José en el chat |
