@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion cabfc4b
+**Verificación IA:** revision 2f2f6c0
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -198,3 +198,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Melany Vindas | 2026-11-10 |  |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-10 | Documentador (subagente): AD-28 provisional en ARQUITECTURA §8 con arreglo H1 y regla del put, capas en §4, ChunkStaging y archivos nuevos en CONTRATOS. Orquestador: diff solo en esos 2 docs, 64 MiB coincide con chunked_upload.py, conformidad 0 problemas. Ficha M3 y reutilizacion no existen todavia (parte 3 y F-39). Bitacora con 4 errores reales de la IA. Verificacion independiente. (cabfc4b) |
 | documentacion | Melany Vindas | 2026-11-10 |  |
+| verificación IA de revision | Claude (Opus 5.5) | 2026-11-10 | Revisor (subagente, contexto nuevo): APROBADO. Diff de la parte 1 cumple el SPEC; sin errores de logica en src; capas y sin llaves. Orquestador: 268 lineas, suite 1086 verde, conformidad 0, bitacora publicada. Autoria: 6 commits aplicados con git am pasaron a Melany Vindas conservando fechas y contenido (rebase con --exec); los hashes anteriores en la tabla de aprobaciones quedan como referencia historica. Pendientes para la parte 2: ResourceWarning en tests/contratos.py:71 y mapeo de ValueError/UploadNotFound. Verificacion independiente. (2f2f6c0) |
