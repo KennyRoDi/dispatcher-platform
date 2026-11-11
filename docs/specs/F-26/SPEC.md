@@ -139,6 +139,13 @@ Hallazgos de QA de la parte 1 (sin defectos en `rbac.py`; rutas no cubiertas por
 - **Scripts sin token:** `scripts/submit_case.py` y `scripts/run_load.py` no envían `Authorization`; se romperán al activar la autenticación (parte 3) y hay que darles el token.
 - **Dashboard:** llama a `/tasks/workers`, ruta que no existe (previo a F-26); no se resuelve aquí, se avisa a su dueña.
 
+Límites declarados de la parte 2 (QA y correcciones):
+
+- **JSON roto o muy grande sin token (abierto).** Con cuerpo inválido, FastAPI responde 422 y parsea el cuerpo antes de autenticar. Arreglo propuesto: middleware ASGI que compruebe `Authorization` antes de leer el cuerpo. Queda como `xfail` en `tests/unit/test_seguridad_qa.py`; decidir en la parte 3.
+- **Corregidos:** `exp` e `iat` no finitos o fuera de año 9999 se rechazan; `sub` vacío o de espacios se rechaza; `JWT_SECRET_FILE` se lee en binario con tope de 4096 bytes, exige archivo regular (`O_NONBLOCK`, `S_ISREG`) y un archivo no UTF-8 no filtra bytes al registro.
+- **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave.
+- **Sin prueba:** varias cabeceras `Authorization` (gana la primera), `JWT_SECRET` sin medir entropía, BOM en el secreto, y los códigos 404/405/307/401 distinguen rutas existentes de inexistentes.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
