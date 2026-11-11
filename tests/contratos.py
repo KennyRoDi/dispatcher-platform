@@ -68,3 +68,14 @@ def comprobar_resource_reader(lector, esperado):
     assert type(uso.memory_current) is int and uso.memory_current >= 0
     assert type(uso.memory_max) is int and uso.memory_max > 0
     assert uso.memory_available == max(uso.memory_max - uso.memory_current, 0)
+
+
+def comprobar_case_catalog(crear):
+    """`crear(caso)` devuelve un catálogo que contiene solo ese `CaseInfo`."""
+    from src.domain.consolidated_report import CaseInfo, CaseSource
+
+    instante = datetime(2026, 11, 3, tzinfo=timezone.utc)
+    caso = CaseInfo("c1", "completed", instante, instante, (CaseSource("a" * 64, "a.txt", "texto", "completed"),))
+    catalogo = crear(caso)
+    assert catalogo.case("c1") == caso
+    assert catalogo.case("inexistente") is None
