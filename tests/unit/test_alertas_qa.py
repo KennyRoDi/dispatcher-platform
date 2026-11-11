@@ -134,11 +134,6 @@ def test_error_de_respuesta_de_redis_en_publish_lo_absorbe_el_publicador_seguro(
     assert caplog.records
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Media: con Redis caido el 503 incluye host, puerto y el texto del error de redis-py en el cuerpo "
-    "(conexion.redis_unavailable); fuga de topologia a cualquier cliente de /alerts",
-)
 def test_503_no_filtra_host_puerto_ni_detalle_del_error(monkeypatch, servidor, cliente):
     monkeypatch.setattr(conexion, "REDIS_HOST", "10.9.8.7")
     servidor.connected = False
@@ -148,12 +143,6 @@ def test_503_no_filtra_host_puerto_ni_detalle_del_error(monkeypatch, servidor, c
     assert "emulating" not in respuesta.text
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Media: una sola entrada con bytes no UTF-8 en el Stream hace fallar toda la lectura (UnicodeDecodeError "
-    "en redis-py con decode_responses=True, fuera del try de _decode): /alerts responde 500 mientras la entrada siga "
-    "entre las ultimas 'limit'",
-)
 def test_una_entrada_con_bytes_no_utf8_se_omite_sin_tirar_la_ruta(cliente, flujo, servidor):
     flujo.publish("incidencia_alta", "c1", "{}")
     sin_decodificar = fakeredis.FakeRedis(server=servidor, decode_responses=False)
@@ -163,43 +152,22 @@ def test_una_entrada_con_bytes_no_utf8_se_omite_sin_tirar_la_ruta(cliente, flujo
     assert [a["case_id"] for a in respuesta.json()["alertas"]] == ["c1"]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Media/baja: un redis.ResponseError (p. ej. WRONGTYPE si la clave 'alerts' no es un Stream) no se atrapa "
-    "en la ruta y responde 500 generico; el SPEC pide 503 limpio solo para Redis que no responde, pero un error de "
-    "servidor tambien debe ser limpio y registrado",
-)
 def test_error_de_respuesta_de_redis_en_lectura_no_es_500(monkeypatch, cliente):
     monkeypatch.setattr(conexion, "redis_client", ClienteRedis(redis.ResponseError("WRONGTYPE")))
     assert cliente.get("/alerts").status_code == 503
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Baja: una entrada ajena con emitted_at sin zona ('2026-01-01T00:00:00' o solo fecha) se devuelve tal cual, "
-    "sin offset; el SPEC promete ISO-8601 UTC y el contrato exige utcoffset 0",
-)
 def test_emitted_at_sin_zona_no_sale_sin_offset(cliente, servidor):
     agregar(emitted_at="2026-01-01T00:00:00")
     for alerta in cliente.get("/alerts").json()["alertas"]:
         assert datetime.fromisoformat(alerta["emitted_at"]).utcoffset() == timedelta(0)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Baja: recent(0) lanza redis.DataError (XREVRANGE COUNT 0 invalido) mientras FakeAlertReader devuelve []; "
-    "el adaptador no cumple igual que el doble para limites no positivos y filtra un tipo de redis-py al llamador",
-)
 def test_recent_con_limite_cero_devuelve_lista_vacia(flujo):
     flujo.publish("k", "c", "d")
     assert flujo.recent(0) == []
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Baja: maxlen=0 o negativo se acepta y XADD ... MAXLEN ~ 0 descarta cada alerta al instante (publish "
-    "'exitoso' que no guarda nada, sin error ni log); el constructor deberia rechazarlo con ValueError",
-)
 def test_maxlen_no_positivo_se_rechaza():
     with pytest.raises(ValueError):
         RedisAlertStream(fakeredis.FakeRedis(decode_responses=True), FakeClock(INICIO), maxlen=0)

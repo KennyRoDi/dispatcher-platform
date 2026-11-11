@@ -1,13 +1,12 @@
 import logging
 
 import redis
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from src.adapters.redis_alert_stream import RedisAlertStream
 from src.application.alerting import SafeAlertPublisher
 from src.application.ports import AlertPublisher, AlertReader
 from src.coordinator import conexion
-from src.coordinator.conexion import redis_unavailable
 from src.infrastructure.clock import SystemClock
 
 router = APIRouter()
@@ -27,8 +26,10 @@ def alerts(limit: int = Query(50, ge=1, le=200), lector: AlertReader = Depends(o
     """Alertas recientes, la más reciente primero."""
     try:
         recientes = lector.recent(limit)
-    except (redis.exceptions.ConnectionError, redis.exceptions.TimeoutError) as error:
-        raise redis_unavailable(error)
+    except redis.exceptions.RedisError as error:
+        # Detalle fijo: el texto de redis-py trae host y puerto.
+        logger.error("Alertas no disponibles: %s", error)
+        raise HTTPException(status_code=503, detail="Alertas no disponibles: Redis no responde o devolvió un error.")
     return {
         "alertas": [
             {
