@@ -102,3 +102,43 @@ def test_resultado_desconocido_se_rechaza(reportar, almacen):
     with pytest.raises(ValueError):
         reportar("c1", "s1", "raro", 1)
     assert almacen.counts("c1") == (0, 0)
+
+
+@pytest.mark.parametrize(
+    "terminal", [CaseState.COMPLETED, CaseState.FAILED, CaseState.PARTIALLY_COMPLETED]
+)
+def test_estado_terminal_no_se_reabre_ni_se_reescribe(terminal):
+    almacen = FakeCaseStateStore()
+    almacen.set_state("c1", terminal, FakeClock().now())
+    assert ReportSubtask(almacen, FakeClock()).execute("c1", "s1", "failed", 1) is None
+    assert almacen.state("c1") is terminal
+    assert len(almacen.history("c1")) == 1
+
+
+def test_los_casos_no_se_mezclan(almacen):
+    almacen.set_state("c2", CaseState.PROCESSING, FakeClock().now())
+    caso = ReportSubtask(almacen, FakeClock())
+    caso.execute("c1", "s1", "completed", 2)
+    assert caso.execute("c2", "s1", "completed", 2) is None
+    assert almacen.counts("c1") == (1, 0)
+    assert almacen.counts("c2") == (1, 0)
+    assert almacen.state("c2") is CaseState.PROCESSING
+
+
+def test_caso_sin_estado_previo_cierra_sin_inventar_procesamiento():
+    almacen = FakeCaseStateStore()
+    assert ReportSubtask(almacen, FakeClock()).execute("c9", "s1", "completed", 1) is CaseState.COMPLETED
+    assert [estado for estado, _ in almacen.history("c9")] == [CaseState.COMPLETED]
+
+
+def test_resultado_desconocido_no_consume_el_identificador(reportar, almacen):
+    with pytest.raises(ValueError):
+        reportar("c1", "s1", "raro", 1)
+    assert reportar("c1", "s1", "completed", 1) is CaseState.COMPLETED
+
+
+def test_reporte_contrario_tras_el_cierre_no_cambia_el_estado_final(reportar, almacen):
+    assert reportar("c1", "s1", "completed", 1) is CaseState.COMPLETED
+    assert reportar("c1", "s2", "failed", 1) is None
+    assert almacen.state("c1") is CaseState.COMPLETED
+    assert almacen.counts("c1") == (1, 1)
