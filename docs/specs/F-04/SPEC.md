@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
 **Verificación IA:** verificacion f80a91b
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -167,3 +167,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo src/adapters/dataset_truth_files.py (131) y scripts/dataset_verdad.py (79); tests intactos. Ejecute suite completa y acceptance (resultados en la terminal de esta fase). Desviacion aceptada: no importa dataset_sintetico (privado); validacion de ruta duplicada de ~4 lineas. Declarado que la validacion de ruta esta duplicada con F-03. (3c5208b) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 4 xfail estrictos nuevos en test_dataset_verdad_qa.py; src y scripts intactos (diff). Ejecute esa prueba: 4 xfailed. CLI real sobre manifiesto de 490 filas dio 0 segun QA (no repetido por mi). Hallazgos menores a pendientes y a documentar en parte 4. (f80a91b) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
