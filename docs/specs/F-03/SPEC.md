@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion bae60fc
+**Verificación IA:** verificacion f5e196d
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -218,3 +218,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-10 | parte solo documental: sin pruebas nuevas (autorizado por la persona) |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte solo documental: sin codigo que implementar. Rama sin cambios de src/scripts/tests respecto de main. Verificacion no independiente. (bae60fc) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | parte solo documental: sin codigo (autorizado por la persona) |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; sin subagente: verificacion no independiente) | 2026-11-10 | Generacion completa real: PYTHONPATH=. python -m scripts.dataset_sintetico --seed 1 --out dataset/sintetico (173 s, rc 0, 490 archivos, 1,9 GB; dato del artefacto, no medicion de SO) y --validar: 'cumple los minimos de B.3'. Recuento desde manifest.json: 40 casos, 300 imagenes, 150 audios, 25 texto, 10 documentos, 5 videos, 5 casos con archivo >=200 MiB (219512832 bytes), licencia MIT y origen sintetico en las 490 filas. sha256 de manifest.json 30bbba45...a73a0c6. Carpeta ignorada por .gitignore (arbol limpio). (f5e196d) |
