@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 3614d68
+**Verificación IA:** documentacion fc8adef
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -146,3 +146,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA 985cf5a: 16 xfail, 8 corregidos y desmarcados; quedan QA-6 (llave vacia o corta aceptada en dominio, 2 xfail; el adaptador exigira 32 bytes) y 3 previos. Rendimiento segun QA: 100000 entradas en 4,8 s con tracemalloc (no reproducido por mi). Lectores deben leer por \n, no splitlines. (3614d68) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs (ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31, SPEC). Numeros presentes (grep) y sin uso en otras ramas remotas (git grep). Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (fc8adef) |
