@@ -21,7 +21,7 @@ Referencia bibliográfica: Silberschatz, Galvin y Gagne, *Operating System Conce
 
 ## 3. Método de medición
 
-**No ejecutado.** En cada nodo B/C/D real, registrar la salida de `docker info --format '{{.MemTotal}}'`, que devuelve bytes de la RAM del daemon Linux donde Docker aplica los límites. Registrar fecha UTC y entorno; no usar la RAM física de Windows. Calcular y anotar la reserva SUP-24 como supuesto. Medir y decidir `WORKER_MEM_LIMIT` por nodo antes de ponerlo en el `.env`; el proyecto no prescribe su valor. Hacer tres arranques por nodo con `python scripts/start_worker.py` o `python scripts/start_worker.py --gpu`, según corresponda. El nodo A no ejecuta workers.
+**No ejecutado en los nodos B/C/D.** En cada nodo real, registrar la salida de `docker info --format '{{.MemTotal}}'`, que devuelve bytes de la RAM del daemon Linux donde Docker aplica los límites. Registrar fecha UTC y entorno; no usar la RAM física de Windows. Calcular y anotar la reserva SUP-24 como supuesto. Medir y decidir `WORKER_MEM_LIMIT` por nodo antes de ponerlo en el `.env`; el proyecto no prescribe su valor. Hacer tres arranques por nodo con `python scripts/start_worker.py` o `python scripts/start_worker.py --gpu`, según corresponda. El nodo A no ejecuta workers.
 
 Desde la raíz del repositorio, con `.env` local sin incorporarlo al historial:
 
@@ -56,10 +56,12 @@ Comparar `memory.max` con `mem_limit` y verificar que `memory.swap.max` coincida
 | Nodo C, VM WSL2 | Pendiente de medición | Pendiente de medición | Pendiente de medición | Pendiente de medición | Ninguna |
 | Nodo D, VM WSL2 | Pendiente de medición | Pendiente de medición | Pendiente de medición | Pendiente de medición | Ninguna |
 
-La evidencia de software es distinta de esta tabla: [QA-parte-1.md](specs/F-16/QA-parte-1.md) registra 1138 pruebas aprobadas, 2 omitidas y 3 deseleccionadas; seis regresiones introducidas en copias temporales fueron detectadas. [QA-parte-2.md](specs/F-16/QA-parte-2.md) informa la suite final con 1149 aprobadas, 2 omitidas y 3 deseleccionadas tras corregir NODE_IP. Estos conteos no prueban Compose real ni límites del kernel. No hay cifras sintéticas presentadas como mediciones.
+**Validación local complementaria, no atribuida a B/C/D.** El 2026-11-10, en el host `DESKTOP-796L2A2`, contexto Docker `desktop-linux`, `docker info --format '{{.MemTotal}}'` devolvió `16728616960` bytes. Con configuración sintética (`NODE_NAME=qa-local`, `NODE_IP=127.0.0.1`, `WORKER_MEM_LIMIT=1g`), el preflight pasó y tres contenedores efímeros de Compose CPU reportaron `memory.max=1073741824`, `memory.swap.max=0` y UID/GID `1000(appuser)`. No se inició el worker de larga duración ni se ejecutó carga B.3; este dato solo comprueba el cableado local del límite en cgroups v2. Los IDs, comandos y salidas están en [QA-parte-2.md](specs/F-16/QA-parte-2.md).
+
+La evidencia de software es distinta de esta tabla: [QA-parte-1.md](specs/F-16/QA-parte-1.md) registra 1138 pruebas aprobadas, 2 omitidas y 3 deseleccionadas; seis regresiones introducidas en copias temporales fueron detectadas. [QA-parte-2.md](specs/F-16/QA-parte-2.md) informa la suite final con 1161 aprobadas, 2 omitidas y 3 deseleccionadas. Estos conteos no sustituyen las tres lecturas de B/C/D ni la calibración de límites bajo carga real. No hay cifras sintéticas presentadas como mediciones de B/C/D.
 
 ## 5. Interpretación
 
 Las pruebas respaldan el cálculo de presupuesto, la validación estática del cableado y la lectura estricta de archivos con el contrato actual. Sin mediciones reales no se puede concluir que el kernel aplique un límite, que los valores elegidos sean adecuados ni que los nodos soporten la carga. AD-29 tiene aprobación de diseño; SUP-24 sigue siendo supuesto pendiente de validación y la calibración de límites sigue pendiente según SUP-17.
 
-La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D. Los demás productos obligatorios de M1 siguen pendientes por feature: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM provocado y recuperación; F-19, huella RSS/PSS por modelo y comparación de estrategias de carga. F-37 cubre saturación del nodo (B.6).
+La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D bajo la carga definida y decidir `WORKER_MEM_LIMIT` por nodo. La validación local con 1 GiB sintético no acredita esos valores. Los demás productos obligatorios de M1 siguen pendientes por feature: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM provocado y recuperación; F-19, huella RSS/PSS por modelo y comparación de estrategias de carga. F-37 cubre saturación del nodo (B.6).
