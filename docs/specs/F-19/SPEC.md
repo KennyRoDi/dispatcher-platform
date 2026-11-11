@@ -70,6 +70,10 @@ Registrar baseline de `memory.current` antes de cargar e instantáneas tras carg
 
 Destino: `docs/evidencia/F-19/` para crudos y metadatos; `docs/modulo-M1-memoria.md` para tabla, comandos, interpretación y límites; AD-07 para conclusión sustentada por esas rutas. No se exige un ahorro predeterminado: una variante puede no ahorrar. Sin nodo, compatibilidad real o lecturas válidas, la verificación de la parte queda pendiente y se solicita decisión humana; no se sustituye por Windows, dobles ni estimaciones.
 
+## Resultados de parte 2
+
+En Docker Linux 29.7.2, Python 3.13.18, faster-whisper 1.2.1, PyAV 18.1.0 y CTranslate2 4.9.0, `fork_compartido` agotó el timeout de 120 s; con `hilos=1`, también agotó el timeout diagnóstico de 30 s. `workers_compartidos` pasó la prueba Linux con Whisper real N=2 y comparación completa de segmentos. Las 5 integraciones pasaron en 5.87 s; las 51 pruebas unitarias focales pasaron en Windows. Detalle y límites en [QA-parte-2.md](QA-parte-2.md). Esto acredita compatibilidad en ese entorno, no una medición de memoria ni una elección definitiva para M1.
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
