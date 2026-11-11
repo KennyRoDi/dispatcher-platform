@@ -2,7 +2,7 @@ import math
 import os
 import stat
 from collections.abc import Mapping
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import jwt  # PyJWT (MIT), https://github.com/jpadilla/pyjwt
@@ -71,6 +71,11 @@ class JwtTokenVerifier:
             raise InvalidToken("token fuera de su ventana de validez")
 
 
+class UtcClock:
+    def now(self) -> datetime:
+        return datetime.now(timezone.utc)
+
+
 class ClosedVerifier:
     def verify(self, token: str) -> Identity:
         raise InvalidToken("autenticacion sin secreto configurado")
@@ -114,9 +119,12 @@ def _secret_from_file(path: str) -> str:
         raise ValueError("JWT_SECRET_FILE no es UTF-8 valido") from None
 
 
-def verificador_desde_entorno(env: Mapping[str, str], clock: Clock) -> TokenVerifier:
+def secreto_desde_entorno(env: Mapping[str, str]) -> str | None:
     if env.get("JWT_SECRET_FILE"):
-        return JwtTokenVerifier(_secret_from_file(env["JWT_SECRET_FILE"]), clock)
-    if env.get("JWT_SECRET"):
-        return JwtTokenVerifier(env["JWT_SECRET"], clock)
-    return ClosedVerifier()
+        return _secret_from_file(env["JWT_SECRET_FILE"])
+    return env.get("JWT_SECRET") or None
+
+
+def verificador_desde_entorno(env: Mapping[str, str], clock: Clock) -> TokenVerifier:
+    secret = secreto_desde_entorno(env)
+    return JwtTokenVerifier(secret, clock) if secret else ClosedVerifier()

@@ -1,12 +1,51 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-28 (partes 1 a 3) y F-27 (partes 1 y 2). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: no hay salidas reales de nodos en este documento; la única de F-27 es una prueba local en una sola máquina, que no acredita M4. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
 ### F-30 Workers sin privilegios
 
 Configuración (AD-36, SUP-32): `user: "10001:10001"`, `read_only: true`, `cap_drop: [ALL]`, `security_opt: [no-new-privileges:true]`, volumen `scratch` propio por worker en `/scratch` y `tmpfs` en `/tmp` de 64 MB. Está en `Dockerfile.worker`, `deploy/docker-compose.worker.yml` y `deploy/docker-compose.local.yml`.
+
+### F-26 Autenticación y roles
+
+Decisión AD-33 (provisional; SUP-28 y SUP-29). Fuente de la matriz: `src/domain/rbac.py` (`PERMISOS`).
+
+| Rol | crear_caso | consultar_caso | cancelar_caso | ver_monitoreo | reportar_subtarea |
+|---|---|---|---|---|---|
+| analista | sí | sí | no | no | no |
+| supervisor | no | sí | sí | sí | no |
+| administrador | sí | sí | sí | sí | no |
+| servicio | no | no | no | no | sí |
+
+El rol `servicio` es para los workers (`POST /subtasks/report`).
+
+**Token.**
+
+- JWT firmado con HS256 (decisión AD-33), con PyJWT (licencia MIT, https://github.com/jpadilla/pyjwt).
+- Claims usados: `sub`, rol, `iat`, `exp`. El coordinador rechaza `sub` vacío y fechas no finitas.
+- Se envía como `Authorization: Bearer <token>`.
+
+**Secreto.** El secreto nunca va en el repositorio. Generarlo fuera de él:
+
+```bash
+openssl rand -hex 32 > ~/jwt.secret
+chmod 600 ~/jwt.secret
+export JWT_SECRET_FILE=~/jwt.secret
+```
+
+`JWT_SECRET` (variable directa) se admite, pero se prefiere el archivo. `.gitignore` cubre `jwt.secret`, `*.key` y `.env`.
+
+**AUTH_ENABLED.** Activa por defecto. Solo `0`, `false`, `no` u `off` la desactivan (`src/coordinator/main.py`). Desactivarla es solo para pruebas locales.
+
+**Emitir un token.**
+
+```bash
+PYTHONPATH=. python scripts/emitir_token.py --rol supervisor --sub demo-supervisor --minutos 30
+```
+
+Roles: `analista`, `supervisor`, `administrador`, `servicio`.
 
 ### F-28 Cifrado en reposo
 
@@ -78,6 +117,23 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 - Con TLS activo, una URL `http://` o `redis://`, o `MINIO_SECURE=false`, se rechaza al arrancar, sin degradar a texto claro.
 - Salidas reales de un arranque con TLS y de un rechazo: pendiente (sin captura ni ejecución medida).
 
+**Parte 3: certificados y Compose.**
+
+- `deploy/tls/generar_certs.sh` crea la CA (EC P-256, `pathlen:0`, 365 días) y el certificado del Nodo A (90 días) en `CERTS_DIR`, fuera del repo. Si a la CA le quedan 91 días o menos, se regenera y hay que redistribuir `ca.pem` a los workers.
+- Coordinador `8443` y Redis `6380` con TLS; MinIO con su certificado. Pasos en `docs/DEPLOY_WORKERS.md`.
+
+**Límites declarados.**
+
+- Redis, MinIO y el coordinador con TLS se probaron solo en una máquina, con las imágenes reales ([evidencia local](evidencia/F-27_servidores_tls_local_2026-11-11.md)); no hay tres nodos reales, Tailscale ni captura de red.
+- `coordinator`, `redis` y `minio` del Nodo A corren con `user: CERTS_UID:CERTS_GID` para leer `server.key` (0600). `redis-data-init` ajusta la propiedad del volumen de Redis a ese UID. Solo se probó con UID 1000, que coincide con el de `appuser` del coordinador; un `CERTS_UID` distinto y el dueño `65532` de `/data/.minio.sys` de MinIO no se probaron ni se investigaron.
+- El healthcheck de MinIO usa `MC_HOST_local=https://localhost:9000 mc --config-dir /tmp/.mc ready local --insecure`, porque con `user:` propio `mc` no puede escribir `/.mc` y su alias apunta a `http`.
+- uvicorn no fija un mínimo de TLS 1.3: con TLS 1.2 el coordinador respondió 200 en la prueba local (AD-37). Redis sí rechazó TLS 1.2.
+- Con `TLS_ENABLED=false` el worker ya no exige `TLS_CA_FILE`; con TLS activo y sin CA se detiene.
+- Pendientes de otros dueños: `dashboard/app.py` y `scripts/generate_dataset.py` siguen apuntando a `http://localhost:8000`; hay que fijar la URL `https://<IP_TAILSCALE_NODO_A>:8443` y, en el dashboard, `REQUESTS_CA_BUNDLE`.
+- Sin evidencia medida, M4 máximo 2.
+
+**Parte 4: prueba de aceptación de la captura.** `tests/acceptance/test_tls_entre_nodos.py` levanta la captura, procesa un caso con marcador sintético y revisa con `tshark` y `strings`. Solo se verificó su omisión (skip); no hay ejecución real.
+
 ### F-29 Cadena de custodia
 
 Parte 1: `CustodyChain` en `src/domain/custody_chain.py` (dominio puro, solo `hmac`, `hashlib` y `json`). Sella cada eslabón con `entry_hash = HMAC-SHA256(llave, prev_hash ‖ JSON canónico)` y `verify_chain` reporta la posición (línea, base 1) de la primera alteración; el ancla del último eslabón (`seq`, `entry_hash`, `mac`) delata el truncamiento (AD-35, SUP-31). La llave es de 32 bytes, fuera del repositorio. Parte 2: `JsonlCustodyLog` en `src/adapters/jsonl_custody_log.py`, log JSONL de solo-anexión (`O_APPEND`, `fsync`, `flock`, modo 0600) que implementa `CustodyLog.record`, escribe el ancla de forma atómica y un ancla génesis al crear el log; `record` verifica solo las últimas 2 líneas y el ancla, y el verificador completo detecta una línea intermedia manipulada. La llave entra como bytes. Parte 3: `verify_custody` (cadena, ancla, evidencia y linaje) y la CLI `scripts/verify_custody.py`, que lee la llave de `CUSTODY_KEY_FILE` con `FileKeyProvider` (F-28); sale con 0 sin violaciones, 1 con violaciones y 2 si no pudo verificar.
@@ -92,6 +148,14 @@ Conceptos que respalda la configuración:
 - **Capacidades de Linux:** `cap_drop: [ALL]` retira todas las capacidades del proceso y `no-new-privileges:true` impide recuperarlas con binarios setuid.
 - **Namespaces:** el contenedor ve su propio árbol de procesos, montajes y usuarios; la raíz de solo lectura (`read_only: true`) impide modificar el sistema de archivos de la imagen.
 - **cgroups:** el volumen `scratch` en `/scratch` cuenta contra el cgroup del contenedor, a diferencia de `tmpfs`, por eso el video grande va a `/scratch` y no a memoria.
+
+### F-26 Autenticación y roles
+
+Conceptos que respalda la configuración (no medidos):
+
+- **Control de acceso por rol (RBAC) y mínimo privilegio:** cada identidad recibe solo las acciones de su rol; el rol técnico `servicio` de los workers solo puede reportar sub-tareas. Es la misma idea que los UID y permisos del sistema operativo, aplicada en la capa de aplicación.
+- **Permisos de archivo:** el secreto de firma vive en un archivo fuera del repositorio con modo `600`, de modo que solo su dueño puede leerlo [B.5 M4].
+- **Secretos fuera del código:** el repositorio es público; la llave nunca se versiona.
 
 ### F-28 Cifrado en reposo
 
@@ -135,6 +199,18 @@ docker inspect --format '{{.HostConfig.CapDrop}}' <worker>
 docker inspect --format '{{.HostConfig.SecurityOpt}}' <worker>
 ```
 
+### F-26 Autenticación y roles
+
+```bash
+TOKEN=$(PYTHONPATH=. python scripts/emitir_token.py --rol analista --sub demo-analista)
+curl -i -X POST http://localhost:8000/cases -H "Authorization: Bearer $TOKEN" ...   # crear
+curl -i http://localhost:8000/cases -H "Authorization: Bearer $TOKEN"              # consultar
+curl -i http://localhost:8000/stats -H "Authorization: Bearer $TOKEN"              # monitoreo
+curl -i http://localhost:8000/cases                                                # sin token
+```
+
+El cuerpo de `POST /cases` se omite; ver `docs/DEMO.md`.
+
 ### F-28 Cifrado en reposo
 
 Pendiente: costo de CPU y tamaño de chunk óptimo se miden con los comandos de `docs/IMPLEMENTACION.md` §5 (busca `F-28`); este documento no los reproduce y no contiene salidas medidas.
@@ -156,13 +232,29 @@ git log -p --all | grep -nE 'BEGIN .*PRIVATE KEY|MINIO_SECRET_KEY=.+'
 
 ### F-27 TLS entre nodos
 
-Comandos exactos de `docs/IMPLEMENTACION.md` §5; los ejecuta la persona en el Nodo A con `sudo`, con la IP real de Tailscale:
+La ejecuta la persona en el Nodo A, con `sudo` y la IP real de Tailscale. Comandos exactos de `docs/IMPLEMENTACION.md` §5, una captura por intento:
 
 ```bash
 sudo tcpdump -i <if> -w m4.pcap 'port 8443 or 6380 or 9000'
 tshark -r m4.pcap -Y tls.handshake.type==1
 strings m4.pcap | grep -c <marcador_sintetico>
 ```
+
+Producto esperado: handshakes TLS y 0 coincidencias del marcador. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+
+Prueba de aceptación (se omite si falta algo de lo siguiente):
+
+```bash
+F27_CAPTURA=1 COORDINATOR_URL=https://<ip>:8443 TLS_CA_FILE=<ca.pem> pytest tests/acceptance/test_tls_entre_nodos.py -q
+```
+
+- `F27_CAPTURA=1`: obligatoria; sin ella se omite.
+- `COORDINATOR_URL` y `TLS_CA_FILE`: obligatorias.
+- `F27_INTERFAZ`: interfaz de captura; por defecto `any`.
+- `F27_LEVANTAR_NODO=1`: ejecuta `docker compose up -d --wait` y lo baja al terminar.
+- Requiere `tcpdump`, `tshark`, `strings` y `sudo` sin contraseña (`sudo -v` antes).
+
+Comandos de la prueba local de los servidores: en la [evidencia local](evidencia/F-27_servidores_tls_local_2026-11-11.md) (`generar_certs.sh`, `docker compose up`, `redis-cli --tls`, `openssl s_client`, `curl --cacert`).
 
 ### F-29 Cadena de custodia
 
@@ -185,6 +277,17 @@ Pendiente: sin evidencia medida en tres nodos reales. Las salidas esperadas y su
 
 Nodos: José, Nahúm y Melany; cada uno captura sus salidas.
 
+### F-26 Autenticación y roles
+
+Pendiente: sin ejecución en la demo.
+
+| Caso | Código esperado | Resultado |
+|---|---|---|
+| Sin token o token inválido/vencido | 401 | pendiente: se mide en la demo |
+| Rol sin permiso (analista en `/stats`, supervisor en `POST /cases`) | 403 | pendiente: se mide en la demo |
+| Rol con permiso | 2xx | pendiente: se mide en la demo |
+| `GET /health` sin token | 200 (ruta pública) | pendiente: se mide en la demo |
+
 ### F-28 Cifrado en reposo
 
 Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de leer la KEK en cada llamada ni de costo de CPU del decorador.
@@ -199,8 +302,10 @@ Pendiente: sin datos medidos de costo de CPU, de tamaño de chunk, de costo de l
 |---|---|
 | Handshakes TLS en la captura (`tshark`) | pendiente |
 | Coincidencias del marcador (`strings ... \| grep -c`) | pendiente |
-| Cliente sin la CA rechazado en los servicios reales | pendiente |
+| Cliente sin la CA rechazado en los servicios reales | pendiente (solo prueba local, abajo) |
 | Costo de TLS sobre el throughput de M3 | pendiente |
+
+**Prueba local de servidores TLS (una sola máquina, sin captura de red; no acredita M4).** Con `redis:7-alpine`, MinIO de Chainguard y el coordinador construido con `Dockerfile.worker`, todo en `127.0.0.1`: los tres servicios quedaron `healthy` con `user:` propio; `redis-cli --tls` y `openssl s_client` verificaron la CA y el hostname con TLS 1.3, Redis rechazó TLS 1.2, el puerto 6379 quedó cerrado, y el coordinador atendió `https://localhost:8443/health` con la CA y rechazó la petición sin ella o en claro. La prueba encontró dos fallos del Compose original (Redis sin permiso de escritura en `redis-data` y healthcheck de MinIO que no pasaba), ya corregidos. Detalle y salidas en [la evidencia](evidencia/F-27_servidores_tls_local_2026-11-11.md).
 
 ### F-29 Cadena de custodia
 
@@ -219,13 +324,19 @@ Salida real de una ejecución local sintética (una sola máquina, datos sintét
 
 Pendiente. Las pruebas unitarias y `python -m scripts.verificar_workers` respaldan que la configuración está escrita, no que el kernel la aplique en los nodos. Sin evidencia medida en los tres nodos reales, el módulo M4 tiene máximo 2 [Parte I §5].
 
+### F-26 Autenticación y roles
+
+Pendiente. Las pruebas unitarias respaldan la matriz y la verificación del token, no el comportamiento medido en la demo. Límites conocidos: ver «Notas» en `docs/specs/F-26/SPEC.md`. Sin evidencia medida, el módulo M4 tiene máximo 2 [Parte I §5].
+
 ### F-28 Cifrado en reposo
 
 Pendiente. Las pruebas unitarias respaldan el formato y la detección de alteraciones, no el costo de CPU en los nodos. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ### F-27 TLS entre nodos
 
-Pendiente. Sin captura real no hay resultado de TLS y el módulo no pasa de 2 [Parte I §5]. `m4.pcap` queda fuera del repo; solo se versiona el resumen de `tshark`.
+Pendiente. La prueba local respalda que los servidores arrancan con TLS y UID propio y que el cliente verifica la CA, no que el tráfico entre nodos reales vaya cifrado: falta la captura con `tshark` y `strings`. Sin captura real no hay resultado de TLS y M4 no pasa de 2 [Parte I §5].
+
+**Repetir M3.** TLS puede alterar M1 a M3: hay que repetir al menos el throughput de M3 con TLS activo y reportar la diferencia (`docs/IMPLEMENTACION.md` §7). No se estima aquí.
 
 ### F-29 Cadena de custodia
 

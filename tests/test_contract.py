@@ -75,7 +75,7 @@ class Env:
 
 
 @pytest.fixture
-def env(tmp_path, monkeypatch):
+def env(tmp_path, monkeypatch, sin_autorizacion):
     fake = fakeredis.FakeRedis(decode_responses=True)
     monkeypatch.setattr(conexion, "redis_client", fake)
     return Env(tmp_path, fake, TestClient(main.app), FakeStorage())

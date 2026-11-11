@@ -1,8 +1,8 @@
 # SPEC F-27: TLS entre nodos
 
 **Fase:** pr
-**Base:** feat/F-27-1-tls-entre-nodos
-**Verificación IA:** revision 92fa984
+**Base:** feat/F-27-3-tls-entre-nodos
+**Verificación IA:** revision 12c2c90
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -192,3 +192,33 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: todo punto de conexion pasa por tls.py (grep del revisor), sin cambio con TLS apagado, conftest no oculta defectos, 2 pruebas editadas justificadas; pytest segun revisor 1909 passed/4 xfailed. Menores declarados por mi en el SPEC (import de conexion.py con TLS activo sin CA, sesiones sin cerrar, TlsConfigError sin atrapar en run_load/reaper/seed_minio). (92fa984) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (unit compose, unit generar_certs, integracion servicios reales) y SPEC; src y deploy intactos. Ejecute las 2 unitarias nuevas: ver resultado arriba (rojo por falta de implementacion; 9 son guardas que ya pasan). Integracion saltada sin RUN_DOCKER_TLS=1. Aviso: test_despliegue_compose.py (F-38) exige hoy puertos 8000/6379 y reaper http: la implementacion debe actualizarlo. Carpeta de certs de MinIO sin confirmar en doc oficial; preguntas 1 y 4 del SPEC sin comprobar. (6c42f4d) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: generar_certs.sh (40 lineas), docker-compose.yml, 2 compose, .env.example, .gitignore; sin llaves/certs versionados (git ls-files). Suite completa tras c54de78: 1965 passed, 9 skipped, 4 xfailed. Ediciones a tests existentes (comprobadas por diff): test_tls_compose (1 linea, regex de split) y test_despliegue_compose de F-38 (puertos 8000->8443, 6379->6380, http->https, 10 lineas). docker compose config -q valido segun developer (no repeti). SIN PROBAR con servicios reales: flags --tls de redis:7-alpine, --certs-dir de MinIO Chainguard, lectura de llaves 0600 por UID de cada imagen, healthcheck https del coordinador. (c54de78) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: defectos 1-4 (UID de llaves en redis/MinIO, feeder sin TLS_ENABLED=false, validacion de NODE_IP, pathlen y CA por vencer) |
+| verificación IA de implementacion | pytest + revision manual | 2026-11-11 | Corregidos 16 hallazgos QA (commit 81e0d56); suite 2013 passed, 9 skipped, 4 xfailed; user: con CERTS_UID/CERTS_GID sin probar con imagenes reales (81e0d56) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | qa-tester + orquestador | 2026-11-11 | QA 7e526c3: 16 defectos reproducidos como xfail, todos corregidos en 81e0d56 y en verde; sin segundo QA; Redis y MinIO reales sin probar (1c8705b) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs de TLS en DEPLOY_WORKERS, DEMO y modulo-M4 revisados contra codigo; bitacora en estado; sin cambios de codigo, no se repite pytest (7fd75b5) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de revision | Kenni Rodriguez | 2026-11-11 | Revisor: coordinator monta server.key 0600 sin user:; añadir user CERTS_UID:CERTS_GID y cubrirlo en prueba |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Hallazgo del revisor corregido en 39d0aac: coordinator con user CERTS_UID:CERTS_GID; prueba vista en rojo y luego verde; suite 2014 passed, 9 skipped, 4 xfailed (39d0aac) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | orquestador | 2026-11-11 | Revision del QA de implementacion sin cambios: pruebas QA en verde (87 passed en tls_compose); sin imagen real del coordinador (77474f4) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs actualizadas para incluir coordinator en user: CERTS_UID/CERTS_GID; limite declarado (e2d2eec) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO tras corregir coordinator user (39d0aac); Redis, MinIO y coordinador reales sin probar con imagen (b387b37) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Prueba de aceptacion creada (commit 20d5104), 2 skipped por diseno; src intacto; sin resultados inventados (20d5104) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada; la prueba de aceptación se salta sin captura real (sudo), no puede estar en rojo |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Parte sin codigo (0 lineas en src); suite sin cambios 2014 passed, 9 skipped, 4 xfailed (44fba43) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código |
+| verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte solo de prueba de aceptacion saltada y docs; captura real pendiente de la persona con sudo (c879d58) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs de la ficha M4 y guion revisados por el orquestador contra el SPEC (pila fila 4): resultados pendiente, sin datos inventados, M4 max 2; sin subagente revisor, verificacion no independiente (689196c) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; parte sin código; revisión sin subagente |
+| verificación IA de revision | orquestador | 2026-11-11 | Revision del diff de la parte 4 contra el SPEC (fila 4 de la pila): prueba de aceptacion saltada por diseno, ficha M4 con resultados pendiente, 0 lineas de src; sin subagente revisor, verificacion no independiente (12c2c90) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin subagente revisor |

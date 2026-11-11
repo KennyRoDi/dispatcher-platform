@@ -11,6 +11,9 @@ from tests.ayudas_cierre import crear_caso, reportar
 from tests.dobles import FakeAlertPublisher
 
 
+pytestmark = pytest.mark.usefixtures("sin_autorizacion")
+
+
 class PublicadorRoto:
     def __init__(self):
         self.llamadas = 0

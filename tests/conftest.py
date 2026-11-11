@@ -12,3 +12,13 @@ os.environ["TLS_ENABLED"] = "false"
 def tls_apagado_por_defecto(monkeypatch):
     monkeypatch.setenv("TLS_ENABLED", "false")
     monkeypatch.delenv("TLS_CA_FILE", raising=False)
+
+
+@pytest.fixture
+def sin_autorizacion():
+    import src.coordinator.main as main
+    from src.coordinator.seguridad import autorizar
+
+    main.app.dependency_overrides[autorizar] = lambda: None
+    yield
+    main.app.dependency_overrides.pop(autorizar, None)

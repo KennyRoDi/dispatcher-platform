@@ -18,12 +18,18 @@ services:
     environment:
       WORK_DIR: /scratch
       NODE_IP: ${NODE_IP:?define NODE_IP en .env}
+      TLS_ENABLED: ${TLS_ENABLED:-true}
+      TLS_CA_FILE: /certs/ca.pem
     user: "10001:10001"
     read_only: true
     cap_drop: [ALL]
     security_opt:
       - no-new-privileges:true
+    # Solo la CA publica: TLS_CA_FILE del .env es la ruta de ca.pem en esta maquina. Nunca llaves.
+    # Con TLS_ENABLED=false no hace falta: monta /dev/null y el worker no lee la CA. Con TLS activo
+    # y sin TLS_CA_FILE el worker se detiene con «TLS_CA_FILE no apunta a un archivo existente».
     volumes:
+      - ${TLS_CA_FILE:-/dev/null}:/certs/ca.pem:ro
       - scratch:/scratch
     tmpfs:
       - /tmp:size=64m,mode=1777

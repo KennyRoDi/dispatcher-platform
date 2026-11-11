@@ -235,3 +235,12 @@ def test_sin_tls_el_comportamiento_no_cambia(apagado):
     assert redis_kwargs(apagado) == {}
     assert minio_http_client(apagado) is None
     assert requests_session(apagado).verify is True
+
+
+def test_worker_con_tls_desactivado_no_exige_ca():
+    from src.workers.config import Settings, make_redis
+
+    settings = Settings.from_env({"TLS_ENABLED": "false"})
+    pool = make_redis(settings, TlsSettings.from_env({"TLS_ENABLED": "false"})).connection_pool
+    assert "ssl_ca_certs" not in pool.connection_kwargs
+    assert pool.connection_class.__name__ == "Connection"

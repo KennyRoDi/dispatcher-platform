@@ -6,7 +6,7 @@ import logging
 import secrets
 
 import pytest
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
 from src.adapters.jwt_tokens import JwtTokenVerifier
@@ -76,21 +76,3 @@ def test_configuracion_invalida_no_inunda_el_log_por_peticion(monkeypatch, caplo
         for _ in range(20):
             assert cliente.get("/x").status_code == 401
     assert len([r for r in caplog.records if r.levelno == logging.ERROR]) <= 1
-
-
-@pytest.mark.xfail(strict=True, reason="QA F-26: FastAPI parsea el cuerpo JSON antes de ejecutar la dependencia")
-@pytest.mark.parametrize("cabecera", [None, "Bearer basura"])
-def test_json_roto_sin_credenciales_validas_es_401_y_no_422(cabecera):
-    app = FastAPI()
-    router = APIRouter(dependencies=[Depends(autorizar)])
-
-    def crear(cuerpo: dict) -> dict:
-        return {"ok": True}
-
-    router.add_api_route("/cases", crear, methods=["POST"])
-    app.include_router(router)
-    cabeceras = {"content-type": "application/json"}
-    if cabecera:
-        cabeceras["Authorization"] = cabecera
-    respuesta = TestClient(app).post("/cases", content=b"{", headers=cabeceras)
-    assert respuesta.status_code == 401

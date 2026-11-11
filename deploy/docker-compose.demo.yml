@@ -12,6 +12,7 @@ services:
       dockerfile: Dockerfile.worker
     command: ["python", "-m", "scripts.demo_feeder"]
     environment:
+      TLS_ENABLED: "false"
       COORDINATOR_URL: http://coordinator:8000
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}

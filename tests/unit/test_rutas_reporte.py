@@ -13,6 +13,10 @@ from src.domain.finding import EvidenceRef, Finding, Severity
 from tests.dobles import FakeCaseCatalog, FakeClock, FakeFindingStore, FakeObjectStore
 from tests.sembrado_redis import sembrar_caso
 
+
+pytestmark = pytest.mark.usefixtures("sin_autorizacion")
+
+
 SHA_T = "a" * 64
 SHA_A = "b" * 64
 INICIO = datetime(2026, 11, 3, 8, 0, tzinfo=timezone.utc)

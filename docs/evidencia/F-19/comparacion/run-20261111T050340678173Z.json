@@ -1,0 +1,2030 @@
+{
+  "captured_at_utc": "2026-11-11T05:03:40.620649+00:00",
+  "node": "6da38f0916e7",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.13.18 (main, Nov  5 2026, 07:59:38) [GCC 14.2.0]",
+  "versions": {
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.9.0",
+    "av": "18.1.0"
+  },
+  "config": {
+    "nombre": "base",
+    "revision": "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66",
+    "idioma": "es",
+    "compute_type": "int8",
+    "beam_size": 5,
+    "hilos": 1
+  },
+  "input_sha256": "3cd6d40c57c7ca5c97500666901879ca027e98b004ec43e3ce9794b3f4e552b4",
+  "runs": [
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "repetition": 1,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 638816256,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "638816256",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21020672,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20528 kB\nPss_Dirty:         16574 kB\nPss_Anon:          16574 kB\nPss_File:           3954 kB\nPss_Shmem:             0 kB\nShared_Clean:      11120 kB\nShared_Dirty:       4444 kB\nPrivate_Clean:        40 kB\nPrivate_Dirty:     14352 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "14": {
+              "rss_bytes": 241664000,
+              "pss_bytes": 231938048,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236000 kB\nPss:              226502 kB\nPss_Dirty:        174960 kB\nPss_Anon:         174956 kB\nPss_File:          51542 kB\nPss_Shmem:             4 kB\nShared_Clean:      11264 kB\nShared_Dirty:       4440 kB\nPrivate_Clean:     47556 kB\nPrivate_Dirty:    172740 kB\nReferenced:       234200 kB\nAnonymous:        177176 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 272338944,
+          "pss_bytes": 252958720,
+          "cgroup": {
+            "memory_current": 821252096,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "821252096",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21448704,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20946 kB\nPss_Dirty:         17008 kB\nPss_Anon:          17008 kB\nPss_File:           3938 kB\nPss_Shmem:             0 kB\nShared_Clean:      11120 kB\nShared_Dirty:       3576 kB\nPrivate_Clean:        40 kB\nPrivate_Dirty:     15220 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "14": {
+              "rss_bytes": 292192256,
+              "pss_bytes": 282779648,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              285344 kB\nPss:              276152 kB\nPss_Dirty:        201584 kB\nPss_Anon:         201580 kB\nPss_File:          74568 kB\nPss_Shmem:             4 kB\nShared_Clean:      11484 kB\nShared_Dirty:       3576 kB\nPrivate_Clean:     70488 kB\nPrivate_Dirty:    199796 kB\nReferenced:       284348 kB\nAnonymous:        203368 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 322867200,
+          "pss_bytes": 304228352,
+          "cgroup": {
+            "memory_current": 848392192,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "848392192",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "repetition": 1,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643149824,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643149824",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21092352,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20598 kB\nPss_Dirty:         16332 kB\nPss_Anon:          16332 kB\nPss_File:           4266 kB\nPss_Shmem:             0 kB\nShared_Clean:      11096 kB\nShared_Dirty:       4928 kB\nPrivate_Clean:        64 kB\nPrivate_Dirty:     13868 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "62": {
+              "rss_bytes": 199098368,
+              "pss_bytes": 191066112,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              194432 kB\nPss:              186588 kB\nPss_Dirty:        143918 kB\nPss_Anon:         143914 kB\nPss_File:          42670 kB\nPss_Shmem:             4 kB\nShared_Clean:       8072 kB\nShared_Dirty:       4924 kB\nPrivate_Clean:     39980 kB\nPrivate_Dirty:    141456 kB\nReferenced:       191732 kB\nAnonymous:        146376 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 229773312,
+          "pss_bytes": 212158464,
+          "cgroup": {
+            "memory_current": 789004288,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "789004288",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21605376,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21099 kB\nPss_Dirty:         16848 kB\nPss_Anon:          16848 kB\nPss_File:           4251 kB\nPss_Shmem:             0 kB\nShared_Clean:      11096 kB\nShared_Dirty:       3896 kB\nPrivate_Clean:        64 kB\nPrivate_Dirty:     14900 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "62": {
+              "rss_bytes": 248504320,
+              "pss_bytes": 240870400,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              242680 kB\nPss:              235225 kB\nPss_Dirty:        169464 kB\nPss_Anon:         169460 kB\nPss_File:          65761 kB\nPss_Shmem:             4 kB\nShared_Clean:       8292 kB\nShared_Dirty:       3896 kB\nPrivate_Clean:     62976 kB\nPrivate_Dirty:    167516 kB\nReferenced:       241176 kB\nAnonymous:        171408 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 279179264,
+          "pss_bytes": 262475776,
+          "cgroup": {
+            "memory_current": 815341568,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "815341568",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "repetition": 2,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643350528,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643350528",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21088256,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20594 kB\nPss_Dirty:         16328 kB\nPss_Anon:          16328 kB\nPss_File:           4266 kB\nPss_Shmem:             0 kB\nShared_Clean:      11096 kB\nShared_Dirty:       4936 kB\nPrivate_Clean:        64 kB\nPrivate_Dirty:     13860 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "101": {
+              "rss_bytes": 199098368,
+              "pss_bytes": 191062016,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              194432 kB\nPss:              186584 kB\nPss_Dirty:        143914 kB\nPss_Anon:         143910 kB\nPss_File:          42670 kB\nPss_Shmem:             4 kB\nShared_Clean:       8072 kB\nShared_Dirty:       4932 kB\nPrivate_Clean:     39980 kB\nPrivate_Dirty:    141448 kB\nReferenced:       191732 kB\nAnonymous:        146376 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 229773312,
+          "pss_bytes": 212150272,
+          "cgroup": {
+            "memory_current": 788680704,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "788680704",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21607424,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21101 kB\nPss_Dirty:         16850 kB\nPss_Anon:          16850 kB\nPss_File:           4251 kB\nPss_Shmem:             0 kB\nShared_Clean:      11096 kB\nShared_Dirty:       3892 kB\nPrivate_Clean:        64 kB\nPrivate_Dirty:     14904 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "101": {
+              "rss_bytes": 241557504,
+              "pss_bytes": 233925632,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              235896 kB\nPss:              228443 kB\nPss_Dirty:        162746 kB\nPss_Anon:         162742 kB\nPss_File:          65697 kB\nPss_Shmem:             4 kB\nShared_Clean:       8292 kB\nShared_Dirty:       3892 kB\nPrivate_Clean:     62912 kB\nPrivate_Dirty:    160800 kB\nReferenced:       234396 kB\nAnonymous:        164688 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 272232448,
+          "pss_bytes": 255533056,
+          "cgroup": {
+            "memory_current": 808984576,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "808984576",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "repetition": 2,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643698688,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643698688",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 22023168,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21507 kB\nPss_Dirty:         16324 kB\nPss_Anon:          16324 kB\nPss_File:           5183 kB\nPss_Shmem:             0 kB\nShared_Clean:       9180 kB\nShared_Dirty:       4944 kB\nPrivate_Clean:      1980 kB\nPrivate_Dirty:     13852 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "139": {
+              "rss_bytes": 199168000,
+              "pss_bytes": 191217664,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              194500 kB\nPss:              186736 kB\nPss_Dirty:        143914 kB\nPss_Anon:         143910 kB\nPss_File:          42822 kB\nPss_Shmem:             4 kB\nShared_Clean:       7840 kB\nShared_Dirty:       4940 kB\nPrivate_Clean:     40276 kB\nPrivate_Dirty:    141444 kB\nReferenced:       191800 kB\nAnonymous:        146380 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 229842944,
+          "pss_bytes": 213240832,
+          "cgroup": {
+            "memory_current": 788889600,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "788889600",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21580800,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21075 kB\nPss_Dirty:         16842 kB\nPss_Anon:          16842 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3908 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14888 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "139": {
+              "rss_bytes": 248225792,
+              "pss_bytes": 240654336,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              242408 kB\nPss:              235014 kB\nPss_Dirty:        169466 kB\nPss_Anon:         169462 kB\nPss_File:          65548 kB\nPss_Shmem:             4 kB\nShared_Clean:       8028 kB\nShared_Dirty:       3908 kB\nPrivate_Clean:     62960 kB\nPrivate_Dirty:    167512 kB\nReferenced:       240904 kB\nAnonymous:        171416 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 278900736,
+          "pss_bytes": 262235136,
+          "cgroup": {
+            "memory_current": 815878144,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "815878144",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "repetition": 3,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644268032,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644268032",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21062656,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20569 kB\nPss_Dirty:         16320 kB\nPss_Anon:          16320 kB\nPss_File:           4249 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       4952 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     13844 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "178": {
+              "rss_bytes": 199176192,
+              "pss_bytes": 190358528,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              194508 kB\nPss:              185897 kB\nPss_Dirty:        143918 kB\nPss_Anon:         143914 kB\nPss_File:          41979 kB\nPss_Shmem:             4 kB\nShared_Clean:       9452 kB\nShared_Dirty:       4948 kB\nPrivate_Clean:     38664 kB\nPrivate_Dirty:    141444 kB\nReferenced:       191808 kB\nAnonymous:        146388 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 229851136,
+          "pss_bytes": 211421184,
+          "cgroup": {
+            "memory_current": 788905984,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "788905984",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21580800,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21075 kB\nPss_Dirty:         16842 kB\nPss_Anon:          16842 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3908 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14888 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "178": {
+              "rss_bytes": 241278976,
+              "pss_bytes": 232916992,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              235624 kB\nPss:              227458 kB\nPss_Dirty:        162746 kB\nPss_Anon:         162742 kB\nPss_File:          64712 kB\nPss_Shmem:             4 kB\nShared_Clean:       9572 kB\nShared_Dirty:       3908 kB\nPrivate_Clean:     61352 kB\nPrivate_Dirty:    160792 kB\nReferenced:       234124 kB\nAnonymous:        164696 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 271953920,
+          "pss_bytes": 254497792,
+          "cgroup": {
+            "memory_current": 808935424,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "808935424",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "repetition": 3,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643543040,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643543040",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21056512,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20563 kB\nPss_Dirty:         16314 kB\nPss_Anon:          16314 kB\nPss_File:           4249 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       4964 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     13832 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "216": {
+              "rss_bytes": 199114752,
+              "pss_bytes": 190290944,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              194448 kB\nPss:              185831 kB\nPss_Dirty:        143916 kB\nPss_Anon:         143912 kB\nPss_File:          41915 kB\nPss_Shmem:             4 kB\nShared_Clean:       9452 kB\nShared_Dirty:       4960 kB\nPrivate_Clean:     38600 kB\nPrivate_Dirty:    141436 kB\nReferenced:       191748 kB\nAnonymous:        146392 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 229789696,
+          "pss_bytes": 211347456,
+          "cgroup": {
+            "memory_current": 788619264,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "788619264",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21570560,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21065 kB\nPss_Dirty:         16832 kB\nPss_Anon:          16832 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14868 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "216": {
+              "rss_bytes": 248516608,
+              "pss_bytes": 240116736,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              242692 kB\nPss:              234489 kB\nPss_Dirty:        169460 kB\nPss_Anon:         169456 kB\nPss_File:          65029 kB\nPss_Shmem:             4 kB\nShared_Clean:       9620 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:     61648 kB\nPrivate_Dirty:    167496 kB\nReferenced:       241188 kB\nAnonymous:        171420 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 279191552,
+          "pss_bytes": 261687296,
+          "cgroup": {
+            "memory_current": 816316416,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "816316416",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "repetition": 4,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644669440,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644669440",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21058560,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20565 kB\nPss_Dirty:         16316 kB\nPss_Anon:          16316 kB\nPss_File:           4249 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       4960 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     13836 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "255": {
+              "rss_bytes": 200773632,
+              "pss_bytes": 191925248,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196068 kB\nPss:              187427 kB\nPss_Dirty:        143922 kB\nPss_Anon:         143918 kB\nPss_File:          43505 kB\nPss_Shmem:             4 kB\nShared_Clean:       9500 kB\nShared_Dirty:       4956 kB\nPrivate_Clean:     40168 kB\nPrivate_Dirty:    141444 kB\nReferenced:       193368 kB\nAnonymous:        146396 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231448576,
+          "pss_bytes": 212983808,
+          "cgroup": {
+            "memory_current": 790044672,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "790044672",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21576704,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21071 kB\nPss_Dirty:         16838 kB\nPss_Anon:          16838 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3916 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14880 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "255": {
+              "rss_bytes": 241696768,
+              "pss_bytes": 233303040,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236032 kB\nPss:              227835 kB\nPss_Dirty:        162750 kB\nPss_Anon:         162746 kB\nPss_File:          65085 kB\nPss_Shmem:             4 kB\nShared_Clean:       9620 kB\nShared_Dirty:       3916 kB\nPrivate_Clean:     61704 kB\nPrivate_Dirty:    160792 kB\nReferenced:       234532 kB\nAnonymous:        164704 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 272371712,
+          "pss_bytes": 254879744,
+          "cgroup": {
+            "memory_current": 809390080,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "809390080",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "repetition": 4,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644685824,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644685824",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21060608,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20567 kB\nPss_Dirty:         16318 kB\nPss_Anon:          16318 kB\nPss_File:           4249 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       4956 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     13840 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "293": {
+              "rss_bytes": 199110656,
+              "pss_bytes": 190264320,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              194444 kB\nPss:              185805 kB\nPss_Dirty:        143916 kB\nPss_Anon:         143912 kB\nPss_File:          41889 kB\nPss_Shmem:             4 kB\nShared_Clean:       9500 kB\nShared_Dirty:       4952 kB\nPrivate_Clean:     38552 kB\nPrivate_Dirty:    141440 kB\nReferenced:       191748 kB\nAnonymous:        146388 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 229785600,
+          "pss_bytes": 211324928,
+          "cgroup": {
+            "memory_current": 789008384,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "789008384",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21574656,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21069 kB\nPss_Dirty:         16836 kB\nPss_Anon:          16836 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3920 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14876 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "293": {
+              "rss_bytes": 248516608,
+              "pss_bytes": 240120832,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              242692 kB\nPss:              234493 kB\nPss_Dirty:        169464 kB\nPss_Anon:         169460 kB\nPss_File:          65029 kB\nPss_Shmem:             4 kB\nShared_Clean:       9620 kB\nShared_Dirty:       3920 kB\nPrivate_Clean:     61648 kB\nPrivate_Dirty:    167504 kB\nReferenced:       241192 kB\nAnonymous:        171420 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 279191552,
+          "pss_bytes": 261695488,
+          "cgroup": {
+            "memory_current": 815497216,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "815497216",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "repetition": 5,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643428352,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643428352",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21058560,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20565 kB\nPss_Dirty:         16316 kB\nPss_Anon:          16316 kB\nPss_File:           4249 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       4960 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     13836 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "332": {
+              "rss_bytes": 200798208,
+              "pss_bytes": 191949824,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196092 kB\nPss:              187451 kB\nPss_Dirty:        143946 kB\nPss_Anon:         143942 kB\nPss_File:          43505 kB\nPss_Shmem:             4 kB\nShared_Clean:       9500 kB\nShared_Dirty:       4956 kB\nPrivate_Clean:     40168 kB\nPrivate_Dirty:    141468 kB\nReferenced:       193392 kB\nAnonymous:        146420 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231473152,
+          "pss_bytes": 213008384,
+          "cgroup": {
+            "memory_current": 788664320,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "788664320",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21572608,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21067 kB\nPss_Dirty:         16834 kB\nPss_Anon:          16834 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3924 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14872 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "332": {
+              "rss_bytes": 241717248,
+              "pss_bytes": 233319424,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236052 kB\nPss:              227851 kB\nPss_Dirty:        162766 kB\nPss_Anon:         162762 kB\nPss_File:          65085 kB\nPss_Shmem:             4 kB\nShared_Clean:       9620 kB\nShared_Dirty:       3924 kB\nPrivate_Clean:     61704 kB\nPrivate_Dirty:    160804 kB\nReferenced:       234548 kB\nAnonymous:        164724 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 272392192,
+          "pss_bytes": 254892032,
+          "cgroup": {
+            "memory_current": 808800256,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "808800256",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "repetition": 5,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643637248,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643637248",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21056512,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20563 kB\nPss_Dirty:         16314 kB\nPss_Anon:          16314 kB\nPss_File:           4249 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       4964 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     13832 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "370": {
+              "rss_bytes": 200781824,
+              "pss_bytes": 191931392,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196076 kB\nPss:              187433 kB\nPss_Dirty:        143928 kB\nPss_Anon:         143924 kB\nPss_File:          43505 kB\nPss_Shmem:             4 kB\nShared_Clean:       9500 kB\nShared_Dirty:       4960 kB\nPrivate_Clean:     40168 kB\nPrivate_Dirty:    141448 kB\nReferenced:       193376 kB\nAnonymous:        146404 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231456768,
+          "pss_bytes": 212987904,
+          "cgroup": {
+            "memory_current": 789291008,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "789291008",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21570560,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               21065 kB\nPss_Dirty:         16832 kB\nPss_Anon:          16832 kB\nPss_File:           4233 kB\nPss_Shmem:             0 kB\nShared_Clean:      10976 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:       184 kB\nPrivate_Dirty:     14868 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "370": {
+              "rss_bytes": 248651776,
+              "pss_bytes": 240251904,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              242824 kB\nPss:              234621 kB\nPss_Dirty:        169472 kB\nPss_Anon:         169468 kB\nPss_File:          65149 kB\nPss_Shmem:             4 kB\nShared_Clean:       9620 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:     61768 kB\nPrivate_Dirty:    167508 kB\nReferenced:       241320 kB\nAnonymous:        171432 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 279326720,
+          "pss_bytes": 261822464,
+          "cgroup": {
+            "memory_current": 816484352,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "816484352",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "repetition": 1,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644583424,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644583424",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 19621888,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19162 kB\nPss_Dirty:         15487 kB\nPss_Anon:          15487 kB\nPss_File:           3675 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4964 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13832 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "409": {
+              "rss_bytes": 200749056,
+              "pss_bytes": 169565184,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196044 kB\nPss:              165591 kB\nPss_Dirty:        143103 kB\nPss_Anon:         143099 kB\nPss_File:          22487 kB\nPss_Shmem:             4 kB\nShared_Clean:      49600 kB\nShared_Dirty:       4988 kB\nPrivate_Clean:        20 kB\nPrivate_Dirty:    141436 kB\nReferenced:       193344 kB\nAnonymous:        146420 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "410": {
+              "rss_bytes": 200744960,
+              "pss_bytes": 169567232,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196040 kB\nPss:              165593 kB\nPss_Dirty:        143113 kB\nPss_Anon:         143109 kB\nPss_File:          22479 kB\nPss_Shmem:             4 kB\nShared_Clean:      49592 kB\nShared_Dirty:       4992 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:    141444 kB\nReferenced:       193340 kB\nAnonymous:        146432 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 432168960,
+          "pss_bytes": 358754304,
+          "cgroup": {
+            "memory_current": 935354368,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "935354368",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20307968,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19832 kB\nPss_Dirty:         16183 kB\nPss_Anon:          16183 kB\nPss_File:           3649 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3920 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14876 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "409": {
+              "rss_bytes": 241700864,
+              "pss_bytes": 200093696,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236036 kB\nPss:              195404 kB\nPss_Dirty:        162111 kB\nPss_Anon:         162107 kB\nPss_File:          33293 kB\nPss_Shmem:             4 kB\nShared_Clean:      71280 kB\nShared_Dirty:       3944 kB\nPrivate_Clean:        20 kB\nPrivate_Dirty:    160792 kB\nReferenced:       234536 kB\nAnonymous:        164732 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "410": {
+              "rss_bytes": 241692672,
+              "pss_bytes": 200087552,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236028 kB\nPss:              195398 kB\nPss_Dirty:        162117 kB\nPss_Anon:         162113 kB\nPss_File:          33281 kB\nPss_Shmem:             4 kB\nShared_Clean:      71272 kB\nShared_Dirty:       3948 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:    160796 kB\nReferenced:       234528 kB\nAnonymous:        164740 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 514068480,
+          "pss_bytes": 420489216,
+          "cgroup": {
+            "memory_current": 975167488,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "975167488",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "repetition": 1,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644243456,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644243456",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20961280,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20470 kB\nPss_Dirty:         16314 kB\nPss_Anon:          16314 kB\nPss_File:           4156 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4964 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13832 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "485": {
+              "rss_bytes": 200851456,
+              "pss_bytes": 191950848,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196144 kB\nPss:              187452 kB\nPss_Dirty:        143996 kB\nPss_Anon:         143992 kB\nPss_File:          43456 kB\nPss_Shmem:             4 kB\nShared_Clean:       9584 kB\nShared_Dirty:       4960 kB\nPrivate_Clean:     40084 kB\nPrivate_Dirty:    141516 kB\nReferenced:       193448 kB\nAnonymous:        146472 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231526400,
+          "pss_bytes": 212912128,
+          "cgroup": {
+            "memory_current": 788660224,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "788660224",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21476352,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20973 kB\nPss_Dirty:         16832 kB\nPss_Anon:          16832 kB\nPss_File:           4141 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14868 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "485": {
+              "rss_bytes": 270839808,
+              "pss_bytes": 262390784,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              264492 kB\nPss:              256241 kB\nPss_Dirty:        191076 kB\nPss_Anon:         191072 kB\nPss_File:          65165 kB\nPss_Shmem:             4 kB\nShared_Clean:       9704 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:     61748 kB\nPrivate_Dirty:    189112 kB\nReferenced:       262992 kB\nAnonymous:        193036 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 301514752,
+          "pss_bytes": 283867136,
+          "cgroup": {
+            "memory_current": 838012928,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "838012928",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "repetition": 2,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 643809280,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "643809280",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 19620864,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19161 kB\nPss_Dirty:         15487 kB\nPss_Anon:          15487 kB\nPss_File:           3674 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4964 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13832 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "541": {
+              "rss_bytes": 200679424,
+              "pss_bytes": 169566208,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              195976 kB\nPss:              165592 kB\nPss_Dirty:        143127 kB\nPss_Anon:         143123 kB\nPss_File:          22464 kB\nPss_Shmem:             4 kB\nShared_Clean:      49448 kB\nShared_Dirty:       4988 kB\nPrivate_Clean:        80 kB\nPrivate_Dirty:    141460 kB\nReferenced:       193276 kB\nAnonymous:        146444 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "542": {
+              "rss_bytes": 200716288,
+              "pss_bytes": 169587712,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196012 kB\nPss:              165613 kB\nPss_Dirty:        143101 kB\nPss_Anon:         143097 kB\nPss_File:          22511 kB\nPss_Shmem:             4 kB\nShared_Clean:      49468 kB\nShared_Dirty:       4992 kB\nPrivate_Clean:       120 kB\nPrivate_Dirty:    141432 kB\nReferenced:       193312 kB\nAnonymous:        146420 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 432070656,
+          "pss_bytes": 358774784,
+          "cgroup": {
+            "memory_current": 935489536,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "935489536",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20310016,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19834 kB\nPss_Dirty:         16183 kB\nPss_Anon:          16183 kB\nPss_File:           3651 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3920 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14876 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "541": {
+              "rss_bytes": 241733632,
+              "pss_bytes": 200187904,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236068 kB\nPss:              195496 kB\nPss_Dirty:        162131 kB\nPss_Anon:         162127 kB\nPss_File:          33364 kB\nPss_Shmem:             4 kB\nShared_Clean:      71160 kB\nShared_Dirty:       3944 kB\nPrivate_Clean:       152 kB\nPrivate_Dirty:    160812 kB\nReferenced:       234568 kB\nAnonymous:        164752 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "542": {
+              "rss_bytes": 241614848,
+              "pss_bytes": 200053760,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              235952 kB\nPss:              195365 kB\nPss_Dirty:        162109 kB\nPss_Anon:         162105 kB\nPss_File:          33256 kB\nPss_Shmem:             4 kB\nShared_Clean:      71180 kB\nShared_Dirty:       3948 kB\nPrivate_Clean:        36 kB\nPrivate_Dirty:    160788 kB\nReferenced:       234452 kB\nAnonymous:        164732 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 514023424,
+          "pss_bytes": 420551680,
+          "cgroup": {
+            "memory_current": 976048128,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "976048128",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "repetition": 2,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644870144,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644870144",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20961280,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20470 kB\nPss_Dirty:         16314 kB\nPss_Anon:          16314 kB\nPss_File:           4156 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4964 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13832 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "617": {
+              "rss_bytes": 200876032,
+              "pss_bytes": 191975424,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196168 kB\nPss:              187476 kB\nPss_Dirty:        144020 kB\nPss_Anon:         144016 kB\nPss_File:          43456 kB\nPss_Shmem:             4 kB\nShared_Clean:       9584 kB\nShared_Dirty:       4960 kB\nPrivate_Clean:     40084 kB\nPrivate_Dirty:    141540 kB\nReferenced:       193472 kB\nAnonymous:        146496 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231550976,
+          "pss_bytes": 212936704,
+          "cgroup": {
+            "memory_current": 789553152,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "789553152",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21475328,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20972 kB\nPss_Dirty:         16832 kB\nPss_Anon:          16832 kB\nPss_File:           4140 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14868 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "617": {
+              "rss_bytes": 261369856,
+              "pss_bytes": 252919808,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              255244 kB\nPss:              246992 kB\nPss_Dirty:        181784 kB\nPss_Anon:         181780 kB\nPss_File:          65208 kB\nPss_Shmem:             4 kB\nShared_Clean:       9704 kB\nShared_Dirty:       3928 kB\nPrivate_Clean:     61792 kB\nPrivate_Dirty:    179820 kB\nReferenced:       253744 kB\nAnonymous:        183744 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 292044800,
+          "pss_bytes": 274395136,
+          "cgroup": {
+            "memory_current": 828919808,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "828919808",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "repetition": 3,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644018176,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644018176",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 19616768,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19157 kB\nPss_Dirty:         15484 kB\nPss_Anon:          15484 kB\nPss_File:           3673 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4968 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13828 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "673": {
+              "rss_bytes": 200826880,
+              "pss_bytes": 169600000,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196120 kB\nPss:              165625 kB\nPss_Dirty:        143137 kB\nPss_Anon:         143133 kB\nPss_File:          22487 kB\nPss_Shmem:             4 kB\nShared_Clean:      49660 kB\nShared_Dirty:       4992 kB\nPrivate_Clean:         0 kB\nPrivate_Dirty:    141468 kB\nReferenced:       193420 kB\nAnonymous:        146456 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "674": {
+              "rss_bytes": 200859648,
+              "pss_bytes": 169624576,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196152 kB\nPss:              165649 kB\nPss_Dirty:        143159 kB\nPss_Anon:         143155 kB\nPss_File:          22490 kB\nPss_Shmem:             4 kB\nShared_Clean:      49668 kB\nShared_Dirty:       4996 kB\nPrivate_Clean:         0 kB\nPrivate_Dirty:    141488 kB\nReferenced:       193452 kB\nAnonymous:        146480 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 432361472,
+          "pss_bytes": 358841344,
+          "cgroup": {
+            "memory_current": 934658048,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "934658048",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20305920,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19830 kB\nPss_Dirty:         16180 kB\nPss_Anon:          16180 kB\nPss_File:           3650 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3924 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14872 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "673": {
+              "rss_bytes": 240680960,
+              "pss_bytes": 199585792,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              235040 kB\nPss:              194908 kB\nPss_Dirty:        162144 kB\nPss_Anon:         162140 kB\nPss_File:          32764 kB\nPss_Shmem:             4 kB\nShared_Clean:      70268 kB\nShared_Dirty:       3948 kB\nPrivate_Clean:         0 kB\nPrivate_Dirty:    160824 kB\nReferenced:       233540 kB\nAnonymous:        164768 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "674": {
+              "rss_bytes": 241827840,
+              "pss_bytes": 200725504,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236160 kB\nPss:              196021 kB\nPss_Dirty:        162162 kB\nPss_Anon:         162158 kB\nPss_File:          33858 kB\nPss_Shmem:             4 kB\nShared_Clean:      70276 kB\nShared_Dirty:       3952 kB\nPrivate_Clean:      1092 kB\nPrivate_Dirty:    160840 kB\nReferenced:       234660 kB\nAnonymous:        164788 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 513183744,
+          "pss_bytes": 420617216,
+          "cgroup": {
+            "memory_current": 976113664,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "976113664",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "repetition": 3,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 645976064,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "645976064",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20957184,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20466 kB\nPss_Dirty:         16310 kB\nPss_Anon:          16310 kB\nPss_File:           4156 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4972 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13824 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "749": {
+              "rss_bytes": 200900608,
+              "pss_bytes": 191995904,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196192 kB\nPss:              187496 kB\nPss_Dirty:        144040 kB\nPss_Anon:         144036 kB\nPss_File:          43456 kB\nPss_Shmem:             4 kB\nShared_Clean:       9584 kB\nShared_Dirty:       4968 kB\nPrivate_Clean:     40084 kB\nPrivate_Dirty:    141556 kB\nReferenced:       193492 kB\nAnonymous:        146520 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231575552,
+          "pss_bytes": 212953088,
+          "cgroup": {
+            "memory_current": 790335488,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "790335488",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21471232,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20968 kB\nPss_Dirty:         16828 kB\nPss_Anon:          16828 kB\nPss_File:           4140 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3936 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14860 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "749": {
+              "rss_bytes": 270696448,
+              "pss_bytes": 262242304,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              264352 kB\nPss:              256096 kB\nPss_Dirty:        190888 kB\nPss_Anon:         190884 kB\nPss_File:          65208 kB\nPss_Shmem:             4 kB\nShared_Clean:       9704 kB\nShared_Dirty:       3936 kB\nPrivate_Clean:     61792 kB\nPrivate_Dirty:    188920 kB\nReferenced:       262848 kB\nAnonymous:        192852 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 301371392,
+          "pss_bytes": 283713536,
+          "cgroup": {
+            "memory_current": 838438912,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "838438912",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "repetition": 4,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 644464640,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "644464640",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 19611648,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19152 kB\nPss_Dirty:         15476 kB\nPss_Anon:          15476 kB\nPss_File:           3675 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4980 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13816 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "805": {
+              "rss_bytes": 200626176,
+              "pss_bytes": 169532416,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              195924 kB\nPss:              165559 kB\nPss_Dirty:        143153 kB\nPss_Anon:         143149 kB\nPss_File:          22406 kB\nPss_Shmem:             4 kB\nShared_Clean:      49420 kB\nShared_Dirty:       5004 kB\nPrivate_Clean:        20 kB\nPrivate_Dirty:    141480 kB\nReferenced:       193224 kB\nAnonymous:        146480 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "806": {
+              "rss_bytes": 200781824,
+              "pss_bytes": 169681920,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196076 kB\nPss:              165705 kB\nPss_Dirty:        143147 kB\nPss_Anon:         143143 kB\nPss_File:          22557 kB\nPss_Shmem:             4 kB\nShared_Clean:      49416 kB\nShared_Dirty:       5008 kB\nPrivate_Clean:       180 kB\nPrivate_Dirty:    141472 kB\nReferenced:       193376 kB\nAnonymous:        146476 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 432082944,
+          "pss_bytes": 358825984,
+          "cgroup": {
+            "memory_current": 935604224,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "935604224",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20299776,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19824 kB\nPss_Dirty:         16172 kB\nPss_Anon:          16172 kB\nPss_File:           3652 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3936 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14860 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "805": {
+              "rss_bytes": 241692672,
+              "pss_bytes": 200114176,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236028 kB\nPss:              195424 kB\nPss_Dirty:        162160 kB\nPss_Anon:         162156 kB\nPss_File:          33263 kB\nPss_Shmem:             4 kB\nShared_Clean:      71212 kB\nShared_Dirty:       3960 kB\nPrivate_Clean:        20 kB\nPrivate_Dirty:    160836 kB\nReferenced:       234528 kB\nAnonymous:        164792 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "806": {
+              "rss_bytes": 241754112,
+              "pss_bytes": 200196096,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              236088 kB\nPss:              195504 kB\nPss_Dirty:        162154 kB\nPss_Anon:         162150 kB\nPss_File:          33349 kB\nPss_Shmem:             4 kB\nShared_Clean:      71176 kB\nShared_Dirty:       3964 kB\nPrivate_Clean:       120 kB\nPrivate_Dirty:    160828 kB\nReferenced:       234588 kB\nAnonymous:        164788 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 514121728,
+          "pss_bytes": 420610048,
+          "cgroup": {
+            "memory_current": 975912960,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "975912960",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "repetition": 4,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 645152768,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "645152768",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20951040,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20460 kB\nPss_Dirty:         16304 kB\nPss_Anon:          16304 kB\nPss_File:           4156 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4984 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13812 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "881": {
+              "rss_bytes": 200912896,
+              "pss_bytes": 192002048,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196204 kB\nPss:              187502 kB\nPss_Dirty:        144046 kB\nPss_Anon:         144042 kB\nPss_File:          43456 kB\nPss_Shmem:             4 kB\nShared_Clean:       9584 kB\nShared_Dirty:       4980 kB\nPrivate_Clean:     40084 kB\nPrivate_Dirty:    141556 kB\nReferenced:       193508 kB\nAnonymous:        146532 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231587840,
+          "pss_bytes": 212953088,
+          "cgroup": {
+            "memory_current": 789516288,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "789516288",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21465088,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20962 kB\nPss_Dirty:         16822 kB\nPss_Anon:          16822 kB\nPss_File:           4140 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3948 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14848 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "881": {
+              "rss_bytes": 270700544,
+              "pss_bytes": 262240256,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              264356 kB\nPss:              256094 kB\nPss_Dirty:        190886 kB\nPss_Anon:         190882 kB\nPss_File:          65208 kB\nPss_Shmem:             4 kB\nShared_Clean:       9704 kB\nShared_Dirty:       3948 kB\nPrivate_Clean:     61792 kB\nPrivate_Dirty:    188912 kB\nReferenced:       262856 kB\nAnonymous:        192856 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 301375488,
+          "pss_bytes": 283705344,
+          "cgroup": {
+            "memory_current": 838680576,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "838680576",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "repetition": 5,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 645103616,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "645103616",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 19619840,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19160 kB\nPss_Dirty:         15471 kB\nPss_Anon:          15471 kB\nPss_File:           3688 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4988 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13808 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "937": {
+              "rss_bytes": 200769536,
+              "pss_bytes": 169639936,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196064 kB\nPss:              165664 kB\nPss_Dirty:        143175 kB\nPss_Anon:         143171 kB\nPss_File:          22488 kB\nPss_Shmem:             4 kB\nShared_Clean:      49504 kB\nShared_Dirty:       5012 kB\nPrivate_Clean:        48 kB\nPrivate_Dirty:    141500 kB\nReferenced:       193364 kB\nAnonymous:        146508 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "938": {
+              "rss_bytes": 200749056,
+              "pss_bytes": 169611264,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196044 kB\nPss:              165636 kB\nPss_Dirty:        143177 kB\nPss_Anon:         143173 kB\nPss_File:          22458 kB\nPss_Shmem:             4 kB\nShared_Clean:      49512 kB\nShared_Dirty:       5016 kB\nPrivate_Clean:        16 kB\nPrivate_Dirty:    141500 kB\nReferenced:       193344 kB\nAnonymous:        146512 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 432193536,
+          "pss_bytes": 358871040,
+          "cgroup": {
+            "memory_current": 935833600,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "935833600",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20305920,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               19830 kB\nPss_Dirty:         16167 kB\nPss_Anon:          16167 kB\nPss_File:           3663 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3944 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14852 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "937": {
+              "rss_bytes": 241086464,
+              "pss_bytes": 199528448,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              235436 kB\nPss:              194852 kB\nPss_Dirty:        161527 kB\nPss_Anon:         161523 kB\nPss_File:          33324 kB\nPss_Shmem:             4 kB\nShared_Clean:      71204 kB\nShared_Dirty:       3968 kB\nPrivate_Clean:        64 kB\nPrivate_Dirty:    160200 kB\nReferenced:       233936 kB\nAnonymous:        164164 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "938": {
+              "rss_bytes": 241037312,
+              "pss_bytes": 199454720,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              235388 kB\nPss:              194780 kB\nPss_Dirty:        161509 kB\nPss_Anon:         161505 kB\nPss_File:          33271 kB\nPss_Shmem:             4 kB\nShared_Clean:      71236 kB\nShared_Dirty:       3972 kB\nPrivate_Clean:         0 kB\nPrivate_Dirty:    160180 kB\nReferenced:       233888 kB\nAnonymous:        164148 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 512798720,
+          "pss_bytes": 419289088,
+          "cgroup": {
+            "memory_current": 974630912,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "974630912",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "repetition": 5,
+      "outputs": [
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ],
+        [
+          {
+            "inicio": 0.0,
+            "fin": 5.0,
+            "texto": "Si no me pagan la deuda hoy, ¿más a ver lo que pasa?",
+            "confianza": 0.6096274173351923
+          }
+        ]
+      ],
+      "baseline": {
+        "memory_current": 645537792,
+        "memory_max": 4294967296,
+        "memory_swap_max": 0,
+        "raw": {
+          "memory.current": "645537792",
+          "memory.max": "4294967296",
+          "memory.swap.max": "0"
+        }
+      },
+      "snapshots": [
+        {
+          "stage": "loaded",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 20948992,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20458 kB\nPss_Dirty:         16302 kB\nPss_Anon:          16302 kB\nPss_File:           4156 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       4988 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     13808 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "1013": {
+              "rss_bytes": 200945664,
+              "pss_bytes": 192032768,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              196236 kB\nPss:              187532 kB\nPss_Dirty:        144076 kB\nPss_Anon:         144072 kB\nPss_File:          43456 kB\nPss_Shmem:             4 kB\nShared_Clean:       9584 kB\nShared_Dirty:       4984 kB\nPrivate_Clean:     40084 kB\nPrivate_Dirty:    141584 kB\nReferenced:       193540 kB\nAnonymous:        146564 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 231620608,
+          "pss_bytes": 212981760,
+          "cgroup": {
+            "memory_current": 789061632,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "789061632",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        },
+        {
+          "stage": "inferred",
+          "pids": {
+            "13": {
+              "rss_bytes": 30674944,
+              "pss_bytes": 21463040,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:               29956 kB\nPss:               20960 kB\nPss_Dirty:         16820 kB\nPss_Anon:          16820 kB\nPss_File:           4140 kB\nPss_Shmem:             0 kB\nShared_Clean:      11148 kB\nShared_Dirty:       3952 kB\nPrivate_Clean:        12 kB\nPrivate_Dirty:     14844 kB\nReferenced:        29956 kB\nAnonymous:         18796 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            },
+            "1013": {
+              "rss_bytes": 270966784,
+              "pss_bytes": 262504448,
+              "raw": "5bd184ea3000-7fff3134a000 ---p 00000000 00:00 0                          [rollup]\nRss:              264616 kB\nPss:              256352 kB\nPss_Dirty:        191144 kB\nPss_Anon:         191140 kB\nPss_File:          65208 kB\nPss_Shmem:             4 kB\nShared_Clean:       9704 kB\nShared_Dirty:       3952 kB\nPrivate_Clean:     61792 kB\nPrivate_Dirty:    189168 kB\nReferenced:       263116 kB\nAnonymous:        193116 kB\nKSM:                   0 kB\nLazyFree:              0 kB\nAnonHugePages:         0 kB\nShmemPmdMapped:        0 kB\nFilePmdMapped:         0 kB\nShared_Hugetlb:        0 kB\nPrivate_Hugetlb:       0 kB\nSwap:                  0 kB\nSwapPss:               0 kB\nLocked:                0 kB\n"
+            }
+          },
+          "rss_bytes": 301641728,
+          "pss_bytes": 283967488,
+          "cgroup": {
+            "memory_current": 838942720,
+            "memory_max": 4294967296,
+            "memory_swap_max": 0,
+            "raw": {
+              "memory.current": "838942720",
+              "memory.max": "4294967296",
+              "memory.swap.max": "0"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "stage": "inferred",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 282363494.4,
+          "min": 271953920,
+          "max": 322867200,
+          "range": 50913280
+        },
+        "pss_bytes": {
+          "mean": 264806195.2,
+          "min": 254497792,
+          "max": 304228352,
+          "range": 49730560
+        },
+        "memory_current_bytes": {
+          "mean": 816900505.6,
+          "min": 808800256,
+          "max": 848392192,
+          "range": 39591936
+        },
+        "memory_current_delta_bytes": {
+          "mean": 173993984.0,
+          "min": 164667392,
+          "max": 209575936,
+          "range": 44908544
+        }
+      }
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 1,
+      "stage": "loaded",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 238977024.0,
+          "min": 229773312,
+          "max": 272338944,
+          "range": 42565632
+        },
+        "pss_bytes": {
+          "mean": 220504473.6,
+          "min": 211421184,
+          "max": 252958720,
+          "range": 41537536
+        },
+        "memory_current_bytes": {
+          "mean": 795509555.2,
+          "min": 788664320,
+          "max": 821252096,
+          "range": 32587776
+        },
+        "memory_current_delta_bytes": {
+          "mean": 152603033.6,
+          "min": 144637952,
+          "max": 182435840,
+          "range": 37797888
+        }
+      }
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "stage": "inferred",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 513639219.2,
+          "min": 512798720,
+          "max": 514121728,
+          "range": 1323008
+        },
+        "pss_bytes": {
+          "mean": 420311449.6,
+          "min": 419289088,
+          "max": 420617216,
+          "range": 1328128
+        },
+        "memory_current_bytes": {
+          "mean": 975574630.4,
+          "min": 974630912,
+          "max": 976113664,
+          "range": 1482752
+        },
+        "memory_current_delta_bytes": {
+          "mean": 331178803.2,
+          "min": 329527296,
+          "max": 332238848,
+          "range": 2711552
+        }
+      }
+    },
+    {
+      "strategy": "por_proceso",
+      "workers": 2,
+      "stage": "loaded",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 432175513.6,
+          "min": 432070656,
+          "max": 432361472,
+          "range": 290816
+        },
+        "pss_bytes": {
+          "mean": 358813491.2,
+          "min": 358754304,
+          "max": 358871040,
+          "range": 116736
+        },
+        "memory_current_bytes": {
+          "mean": 935387955.2,
+          "min": 934658048,
+          "max": 935833600,
+          "range": 1175552
+        },
+        "memory_current_delta_bytes": {
+          "mean": 290992128.0,
+          "min": 290639872,
+          "max": 291680256,
+          "range": 1040384
+        }
+      }
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "stage": "inferred",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 279157964.8,
+          "min": 278900736,
+          "max": 279326720,
+          "range": 425984
+        },
+        "pss_bytes": {
+          "mean": 261983232.0,
+          "min": 261687296,
+          "max": 262475776,
+          "range": 788480
+        },
+        "memory_current_bytes": {
+          "mean": 815903539.2,
+          "min": 815341568,
+          "max": 816484352,
+          "range": 1142784
+        },
+        "memory_current_delta_bytes": {
+          "mean": 172160614.4,
+          "min": 170811392,
+          "max": 172847104,
+          "range": 2035712
+        }
+      }
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 1,
+      "stage": "loaded",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 230129664.0,
+          "min": 229773312,
+          "max": 231456768,
+          "range": 1683456
+        },
+        "pss_bytes": {
+          "mean": 212211916.8,
+          "min": 211324928,
+          "max": 213240832,
+          "range": 1915904
+        },
+        "memory_current_bytes": {
+          "mean": 788962508.8,
+          "min": 788619264,
+          "max": 789291008,
+          "range": 671744
+        },
+        "memory_current_delta_bytes": {
+          "mean": 145219584.0,
+          "min": 144322560,
+          "max": 145854464,
+          "range": 1531904
+        }
+      }
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "stage": "inferred",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 299589632.0,
+          "min": 292044800,
+          "max": 301641728,
+          "range": 9596928
+        },
+        "pss_bytes": {
+          "mean": 281929728.0,
+          "min": 274395136,
+          "max": 283967488,
+          "range": 9572352
+        },
+        "memory_current_bytes": {
+          "mean": 836598988.8,
+          "min": 828919808,
+          "max": 838942720,
+          "range": 10022912
+        },
+        "memory_current_delta_bytes": {
+          "mean": 191442944.0,
+          "min": 184049664,
+          "max": 193769472,
+          "range": 9719808
+        }
+      }
+    },
+    {
+      "strategy": "workers_compartidos",
+      "workers": 2,
+      "stage": "loaded",
+      "repetitions": 5,
+      "metrics": {
+        "rss_bytes": {
+          "mean": 231572275.2,
+          "min": 231526400,
+          "max": 231620608,
+          "range": 94208
+        },
+        "pss_bytes": {
+          "mean": 212947353.6,
+          "min": 212912128,
+          "max": 212981760,
+          "range": 69632
+        },
+        "memory_current_bytes": {
+          "mean": 789425356.8,
+          "min": 788660224,
+          "max": 790335488,
+          "range": 1675264
+        },
+        "memory_current_delta_bytes": {
+          "mean": 144269312.0,
+          "min": 143523840,
+          "max": 144683008,
+          "range": 1159168
+        }
+      }
+    }
+  ]
+}

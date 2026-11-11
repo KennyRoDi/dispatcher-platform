@@ -15,7 +15,7 @@ from src.domain.finding import EvidenceRef, Finding, Severity
 from tests.ayudas_cierre import crear_caso, reportar
 from tests.dobles import FakeClock, FakeFindingStore
 
-pytestmark = pytest.mark.acceptance
+pytestmark = [pytest.mark.acceptance, pytest.mark.usefixtures("sin_autorizacion")]
 
 INICIO = datetime(2026, 11, 3, 8, 0, tzinfo=timezone.utc)
 SHA = "a" * 64
