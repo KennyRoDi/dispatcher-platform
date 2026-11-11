@@ -1,7 +1,9 @@
 import io
+import os
 from collections import defaultdict
 from datetime import datetime, timezone
 
+from src.domain.custody_chain import GENESIS_HASH, make_anchor, seal
 from src.domain.resources import ResourceUsage
 from src.domain.subtask import QueueFull
 from src.domain.text_analysis import MessageAnalysis
@@ -102,11 +104,27 @@ class FakeFindingStore:
 
 
 class FakeCustodyLog:
-    def __init__(self):
+    def __init__(self, key=None, clock=None):
+        self.key = key if key is not None else os.urandom(32)
+        self.clock = clock or FakeClock()
         self.entradas = []
 
     def record(self, evidence_sha256, operation, result_sha256, actor):
-        self.entradas.append((evidence_sha256, operation, result_sha256, actor))
+        previo = self.entradas[-1].entry_hash if self.entradas else GENESIS_HASH
+        campos = {
+            "ts": self.clock.now().isoformat(),
+            "evidence_sha256": evidence_sha256,
+            "operation": operation,
+            "result_sha256": result_sha256,
+            "actor": actor,
+        }
+        self.entradas.append(seal(self.key, previo, len(self.entradas), campos))
+
+    def leer(self):
+        if not self.entradas:
+            return [], None
+        ultima = self.entradas[-1]
+        return [e.line() for e in self.entradas], make_anchor(self.key, ultima.seq, ultima.entry_hash)
 
 
 class FakeRoutingPolicy:
