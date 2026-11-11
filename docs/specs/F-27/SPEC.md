@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests e1a1159
+**Verificación IA:** implementacion df15443
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -145,3 +145,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (unit, integracion) y requirements-dev.txt (trustme==1.2.1); src intacto. Ejecute test_tls: error de coleccion ModuleNotFoundError src.infrastructure.tls (rojo); integracion compila. Developer valido los helpers de integracion con un stub temporal (7/7); ese cambio final del timeout solo con py_compile. API asumida la fijan las pruebas (TlsSettings, client_context, exigir_cifrado, redis_kwargs, requests_session, minio_http_client). Pruebas de repo sin llaves y de generar_certs.sh quedan para la parte 3. (e1a1159) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: src/infrastructure/tls.py (~90 lineas) y SPEC; tests intactos. Ejecute test_tls y la integracion local de TLS (resultados arriba). Suite completa segun developer 1813 passed/3 xfailed (no la repeti). Limite: requests_session no impone TLS 1.3 minimo (verifica CA y hostname). (df15443) |
