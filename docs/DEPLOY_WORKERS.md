@@ -178,6 +178,134 @@ Captura de TLS para M4 (`tcpdump`, `tshark`, prueba de aceptación): [modulo-M4-
 
 MinIO dejó de publicar imágenes públicas, por eso el Compose usa `cgr.dev/chainguard/minio:latest`. Si dejara de estar disponible, define otra en `.env` con `MINIO_IMAGE=...`.
 
+### Conectarse al Nodo A desde Windows (prueba de conexión)
+
+Pasos completos, probados desde un nodo Windows real (`PC-KEVIN`) contra el Nodo A (2026-11-11): `check_connectivity` salió con código 0. **No arranca el worker**: solo comprueba red, TLS y credenciales. Todos los comandos son PowerShell y se ejecutan desde la raíz del repositorio, salvo que se indique otra cosa.
+
+**Qué debe darte quien opera el Nodo A, por un canal privado** (nunca por el repositorio, commits ni chats públicos):
+
+1. La IP de Tailscale del Nodo A (en este despliegue, `100.86.249.90`; confírmala con `tailscale ip -4` en el Nodo A).
+2. El archivo `ca.pem` (o su contenido). Es la CA pública; no es secreto. **Nunca** pidas ni uses `ca.key` ni `server.key`.
+3. `REDIS_PASSWORD`, `MINIO_ACCESS_KEY` y `MINIO_SECRET_KEY`, que están en el `.env` del Nodo A.
+4. La huella SHA-256 de la CA, por un canal distinto al del archivo. En el Nodo A: `openssl x509 -in ~/.ms-certs/ca.pem -noout -fingerprint -sha256`. Sin ese segundo canal, la comprobación del paso 3 solo prueba que el archivo está íntegro, no que sea el correcto.
+
+**Paso 1. Instalar y activar (una sola vez).** Docker Desktop con el motor WSL2, Tailscale con sesión en la misma red que el Nodo A, y Git (comandos de §2). Después:
+
+```powershell
+git clone https://github.com/KennyRoDi/dispatcher-platform.git
+cd dispatcher-platform
+git checkout main
+git pull origin main
+```
+
+**Paso 2. Comprobar la red.** Debe responder `pong` y las tres pruebas deben dar `TcpTestSucceeded : True`:
+
+```powershell
+tailscale status
+tailscale ping 100.86.249.90
+Test-NetConnection 100.86.249.90 -Port 8443
+Test-NetConnection 100.86.249.90 -Port 6380
+Test-NetConnection 100.86.249.90 -Port 9000
+```
+
+Si `tailscale ping` falla, Tailscale no está activo o no estás en la misma red. Si un puerto falla y el ping responde, el Nodo A no está levantado (`docker compose ps` allí).
+
+**Paso 3. Instalar la CA.**
+
+```powershell
+New-Item -ItemType Directory -Force C:\certs | Out-Null
+notepad C:\certs\ca.pem
+```
+
+Pega el contenido de `ca.pem` (de `-----BEGIN CERTIFICATE-----` a `-----END CERTIFICATE-----`), guarda y cierra. Si recibiste el archivo, cópialo a `C:\certs\ca.pem`. Comprueba:
+
+```powershell
+Select-String -Path C:\certs\ca.pem -Pattern "PRIVATE KEY"
+certutil -dump C:\certs\ca.pem
+```
+
+El primer comando **no** debe imprimir nada: si imprime algo, ese archivo contiene una llave privada, bórralo y avisa. En la salida del segundo, la línea `Cert Hash(sha256)` debe coincidir con la huella del punto 4, sin los dos puntos y sin importar mayúsculas. Esa lectura de `certutil` no se ha verificado en esta guía; si el formato difiere, compara con `openssl x509 -in C:\certs\ca.pem -noout -fingerprint -sha256` (por ejemplo, con el `openssl` que trae Git for Windows).
+
+**Paso 4. Probar HTTPS al coordinador.** Usa `curl.exe`, no `curl`, que en PowerShell es un alias de `Invoke-WebRequest`. **Debe llevar `--ssl-no-revoke`**: Windows (Schannel) intenta comprobar la revocación de la CA y, al ser una CA propia, falla con `curl: (60)`. La opción solo desactiva esa consulta; la cadena sigue verificándose contra `ca.pem`.
+
+```powershell
+curl.exe --ssl-no-revoke --cacert C:\certs\ca.pem https://100.86.249.90:8443/openapi.json -o NUL -w "%{http_code}`n"
+```
+
+Esperado: `200`. No uses `-k` ni `--insecure`: anulan lo que se quiere comprobar.
+
+**Paso 5. Crear el `.env`.**
+
+```powershell
+Copy-Item .env.example .env
+Start-Process notepad .env -Wait
+$ruta = Join-Path $PWD ".env"
+$texto = [IO.File]::ReadAllText($ruta) -replace "`r`n", "`n"
+[IO.File]::WriteAllText($ruta, $texto, [Text.UTF8Encoding]::new($false))
+```
+
+Antes de guardar, deja estas variables exactamente así (las demás se quedan como en `.env.example`). Si una variable aparece comentada o repetida, deja una sola línea activa:
+
+```text
+REDIS_HOST=100.86.249.90
+REDIS_PORT=6380
+REDIS_PASSWORD=<el que te pasaron>
+COORDINATOR_URL=https://100.86.249.90:8443
+MINIO_ENDPOINT=100.86.249.90:9000
+MINIO_ACCESS_KEY=<el que te pasaron>
+MINIO_SECRET_KEY=<el que te pasaron>
+MINIO_SECURE=true
+TLS_ENABLED=true
+TLS_CA_FILE=C:\certs\ca.pem
+NODE_NAME=<salida de: hostname>
+NODE_IP=<salida de: tailscale ip -4>
+WORKER_ID=
+WORKER_MEM_LIMIT=2g
+ADMISSION_MARGIN_BYTES=1
+FOOTPRINT_TRANSCODE_VIDEO_BYTES=1
+FOOTPRINT_EXTRACT_AUDIO_BYTES=1
+FOOTPRINT_GENERATE_THUMBNAIL_BYTES=1
+FOOTPRINT_CONVERT_AUDIO_BYTES=1
+FOOTPRINT_EXTRACT_METADATA_BYTES=1
+```
+
+- `WORKER_ID` va **vacío** (ver «Tres errores que rompen la identidad»).
+- `TLS_CA_FILE` es la ruta de Windows; el Compose la monta en `/certs/ca.pem` dentro del contenedor.
+- `WORKER_MEM_LIMIT` es obligatorio: sin él Compose falla con `define WORKER_MEM_LIMIT en .env`. `ADMISSION_MARGIN_BYTES` y las cinco `FOOTPRINT_*_BYTES` también son obligatorias, incluso para `check_connectivity`, porque lee la misma configuración que el worker. **Los valores `2g` y `1` de arriba son marcadores para esta prueba de conexión: no están medidos y no valen como datos.** Antes de arrancar el worker real hay que medirlos (M1 §4.1) y sustituirlos.
+- No escribas el `.env` con `>` ni con `Out-File`, y no lo subas a git (`.gitignore` ya lo excluye).
+- `NODE_NAME` y `NODE_IP` no deben estar definidos en el shell con otro valor: `Get-ChildItem Env:NODE_NAME, Env:NODE_IP -ErrorAction SilentlyContinue` no debe imprimir nada.
+
+**Paso 6. Verificar el `.env` y probar de extremo a extremo.** La primera vez construye la imagen del worker y tarda varios minutos.
+
+```powershell
+docker compose --env-file .env -f deploy/docker-compose.worker.yml config --quiet
+$LASTEXITCODE
+docker compose --env-file .env -f deploy/docker-compose.worker.yml run --rm worker python -m scripts.check_connectivity
+$LASTEXITCODE
+```
+
+Esperado: ambos códigos `0` y, en el segundo comando:
+
+```text
+[OK] redis: Redis OK en 100.86.249.90:6380
+[OK] coordinator: Coordinador OK en https://100.86.249.90:8443
+[OK] minio: MinIO OK en 100.86.249.90:9000, pero el bucket 'dataset' aun no existe
+[OK] ffmpeg: ffmpeg OK (...)
+[OK] work_dir: WORK_DIR escribible: /scratch
+```
+
+El aviso del bucket `dataset` es normal: el worker lo crea al iniciar. Aquí termina la prueba de conexión. **No ejecutes `python scripts/start_worker.py` todavía.** Antes hacen falta las huellas de admisión y el `WORKER_MEM_LIMIT` medidos y, con la autenticación de F-26 (PR #112), `WORKER_TOKEN` y el `JWT_SECRET` en el Nodo A; con ellos el Nodo A debe recrearse. Mientras tanto, un worker sin token recibiría 401 del coordinador.
+
+**Operador del Nodo A: comprobación previa.** Antes de que nadie pruebe, en el Nodo A:
+
+```bash
+tailscale ip -4                      # debe coincidir con NODE_IP de su .env
+docker compose ps                    # redis, minio y coordinator en healthy; reaper corriendo
+curl -s --cacert ~/.ms-certs/ca.pem -o /dev/null -w "%{http_code}\n" https://$(tailscale ip -4):8443/openapi.json
+```
+
+El tercer comando debe dar `200`. Si el certificado se regenera (`generar_certs.sh`), cambia la huella y todos los nodos necesitan el `ca.pem` nuevo.
+
 ### Cada nodo worker (PowerShell)
 
 `--env-file .env` es obligatorio: el archivo de Compose está en `deploy/` y Compose no buscaría allí el `.env` de la raíz.
@@ -319,6 +447,9 @@ Ninguna fila se ha reproducido sobre nodos reales. «Sin comprobar» marca lo qu
 | Síntoma | Causa | Qué hacer |
 |---|---|---|
 | `check_connectivity` falla en el contenedor, pero en el host `Test-NetConnection <IP_TAILSCALE_NODO_A> -Port 6380` responde | **Sin comprobar.** Un contenedor de Docker Desktop en WSL2 no alcanza la red Tailscale del host. Es la base de esta topología | **La Parte 2 se detiene** y se devuelve a `plan`: `python scripts/flujo.py devolver plan "motivo"`. No improvises otra red |
+| `curl: (60)` o error de revocación en Windows con `curl.exe` | Schannel no puede comprobar la revocación de una CA propia. Reproducido en un nodo Windows real | Añade `--ssl-no-revoke` al `curl.exe` y conserva `--cacert` (ver «Conectarse al Nodo A desde Windows», paso 4) |
+| `define WORKER_MEM_LIMIT en .env` | Falta `WORKER_MEM_LIMIT` en `.env` | Defínelo; para la prueba de conexión sirve `2g` (no medido) |
+| `ADMISSION_MARGIN_BYTES es obligatoria y debe ser un entero en bytes` (o `FOOTPRINT_*`) | Faltan en `.env`; `check_connectivity` lee la misma configuración que el worker | Defínelas como enteros; marcadores en la sección de conexión, medidas reales en M1 §4.1 |
 | `Test-NetConnection` tampoco responde | Tailscale inactivo en alguna máquina, o el Nodo A sin levantar | `tailscale status`, `tailscale ping <IP_TAILSCALE_NODO_A>` y, en el Nodo A, `docker compose ps` |
 | `docker compose up` falla al publicar puertos en el Nodo A | **Sin comprobar.** Tailscale inactivo o `NODE_IP` distinto de `tailscale ip -4`. También podría ocurrir tras reiniciar, si Docker arranca antes que Tailscale | Activa Tailscale, corrige `NODE_IP` y repite `docker compose up -d` |
 | `required variable NODE_NAME is missing a value` | Falta `--env-file .env`, comando fuera de la raíz o `.env` sin completar | Repite desde la raíz con `--env-file .env` |
