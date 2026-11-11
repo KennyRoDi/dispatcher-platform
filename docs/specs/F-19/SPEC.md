@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** documentacion 6e61b5a
+**Verificación IA:** revision a5a3aa6
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -129,3 +129,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Aclarar en SPEC que hilos/cpu_threads intra-op se conserva igual; num_workers/inter_threads varía por estrategia (1 por modelo frente a N workers compartidos). |
 | verificación IA de documentacion | Codex | 2026-11-10 | Revisión de SPEC corrigió que cpu_threads/intra-op permanece igual y num_workers/inter_threads varía por estrategia (1 vs N). Solo diff documental de una línea; QA Linux y Windows ya registrados, no repetidos. Verificación documental encargada al rol documentador; verificación de IA no independiente. (6e61b5a) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de revision | Codex | 2026-11-10 | APROBADO F-19 parte 2. Revisión final del diff 11 archivos vs SPEC: API factory num_workers, procesos y threads compatibles; cleanup ante error/timeout; test real POSIX omitido en Windows; ADD y resultados honestos. Hallazgo previo de Windows y precisión de hilos/intra-op corregidos. Verificación misma sesión, no independiente. (a5a3aa6) |
