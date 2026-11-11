@@ -1,6 +1,6 @@
 # SPEC F-32: Routing por tipo de nodo
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 453baf4
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J
@@ -78,3 +78,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (misma sesion, no independiente) | 2026-11-10 | 22 pruebas en verde (routing, integracion, arquitectura); 3 archivos de codigo ~50 lineas (81647ef) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | claude-code | 2026-11-10 | QA: 22 pruebas verdes. Hallazgo: ruta como str se expandia a letras; ahora ValueError con prueba. Tipo desconocido, sin clase viva y orden de clases verificados. (453baf4) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
