@@ -1,6 +1,6 @@
 # SPEC F-30: Workers sin privilegios
 
-**Fase:** verificacion
+**Fase:** implementacion
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** implementacion 82f685d
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
@@ -97,3 +97,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: Dockerfile.worker, 2 compose, scripts/verificar_workers.py (114 lineas), un test de aceptacion renombrado (sin cambio de contenido); tests unitarios intactos. Ejecute: python -m scripts.verificar_workers rc=0; suite completa tras el commit: 1812 passed, 8 skipped, 3 xfailed. docker compose config valido segun developer (no lo repeti). Pendiente: el worker real con raiz de solo lectura NO se ejecuto; compose local con replicas:3 comparte un volumen scratch. (82f685d) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: replicas comparten scratch y _borrar_temporales_huerfanos borra subtareas ajenas (media); verificador con falsos negativos: privileged, user 10001:0, security_opt str, ENV WORK_DIR redefinido, multi-stage sin USER, useradd en comentario |
