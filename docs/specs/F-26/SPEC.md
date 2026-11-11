@@ -1,6 +1,6 @@
 # SPEC F-26: Autenticación y roles
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-26-1-autenticacion-y-roles
 **Verificación IA:** implementacion 03bc4b2
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
@@ -164,3 +164,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA sin bypass de autenticacion ni escalada; 8 xfail estrictos nuevos en test_seguridad_qa.py; src intacto. Suite unitaria segun QA 1941 passed/11 xfailed. Devuelvo a implementacion los hallazgos 2-5 (NaN, sub vacio, secreto no UTF-8, cache/FIFO); 1 (JSON antes de auth) queda abierto. (9cb7813) |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA parte 2: corregir NaN/inf en exp e iat, sub vacio, lectura del secreto no UTF-8 sin filtrar bytes al log, y cache del verificador con lectura acotada del archivo (FIFO, tamaño); el hallazgo 1 queda abierto |
 | verificación IA de implementacion | orquestador: git diff 03bc4b2, pytest 1947 passed 5 xfailed, conformidad 0 | 2026-11-10 | correcciones QA hallazgos 2 a 5 verificadas en codigo (03bc4b2) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
