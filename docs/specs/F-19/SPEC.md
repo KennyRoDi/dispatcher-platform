@@ -90,11 +90,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 ## Riesgos y preguntas abiertas
 
-- Aprobar o ajustar SUP-25: comparación inicial de Whisper CPU, sin generalizar a texto/imagen ni dar por medida la tabla completa de huellas M1.
-- `fork_compartido` se bloqueó con Whisper real; AD-07 lo sustituyó por `workers_compartidos`, soportado por `num_workers`/`inter_threads` y verificado en Linux. La elección final de AD-07 sigue pendiente de mediciones M1 válidas.
-- Confirmar acceso al nodo Linux/WSL2 con smaps/cgroup legibles y memoria limitada antes de parte 2. No se modifica `deploy/` ni se presume que Windows demuestre CoW.
-- N=1/N=2, cinco repeticiones, un hilo y timeout 120 s son parámetros propuestos, no capacidad medida ni política productiva. Registrar cualquier ajuste y pedir decisión si cambia el SPEC aprobado.
-- CoW puede perder ahorro durante inferencia; el supervisor añade memoria y se incluye. Un modelo, entrada y nodo no justifican una elección universal.
+- La medición M1 de F-19 cubre Whisper CPU en Docker Desktop Linux/WSL2 con un límite de 4 GiB y sin swap; no representa un worker desplegado en los tres nodos ni mide otros modelos o cargas. La elección de `workers_compartidos` queda sustentada solo para este experimento; huellas por modelo y validación en workers reales siguen abiertas.
+- N=1/N=2, cinco repeticiones, un hilo y timeout 120 s son parámetros del experimento, no una política de capacidad productiva. Cualquier cambio al protocolo aprobado requiere registrar su justificación.
 
 ## Aprobaciones
 
