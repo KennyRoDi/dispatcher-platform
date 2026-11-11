@@ -1121,3 +1121,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | pytest en verde y conformidad 0 problemas, verificados por el orquestador; aprobaciones delegadas por la persona (modo autonomo), sin verificacion humana independiente de las fases |
 | Cómo se validó | Pruebas en rojo, implementacion minima, QA adversarial, correccion de QA-1 y QA-2, documentacion |
 | Error de la IA | El developer afirmo que la rama no incluia F-28 cuando FileKeyProvider ya estaba en main; el QA hallo 4 defectos en la primera implementacion (UTF-8 invalido aceptado, ancla leida despues del log con falso truncado, mensaje de error de llave con KEK_FILE, objeto ilegible que oculta violaciones; los dos primeros corregidos, los otros con xfail estricto); el agente de tests no pudo hacer commit por una falla del clasificador de Bash y lo hizo el orquestador |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-36 (`feat/F-36-2-cancelacion-en-curso`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-36 |
+| Propósito | Documentar el escenario cancel_heavy de F-36 parte 2 |
+| Consulta resumida | Redactar la ficha de evidencia del escenario y su límite de medición |
+| Resultado obtenido | Ficha docs/evidencia/F-36_cancelacion_en_curso.md con medición B.6 marcada como pendiente |
+| Validado / corregido / descartado | Revisión humana y contraste con scenarios/cancel_heavy.py y sus pruebas |
+| Cómo se validó | Lectura del código y ejecución de las 14 pruebas unitarias |
