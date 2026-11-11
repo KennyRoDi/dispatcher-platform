@@ -12,6 +12,7 @@ from src.domain.dataset_plan import (
     DatasetParams,
     DatasetPlan,
     check_minimums,
+    checked_case_name,
     plan_dataset,
 )
 
@@ -238,3 +239,9 @@ def test_el_script_del_dataset_reutiliza_los_minimos_del_dominio():
 
     for nombre in ("MIN_CASES", "MIN_MESSAGES", "MIN_IMAGES", "MIN_AUDIOS"):
         assert getattr(dataset_sintetico, nombre) == getattr(dataset_plan, nombre)
+
+
+@pytest.mark.parametrize("name", ["a\x00b", "\x00", "caso-01\x00"])
+def test_checked_case_name_rechaza_un_nul(name):
+    with pytest.raises(ValueError):
+        checked_case_name(name)

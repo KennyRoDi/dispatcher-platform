@@ -114,7 +114,7 @@ def _row_defect(row) -> str | None:
     missing = [name for name in MANIFEST_FIELDS if name not in row]
     if missing:
         return f"faltan campos {missing}"
-    if not isinstance(row["path"], str) or Path(row["path"]).is_absolute() or ".." in Path(row["path"]).parts:
+    if not isinstance(row["path"], str) or "\x00" in row["path"] or Path(row["path"]).is_absolute() or ".." in Path(row["path"]).parts:
         return f"ruta invalida {row['path']!r}"
     if not all(value is None or isinstance(value, (str, int, float)) for value in row.values()):
         return "hay valores que no son escalares"
@@ -132,13 +132,17 @@ def _check_row(row: dict, root: Path) -> list[str]:
     if row["licencia"] != LICENSE_NAME:
         problems.append(f"{path}: licencia {row['licencia']!r} distinta de {LICENSE_NAME!r}")
     file = root / path
-    if not file.resolve().is_relative_to(root.resolve()):
-        return problems + [f"{path}: apunta fuera del directorio del manifiesto"]
-    if not file.is_file():
-        return problems + [f"{path}: no existe"]
-    if file.stat().st_size != row["bytes"]:
-        return problems + [f"{path}: tiene {file.stat().st_size} bytes y el manifiesto declara {row['bytes']}"]
     try:
+        if not file.resolve().is_relative_to(root.resolve()):
+            return problems + [f"{path}: apunta fuera del directorio del manifiesto"]
+    except UnicodeError:
+        return problems + [f"{path}: ruta con caracteres no codificables"]
+    try:
+        if not file.is_file():
+            return problems + [f"{path}: no existe"]
+        size = file.stat().st_size
+        if size != row["bytes"]:
+            return problems + [f"{path}: tiene {size} bytes y el manifiesto declara {row['bytes']}"]
         if sha256_de_archivo(file) != row["sha256"]:
             problems.append(f"{path}: sha256 distinto del declarado")
     except OSError as error:
@@ -214,7 +218,7 @@ def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = ru
         params = _load_params(args.params)
     except ValueError as error:
         parser.error(f"--params: {error}")
-    if out.exists() and not out.is_dir():
+    if (out.exists() or out.is_symlink()) and not out.is_dir():
         parser.error(f"--out: {out} no es un directorio")
     rows = _generate(plan_dataset(args.seed, params), out, runner)
     print(f"{len(rows)} archivos en {out}")
@@ -222,27 +226,31 @@ def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = ru
 
 
 def _generate(plan: DatasetPlan, out: Path, runner: Runner) -> list[dict]:
-    created_out = not out.exists()
+    created_dirs = [directory for directory in (out, *out.parents) if not directory.exists()]
     out.mkdir(parents=True, exist_ok=True)
-    (out / MANIFEST_NAME).unlink(missing_ok=True)
     before = set(out.rglob("*"))
     try:
+        links = sorted(str(path) for path in before if path.is_symlink())
+        if links:
+            raise RuntimeError(f"--out contiene enlaces simbolicos que no se siguen: {links}")
+        (out / MANIFEST_NAME).unlink(missing_ok=True)
+        before.discard(out / MANIFEST_NAME)
         rows = build_manifest(plan, out, runner)
         (out / MANIFEST_NAME).write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     except BaseException:
-        _remove_created(out, before, created_out)
+        _remove_created(out, before, created_dirs)
         raise
     return rows
 
 
-def _remove_created(out: Path, before: set[Path], created_out: bool) -> None:
+def _remove_created(out: Path, before: set[Path], created_dirs: list[Path]) -> None:
     for path in sorted(set(out.rglob("*")) - before, reverse=True):
         if path.is_dir() and not path.is_symlink():
             path.rmdir()
         else:
             path.unlink()
-    if created_out:
-        out.rmdir()
+    for directory in created_dirs:
+        directory.rmdir()
 
 
 def _load_params(path: str | None) -> DatasetParams:

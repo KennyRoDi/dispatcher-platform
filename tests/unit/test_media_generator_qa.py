@@ -192,7 +192,7 @@ def test_produce_se_niega_a_dejar_un_archivo_menor_que_min_bytes(tmp_path):
         path.write_bytes(b"x" * 10)
 
     with pytest.raises(ValueError):
-        media_generator._produce(runner, ["ffmpeg"], path, min_bytes=11)
+        media_generator.produce(runner, ["ffmpeg"], path, min_bytes=11)
 
     assert not path.exists()
 
@@ -203,7 +203,7 @@ def test_produce_acepta_un_archivo_que_alcanza_min_bytes(tmp_path):
     def runner(args):
         path.write_bytes(b"x" * 11)
 
-    media_generator._produce(runner, ["ffmpeg"], path, min_bytes=11)
+    media_generator.produce(runner, ["ffmpeg"], path, min_bytes=11)
 
     assert path.stat().st_size == 11
 
@@ -218,7 +218,7 @@ def test_produce_borra_el_archivo_previo_antes_de_ejecutar(tmp_path):
         visto.append(path.exists())
         path.write_bytes(b"nuevo")
 
-    media_generator._produce(runner, ["ffmpeg"], path)
+    media_generator.produce(runner, ["ffmpeg"], path)
 
     assert visto == [False]
 
@@ -226,7 +226,7 @@ def test_produce_borra_el_archivo_previo_antes_de_ejecutar(tmp_path):
 def test_heavy_case_generator_reutiliza_el_produce_de_media_generator():
     from src.adapters import heavy_case_generator
 
-    assert getattr(heavy_case_generator, "_produce", None) is media_generator._produce
+    assert getattr(heavy_case_generator, "produce", None) is media_generator.produce
 
 
 def test_audio_durations_corta_da_un_error_claro_y_no_deja_archivos(tmp_path):
