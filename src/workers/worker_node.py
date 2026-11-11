@@ -14,11 +14,12 @@ from pathlib import Path
 import redis.exceptions
 
 from src.domain.admission import FootprintTable, admits
-from src.infrastructure.cgroup_resources import CgroupResourceReader
+from src.domain.oom_policy import ExitCause, GiveUp, OomPolicy, classify_exit
+from src.infrastructure.cgroup_resources import CgroupResourceReader, read_memory_events
 from src.workers.cancelacion import SubprocesosPorCaso, escuchar_cancelaciones
 from src.workers.config import Settings, load_admission_config, make_redis
 from src.workers.heartbeat import Heartbeat, WorkerStats
-from src.workers.recovery import ACTIVE_STATES, recover_subtask
+from src.workers.recovery import ACTIVE_STATES, _requeue, recover_subtask
 from src.workers.reporter import Reporter
 from src.workers.storage import Storage, StorageError
 
@@ -45,11 +46,17 @@ class Worker:
         resource_reader=None,
         footprints: FootprintTable | None = None,
         admission_margin: int | None = None,
+        events_reader=None,
+        oom_policy: OomPolicy | None = None,
     ):
         self.settings = settings
         self.resource_reader = resource_reader
         self.footprints = footprints
         self.admission_margin = admission_margin
+        self.events_reader = events_reader
+        self.oom_policy = oom_policy if oom_policy is not None else OomPolicy()
+        self._reserva_activa = 0
+        self._reserva_lock = threading.Lock()
         self.redis = redis_client if redis_client is not None else make_redis(settings)
         self.storage = storage if storage is not None else Storage(settings)
         if processor is None:
@@ -194,7 +201,7 @@ class Worker:
             return admits(
                 current=usage.memory_current,
                 max=usage.memory_max,
-                footprint=footprint,
+                footprint=footprint + self._reserva_activa,
                 margin=self.admission_margin,
             )
         except Exception:
@@ -311,6 +318,10 @@ class Worker:
         encoder: str | None = None
 
         subprocesos = self.subprocesos.para_subtarea(data["case_id"]) if self.subprocesos else None
+        reserva = int(data.get("mem_reserve") or 0)
+        self._ajustar_reserva(reserva)
+        oom_base = self._oom_kill()
+        fallo: Exception | None = None
 
         try:
             src = self.storage.download(data["file_path"], in_dir)
@@ -350,6 +361,7 @@ class Worker:
             error = str(e)
             error_type = "StorageError"
         except Exception as e:
+            fallo = e
             status = "failed"
             error = str(e)
             processing_error_cls = getattr(self.processor, "ProcessingError", None)
@@ -359,9 +371,15 @@ class Worker:
                 error_type = "InternalError"
                 logger.exception("error interno procesando %s", subtask_id)
         finally:
+            self._ajustar_reserva(-reserva)
             if subprocesos is not None:
                 subprocesos.cerrar()
             shutil.rmtree(work_dir, ignore_errors=True)
+
+        if fallo is not None and self._es_oom(fallo, oom_base):
+            if self._reencolar_por_oom(subtask_id, data, reserva):
+                return None
+            error_type = "oom"
 
         finished_at = datetime.now(timezone.utc).isoformat()
         processing_s = round(time.monotonic() - started_monotonic, 3)
@@ -393,6 +411,45 @@ class Worker:
             logger.exception("error al finalizar subtarea %s", subtask_id)
 
         return payload
+
+    def _ajustar_reserva(self, delta: int) -> None:
+        with self._reserva_lock:
+            self._reserva_activa += delta
+
+    def _oom_kill(self) -> int | None:
+        if self.events_reader is None:
+            return None
+        try:
+            return self.events_reader().oom_kill
+        except Exception:
+            logger.exception("no se pudo leer memory.events")
+            return None
+
+    def _es_oom(self, fallo: Exception, oom_base: int | None) -> bool:
+        codigo = getattr(fallo, "exit_code", None)
+        actual = self._oom_kill()
+        if codigo is None or oom_base is None or actual is None:
+            return False
+        return classify_exit(codigo, actual - oom_base) is ExitCause.OOM
+
+    def _reencolar_por_oom(self, subtask_id: str, data: dict, reserva: int) -> bool:
+        """True si la sub-tarea quedó reencolada (o su caso cancelado); False si la política se rindió."""
+        subtask_key = f"subtask:{subtask_id}"
+        oom_count = int(self.redis.hget(subtask_key, "oom_count") or 0)
+        if not reserva and self.footprints is not None:
+            reserva = self.footprints.minimum([data["operation"]])
+        decision = self.oom_policy.decide(oom_count, reserva)
+        if isinstance(decision, GiveUp):
+            return False
+        _requeue(
+            self.redis, subtask_id, data.get("case_id"), data["operation"], data.get("priority"), "oom"
+        )
+        self.redis.hset(subtask_key, mapping={"oom_count": oom_count + 1, "mem_reserve": decision.reserve})
+        self.redis.hincrby(subtask_key, "attempts", -1)
+        self.redis.srem(self._inflight_key, subtask_id)
+        self.stats.task_finished(False)
+        logger.warning("subtarea %s terminada por OOM, reencolada con reserva %d", subtask_id, decision.reserve)
+        return True
 
     def _parse_params(self, raw: str | None, subtask_id: str) -> dict:
         try:
@@ -430,8 +487,13 @@ def main() -> None:
         cgroup_path=os.environ.get("CGROUP_PATH", "/sys/fs/cgroup"),
         worker_id=settings.worker_id,
     )
+    cgroup_path = os.environ.get("CGROUP_PATH", "/sys/fs/cgroup")
     Worker(
-        settings, resource_reader=reader, footprints=footprints, admission_margin=margin
+        settings,
+        resource_reader=reader,
+        footprints=footprints,
+        admission_margin=margin,
+        events_reader=lambda: read_memory_events(cgroup_path),
     ).run_forever()
 
 
