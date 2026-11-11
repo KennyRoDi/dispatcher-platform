@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 9593443d
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -105,3 +105,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 21 unitarias (QueueLimit desde entorno, borde exacto, desactivable, WATCH con reintentos, API 503 con Retry-After sin rastro, caso que no cabe entero, dos colas) y 1 de integracion con Redis real (20 productores, limite 50, la cola nunca lo supera). Rojo: modulos inexistentes y la integracion admite 200 de 200. Contra borrador: 21/21 y 3/3 con Redis real; suite 3773 verde en Linux. (930745a7) |
 | tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. QueueLimit (dominio), transaccion_acotada con WATCH/MULTI/EXEC y 5 reintentos (adaptador), create_case envuelto sin cambiar sus comandos y 503 con Retry-After. Sin limite no hay WATCH. Unitarias 21/21, integracion con Redis real 3/3, test_coordinator 40/40, suite 3773 verde en Linux, conformidad 0. (9593443d) |
+| implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
