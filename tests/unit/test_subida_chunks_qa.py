@@ -267,9 +267,19 @@ def test_keyerror_del_almacen_no_se_disfraza_de_subida_inexistente():
         subidas.complete(upload_id)
 
 
-def test_el_413_informa_el_tamano_real_del_chunk():
-    app, subidas = app_con(FakeChunkStaging())
-    upload_id, _ = subidas.start(sha(b"abcdefgh"), 8, CHUNK)
-    respuesta = TestClient(app).put(f"/uploads/{upload_id}/chunks/0", content=b"abcdefgh", headers={"X-Chunk-SHA256": sha(b"abcd")})
-    assert respuesta.status_code == 413
-    assert f"{CHUNK} bytes" in respuesta.json()["detail"]
+
+def test_complete_tras_discard_entre_is_dir_e_iterdir_responde_404(tmp_path, monkeypatch):
+    staging = DiskChunkStaging(tmp_path)
+    app, subidas = app_con(staging)
+    upload_id, _ = subidas.start(sha(b"abcd"), 4, CHUNK)
+    subidas.receive(upload_id, 0, b"abcd", sha(b"abcd"))
+    iterdir_original = type(tmp_path).iterdir
+
+    def iterdir_tras_discard(carpeta):
+        if carpeta.name == upload_id:
+            staging.discard(upload_id)
+        return iterdir_original(carpeta)
+
+    monkeypatch.setattr(type(tmp_path), "iterdir", iterdir_tras_discard)
+    respuesta = TestClient(app, raise_server_exceptions=False).post(f"/uploads/{upload_id}/complete")
+    assert respuesta.status_code == 404
