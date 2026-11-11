@@ -1,6 +1,6 @@
 # SPEC F-26: Autenticación y roles
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion bd6e3a6
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
@@ -154,3 +154,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA sin defectos en rbac.py; sin commits nuevos (diff solo SPEC). Ejecute test_rbac + test_arquitectura: 81 passed. Hallazgos para partes 2 y 3 (ruta /cases/ con barra, /docs y /openapi.json, scripts sin token) a SPEC y pendientes. No reproduje los mutantes del QA. (a78b6b8) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff: ARQUITECTURA (AD-33), REQUERIMIENTOS (SUP-28/29 provisionales) y SPEC. conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). Numeracion libre segun grep en docs de esta rama; AD-32 esta en la rama de F-04. (bd6e3a6) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
