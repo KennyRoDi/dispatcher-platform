@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 492fceb
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -128,3 +128,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA 5 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (15f497e) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | AD-39 y SUP-35 provisionales registrados con limites de la parte 1; bitacora en estado; sin cambios de codigo (492fceb) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
