@@ -41,3 +41,7 @@ Repetición real Linux: `python -m pytest tests/integration/test_fork_runtime.py
 En un contenedor limpio se creó un `audio.toml` temporal cambiando solo `hilos = 0` por `hilos = 1`; se usó `OMP_NUM_THREADS=1`, modelo/revisión originales y N=1. Resultado: `por_proceso` produjo una salida en 6.22 s; `fork_compartido` excedió 30 s en 31.37 s. El padre tenía 1 hilo antes de cargar Python/modelos y 3 tras la precarga compartida. La advertencia de Python sobre fork de procesos multihilo apareció en la prueba pytest anterior; el control adicional confirmó el timeout con hilos limitados. El archivo productivo `config/audio.toml` no se modificó.
 
 Conclusión acotada: fijar hilos no vuelve compatible el fork del modelo en este entorno. `workers_compartidos` sí pasó igualdad real en Linux; esto no constituye medición de memoria ni justifica todavía una estrategia definitiva.
+
+## Verificación posterior en Windows
+
+`pytest tests/integration/test_fork_runtime.py -q` → **5 skipped en 0.15 s**. El runtime es POSIX y está marcado correctamente para omitir estos casos en Windows; esta omisión no cambia el resultado Linux de 5 passed ni el fallo de `fork_compartido`.
