@@ -711,3 +711,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | El orquestador ejecuto test_rbac y test_arquitectura y conformidad.py. Los mutantes de QA no se reprodujeron. La matriz es interpretacion del arquitecto, no verificada contra el enunciado (SUP-28 provisional). Las fases se aprobaron con --excepcion por delegacion de la persona; falta revision humana. |
 | Cómo se validó | Verificacion del orquestador por fase sobre el commit exacto, sin fiarse de los informes de subagentes. |
 | Error de la IA | El SPEC de F-26 no cubria la ruta /cases/ con barra final ni las rutas de documentacion de FastAPI (/docs, /openapi.json, /redoc); lo detecto QA y se anoto en las notas de las partes 2 y 3. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-19 (`feat/F-19-2-estrategias-de-carga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex |
+| Componente | F-19 |
+| Propósito | Implementar y verificar F-19 parte 2 |
+| Consulta resumida | Comparar carga por proceso con pesos compartidos por CTranslate2 para Whisper CPU |
+| Resultado obtenido | Fork de modelo cargado agotó timeout; workers_compartidos pasó igualdad real en Linux. 51 unitarias y 5 integraciones pasaron. |
+| Validado / corregido / descartado | QA local no independiente; pruebas Linux con Docker Desktop 29.7.2, Python 3.13.18, faster-whisper 1.2.1 y CTranslate2 4.9.0 |
+| Cómo se validó | ADD, SPEC, runtime aislado, ejecución concurrente y evidencia en QA-parte-2.md |
+| Error de la IA | Edición inicial accidental en el worktree raíz en vez de work/arquitecto-F-19; se revirtió de inmediato y se confirmó la raíz limpia. |
