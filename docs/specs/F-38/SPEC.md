@@ -1,6 +1,6 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 40e1a3e
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
@@ -221,3 +221,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | orquestador | 2026-11-11 | Simulacion local corrida por agente; evidencia en docs/evidencia/F-38_tres_nodos_simulacion_local_2026-11-11.md (4d3d79b); 0 contenedores restantes; sin pruebas nuevas (SPEC fila 2) (4d3d79b) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada; el SPEC admite sin pruebas si la corrida no revela errores de código |
 | verificación IA de implementacion | orquestador | 2026-11-11 | Sin cambios de codigo en src (diff solo docs/evidencia) (40e1a3e) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código |
