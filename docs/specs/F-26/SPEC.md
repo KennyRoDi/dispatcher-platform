@@ -1,6 +1,6 @@
 # SPEC F-26: Autenticación y roles
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision a146eec
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
@@ -156,3 +156,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff: ARQUITECTURA (AD-33), REQUERIMIENTOS (SUP-28/29 provisionales) y SPEC. conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). Numeracion libre segun grep en docs de esta rama; AD-32 esta en la rama de F-04. (bd6e3a6) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: matriz celda por celda, capas, numeracion libre en todas las ramas, notas coherentes con rutas reales; ejecuto pytest 1799 passed y conformidad 0. Sin commits nuevos desde la documentacion (comprobado). (a146eec) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
