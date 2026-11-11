@@ -93,7 +93,7 @@ Cada máquina tiene su propio `.env` en la raíz del repositorio. **Nunca se ver
 | `NODE_NAME` | Salida de `hostname` de esa máquina. Único entre nodos | No |
 | `NODE_IP` | Salida de `tailscale ip -4` de esa máquina | No |
 | `WORKER_MEM_LIMIT` | Límite de memoria medido para ese worker, en formato admitido por Compose | No |
-| `TLS_CA_FILE` | Ruta de `ca.pem` en esa máquina (la copia desde el Nodo A) | Sí |
+| `TLS_CA_FILE` | Ruta de `ca.pem` en esa máquina (la copia desde el Nodo A). Obligatorio con TLS activo; con `TLS_ENABLED=false` puede omitirse | Sí |
 | `REDIS_HOST` | `<IP_TAILSCALE_NODO_A>` | Sí |
 | `COORDINATOR_URL` | `https://<IP_TAILSCALE_NODO_A>:8443` | Sí |
 | `MINIO_ENDPOINT` | `<IP_TAILSCALE_NODO_A>:9000` | Sí |
@@ -158,7 +158,7 @@ Tailscale debe estar activo antes de `docker compose up`, porque los puertos se 
 NODE_IP=$(tailscale ip -4) NODE_NAME=$(hostname) CERTS_DIR=$HOME/.ms-certs bash deploy/tls/generar_certs.sh
 ```
 
-En el `.env` del Nodo A: `CERTS_DIR` (la misma ruta), `CERTS_UID=$(id -u)` y `CERTS_GID=$(id -g)`. Con ellos `coordinator`, `redis` y `minio` corren con ese UID para leer `server.key` (0600); no se probó con las imágenes reales. A cada worker copia **solo** `ca.pem` (nunca `ca.key` ni `server.key`) y fija `TLS_CA_FILE` con su ruta en su `.env`.
+En el `.env` del Nodo A: `CERTS_DIR` (la misma ruta), `CERTS_UID=$(id -u)` y `CERTS_GID=$(id -g)`. Con ellos `coordinator`, `redis` y `minio` corren con ese UID para leer `server.key` (0600); se probó con las imágenes reales en una sola máquina ([evidencia](evidencia/F-27_servidores_tls_local_2026-11-11.md)). `redis-data-init` ajusta la propiedad del volumen de Redis a ese UID. A cada worker copia **solo** `ca.pem` (nunca `ca.key` ni `server.key`) y fija `TLS_CA_FILE` con su ruta en su `.env`.
 
 ```bash
 tailscale ip -4    # debe coincidir con NODE_IP
@@ -378,6 +378,8 @@ Casos aleatorios adicionales, de 100 a 500, con archivos del manifiesto ya subid
 python -m scripts.generate_dataset --url https://<IP_TAILSCALE_NODO_A>:8443 --seed 1
 python -m scripts.generate_dataset --dry-run    # solo muestra los payloads
 ```
+
+Con TLS activo el Nodo A sirve `https://...:8443`, pero `dashboard/app.py` (campo «URL del servidor») y el valor por defecto de `--url` en `scripts/generate_dataset.py` siguen en `http://localhost:8000`. No cambian: fija la URL `https://<IP_TAILSCALE_NODO_A>:8443`. Los scripts que usan `src/infrastructure/tls.py` (`submit_case`, `generate_dataset`) leen `TLS_CA_FILE`; el dashboard usa `requests` directo y necesita `REQUESTS_CA_BUNDLE=<ruta de ca.pem>`.
 
 ### Monitorear
 
