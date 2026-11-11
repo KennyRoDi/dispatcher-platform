@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-22-1-chunks-verificados
 **Verificación IA:** tests 427f2c7
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
@@ -201,3 +201,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-10 | Revisor (subagente, contexto nuevo): APROBADO. Diff de la parte 1 cumple el SPEC; sin errores de logica en src; capas y sin llaves. Orquestador: 268 lineas, suite 1086 verde, conformidad 0, bitacora publicada. Autoria: 6 commits aplicados con git am pasaron a Melany Vindas conservando fechas y contenido (rebase con --exec); los hashes anteriores en la tabla de aprobaciones quedan como referencia historica. Pendientes para la parte 2: ResourceWarning en tests/contratos.py:71 y mapeo de ValueError/UploadNotFound. Verificacion independiente. (2f2f6c0) |
 | revision | Melany Vindas | 2026-11-10 |  |
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente: orquestador escribio las pruebas, verificacion no independiente. Diff solo en tests/ (444 lineas). Rojo por falta de funcionalidad: rutas_archivos y subir_por_chunks no existen; 4 de test_chunks fallan con DID NOT RAISE (H2). Resto de la suite en verde. Contra un borrador no confirmado: rutas y cliente 41/41, integracion 200 MiB 2/2 con uvicorn real, suite 1129 verde. ResourceWarning corregido. Conformidad 0. (427f2c7) |
+| tests | Melany Vindas | 2026-11-11 |  |
