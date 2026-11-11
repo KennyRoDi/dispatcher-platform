@@ -229,6 +229,27 @@ def test_from_config_carga_en_cpu_con_la_revision_compute_type_e_hilos_del_confi
     assert opciones.get("revision") == "b" * 40
 
 
+def test_from_config_permite_fijar_hilos_intra_op_y_workers_inter_op(monkeypatch, tmp_path):
+    falso = FasterWhisperFalso().instalar(monkeypatch)
+
+    WhisperTranscriber.from_config(
+        escribir_config(tmp_path / "audio.toml", hilos=6), num_workers=3, hilos=1
+    )
+
+    [(_, opciones)] = falso.cargados
+    assert opciones.get("cpu_threads") == 1
+    assert opciones.get("num_workers") == 3
+
+
+def test_from_config_rechaza_override_de_hilos_no_positivo(monkeypatch, tmp_path):
+    falso = FasterWhisperFalso().instalar(monkeypatch)
+
+    with pytest.raises(ValueError, match="hilos"):
+        WhisperTranscriber.from_config(escribir_config(tmp_path / "audio.toml"), hilos=0)
+
+    assert falso.cargados == []
+
+
 def test_from_config_usa_idioma_y_beam_size_del_config_al_transcribir(monkeypatch, tmp_path, nota):
     modelo = FakeWhisperModel([FakeSegment(0.0, 1.0, " hola", -0.1)])
     modulo = types.ModuleType("faster_whisper")

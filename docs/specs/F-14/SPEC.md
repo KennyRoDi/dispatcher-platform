@@ -90,7 +90,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 |---|---|---|
 | 1 | `feat(F-14): política de alertas y decoradores de publicación` | `src/domain/alert_policy.py`, `src/application/alerting.py`; pruebas unitarias con `FakeAlertPublisher` y `FakeFindingStore` (~140 líneas) |
 | 2 | `feat(F-14): Stream de alertas en Redis y ruta GET /alerts` | puerto `AlertReader` en `ports.py`, `redis_alert_stream.py`, `rutas_alertas.py`, línea en `main.py`, `FakeAlertReader` y pruebas de contrato; integración con Redis; fila nueva en `docs/CONTRATOS.md` (~150 líneas) |
-| 3 | `feat(F-14): alerta al cerrar el caso y evidencia de la prueba A` | llamada protegida en `rutas_subtareas.report_subtask`, prueba de integración y de aceptación, marcas de tiempo de ejemplo en `docs/ejemplos/`, AD-39 y SUP-35 en los documentos, bitácora (~25 líneas) |
+| 3 | `feat(F-14): alerta al cerrar el caso y evidencia de la prueba A` | llamada protegida en `rutas_subtareas.report_subtask`, prueba de integración y de aceptación, prueba de aceptación que escribe las marcas de tiempo de ejemplo solo si se define `F14_EJEMPLO_JSON` (no se versiona JSON de ejemplo), AD-39 y SUP-35 en los documentos, bitácora (~25 líneas) |
 
 Las partes 2 y 3 se apilan sobre la anterior porque usan sus tipos; la parte 1 sale de `main`. No depende de F-13 (solo usa el puerto `FindingStore` de `main`) ni de F-26.
 

@@ -12,6 +12,10 @@ from src.application.alerting import SafeAlertPublisher
 from src.coordinator import conexion, rutas_alertas
 from tests.dobles import FakeClock
 
+
+pytestmark = pytest.mark.usefixtures("sin_autorizacion")
+
+
 INICIO = datetime(2026, 11, 3, 8, 0, tzinfo=timezone.utc)
 ESTAMPA = "2026-01-01T00:00:00+00:00"
 

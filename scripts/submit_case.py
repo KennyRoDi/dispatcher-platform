@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -101,10 +102,16 @@ def upload_plan(storage, plan: list[tuple[Path, str]], prefix: str, bucket: str)
     return keys_ops
 
 
-def resolve_session(coordinator_url: str, session=None) -> requests.Session:
+def resolve_session(coordinator_url: str, session=None, env=None) -> requests.Session:
     tls = TlsSettings.from_env()
     exigir_cifrado(tls, coordinator_url=coordinator_url)
-    return session if session is not None else requests_session(tls)
+    if session is not None:
+        return session
+    sesion = requests_session(tls)
+    token = (os.environ if env is None else env).get("API_TOKEN", "").strip()
+    if token:
+        sesion.headers["Authorization"] = f"Bearer {token}"
+    return sesion
 
 
 def submit_case(coordinator_url: str, keys_ops: list[tuple[str, str]], session=None, priority: str = "normal") -> dict:

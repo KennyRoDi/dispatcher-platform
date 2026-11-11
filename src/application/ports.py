@@ -51,6 +51,11 @@ class FindingStore(Protocol):
 
 
 @runtime_checkable
+class OmissionAwareFindingStore(FindingStore, Protocol):
+    def list_with_omitted(self, case_id: str) -> tuple[list[Finding], int]: ...
+
+
+@runtime_checkable
 class CaseCatalog(Protocol):
     def case(self, case_id: str) -> CaseInfo | None: ...
 

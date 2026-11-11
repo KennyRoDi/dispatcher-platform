@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, timezone
 
+# redis-py no ofrece forma pública de leer sin decodificar con decode_responses=True; su propio
+# código usa esta constante interna (commands/core.py). Una prueba avisa si deja de existir.
 from redis.client import NEVER_DECODE
 
 from src.domain.alert_policy import StoredAlert
@@ -36,8 +38,10 @@ class RedisAlertStream:
         try:
             return self._client.xrevrange(self._key, count=limit)
         except UnicodeDecodeError:
-            # Una entrada ajena con bytes no UTF-8 tira la lectura decodificada; se relee en crudo y _decode la descarta.
-            return self._client.execute_command("XREVRANGE", self._key, "+", "-", "COUNT", limit, **{NEVER_DECODE: True})
+            # Bytes no UTF-8 de una entrada ajena rompen la lectura decodificada: se relee en crudo.
+            return self._client.execute_command(
+                "XREVRANGE", self._key, "+", "-", "COUNT", limit, **{NEVER_DECODE: True}
+            )
 
 
 def _text(value) -> str:

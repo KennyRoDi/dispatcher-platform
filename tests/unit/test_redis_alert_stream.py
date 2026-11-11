@@ -146,3 +146,10 @@ def test_publicador_seguro_absorbe_un_redis_caido_y_lo_registra(servidor, redis_
     with caplog.at_level(logging.ERROR, logger="test.alertas"):
         seguro.publish("incidencia_alta", "c1", "{}")
     assert "c1" in caplog.text or "incidencia_alta" in caplog.text
+
+
+def test_la_relectura_en_crudo_depende_de_una_constante_de_redis_py_no_publica():
+    # redis.client.NEVER_DECODE no es API pública; si desaparece o cambia, esta prueba avisa antes que la relectura.
+    import redis.client
+
+    assert redis.client.NEVER_DECODE == "NEVER_DECODE"

@@ -1,3 +1,5 @@
+import logging
+
 import redis
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -7,9 +9,9 @@ from src.application.build_report import CaseNotFound, build_report
 from src.application.ports import CaseCatalog, Clock, FindingStore, ObjectStore
 from src.application.report_json import report_to_dict
 from src.coordinator import conexion
-from src.coordinator.conexion import redis_unavailable
 from src.infrastructure.clock import SystemClock
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -43,5 +45,7 @@ def consolidated_report(
         return report_to_dict(build_report(case_id, hallazgos, catalogo, almacen, reloj))
     except CaseNotFound:
         raise HTTPException(status_code=404, detail=f"Caso '{case_id}' no encontrado.")
-    except (redis.exceptions.ConnectionError, redis.exceptions.TimeoutError) as error:
-        raise redis_unavailable(error)
+    except redis.exceptions.RedisError as error:
+        # conexion.redis_unavailable filtra host, puerto y texto de la excepción al cliente.
+        logger.error("Redis no disponible al armar el reporte de %s: %s", case_id, type(error).__name__)
+        raise HTTPException(status_code=503, detail="Redis no está disponible.")

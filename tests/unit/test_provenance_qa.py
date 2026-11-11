@@ -3,11 +3,6 @@ import pytest
 from src.domain.provenance import SourceRecord, validate_provenance
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AttributeError,
-    reason="QA F-04 parte 2: licencia no str (5, b'MIT', ['MIT']) lanza AttributeError opaco en vez de un defecto con la ruta",
-)
 @pytest.mark.parametrize("license_value", [5, b"MIT", ["MIT"]])
 def test_licencia_que_no_es_texto_da_un_defecto_con_la_ruta(license_value):
     defects = validate_provenance([SourceRecord("a.png", "sintetico", license_value)])
@@ -16,11 +11,6 @@ def test_licencia_que_no_es_texto_da_un_defecto_con_la_ruta(license_value):
     assert defects[0].startswith("a.png: ")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AttributeError,
-    reason="QA F-04 parte 2: origen no str (5, b'x') lanza AttributeError opaco en vez de un defecto con la ruta",
-)
 @pytest.mark.parametrize("origin_value", [5, b"propio"])
 def test_origen_que_no_es_texto_da_un_defecto_con_la_ruta(origin_value):
     defects = validate_provenance([SourceRecord("a.png", origin_value, "MIT")])
