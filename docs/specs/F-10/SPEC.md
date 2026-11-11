@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-10-2-estados-y-cierre
-**Verificación IA:** revision d8ad108
+**Verificación IA:** tests fac4079
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -113,3 +113,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 2: diff (puerto CaseStateStore, ReportSubtask, doble, contrato) cubre el plan de pila; capas respetadas, 24 pruebas verdes; bitácora veraz con errores de IA. Nota: SPEC describe mark_reported sin outcome, la implementación lo añade (declarado en verificación de tests) (d8ad108) |
 | revision | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de tests | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 3 tests: 4 archivos (adaptador Redis con contrato, delegación de rutas, concurrente I, 7 estados A); en rojo por ImportError de redis_case_state, sin código de producción (fac4079) |
