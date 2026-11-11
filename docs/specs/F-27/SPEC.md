@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-27-1-tls-entre-nodos
 **Verificación IA:** documentacion 1a041d5
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -187,3 +187,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 24a04cf: 12 xfail, 11 corregidos y desmarcados; queda 1 declarado como limite (Storage con cliente inyectado). Sin defectos altos. Redis/MinIO reales NO probados (sin Docker, por orden de una historia a la vez); handshake probado con servidor TLS stub de stdlib segun QA. Puntos en claro restantes: dashboard/ui.py:56 y healthcheck http://localhost:8000 del compose (parte 3). (cdc8c52) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC y modulo-M4); rama alineada con origen. Salidas pendientes, sin inventar. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (1a041d5) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
