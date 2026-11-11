@@ -4,7 +4,7 @@
 import math
 import re
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -43,8 +43,14 @@ class WhisperTranscriber:
         self.config = config
 
     @classmethod
-    def from_config(cls, ruta_config: Path, num_workers: int = 1) -> "WhisperTranscriber":
+    def from_config(
+        cls, ruta_config: Path, num_workers: int = 1, hilos: int | None = None
+    ) -> "WhisperTranscriber":
         config = cargar_config_de_audio(ruta_config)
+        if hilos is not None:
+            if type(hilos) is not int or hilos <= 0:
+                raise ValueError("hilos debe ser un entero positivo")
+            config = replace(config, hilos=hilos)
         # Importación diferida: las unitarias y el resto del worker no cargan faster-whisper, CTranslate2 ni PyAV.
         from faster_whisper import WhisperModel
 
