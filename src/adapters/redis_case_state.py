@@ -1,8 +1,11 @@
 from datetime import datetime, timezone
 
+from redis.exceptions import WatchError
+
 from src.domain.case_state import CaseState
 
 _OUTCOMES = {"completed", "failed"}
+_TERMINAL = {CaseState.COMPLETED, CaseState.PARTIALLY_COMPLETED, CaseState.FAILED, CaseState.CANCELLED}
 
 
 class RedisCaseState:
@@ -28,11 +31,22 @@ class RedisCaseState:
         except ValueError:
             return None
 
-    def set_state(self, case_id: str, nuevo: CaseState, at: datetime) -> None:
-        pipe = self._client.pipeline(transaction=True)
-        pipe.hset(f"case:{case_id}", "status", nuevo.value)
-        pipe.rpush(f"case:{case_id}:state_history", f"{nuevo.value}|{at.astimezone(timezone.utc).isoformat()}")
-        pipe.execute()
+    def set_state(self, case_id: str, nuevo: CaseState, at: datetime) -> bool:
+        key = f"case:{case_id}"
+        entry = f"{nuevo.value}|{at.astimezone(timezone.utc).isoformat()}"
+        with self._client.pipeline() as pipe:
+            while True:
+                try:
+                    pipe.watch(key)
+                    if self.state(case_id) in _TERMINAL:
+                        return False
+                    pipe.multi()
+                    pipe.hset(key, "status", nuevo.value)
+                    pipe.rpush(f"{key}:state_history", entry)
+                    pipe.execute()
+                    return True
+                except WatchError:
+                    continue
 
     def history(self, case_id: str) -> list[tuple[CaseState, datetime]]:
         entries = self._client.lrange(f"case:{case_id}:state_history", 0, -1)

@@ -74,3 +74,19 @@ def test_mark_reported_rechaza_resultado_desconocido_sin_registrarlo(redis_falso
 def test_estado_con_valor_corrupto_no_rompe_la_lectura(redis_falso):
     redis_falso.hset("case:c1", mapping={"status": "inventado"})
     assert RedisCaseState(redis_falso).state("c1") is None
+
+
+def test_segundo_cierre_terminal_no_se_aplica_ni_duplica_historial(redis_falso):
+    almacen = RedisCaseState(redis_falso)
+    assert almacen.set_state("c1", CaseState.PROCESSING, INICIO) is True
+    assert almacen.set_state("c1", CaseState.COMPLETED, INICIO) is True
+    assert almacen.set_state("c1", CaseState.FAILED, INICIO) is False
+    assert almacen.state("c1") is CaseState.COMPLETED
+    assert [e for e, _ in almacen.history("c1")] == [CaseState.PROCESSING, CaseState.COMPLETED]
+
+
+def test_identificador_de_subtarea_repetido_con_hilos_cuenta_una_vez(redis_falso):
+    almacen = RedisCaseState(redis_falso)
+    for _ in range(3):
+        almacen.mark_reported("c1", "s1", "completed")
+    assert almacen.counts("c1") == (1, 0)
