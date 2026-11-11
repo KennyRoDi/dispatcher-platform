@@ -55,7 +55,7 @@ def test_seal_rechaza_campos_que_verify_no_aceptaria(llave, valor):
 
 
 @pytest.mark.xfail(strict=True, reason="QA-4: ensure_ascii=False deja U+2028/U+0085 sin escapar y splitlines() parte la linea")
-@pytest.mark.parametrize("separador", [" ", " ", "\x85", "\x0b", "\x0c", "\x1c"])
+@pytest.mark.parametrize("separador", ["\u2028", "\u2029", "\x85"])
 def test_la_linea_no_se_parte_con_splitlines(llave, separador):
     entrada = seal(llave, GENESIS_HASH, 0, {**campos(0), "actor": f"a{separador}b"})
 
