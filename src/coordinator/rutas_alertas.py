@@ -13,12 +13,16 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-def obtener_lector_alertas() -> AlertReader:
+def crear_flujo_alertas() -> RedisAlertStream:
     return RedisAlertStream(conexion.redis_client, SystemClock())
 
 
+def obtener_lector_alertas() -> AlertReader:
+    return crear_flujo_alertas()
+
+
 def obtener_publicador_alertas() -> AlertPublisher:
-    return SafeAlertPublisher(RedisAlertStream(conexion.redis_client, SystemClock()), logger)
+    return SafeAlertPublisher(crear_flujo_alertas(), logger)
 
 
 @router.get("/alerts", response_model=dict, tags=["Alerts"])
