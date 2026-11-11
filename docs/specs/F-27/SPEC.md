@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-27-1-tls-entre-nodos
-**Verificación IA:** tests 30fcac4
+**Verificación IA:** implementacion 5be25e1
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -167,3 +167,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (test_tls_cableado.py, tests/conftest.py nuevo) y SPEC; src y scripts intactos. Ejecute test_tls_cableado: ver resultado arriba (fallos por razon correcta segun developer: 23 fallan, 8 pasan de TLS apagado/cliente inyectado). Aviso: tests/conftest.py tambien lo crea la rama de F-26 parte 3: conflicto al fusionar. Sin cubrir: demo_feeder, fetch_results, seed_minio, generate_dataset. Implementacion tocara archivos de Jose (config.py, reporter.py, storage.py), conexion.py (Nahum) y 3 scripts: avisar antes de fusionar. (30fcac4) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: 7 archivos de src/scripts (+67/-22), tests intactos. Suite completa tras 5be25e1: 1895 passed, 8 skipped, 3 xfailed. Toca archivos de Jose (config, reporter, storage), conexion.py (Nahum) y 3 scripts: avisar. Limites: Reporter rechaza http con TLS activo aunque se inyecte sesion; Storage no comprueba con cliente inyectado; demo_feeder, fetch_results, seed_minio, generate_dataset quedan en claro. Sin prueba real contra servicios. (5be25e1) |
