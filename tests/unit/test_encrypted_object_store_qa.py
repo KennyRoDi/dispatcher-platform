@@ -103,7 +103,6 @@ class AlmacenConFlujo(FakeObjectStore):
         return self.flujo
 
 
-@pytest.mark.xfail(strict=True, reason="tras un fallo de autenticacion el lector devuelve lo ya descifrado como valido")
 def test_un_error_de_autenticacion_no_se_convierte_en_lectura_parcial_valida():
     almacen, inner = _almacen()
     sha = _guardar(almacen, os.urandom(4 * CHUNK))
@@ -115,7 +114,6 @@ def test_un_error_de_autenticacion_no_se_convierte_en_lectura_parcial_valida():
         lector.read(100)
 
 
-@pytest.mark.xfail(strict=True, reason="el lector no implementa readinto: file_digest y BufferedReader fallan")
 def test_el_lector_sirve_para_file_digest_y_bufferedreader():
     almacen, _ = _almacen()
     contenido = os.urandom(5 * CHUNK + 3)
@@ -124,7 +122,6 @@ def test_el_lector_sirve_para_file_digest_y_bufferedreader():
     assert io.BufferedReader(almacen.open(sha)).read() == contenido
 
 
-@pytest.mark.xfail(strict=True, reason="read tras close devuelve datos en vez de ValueError")
 def test_read_tras_close_falla():
     almacen, _ = _almacen()
     sha = _guardar(almacen, os.urandom(3 * CHUNK))
@@ -134,7 +131,6 @@ def test_read_tras_close_falla():
         lector.read(5)
 
 
-@pytest.mark.xfail(strict=True, reason="si close del flujo interno falla, el lector queda abierto")
 def test_close_con_fallo_del_flujo_interno_deja_el_lector_cerrado():
     class Roto(AlmacenConFlujo):
         def open(self, sha256):
@@ -159,7 +155,6 @@ def test_close_con_fallo_del_flujo_interno_deja_el_lector_cerrado():
     assert lector.closed
 
 
-@pytest.mark.xfail(strict=True, reason="cada read(n) copia el chunk pendiente: costo cuadratico con lecturas pequenas")
 def test_leer_en_bloques_pequenos_cuesta_lo_mismo_que_leer_todo(tmp_path):
     chunk = 4 * MIB
     almacen, _ = _almacen(chunk_size=chunk)
