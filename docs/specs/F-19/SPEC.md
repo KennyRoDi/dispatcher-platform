@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** verificacion 55915e7
+**Verificación IA:** documentacion 8fda877
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de verificacion | Codex | 2026-11-10 | QA confirma criterios y hallazgo Windows resuelto: la suite Linux con Whisper real pasó 5/5 en Docker; la integración de procesos se omite correctamente en Windows (5 skipped). 51 unitarias ya verdes, sin repetir. Sin diferencia ni pérdida de resultados en código de proceso. Revisión misma sesión, no independiente; límites y fallo fork constan en QA-parte-2.md. (55915e7) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de documentacion | Codex | 2026-11-10 | Documentación parte 2 verificada: QA-parte-2 registra fork fallido, alternativa Linux 5 passed y omisión correcta en Windows (5 skipped); SPEC enlaza informe y delimita evidencia. Bitácora F-19 ya publicada por flujo.py. Sin cifras inventadas. Verificación documental same-session, no independiente. (8fda877) |
