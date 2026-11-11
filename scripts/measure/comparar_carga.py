@@ -207,16 +207,11 @@ def _arguments(argv=None):
     parser.add_argument("--solo-validar", action="store_true")
     parser.add_argument("--salida", type=Path, required=True)
     args = parser.parse_args(argv)
-    if args.hilos <= 0 or args.repeticiones <= 0 or args.timeout <= 0:
-        parser.error("hilos, repeticiones y timeout deben ser positivos")
-    if any(type(count) is not int or count <= 0 for count in args.procesos):
-        parser.error("procesos debe contener enteros positivos")
-    if set(args.estrategias) != set(ESTRATEGIAS):
+    if min(args.hilos, args.repeticiones, args.timeout) <= 0: parser.error("hilos, repeticiones y timeout deben ser positivos")
+    if any(count <= 0 for count in args.procesos): parser.error("procesos debe contener enteros positivos")
+    if set(args.estrategias) != set(ESTRATEGIAS) or len(args.estrategias) != len(ESTRATEGIAS):
         parser.error("deben indicarse ambas estrategias")
-    if len(args.estrategias) != len(ESTRATEGIAS):
-        parser.error("cada estrategia debe indicarse una vez")
-    if not args.config.is_file() or not args.entrada.is_file():
-        parser.error("config y entrada deben existir")
+    if not all(path.is_file() for path in (args.config, args.entrada)): parser.error("config y entrada deben existir")
     return args
 
 
@@ -229,13 +224,11 @@ def _run(args):
         factory = _transcriber_factory(args.config, args.hilos)
         runner = MeasurementRunner(factory, args.timeout, args.cgroup)
         runs = []
-        counts = [args.procesos[0]] if args.solo_validar else args.procesos
-        repeats = 1 if args.solo_validar else args.repeticiones
-        strategies = args.estrategias
+        counts, repeats = ([args.procesos[0]], 1) if args.solo_validar else (args.procesos, args.repeticiones)
         for workers in counts:
             for repetition in range(1, repeats + 1):
                 by_strategy = {}
-                for strategy in strategies:
+                for strategy in args.estrategias:
                     outputs, snapshots, baseline = runner.run(
                         strategy, workers, args.entrada, measure=not args.solo_validar
                     )
@@ -249,17 +242,14 @@ def _run(args):
 
 def _record_run(strategy, workers, repetition, outputs, snapshots, baseline):
     return {
-        "strategy": strategy,
-        "workers": workers,
-        "repetition": repetition,
+        "strategy": strategy, "workers": workers, "repetition": repetition,
         "outputs": [[asdict(segment) for segment in result] for result in outputs],
         "baseline": asdict(baseline) if baseline is not None else None,
         "snapshots": [
             {
                 "stage": snapshot.stage,
                 "pids": {str(pid): asdict(memory) for pid, memory in snapshot.pids.items()},
-                "rss_bytes": snapshot.rss_bytes,
-                "pss_bytes": snapshot.pss_bytes,
+                "rss_bytes": snapshot.rss_bytes, "pss_bytes": snapshot.pss_bytes,
                 "cgroup": asdict(snapshot.cgroup),
             }
             for snapshot in snapshots
@@ -275,10 +265,7 @@ def _write_output(args, runs):
         "node": platform.node(),
         "kernel": platform.release(),
         "python": sys.version,
-        "versions": {
-            name: importlib.metadata.version(name)
-            for name in ("faster-whisper", "ctranslate2", "av")
-        },
+        "versions": {name: importlib.metadata.version(name) for name in ("faster-whisper", "ctranslate2", "av")},
         "config": asdict(model_config),
         "input_sha256": hashlib.sha256(args.entrada.read_bytes()).hexdigest(),
         "runs": runs,
@@ -294,40 +281,28 @@ def summarize_runs(runs):
     for run in runs:
         baseline = run["baseline"]["memory_current"] if run["baseline"] else None
         for snapshot in run["snapshots"]:
-            grouped[(run["strategy"], run["workers"], snapshot["stage"])].append(
-                {
-                    "rss_bytes": snapshot["rss_bytes"],
-                    "pss_bytes": snapshot["pss_bytes"],
-                    "memory_current_bytes": snapshot["cgroup"]["memory_current"],
-                    "memory_current_delta_bytes": (
-                        snapshot["cgroup"]["memory_current"] - baseline
-                        if baseline is not None else None
-                    ),
+            cgroup = snapshot["cgroup"]["memory_current"]
+            grouped[(run["strategy"], run["workers"], snapshot["stage"])].append({
+                "rss_bytes": snapshot["rss_bytes"],
+                "pss_bytes": snapshot["pss_bytes"],
+                "memory_current_bytes": cgroup,
+                "memory_current_delta_bytes": cgroup - baseline if baseline is not None else None,
+            })
+    return [
+        {
+            "strategy": strategy, "workers": workers, "stage": stage,
+            "repetitions": len(values),
+            "metrics": {
+                metric: {
+                    "mean": sum(numbers) / len(numbers), "min": min(numbers),
+                    "max": max(numbers), "range": max(numbers) - min(numbers),
                 }
-            )
-    summaries = []
-    for (strategy, workers, stage), values in sorted(grouped.items()):
-        metrics = {}
-        for metric in values[0]:
-            numbers = [value[metric] for value in values if value[metric] is not None]
-            if not numbers:
-                continue
-            low, high = min(numbers), max(numbers)
-            metrics[metric] = {
-                "mean": sum(numbers) / len(numbers),
-                "min": low,
-                "max": high,
-                "range": high - low,
-            }
-        summaries.append(
-            {"strategy": strategy, "workers": workers, "stage": stage,
-             "repetitions": len(values), "metrics": metrics}
-        )
-    return summaries
-
-
-def main():
-    _run(_arguments())
+                for metric in values[0]
+                if (numbers := [value[metric] for value in values if value[metric] is not None])
+            },
+        }
+        for (strategy, workers, stage), values in sorted(grouped.items())
+    ]
 
 
 def _handle_sigterm(_signum, _frame):
@@ -335,4 +310,4 @@ def _handle_sigterm(_signum, _frame):
 
 
 if __name__ == "__main__":
-    main()
+    _run(_arguments())
