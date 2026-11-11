@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 767ac98
+**Verificación IA:** tests 5c51d61
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -61,3 +61,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code | 2026-11-10 | SPEC sin campos pendientes; 2 PR; verificación no independiente (sin subagente) (767ac98) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | pytest tests/unit/test_process_supervisor.py -q | 2026-11-10 | 6 pruebas con dobles fallan por ModuleNotFoundError (falta process_supervisor); 4 con sleep real saltadas en Windows (requieren WSL2), no ejecutadas. Sin código de implementación. Verificación NO independiente: sin subagente. (5c51d61) |
