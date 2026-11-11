@@ -1,7 +1,7 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-22-1-chunks-verificados
 **Verificación IA:** revision 2f2f6c0
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
