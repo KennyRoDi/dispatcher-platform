@@ -22,3 +22,4 @@ servidor_central.log
 
 # Pesos de modelos: se descargan aparte y se verifican por sha256 (F-08)
 *.pt
+*.custody-key
