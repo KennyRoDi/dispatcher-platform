@@ -1,8 +1,8 @@
 # SPEC F-13: Reporte consolidado
 
-**Fase:** pr
-**Base:** feat/F-13-1-reporte-consolidado
-**Verificación IA:** revision 3067dd4
+**Fase:** cerrada
+**Base:** feat/F-13-2-reporte-consolidado
+**Verificación IA:** revision 3c44e26
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -17,7 +17,7 @@ Que el analista consulte, para un caso, un reporte JSON con hallazgos, categorí
 - Adaptadores Redis de `FindingStore` (escritura y lectura; lo prometido en `docs/CONTRATOS.md` a Kenni) y de `CaseCatalog` (solo lectura de los hashes del coordinador).
 - Ruta `GET /cases/{case_id}/consolidated-report` en un archivo nuevo, con una línea `include_router` en `main.py`.
 - Serialización a JSON separada del dominio (refactor de IMPLEMENTACION §4).
-- JSON de ejemplo sintético en `docs/evidencia/` como evidencia de la prueba A.
+- JSON de ejemplo sintético en `docs/ejemplos/` (generado por la prueba de aceptación con `F13_EJEMPLO_JSON`) como evidencia de la prueba A.
 
 **No incluye:**
 - Cablear a los workers para que escriban hallazgos en el `FindingStore` (código de José, `src/workers/`); queda como contacto declarado, ver preguntas.
@@ -138,4 +138,17 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 2 en AD-38 (solo docs/ARQUITECTURA.md); bitacora en estado; sin cambios de codigo (e207627) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 2: 181 lineas src, capas ok, CaseCatalog con contrato y doble, limites AD-38 coinciden; 4 menores no bloqueantes anotados en CLAUDE.md local (3067dd4) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | orquestador | 2026-11-11 | Diff solo tests (dc12d33), src intacto; 4 modulos nuevos fallan en coleccion con ModuleNotFoundError (rojo); hash real de subtarea trae task_type, no kind: implementacion debe leer kind con respaldo task_type (dc12d33) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de implementacion | pytest + revision | 2026-11-11 | Adaptadores Redis y ruta implementados (13afce3, 133 lineas src); suite verde; obtener_almacen responde 503 hasta F-23; JSON de ejemplo sintetico en docs/ejemplos (13afce3) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: Redis caido da 500 (debe 503), hallazgo corrupto tumba reporte, fuente por file_path sale con sha vacio, fechas malformadas, bytes no UTF-8, case_id que colisiona con claves de lista |
+| verificación IA de implementacion | orquestador | 2026-11-11 | 14 hallazgos QA corregidos en 12e1d1a; suite verde; una asercion cambiada por error real (test_error_500); toca build_report.py de la parte 2 (_source con replace); hallazgos corruptos se omiten con warning de recuento (12e1d1a) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de verificacion | orquestador | 2026-11-11 | QA 14 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (4d3eaa2) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 3 en AD-38, nota del ejemplo, curl en DEMO.md, SPEC corregido a docs/ejemplos; bitacora en estado; sin cambios de codigo (eba8f45) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 3: 170 lineas src, case_id validado, ruta no pisa /report, limites AD-38 coinciden con codigo; 4 menores no bloqueantes anotados en CLAUDE.md local (3c44e26) |
 | revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada |

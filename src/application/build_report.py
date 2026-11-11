@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import timezone
 
 from src.application.analyze_audio import CATEGORIA_TRANSCRIPCION
@@ -96,4 +97,7 @@ def _source(case: CaseInfo, sha: str) -> CaseSource | None:
         return None
     # El almacén es direccionado por contenido: file_path igual al sha256 identifica la fuente si falta source_sha256.
     by_hash = next((s for s in case.sources if s.sha256 == sha), None)
-    return by_hash or next((s for s in case.sources if s.file_path == sha), None)
+    if by_hash:
+        return by_hash
+    by_path = next((s for s in case.sources if s.file_path == sha), None)
+    return replace(by_path, sha256=sha) if by_path else None
