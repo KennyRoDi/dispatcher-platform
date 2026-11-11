@@ -72,7 +72,7 @@ Derivados del enunciado y de este diseño:
 - **Solo espacios exteriores.** Se recorta con `str.strip`; un relleno con espacio interior doble, NBSP o tabulador (`sin  licencia`) pasa como licencia válida (xfail, 3 casos).
 - **Caracteres invisibles.** Una licencia de solo `U+200B` o `U+FEFF` no cuenta como vacía y pasa (xfail, 3 casos).
 - **Rellenos fuera de la lista.** `N/A.`, `unknown` y `none` pasan con origen `sintetico` o `propio`, porque `rejected_licenses` es una lista cerrada que se amplía por política; solo una fuente `publico` los rechaza, y por no estar en `public_licenses`. Es consecuencia de SUP-27, que sigue provisional.
-- **`ProvenancePolicy` sin validación de tipos.** Una cadena en `admitted_origins` se recorre por caracteres (`"sintetico"` rechaza todo origen); un elemento no `str` da `AttributeError` y `None` da `TypeError`. No hay prueba.
+- **`ProvenancePolicy` sin validación de tipos.** Una cadena en `admitted_origins` se recorre por caracteres (`"sintetico"` rechaza todo origen); un elemento no `str` (p. ej. `5`) da `AttributeError`; un `None` o un elemento vacío en `admitted_origins` se normaliza a `""` y admite en silencio un origen vacío, y en `rejected_licenses` no falla. No hay prueba.
 
 **Reutilización.** Del I Proyecto no se toma código. Del repo se reutilizan `Finding` y las constantes de `src/adapters/media_generator.py` (`ORIGIN`, `LICENSE_NAME`, `POSITIVE`, `NEUTRAL`) solo en el adaptador, no en el dominio. El criterio VP/FP/FN/VN sigue a `scripts/aciertos_imagen.py`; no se importa.
 
