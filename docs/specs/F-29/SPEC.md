@@ -1,6 +1,6 @@
 # SPEC F-29: Cadena de custodia
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-29-1-cadena-de-custodia
 **Verificación IA:** verificacion 8c9a806
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
@@ -177,3 +177,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Ancla genesis: src y 13 pruebas nuevas; unico cambio en tests existentes: 2->3 en el conteo de os.replace (comprobado por diff). Suite completa tras 4106891: 1954 passed, 8 skipped, 6 xfailed. Developer reporta ademas una carrera al crear el log (1 de 60 corridas) cerrada en 4106891 (_create_log); el commit anterior estuvo empujado con la carrera. (4106891) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 8c9a806 sobre ancla genesis: solo tests nuevos (diff comprobado); archivo QA ejecutado: ver pytest. 4 xfail baja: ancla genesis determinista por llave, una copia de ella oculta truncado a 0/1 entradas (ampliar SUP-31); mensaje engañoso con log ausente y ancla ilegible. Sin carrera en 8 procesos/hilos x100 corridas (segun QA), recuperacion tras os._exit. Decision: declarar como limites. (8c9a806) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
