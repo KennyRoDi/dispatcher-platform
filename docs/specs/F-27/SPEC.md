@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-27-2-tls-entre-nodos
 **Verificación IA:** implementacion c54de78
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -195,3 +195,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (unit compose, unit generar_certs, integracion servicios reales) y SPEC; src y deploy intactos. Ejecute las 2 unitarias nuevas: ver resultado arriba (rojo por falta de implementacion; 9 son guardas que ya pasan). Integracion saltada sin RUN_DOCKER_TLS=1. Aviso: test_despliegue_compose.py (F-38) exige hoy puertos 8000/6379 y reaper http: la implementacion debe actualizarlo. Carpeta de certs de MinIO sin confirmar en doc oficial; preguntas 1 y 4 del SPEC sin comprobar. (6c42f4d) |
 | tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff: generar_certs.sh (40 lineas), docker-compose.yml, 2 compose, .env.example, .gitignore; sin llaves/certs versionados (git ls-files). Suite completa tras c54de78: 1965 passed, 9 skipped, 4 xfailed. Ediciones a tests existentes (comprobadas por diff): test_tls_compose (1 linea, regex de split) y test_despliegue_compose de F-38 (puertos 8000->8443, 6379->6380, http->https, 10 lineas). docker compose config -q valido segun developer (no repeti). SIN PROBAR con servicios reales: flags --tls de redis:7-alpine, --certs-dir de MinIO Chainguard, lectura de llaves 0600 por UID de cada imagen, healthcheck https del coordinador. (c54de78) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
