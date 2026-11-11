@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 93b09fb
+**Verificación IA:** verificacion 0ca579a
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de implementacion | Codex | 2026-11-10 | 42 unitarias de WhisperTranscriber (incluye hilos/num_workers), 16 unitarias de memoria/CLI y 8 unitarias del lector pasaron en Windows; la integración POSIX nueva se omite en Windows (3 skipped). git diff --check limpio; código de producción bajo 400 líneas. No se ejecutó ninguna medición: Docker daemon apagado y no hay acceso al nodo Linux/cgroup. Verificación misma sesión, no independiente. (93b09fb) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de verificacion | Codex | 2026-11-10 | PENDIENTE: unitarias focales ya verdes; integración POSIX requiere Linux. Docker npipe no existe y WSL devuelve E_ACCESSDENIED; no hay nodo Linux/cgroup v2 limitado. No se ejecutaron preflight ni repeticiones M1; QA-parte-3 documenta comandos y recurso faltante. No aprobar hasta lecturas reales PSS/memory.current. (0ca579a) |
