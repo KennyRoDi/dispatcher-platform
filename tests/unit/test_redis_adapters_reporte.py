@@ -120,6 +120,13 @@ def test_case_catalog_subtarea_sin_source_sha256_queda_con_sha_vacio_para_unir_p
     assert origen.sha256 == "" and origen.file_path == SHA_A
 
 
+def test_case_catalog_usa_task_type_cuando_la_subtarea_no_trae_kind(redis_falso):
+    sembrar_caso(redis_falso, caso([fuente()]))
+    redis_falso.hdel("subtask:c1-s0", "kind")
+    redis_falso.hset("subtask:c1-s0", "task_type", "extract_audio")
+    assert RedisCaseCatalog(redis_falso).case("c1").sources[0].kind == "extract_audio"
+
+
 def test_case_catalog_error_type_vacio_es_none(redis_falso):
     sembrar_caso(redis_falso, caso([fuente(error_type=None)]))
     assert RedisCaseCatalog(redis_falso).case("c1").sources[0].error_type is None
