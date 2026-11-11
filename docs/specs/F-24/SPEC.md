@@ -1,7 +1,7 @@
 # SPEC F-24: Backpressure
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
 **Verificación IA:** revision b7e0d357
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
