@@ -750,3 +750,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Sí: el orquestador leyó el diff, corrió pytest y conformidad; aprobaciones delegadas por la persona (modo autónomo) y sin segundo QA tras las correcciones |
 | Cómo se validó | Revisión del diff, pytest -q y scripts/conformidad.py; el hallazgo de JSON antes de autenticar queda abierto como xfail |
 | Error de la IA | El developer inicial aceptó exp/iat NaN o infinito, sub vacío y leyó JWT_SECRET_FILE sin acotar (FIFO) ni controlar UTF-8; lo detectó QA y se corrigió en 03bc4b2 |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-32 (`feat/F-32-1-routing-por-tipo-de-nodo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-32 |
+| Propósito | Plan, pruebas, implementacion, verificacion y documentacion de F-32 (routing por tipo de nodo) |
+| Consulta resumida | Disenar RoutingTable con alternativa y tabla validada, pruebas TDD y ficha M5 |
+| Resultado obtenido | RoutingTable, routing_config, config/routing.toml, 22 pruebas, AD-32 y seccion M5 con valores provisionales |
+| Validado / corregido / descartado | Pruebas en verde, verificacion QA, revision de diff por la persona |
+| Cómo se validó | Revision de cada fase y pruebas; medicion en nodos reales pendiente (F-38) |
+| Error de la IA | La IA acepto una ruta pasada como cadena ('cpu') y la expandia a ('c','p','u'); la verificacion QA lo detecto y ahora RoutingTable lanza ValueError (test_ruta_como_cadena_se_rechaza) |
