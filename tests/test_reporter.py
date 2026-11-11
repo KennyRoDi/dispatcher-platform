@@ -139,3 +139,24 @@ def test_flush_pending_empty_queue_returns_zero():
     reporter = make_reporter(redis_client)
 
     assert reporter.flush_pending() == 0
+
+
+@responses.activate
+def test_report_envia_el_token_de_servicio_si_esta_configurado():
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    ajustes = make_settings(WORKER_TOKEN="token-de-prueba")
+    reporter = Reporter(ajustes, redis_client, delays=(0,), sleep=lambda s: None)
+    responses.add(responses.POST, "http://coord/subtasks/report", json={"ok": True}, status=200)
+
+    assert reporter.report(make_payload()) is True
+    assert responses.calls[0].request.headers["Authorization"] == "Bearer token-de-prueba"
+
+
+@responses.activate
+def test_report_sin_token_configurado_no_envia_authorization():
+    redis_client = fakeredis.FakeRedis(decode_responses=True)
+    reporter = make_reporter(redis_client)
+    responses.add(responses.POST, "http://coord/subtasks/report", json={"ok": True}, status=200)
+
+    reporter.report(make_payload())
+    assert "Authorization" not in responses.calls[0].request.headers

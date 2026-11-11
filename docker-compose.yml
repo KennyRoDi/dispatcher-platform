@@ -79,6 +79,7 @@ services:
       TLS_CA_FILE: /certs/ca.pem
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      JWT_SECRET: ${JWT_SECRET:?define JWT_SECRET en .env (python -m scripts.generar_credenciales)}
     ports:
       - "${NODE_IP:?define NODE_IP en .env}:8443:8443"
     volumes:

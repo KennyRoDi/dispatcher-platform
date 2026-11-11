@@ -38,6 +38,8 @@ class Reporter:
         self.delays = delays
         self.timeout = timeout
         self.url = f"{settings.coordinator_url}/subtasks/report"
+        if settings.worker_token:
+            self.session.headers["Authorization"] = f"Bearer {settings.worker_token}"
 
     def _post(self, payload: dict) -> tuple[bool, bool]:
         """Attempt one POST. Returns (delivered, retryable_failure)."""

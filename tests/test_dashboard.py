@@ -202,3 +202,40 @@ def test_static_no_emoji_and_no_use_container_width():
         src = f.read_text(encoding="utf-8")
         assert not emoji.search(src), f
         assert "use_container_width" not in src, f
+
+
+def test_api_get_envia_api_token_como_bearer(monkeypatch):
+    from dashboard import ui
+
+    visto = {}
+
+    class Respuesta:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {"ok": True}
+
+    def falso_get(url, params=None, headers=None, timeout=None):
+        visto["headers"] = headers
+        return Respuesta()
+
+    monkeypatch.setattr(ui.requests, "get", falso_get)
+    monkeypatch.setenv("API_TOKEN", " tok ")
+    assert ui.api_get("http://c", "/stats") == ({"ok": True}, None)
+    assert visto["headers"] == {"Authorization": "Bearer tok"}
+
+    monkeypatch.delenv("API_TOKEN")
+    ui.api_get("http://c", "/stats")
+    assert visto["headers"] is None
+
+
+def test_api_get_explica_el_401_con_la_variable_a_definir(monkeypatch):
+    from dashboard import ui
+
+    class Respuesta:
+        status_code = 401
+
+    monkeypatch.setattr(ui.requests, "get", lambda *a, **k: Respuesta())
+    datos, error = ui.api_get("http://c", "/stats")
+    assert datos is None and "API_TOKEN" in error
