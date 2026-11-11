@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-10-1-estados-y-cierre
-**Verificación IA:** revision 5976303
+**Verificación IA:** tests 43edf58
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -103,3 +103,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; fase solo documental |
 | verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 1: diff cubre dominio de la parte 1 del plan de pila; caso de uso, puerto, Redis y cableado asignados a partes 2 y 3 del SPEC; AD-43 y SUP-39 sin duplicados; bitácora declara uso de IA (5976303) |
 | revision | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; revisión sin código nuevo |
+| verificación IA de tests | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: 10 pruebas unitarias de ReportSubtask, doble FakeCaseStateStore y comprobar_case_state_store; fallan por ImportError (puerto y caso de uso aún no existen). Firma mark_reported lleva outcome (3er arg) para poder contar fallidas. (43edf58) |
