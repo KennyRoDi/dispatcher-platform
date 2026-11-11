@@ -85,6 +85,14 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 4. ¿Se endurece también el servicio `worker` de `deploy/docker-compose.local.yml` (desarrollo), o solo `deploy/docker-compose.worker.yml`? Propuesta: ambos.
 5. Aceptación y ficha M4 requieren los tres nodos reales (José, Nahúm, Melany); sin ellos, la evidencia queda pendiente.
 
+## Límites declarados
+
+- El compose local pasó de `replicas: 3` a `worker-1..3` con volumen `scratch` propio, porque `WorkerNode._borrar_temporales_huerfanos` borra todo `WORK_DIR` al arrancar y réplicas con un volumen común se borraban entre sí (hallazgo de QA). Por ese cambio se editó el test existente `tests/test_scripts.py`.
+- El worker real con raíz de solo lectura **no se ejecutó**: no hay imagen local ni se hizo `pull`. Solo se validó `docker compose config` del compose local.
+- Los adaptadores ML (whisper, spaCy/HF, YOLO) escriben cachés en `~/.cache`. Hoy no están cableados en el worker; si se cablean, hará falta `HF_HOME`/`XDG_CACHE_HOME` apuntando a un volumen.
+- `_es_worker` del verificador es una heurística por nombre o `command` del servicio; `extends` no se resuelve.
+- La aceptación y la ficha M4 necesitan los tres nodos reales. Hasta tener datos medidos, el módulo M4 tiene máximo 2.
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
