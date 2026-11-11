@@ -1,6 +1,6 @@
 # SPEC F-12: Cancelación real
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion fa4b353
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
@@ -68,3 +68,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), sin subagentes: NO independiente | 2026-11-10 | pytest tests/unit/test_process_supervisor.py y test_arquitectura.py: 10 pasan, 4 POSIX reales omitidos (win32, sin WSL con python). SPEC sin mediciones. Prueba manual: cancel(pid) repetido o con pid desconocido lanza KeyError (hallazgo, fuera del SPEC). Diff 356 lineas. (66d5f1e) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de documentacion | git diff --stat; flujo.py verificar | 2026-11-10 | Documentador (haiku) no cambió nada: SPEC dice Mediciones No aplica y Sin decisión nueva (AD-09 ya existe); reutilizacion.md no existe; README sin cambio. Verificación no independiente: solo comprobé árbol limpio y SPEC. (fa4b353) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
