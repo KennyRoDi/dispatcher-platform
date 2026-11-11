@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-18-1-deteccion-de-oom
-**Verificación IA:** revision c445152
+**Verificación IA:** tests 3c99142
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
 
 ## Objetivo
@@ -71,3 +71,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de revision | Claude Code | 2026-11-10 | Revisión: diff coincide con SPEC parte 1 (oom_policy, read_memory_events, pruebas); APROBADO; no independiente (c445152) |
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de tests | Claude Code | 2026-11-10 | 5 pruebas nuevas en rojo, sin código; no independiente (3c99142) |
