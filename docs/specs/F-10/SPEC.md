@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-10-2-estados-y-cierre
 **Verificación IA:** revision e5fabe4
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Documentación parte 3: AD-43 actualizado con RedisCaseState, HSETNX/SADD, historial y WATCH; 40 corridas concurrentes; bitácora publicada con el error real de doble cierre; sin AD/SUP nuevos ni ids duplicados (6b048b9) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Revisión parte 3: diff contra origin/main cubre redis_case_state, historial, cableado de la ruta, prueba I y A de 7 estados; capas respetadas (arquitectura verde); bitácora declara IA y el error real de doble cierre; sin AD/SUP duplicados (e5fabe4) |
+| revision | José Andrés Loría Herrera | 2026-11-11 |  |
