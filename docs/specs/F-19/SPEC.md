@@ -74,6 +74,10 @@ Destino: `docs/evidencia/F-19/` para crudos y metadatos; `docs/modulo-M1-memoria
 
 En Docker Linux 29.7.2, Python 3.13.18, faster-whisper 1.2.1, PyAV 18.1.0 y CTranslate2 4.9.0, `fork_compartido` agotó el timeout de 120 s; con `hilos=1`, también agotó el timeout diagnóstico de 30 s. `workers_compartidos` pasó la prueba Linux con Whisper real N=2 y comparación completa de segmentos. Las 5 integraciones pasaron en 5.87 s; las 51 pruebas unitarias focales pasaron en Windows. Detalle y límites en [QA-parte-2.md](QA-parte-2.md). Esto acredita compatibilidad en ese entorno, no una medición de memoria ni una elección definitiva para M1.
 
+## Resultados de parte 3
+
+Implementación de lectura RSS/PSS/cgroup y CLI terminada; pruebas locales focales verdes. Las mediciones M1 siguen pendientes: Docker no está disponible, WSL está denegado y no hay nodo worker Linux accesible. Ver [QA-parte-3.md](QA-parte-3.md); AD-07 sigue provisional.
+
 ## Plan de pila
 
 Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
@@ -81,13 +85,13 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
 | 1 | `feat(F-19): seleccionar estrategia de carga de modelos` | Selección pura y protocolo de carga con operaciones inyectadas; unitarias y límite documentado. Hasta 150 líneas de producto. No acredita procesos ni memoria reales |
-| 2 | `feat(F-19): ejecutar carga por proceso y compartida con fork` | Supervisor Linux, ciclo de procesos y composición Whisper; prueba real obligatoria de igualdad/compatibilidad, fallos y recolección. Hasta 400 líneas de producto; base parte 1 |
+| 2 | `feat(F-19): ejecutar carga por proceso y compartida con workers CTranslate2` | Supervisor Linux, ciclo de procesos y composición Whisper; prueba real obligatoria de igualdad/compatibilidad, fallos y recolección. Hasta 400 líneas de producto; base parte 1 |
 | 3 | `feat(F-19): medir memoria y comparar estrategias de carga` | Lector RSS/PSS, CLI de validación/medición, crudos, ficha M1 y conclusión AD-07. Hasta 400 líneas de producto; base parte 2. Dividir antes de cerrar si excede el límite |
 
 ## Riesgos y preguntas abiertas
 
 - Aprobar o ajustar SUP-25: comparación inicial de Whisper CPU, sin generalizar a texto/imagen ni dar por medida la tabla completa de huellas M1.
-- Seguridad de fork con CTranslate2 no comprobada. Python advierte sobre hilos/fork ([os.fork](https://docs.python.org/3.14/library/os.html#os.fork)); faster-whisper expone paralelismo nativo ([fuente v1.2.1](https://github.com/SYSTRAN/faster-whisper/blob/v1.2.1/faster_whisper/transcribe.py)). Fijar un hilo no demuestra ausencia de hilos nativos. Si falla la puerta real, detenerse y proponer decisión humana.
+- `fork_compartido` se bloqueó con Whisper real; AD-07 lo sustituyó por `workers_compartidos`, soportado por `num_workers`/`inter_threads` y verificado en Linux. La elección final de AD-07 sigue pendiente de mediciones M1 válidas.
 - Confirmar acceso al nodo Linux/WSL2 con smaps/cgroup legibles y memoria limitada antes de parte 2. No se modifica `deploy/` ni se presume que Windows demuestre CoW.
 - N=1/N=2, cinco repeticiones, un hilo y timeout 120 s son parámetros propuestos, no capacidad medida ni política productiva. Registrar cualquier ajuste y pedir decisión si cambia el SPEC aprobado.
 - CoW puede perder ahorro durante inferencia; el supervisor añade memoria y se incluye. Un modelo, entrada y nodo no justifican una elección universal.
