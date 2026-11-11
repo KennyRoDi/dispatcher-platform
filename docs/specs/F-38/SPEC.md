@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 1f343ad
+**Verificación IA:** documentacion 10adc18
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -224,3 +224,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código |
 | verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte de evidencia; hallazgo real de la guia (variables F-17 omitidas) pasa a documentacion; captura real y Tailscale pendientes (1f343ad) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs revisadas: variables F-17 en .env.example y DEPLOY_WORKERS (nombres coinciden con config.py:196, env_file las pasa al worker), sin valores inventados; bitacora en estado (10adc18) |
