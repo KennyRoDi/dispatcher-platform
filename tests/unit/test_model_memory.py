@@ -14,7 +14,10 @@ def test_parse_smaps_rollup_convierte_rss_y_pss_de_kib_a_bytes():
     assert parse_smaps_rollup(texto) == ProcessMemory(rss_bytes=1_228_800, pss_bytes=819_200)
 
 
-@pytest.mark.parametrize("texto", ["Rss: 10 kB\n", "Rss: x kB\nPss: 2 kB\n"])
+@pytest.mark.parametrize(
+    "texto",
+    ["Rss: 10 kB\n", "Rss: x kB\nPss: 2 kB\n", "Rss: 2 kB\nPss: 10 kB\n"],
+)
 def test_parse_smaps_rollup_rechaza_lecturas_ausentes_o_invalidas(texto):
     with pytest.raises(ValueError):
         parse_smaps_rollup(texto)
@@ -46,4 +49,13 @@ def test_read_cgroup_memory_rechaza_limite_ausente_o_ilimitado(tmp_path):
     (tmp_path / "memory.swap.max").write_text("0\n", encoding="utf-8")
 
     with pytest.raises(ValueError):
+        read_cgroup_memory(tmp_path)
+
+
+def test_read_cgroup_memory_rechaza_swap_habilitado(tmp_path):
+    (tmp_path / "memory.current").write_text("4096\n", encoding="utf-8")
+    (tmp_path / "memory.max").write_text("16384\n", encoding="utf-8")
+    (tmp_path / "memory.swap.max").write_text("1024\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="memory.swap.max"):
         read_cgroup_memory(tmp_path)
