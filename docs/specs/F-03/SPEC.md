@@ -1,6 +1,6 @@
 # SPEC F-03: Dataset sintético
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-03-6-dataset-sintetico
 **Verificación IA:** documentacion 462d05e
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
@@ -211,3 +211,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA breve de 3cbe56f sin defectos nuevos. Ejecute pytest: 1591 passed, 7 skipped, 3 xfailed (pendientes aceptados 2,3,6). Sin commits nuevos desde la implementacion. Pruebas temporales del QA (sustituto, enlace roto, manifiesto previo) y generacion ffmpeg reducida son datos del QA, no repetidos. (4e22c95) |
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff desde la verificacion solo toca el SPEC (comprobado). Releí el parrafo de limites de la parte 7 y la fila 7 alineada con lo implementado (enlaces en --out). README/ARQUITECTURA sin cambios (grep del documentador). Pendiente: razon del xfail de enlace ajeno desactualizada. Sin docs/dataset.md ni AD-25 (parte 8). (462d05e) |
+| documentacion | Kenni Rodriguez | 2026-11-10 |  |
