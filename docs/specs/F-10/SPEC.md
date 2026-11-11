@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-10-2-estados-y-cierre
-**Verificación IA:** tests fac4079
+**Verificación IA:** implementacion 0af6c06
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -115,3 +115,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de tests | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 3 tests: 4 archivos (adaptador Redis con contrato, delegación de rutas, concurrente I, 7 estados A); en rojo por ImportError de redis_case_state, sin código de producción (fac4079) |
 | tests | José Andrés Loría Herrera | 2026-11-11 |  |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 3 impl: RedisCaseState (HSETNX+SADD, historial), ruta delega en ReportSubtask; 4 archivos de la parte en verde; tests/unit 2822 verdes, 2 fallos TLS preexistentes; ajustada aserción de test_cierre_alertas (queued->processing tras reporte parcial, por SPEC). Riesgo: doble cierre en carrera entre los dos últimos reportes (ReportSubtask, parte 2) (0af6c06) |
