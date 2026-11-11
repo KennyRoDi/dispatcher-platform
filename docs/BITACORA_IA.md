@@ -1021,3 +1021,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificación no independiente en documentación |
 | Cómo se validó | Revisión del diff contra el SPEC |
 | Error de la IA | El QA halló que Redis caído daba 500, que un hallazgo corrupto tumbaba el reporte completo y que la fuente unida por file_path salía con sha256 vacío, más 3 defectos menores (fechas malformadas, bytes no UTF-8, case_id que colisiona con claves) |
+
+## 2026-11-11 · Kenni Rodriguez · F-14 (`feat/F-14-1-alertas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-14 |
+| Propósito | Alertas de incidencia alta y cierre de caso (F-14 parte 1: dominio y decoradores) |
+| Consulta resumida | Subagentes arquitecto, developer, QA y documentador sobre el SPEC de F-14 |
+| Resultado obtenido | Dominio alert_policy, SafeAlertPublisher y AlertingFindingStore con pruebas; AD-39 y SUP-35 provisionales |
+| Validado / corregido / descartado | Si |
+| Cómo se validó | Aprobaciones delegadas por la persona (modo autonomo); verificacion del orquestador, pytest y revision del diff contra el SPEC |
+| Error de la IA | el QA halló que un generador pasado a add se agotaba y no alertaba, que un publicador sin SafeAlertPublisher perdía alertas tras guardar y 3 defectos menores (TypeError con estado no hashable, inyección de líneas en el log, publicador async perdido) |
