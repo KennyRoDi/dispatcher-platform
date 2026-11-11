@@ -21,3 +21,6 @@ class PosixProcessRunner:
             proceso.wait()
             return True
         return proceso.poll() is not None
+
+    def poll(self, pid: int) -> int | None:
+        return self._procesos[pid].poll()
