@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion 4bd975d
+**Verificación IA:** revision 26baec0
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -209,3 +209,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 |  |
 | verificación IA de documentacion | conformidad | 2026-11-11 | SPEC con limites de la parte 3, ficha M4 con 5 secciones, evidencia local sintetica rotulada, .env.example con CUSTODY_KEY_FILE, bitacora publicada; conformidad 0 problemas (4bd975d) |
 | documentacion | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de revision | revisor | 2026-11-11 | Revisor APROBADO, 0 bloqueantes, 2 menores (posicion base 0 en utf8_invalido; orden de validacion en DirectoryStore.exists); 42 passed 2 xfailed, conformidad 0 (26baec0) |
