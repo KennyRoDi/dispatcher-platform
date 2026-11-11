@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-27-1-tls-entre-nodos
 **Verificación IA:** verificacion cdc8c52
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -173,3 +173,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Correccion de hallazgos QA. Suite completa tras 98aa38f: 1909 passed, 8 skipped, 4 xfailed. Diff de tests: se editaron 2 tests existentes con cambio de asercion, comprobado por diff: test_tls_cableado (check_minio con MINIO_SECURE=false ahora afirma (False,msg) en vez de raises) y test_tls_qa de la parte 1 (se quita https://u:p@h/ de URLs validas porque ahora se rechaza); ambos justificados por los hallazgos 3 y 5. Alcance ampliado: fetch_results, demo_feeder, generate_dataset ahora usan resolve_session. Queda: Storage con cliente inyectado sin comprobar (xfail) y 3 xfail de la parte 1. (98aa38f) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 24a04cf: 12 xfail, 11 corregidos y desmarcados; queda 1 declarado como limite (Storage con cliente inyectado). Sin defectos altos. Redis/MinIO reales NO probados (sin Docker, por orden de una historia a la vez); handshake probado con servidor TLS stub de stdlib segun QA. Puntos en claro restantes: dashboard/ui.py:56 y healthcheck http://localhost:8000 del compose (parte 3). (cdc8c52) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
