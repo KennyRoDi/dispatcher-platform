@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 0d427b5
+**Verificación IA:** tests e1a1159
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
 
 ## Objetivo
@@ -143,3 +143,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-11 | SPEC F-27 sin campos pendientes (grep 0); diff contra main solo el SPEC (rama al dia con main, Base: main). AD-37/SUP-33 libres segun arquitecto (no re-verifique). Diseño (TLS de servidor + CA + hostname, sin mTLS, trustme==1.2.1 como dependencia de desarrollo) es propuesta del arquitecto. Pila de 4 partes; 10 preguntas abiertas; decision provisional: aceptar, no fusionar la parte 3 sin coordinar con Jose, Nahum y Melany. (0d427b5) |
 | plan | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Diff solo tests (unit, integracion) y requirements-dev.txt (trustme==1.2.1); src intacto. Ejecute test_tls: error de coleccion ModuleNotFoundError src.infrastructure.tls (rojo); integracion compila. Developer valido los helpers de integracion con un stub temporal (7/7); ese cambio final del timeout solo con py_compile. API asumida la fijan las pruebas (TlsSettings, client_context, exigir_cifrado, redis_kwargs, requests_session, minio_http_client). Pruebas de repo sin llaves y de generar_certs.sh quedan para la parte 3. (e1a1159) |
