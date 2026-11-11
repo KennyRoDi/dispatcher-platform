@@ -724,3 +724,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | QA local no independiente; pruebas Linux con Docker Desktop 29.7.2, Python 3.13.18, faster-whisper 1.2.1 y CTranslate2 4.9.0 |
 | Cómo se validó | ADD, SPEC, runtime aislado, ejecución concurrente y evidencia en QA-parte-2.md |
 | Error de la IA | Edición inicial accidental en el worktree raíz en vez de work/arquitecto-F-19; se revirtió de inmediato y se confirmó la raíz limpia. |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-31 (`feat/F-31-1-benchmark-de-inferencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-31 |
+| Propósito | Plan, pruebas, implementación y ficha M5 del benchmark de inferencia (F-31) |
+| Consulta resumida | Agregación de corridas, script m5_bench con reloj y transcriptor inyectados, ficha M5 |
+| Resultado obtenido | domain/benchmark.py, scripts/measure/m5_bench.py, 15 pruebas unitarias en verde, ficha con medición pendiente |
+| Validado / corregido / descartado | Sí: pruebas unitarias, prueba de arquitectura y revisión de José delegada |
+| Cómo se validó | Ejecución de pytest; la integración con faster_whisper no corrió (no instalado); sin datos medidos |
+| Error de la IA | Ninguno detectado en esta parte |
