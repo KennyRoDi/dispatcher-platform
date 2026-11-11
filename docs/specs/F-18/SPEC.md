@@ -1,6 +1,6 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-18-1-deteccion-de-oom
 **Verificación IA:** revision 8647f04
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
