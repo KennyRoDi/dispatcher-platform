@@ -918,3 +918,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas unitarias y docker compose config; worker real no ejecutado |
 | Cómo se validó | Subagentes developer, qa-tester y documentador bajo un orquestador; aprobaciones delegadas y sin verificacion humana independiente. Mediciones de SO pendientes (tres nodos reales). |
 | Error de la IA | La primera version del compose local dejaba las 3 replicas compartiendo un volumen scratch que el arranque de cada worker vacia (QA lo detecto), y el verificador dejaba pasar privileged:true y user 10001:0. |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-1-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5): orquestador y subagentes developer, qa-tester y documentador |
+| Componente | F-27 |
+| Propósito | Parte 1 de F-27: configuración y contexto TLS de cliente, pruebas, QA y documentación |
+| Consulta resumida | Plan del SPEC de F-27, pruebas en rojo, implementación de src/infrastructure/tls.py, QA que intenta romperlo y documentación (AD-37, SUP-33, ficha M4) |
+| Resultado obtenido | tls.py con TlsSettings, client_context, exigir_cifrado, redis_kwargs, requests_session y minio_http_client; pruebas unitarias e integración con trustme; AD-37, SUP-33 y borrador de la ficha M4 con resultados pendientes |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente de las fases. Verificación IA del orquestador sobre el commit exacto con flujo.py verificar |
+| Cómo se validó | Subagentes developer, qa-tester y documentador; el orquestador comprobó diffs y ejecutó las pruebas de TLS |
+| Error de la IA | La primera versión de requests_session aceptaba un servidor de otra CA si existía REQUESTS_CA_BUNDLE y seguía redirecciones de https a http; el QA lo detectó y se corrigió con trust_env=False, verify fijo y bloqueo de redirección a esquemas en claro |
