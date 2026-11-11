@@ -944,3 +944,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente |
 | Cómo se validó | Subagentes por fase, verificados por el orquestador |
 | Error de la IA | La primera versión del cableado dejaba submit_case, cancel_case, fetch_report y poll_case enviando en claro con TLS activo y tres scripts fuera de tls.py; el QA lo detectó y se corrigió |
+
+## 2026-11-11 · Kenni Rodriguez · F-27 (`feat/F-27-3-tls-entre-nodos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-27 |
+| Propósito | Documentar TLS entre nodos (F-27 parte 3) |
+| Consulta resumida | Subagentes por fase; aprobaciones delegadas por la persona, verificación del orquestador |
+| Resultado obtenido | DEPLOY_WORKERS, DEMO y ficha M4 actualizados. Pendientes de otros dueños: dashboard/app.py:23 y scripts/generate_dataset.py:18,291 apuntan a http/8000 |
+| Validado / corregido / descartado | Pendiente de revisión humana |
+| Cómo se validó | Revisión del diff; sin mediciones |
+| Error de la IA | el QA halló 16 defectos en generar_certs.sh y compose tras la implementación (validación de NODE_IP solo por caracteres, feeder sin TLS_ENABLED=false, CA sin pathlen:0, llaves 0600 ilegibles por UID de redis/MinIO) |
