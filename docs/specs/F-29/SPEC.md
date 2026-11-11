@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 2d1447a
+**Verificación IA:** verificacion 62a009e
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -190,3 +190,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-11 |  |
 | verificación IA de implementacion | pytest | 2026-11-11 | 55 pruebas de custodia y arquitectura en verde (unit, integration, acceptance); 153 lineas en src y scripts; suite completa 3156 passed segun el developer; Protocol KeyProvider local porque main no lo expone en ports.py (2d1447a) |
 | implementacion | Kenni Rodriguez | 2026-11-11 |  |
+| verificación IA de verificacion | pytest | 2026-11-11 | QA: 4 hallazgos; QA-1 y QA-2 corregidos (commit 62a009e), QA-3 y QA-4 xfail estricto declarados como limites; 3158 passed segun developer; prueba A local sintetica con 12 escenarios, no nodos reales (62a009e) |
