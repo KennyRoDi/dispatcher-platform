@@ -1234,3 +1234,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | JSON crudos revisados y aceptación pasa sobre ellos; datos no estimados |
 | Cómo se validó | Revisión de los JSON y de los comandos reproducibles en docs/evidencia/mediciones-f36-f37 |
 | Error de la IA | Primer arnés F-36 usó la operación 'transcode' (inexistente, es transcode_video): el hilo falló al instante sin ffmpeg en curso. Se detectó por el assert; el test de integración test_cancelacion_en_curso_linux.py usa el mismo nombre y su except lo oculta (no se corrigió: fuera de alcance) |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-18 (`docs/medicion-f18`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-18 |
+| Propósito | Medición M1 real de OOM en contenedor Docker Desktop |
+| Consulta resumida | Escribir arnés medir_f18.py y ficha M1 con los datos medidos |
+| Resultado obtenido | 3 repeticiones: oom, requeue 96/144 MiB, giveup:oom; control killed |
+| Validado / corregido / descartado | Salida JSON cruda guardada en docs/evidencia/mediciones-f18 |
+| Cómo se validó | Ejecución real en Docker; revisión de JSON de las 3 corridas |
