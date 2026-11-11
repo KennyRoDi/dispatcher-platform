@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-10-1-estados-y-cierre
 **Verificación IA:** implementacion f93eb46
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -106,3 +106,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: 10 pruebas unitarias de ReportSubtask, doble FakeCaseStateStore y comprobar_case_state_store; fallan por ImportError (puerto y caso de uso aún no existen). Firma mark_reported lleva outcome (3er arg) para poder contar fallidas. (43edf58) |
 | tests | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 2: puerto CaseStateStore y ReportSubtask; 17 pruebas verdes (reporte + arquitectura). Corregida aserción de historial en test_caso_cancelado (el fixture ya añade PROCESSING: error de la prueba, no del código). (f93eb46) |
+| implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; suite completa falla solo en 3 pruebas TLS ajenas de Windows (test_tls_cableado*) |
