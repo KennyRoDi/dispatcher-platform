@@ -9,6 +9,7 @@ from pathlib import Path
 import redis as redis_module
 import requests
 
+from src.infrastructure.tls import TlsConfigError, TlsSettings, exigir_cifrado, requests_session
 from src.workers.config import Settings, make_redis
 from src.workers.storage import Storage, StorageError
 
@@ -27,13 +28,19 @@ def check_redis(settings: Settings, client=None) -> tuple[bool, str]:
         return False, f"Redis en {settings.redis_host}:{settings.redis_port} no responde: {e}"
 
 
-def check_coordinator(settings: Settings, get=requests.get) -> tuple[bool, str]:
+def check_coordinator(settings: Settings, get=None) -> tuple[bool, str]:
     url = f"{settings.coordinator_url}/openapi.json"
     try:
+        if get is None:
+            tls = TlsSettings.from_env()
+            exigir_cifrado(tls, coordinator_url=settings.coordinator_url)
+            get = requests_session(tls).get
         resp = get(url, timeout=5)
         if resp.status_code == 200:
             return True, f"Coordinador OK en {settings.coordinator_url}"
         return False, f"Coordinador respondio HTTP {resp.status_code} en {url}"
+    except TlsConfigError as e:
+        return False, f"Configuracion TLS rechazada: {e}"
     except requests.RequestException as e:
         return False, f"No se pudo conectar al coordinador en {url}: {e}"
 
