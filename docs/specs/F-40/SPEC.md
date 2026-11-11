@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan fb53d33
+**Verificación IA:** tests f94c592
 **Historia:** US-40 · **Requisitos:** RNF-17, RNF-18, RNF-19, RNF-20; [Parte I §3, §4, §8], [Anexos 1 y 3], [B.9], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-40 sin campos pendientes (grep), solo toca el SPEC, commit empujado. Recontado: git shortlog -sn --all coincide con el informe (Jose 595, Kenni 364, Melany 37, krd 24, Auditoria 20, Nahum 17); bitacora en estado con 45 entradas. No verifique fechas por autor ni errores de IA individuales. (fb53d33) |
 | plan | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | F-40 es solo documental (SPEC): sin pruebas ni codigo; la rama solo difiere de main en el SPEC. Verificacion no independiente. (f94c592) |
