@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-26-1-autenticacion-y-roles
-**Verificación IA:** verificacion 6c47dd8
+**Verificación IA:** documentacion c6271f6
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -174,3 +174,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | orquestador: QA previo (9cb7813) + correcciones 03bc4b2 verificadas, pytest 1947 passed 5 xfailed | 2026-11-10 | QA parte 2 completo; hallazgo 1 (parseo antes de auth) abierto como xfail y limite declarado; sin segundo QA para ahorrar cuota (6c47dd8) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | orquestador (sin subagente documentador, verificación no independiente) | 2026-11-10 | SPEC con limites declarados y entrada de bitacora publicada (c6271f6) |
