@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-03-8-dataset-sintetico
-**Verificación IA:** verificacion b0f1c19
+**Verificación IA:** documentacion 8095761
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -141,3 +141,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 2 xfail estrictos nuevos (accuracy con total 0, ids de tipos mezclados) en test_ground_truth_qa.py; src intacto. Ejecute test_ground_truth y _qa: 14 pasan/xfail segun lo esperado. Hallazgos menores a pendientes; accuracy global se declara en documentacion. No repeti la prueba de 200000 elementos (dato del QA). (b0f1c19) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca ARQUITECTURA (AD-31), REQUERIMIENTOS (SUP-26/27 provisional) y SPEC. conformidad.py: 0 problemas (ejecutado por mi). Numeros libres en main segun grep del documentador. No repeti pytest (solo docs). (8095761) |
