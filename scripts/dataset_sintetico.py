@@ -13,9 +13,13 @@ from src.adapters.heavy_case_generator import generate_heavy_cases
 from src.adapters.media_generator import LICENSE_NAME, ORIGIN, POSITIVE, Runner, generate_media, run_ffmpeg
 from src.domain.dataset_plan import (
     IMAGE_CATEGORIES,
+    MIN_AUDIOS,
+    MIN_CASES,
     MIN_HEAVY,
     MIN_HEAVY_BYTES,
     MIN_HETEROGENEOUS,
+    MIN_IMAGES,
+    MIN_MESSAGES,
     DatasetParams,
     DatasetPlan,
     Level,
@@ -44,11 +48,7 @@ REQUIRED_KINDS = {
 }
 CHATS_DIR = "chats"
 DEFAULT_OUT = "~/scratch/dataset"
-MIN_CASES = 40
 MIN_LIGHT = 5
-MIN_MESSAGES = 20_000
-MIN_IMAGES = 300
-MIN_AUDIOS = 150
 MIN_DISTINCT_DURATIONS = 2
 WHATSAPP_HEADER = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}, \d{2}:\d{2} - ", re.MULTILINE)
 
@@ -100,10 +100,10 @@ def _usable_rows(raw: list) -> tuple[list[dict], list[str]]:
         defect = _row_defect(row)
         if defect:
             problems.append(f"fila {index}: {defect}")
-        elif row["path"] in seen:
+        elif Path(row["path"]).as_posix() in seen:
             problems.append(f"{row['path']}: fila duplicada")
         else:
-            seen.add(row["path"])
+            seen.add(Path(row["path"]).as_posix())
             rows.append(row)
     return rows, problems
 
@@ -114,13 +114,17 @@ def _row_defect(row) -> str | None:
     missing = [name for name in MANIFEST_FIELDS if name not in row]
     if missing:
         return f"faltan campos {missing}"
-    if not isinstance(row["path"], str) or any(
+    if not isinstance(row["path"], str) or "\x00" in row["path"] or any(
         ruta.root or ruta.drive or ".." in ruta.parts
         for ruta in (PurePosixPath(row["path"]), PureWindowsPath(row["path"]))
     ):
         return f"ruta invalida {row['path']!r}"
     if not all(value is None or isinstance(value, (str, int, float)) for value in row.values()):
         return "hay valores que no son escalares"
+    if isinstance(row["bytes"], bool) or not isinstance(row["bytes"], int):
+        return f"{row['path']}: bytes debe ser un entero, no {row['bytes']!r}"
+    if not isinstance(row["case"], str):
+        return f"{row['path']}: case debe ser una cadena, no {row['case']!r}"
     return None
 
 
@@ -131,12 +135,21 @@ def _check_row(row: dict, root: Path) -> list[str]:
     if row["licencia"] != LICENSE_NAME:
         problems.append(f"{path}: licencia {row['licencia']!r} distinta de {LICENSE_NAME!r}")
     file = root / path
-    if not file.is_file():
-        return problems + [f"{path}: no existe"]
-    if file.stat().st_size != row["bytes"]:
-        return problems + [f"{path}: tiene {file.stat().st_size} bytes y el manifiesto declara {row['bytes']}"]
-    if sha256_de_archivo(file) != row["sha256"]:
-        problems.append(f"{path}: sha256 distinto del declarado")
+    try:
+        if not file.resolve().is_relative_to(root.resolve()):
+            return problems + [f"{path}: apunta fuera del directorio del manifiesto"]
+    except UnicodeError:
+        return problems + [f"{path}: ruta con caracteres no codificables"]
+    try:
+        if not file.is_file():
+            return problems + [f"{path}: no existe"]
+        size = file.stat().st_size
+        if size != row["bytes"]:
+            return problems + [f"{path}: tiene {size} bytes y el manifiesto declara {row['bytes']}"]
+        if sha256_de_archivo(file) != row["sha256"]:
+            problems.append(f"{path}: sha256 distinto del declarado")
+    except OSError as error:
+        problems.append(f"{path}: no se pudo leer ({error.strerror})")
     return problems
 
 
@@ -208,10 +221,39 @@ def main(argv: list[str] | None = None, runner: Callable[[list[str]], None] = ru
         params = _load_params(args.params)
     except ValueError as error:
         parser.error(f"--params: {error}")
-    rows = build_manifest(plan_dataset(args.seed, params), out, runner)
-    (out / MANIFEST_NAME).write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    if (out.exists() or out.is_symlink()) and not out.is_dir():
+        parser.error(f"--out: {out} no es un directorio")
+    rows = _generate(plan_dataset(args.seed, params), out, runner)
     print(f"{len(rows)} archivos en {out}")
     return 0
+
+
+def _generate(plan: DatasetPlan, out: Path, runner: Runner) -> list[dict]:
+    created_dirs = [directory for directory in (out, *out.parents) if not directory.exists()]
+    out.mkdir(parents=True, exist_ok=True)
+    before = set(out.rglob("*"))
+    try:
+        links = sorted(str(path) for path in before if path.is_symlink())
+        if links:
+            raise RuntimeError(f"--out contiene enlaces simbolicos que no se siguen: {links}")
+        (out / MANIFEST_NAME).unlink(missing_ok=True)
+        before.discard(out / MANIFEST_NAME)
+        rows = build_manifest(plan, out, runner)
+        (out / MANIFEST_NAME).write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    except BaseException:
+        _remove_created(out, before, created_dirs)
+        raise
+    return rows
+
+
+def _remove_created(out: Path, before: set[Path], created_dirs: list[Path]) -> None:
+    for path in sorted(set(out.rglob("*")) - before, reverse=True):
+        if path.is_dir() and not path.is_symlink():
+            path.rmdir()
+        else:
+            path.unlink()
+    for directory in created_dirs:
+        directory.rmdir()
 
 
 def _load_params(path: str | None) -> DatasetParams:
@@ -227,10 +269,7 @@ def _load_params(path: str | None) -> DatasetParams:
     for name, value in raw.items():
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ValueError(f"{name} debe ser un entero no negativo, no {value!r}")
-    params = DatasetParams(**raw)
-    if params.cases < 1:
-        raise ValueError("cases debe ser al menos 1")
-    return params
+    return DatasetParams(**raw)
 
 
 def _validate(out: Path) -> int:

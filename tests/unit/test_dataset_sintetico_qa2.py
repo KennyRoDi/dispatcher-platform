@@ -6,7 +6,6 @@ from scripts.dataset_sintetico import MANIFEST_NAME, main, validate_manifest
 from tests.unit.test_dataset_sintetico import FakeRunner, _guardar, _rows, _params_file, reduced  # noqa: F401
 
 
-@pytest.mark.xfail(strict=True, reason="QA: bytes que no es entero provoca TypeError en el validador")
 @pytest.mark.parametrize("valor", ["123", None])
 def test_validar_reporta_bytes_que_no_es_entero_sin_traza(reduced, valor):  # noqa: F811
     rows = _rows(reduced)
@@ -18,7 +17,6 @@ def test_validar_reporta_bytes_que_no_es_entero_sin_traza(reduced, valor):  # no
     assert any(rows[0]["path"] in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: case que no es texto provoca TypeError al ordenar en el validador")
 def test_validar_reporta_un_case_nulo_sin_traza(reduced):  # noqa: F811
     rows = _rows(reduced)
     rows[0]["case"] = None
@@ -29,7 +27,6 @@ def test_validar_reporta_un_case_nulo_sin_traza(reduced):  # noqa: F811
     assert any(rows[0]["path"] in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: la misma ruta escrita como ./x o a//x no se detecta como duplicada")
 @pytest.mark.parametrize("variante", ["./{}", "{}/"])
 def test_validar_detecta_duplicados_con_otra_grafia_de_la_ruta(reduced, variante):  # noqa: F811
     rows = _rows(reduced)
@@ -42,7 +39,6 @@ def test_validar_detecta_duplicados_con_otra_grafia_de_la_ruta(reduced, variante
     assert any("duplicad" in p or "ruta invalida" in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un archivo sin permiso de lectura provoca PermissionError en el validador")
 @pytest.mark.skipif(
     os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
     reason="Windows no aplica chmod como permisos POSIX y root ignora los permisos",
@@ -59,7 +55,7 @@ def test_validar_reporta_un_archivo_ilegible_sin_traza(reduced):  # noqa: F811
     assert any(imagen["path"] in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: un enlace simbolico hacia fuera de --out se acepta como parte del dataset")
+@pytest.mark.usefixtures("symlink_capable")
 def test_validar_rechaza_un_enlace_simbolico_que_sale_del_directorio(reduced, tmp_path):  # noqa: F811
     imagen = next(r for r in _rows(reduced) if r["kind"] == "imagen")
     archivo = reduced / imagen["path"]
@@ -73,7 +69,6 @@ def test_validar_rechaza_un_enlace_simbolico_que_sale_del_directorio(reduced, tm
     assert any(imagen["path"] in p for p in problemas)
 
 
-@pytest.mark.xfail(strict=True, reason="QA: --out que es un archivo termina con NotADirectoryError y traza")
 def test_la_cli_informa_un_out_que_es_un_archivo_sin_traza(tmp_path, capsys):
     out = tmp_path / "archivo"
     out.write_text("x", encoding="utf-8")

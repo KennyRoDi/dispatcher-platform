@@ -5,10 +5,10 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.domain.dataset_plan import IMAGE_CATEGORIES, DatasetPlan
+from src.domain.dataset_plan import IMAGE_CATEGORIES, MIB, DatasetPlan, checked_case_name
 
 ORIGIN = "sintetico"
-LICENSE_NAME = "generado por el equipo, uso academico"
+LICENSE_NAME = "MIT"
 
 POSITIVE = "positivo"
 NEUTRAL = "neutro"
@@ -54,26 +54,34 @@ class MediaFile:
 
 
 def run_ffmpeg(args: list[str]) -> None:
-    subprocess.run(args, check=True, capture_output=True, timeout=FFMPEG_TIMEOUT_SECONDS)
+    try:
+        subprocess.run(args, check=True, capture_output=True, timeout=FFMPEG_TIMEOUT_SECONDS)
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or b"").decode(errors="replace").strip()
+        raise RuntimeError(f"{error}: {detail}" if detail else str(error)) from error
 
 
 def generate_media(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg) -> list[MediaFile]:
+    if len(plan.audio_durations) < sum(case.audios for case in plan.cases):
+        raise ValueError("audio_durations tiene menos duraciones que audios en el plan")
     rng = random.Random(plan.seed)
     image_slots = iter(_image_slots(plan, rng))
     durations = iter(plan.audio_durations)
+    image_formats = itertools.cycle(IMAGE_FORMATS)
+    audio_formats = itertools.cycle(AUDIO_FORMATS)
     files: list[MediaFile] = []
     for case in plan.cases:
-        case_dir = out_dir / case.name
+        case_dir = out_dir / checked_case_name(case.name)
         for index in range(case.images):
             categoria, etiqueta, color = next(image_slots)
-            path = case_dir / f"{case.name}-imagen-{index + 1:03d}.{IMAGE_FORMATS[index % len(IMAGE_FORMATS)]}"
-            _produce(runner, _image_args(color, path), path)
+            path = case_dir / f"{case.name}-imagen-{index + 1:03d}.{next(image_formats)}"
+            produce(runner, _image_args(color, path), path)
             files.append(_media(plan, case.name, "imagen", path, etiqueta, categoria=categoria))
         for index in range(case.audios):
             duration = next(durations)
-            path = case_dir / f"{case.name}-audio-{index + 1:03d}.{AUDIO_FORMATS[index % len(AUDIO_FORMATS)]}"
+            path = case_dir / f"{case.name}-audio-{index + 1:03d}.{next(audio_formats)}"
             etiqueta, args = _audio_args(rng, duration, path)
-            _produce(runner, args, path)
+            produce(runner, args, path)
             files.append(_media(plan, case.name, "audio", path, etiqueta, duration=duration))
     return files
 
@@ -133,12 +141,26 @@ def _audio_args(rng: random.Random, duration: int, path: Path) -> tuple[str, lis
     return etiqueta, FFMPEG_BASE + ["-f", "lavfi", "-i", source, "-t", str(duration)] + BITEXACT + codec + [str(path)]
 
 
-def _produce(runner: Runner, args: list[str], path: Path) -> None:
+# Se borra el archivo previo para que un ejecutor que no produjo nada no pase por uno de otra ejecucion.
+def produce(runner: Runner, args: list[str], path: Path, min_bytes: int = 0) -> None:
+    parent_existed = path.parent.exists()
     path.parent.mkdir(parents=True, exist_ok=True)
+    path.unlink(missing_ok=True)
     try:
         runner(args)
         if not path.is_file():
             raise FileNotFoundError(f"ffmpeg no produjo {path}")
+        if path.stat().st_size < min_bytes:
+            raise ValueError(f"{path} mide {path.stat().st_size} bytes y no alcanza {min_bytes // MIB} MiB")
     except BaseException:
         path.unlink(missing_ok=True)
+        if not parent_existed:
+            _remove_if_empty(path.parent)
         raise
+
+
+def _remove_if_empty(directory: Path) -> None:
+    try:
+        directory.rmdir()
+    except OSError:
+        pass

@@ -3,8 +3,8 @@ import random
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
-from src.adapters.media_generator import BITEXACT, FFMPEG_BASE, LICENSE_NAME, ORIGIN, Runner, run_ffmpeg
-from src.domain.dataset_plan import MIB, DatasetPlan
+from src.adapters.media_generator import BITEXACT, FFMPEG_BASE, LICENSE_NAME, ORIGIN, Runner, produce, run_ffmpeg
+from src.domain.dataset_plan import DatasetPlan, checked_case_name
 
 VIDEO_KIND = "video"
 VIDEO_EXTENSION = "mpg"
@@ -39,8 +39,8 @@ def generate_heavy_cases(plan: DatasetPlan, out_dir: Path, runner: Runner = run_
             for ruta in (PurePosixPath(case.name), PureWindowsPath(case.name))
         ):
             raise ValueError("el nombre de caso debe ser un nombre de directorio simple")
-        path = out_dir / case.name / f"{case.name}-video-001.{VIDEO_EXTENSION}"
-        _produce(runner, _video_args(rng.randrange(NOISE_SEED_LIMIT), case.heavy_bytes, path), path, case.heavy_bytes)
+        path = out_dir / checked_case_name(case.name) / f"{case.name}-video-001.{VIDEO_EXTENSION}"
+        produce(runner, _video_args(rng.randrange(NOISE_SEED_LIMIT), case.heavy_bytes, path), path, min_bytes=case.heavy_bytes)
         files.append(HeavyFile(case.name, VIDEO_KIND, path, path.stat().st_size, ORIGIN, LICENSE_NAME, plan.seed))
     return files
 
@@ -50,18 +50,3 @@ def _video_args(noise_seed: int, min_bytes: int, path: Path) -> list[str]:
     source = f"testsrc2=size={VIDEO_SIZE}:rate={VIDEO_FPS}"
     noise = f"noise=alls=20:all_seed={noise_seed}"
     return FFMPEG_BASE + ["-f", "lavfi", "-i", source, "-t", str(duration), "-vf", noise] + BITEXACT + ["-flags:v", "+bitexact"] + VIDEO_CODEC + [str(path)]
-
-
-# Se borra el archivo previo para que un ejecutor que no produjo nada no pase por uno de otra ejecucion.
-def _produce(runner: Runner, args: list[str], path: Path, min_bytes: int) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.unlink(missing_ok=True)
-    try:
-        runner(args)
-        if not path.is_file():
-            raise FileNotFoundError(f"ffmpeg no produjo {path}")
-        if path.stat().st_size < min_bytes:
-            raise ValueError(f"{path} mide {path.stat().st_size} bytes y no alcanza {min_bytes // MIB} MiB")
-    except BaseException:
-        path.unlink(missing_ok=True)
-        raise
