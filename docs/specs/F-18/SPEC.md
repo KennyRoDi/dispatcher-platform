@@ -1,6 +1,6 @@
 # SPEC F-18: Detección de OOM
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan e190b38
 **Historia:** US-18 · **Requisitos:** RF-26, RNF-09, SUP-14 · **Responsable:** J
@@ -60,3 +60,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Code | 2026-11-10 | SPEC completo, plan de pila en 2 partes; verificación no independiente (e190b38) |
+| plan | José Andrés Loría Herrera | 2026-11-10 |  |
