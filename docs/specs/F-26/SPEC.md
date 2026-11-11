@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-26-2-autenticacion-y-roles
-**Verificación IA:** tests 2110b77
+**Verificación IA:** implementacion f792c68
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -180,3 +180,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests (diff sin src ni scripts). Ejecute: test_api_jwt+auth_habilitada+gitignore 55 failed/27 passed (los 27 verdes son rutas que ya cumplen, p.ej. publicas/422); test_emitir_token error de coleccion ModuleNotFoundError scripts.emitir_token; test_coordinator+contract+seguridad_qa 56 passed. Desviacion: fixture sin_autorizacion es no-op de autorizar, no FakeTokenVerifier. Sin cambio en workers (SERVICE_TOKEN fuera de alcance). (2110b77) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests. Ejecute suite completa tras f792c68: 2048 passed, 7 skipped, 3 xfailed. 144 lineas añadidas en src/scripts. Desviacion a revisar: middleware AutenticacionPrevia se salta la verificacion si app.dependency_overrides contiene autorizar (codigo de produccion conoce el mecanismo de pruebas); verify corre dos veces por peticion. (f792c68) |
