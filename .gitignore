@@ -30,3 +30,9 @@ servidor_central.log
 *.srl
 certs/
 .ms-certs/
+
+# Llaves de cifrado en reposo (F-28): nunca versionar
+*.kek
+kek*
+
+dataset/sintetico/

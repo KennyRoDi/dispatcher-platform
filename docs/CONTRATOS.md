@@ -22,10 +22,12 @@ Cada módulo se desarrolla de principio a fin sin esperar a otro. Los módulos s
 | `WorkQueue` | Nahúm, F-06; Melany agrega el límite, F-24 | M2, M1 (reencolar), workers |
 | `ObjectStore` | Melany, F-23; Kenni lo envuelve con cifrado, F-28 | Coordinador, workers |
 | `FindingStore` | Kenni, F-13 | Workers (escribe), reporte (lee) |
+| `CaseCatalog`, `CaseInfo` | Kenni, F-13; conformidad: `comprobar_case_catalog` en `tests/contratos.py` | Reporte consolidado (lee); Nahúm y José no cambian código |
 | `CustodyLog` | Kenni, F-29 | Recepción (M3), workers |
 | `RoutingPolicy` | José Andrés, F-32 | Scheduler (M2) |
 | `ResourceReader`, `ResourceUsage` | José Andrés, F-16 | Admisión (M1), dashboard (F-15) |
 | `AlertPublisher` | Kenni, F-14 | Coordinador, workers |
+| `AlertReader` | Kenni, F-14 | Dashboard (F-15) |
 | `Clock` | Infraestructura de quien lo necesite | Todos |
 
 ## Quién toca qué
