@@ -6,7 +6,7 @@
 | F-01 | pendiente |
 | F-02 | pendiente |
 | F-03 | en-pr |
-| F-04 | implementacion |
+| F-04 | verificacion |
 | F-05 | pendiente |
 | F-06 | pendiente |
 | F-07 | hecha |
