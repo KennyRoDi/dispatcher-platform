@@ -5,7 +5,7 @@
 ## Verificación
 
 - `tests/unit/test_model_memory.py`: 8 passed; `tests/unit/test_comparar_carga.py`: 9 passed; `tests/unit/test_whisper_transcriber.py`: 42 passed.
-- `tests/integration/test_comparar_carga.py`: 3 skipped en Windows; requieren POSIX.
+- `tests/integration/test_comparar_carga_posix.py`: 3 skipped en Windows; requieren POSIX. Se renombró para evitar colisión de colección pytest con `tests/unit/test_comparar_carga.py`, ambos compartían basename.
 - Preflight y 20 ejecuciones (dos estrategias × N=1/2 × 5 repeticiones) completados. JSON crudos en `docs/evidencia/F-19/{compatibilidad,comparacion}/`.
 - Entorno: Docker Engine 29.7.2, kernel `6.18.33.2-microsoft-standard-WSL2`, Python 3.13.18, faster-whisper 1.2.1, CTranslate2 4.9.0, PyAV 18.1.0, cgroup v2 `memory.max=4294967296`, `memory.swap.max=0`; proceso no-root.
 
