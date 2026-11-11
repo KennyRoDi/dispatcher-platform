@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-28-1-cifrado-en-reposo
-**Verificación IA:** verificacion 8eb8ed0
+**Verificación IA:** documentacion 4663be7
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -164,3 +164,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA a93526b: 12 xfail; 5 corregidos y desmarcados; 4 sin cerrar (KEK en locales, 3 tests, defecto del test) y 3 pre-existentes. Prueba inestable de la suite no identificada ni reproducida (70 corridas verdes); hipotesis: pruebas que dependen del estado de git. Sin fuga de KEK por repr/str/cause/context. (8eb8ed0) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs (modulo-M4 y SPEC). Mediciones pendientes, sin datos inventados. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (4663be7) |
