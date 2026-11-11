@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 4453054
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | SPEC parte 3 aún afirma que acceso WSL2 y mediciones M1 están pendientes; la medición ya está registrada. |
 | verificación IA de documentacion | Codex | 2026-11-10 | Reverificación documental tras hallar y corregir riesgos obsoletos en el SPEC. git diff --stat confirma el único cambio documental previsto; QA, resultados SPEC, ficha M1 y AD-07 concuerdan con los JSON reales y límites Docker/WSL2. Bitácora de F-19 ya publicada. Revisión documental comprobada en la misma sesión, no independiente. (4453054) |
+| documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
