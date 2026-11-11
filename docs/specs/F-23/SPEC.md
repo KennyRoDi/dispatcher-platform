@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-23-4-deduplicar-subidas-antes-de-transferir
-**Verificación IA:** revision 08e4f8e
+**Verificación IA:** tests eb396b8c
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -141,3 +141,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo; documentación contrastada con código, SPEC y resultado de pruebas. |
 | verificación IA de revision | Codex | 2026-11-11 | Corrección: crear OBJECTS_BUCKET al iniciar si falta, igual que otros adaptadores de almacenamiento. Prueba de composición lo verifica; 3 pruebas unitarias, conformidad 0. QA no independiente. (08e4f8e) |
 | revision | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó la ejecución autónoma; el requisito de crear bucket queda probado y la medición real sigue pendiente. |
+| verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 14 pruebas: is_stored, POST 200 stored sin staging, cliente sin chunks, dos fuentes iguales un objeto (US-23), composicion desde entorno (sin MINIO_ENDPOINT None, bucket creado, STAGING_DIR obligatorio, TLS exige MinIO seguro, KEK envuelve con cifrado) y 503 si falla al arrancar. Rojo 13/14 por funcionalidad ausente. Contra borrador: 14/14, suite 3746 verde en Linux. (eb396b8c) |
