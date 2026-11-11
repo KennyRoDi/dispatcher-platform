@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-23-1-exigir-que-objectstore-no-confirme-un-put-fallido
-**Verificación IA:** verificacion a4be525
+**Verificación IA:** documentacion 6d8793a
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -127,3 +127,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar de forma autónoma las fases sin aprobación humana; verificación de IA registrada en 7dd2322. |
 | verificación IA de verificacion | Codex | 2026-11-11 | F-23 parte 2: adaptador MinioObjectStore verificado; integración con MinIO real 4/4, unitarias y revisión IA independiente registradas antes; conformidad 0. Verificación de orquestación no independiente. (a4be525) |
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó completar autónomamente las fases con excepción; CI y MinIO real ya verificados y el control humano no está disponible. QA del orquestador no independiente. |
+| verificación IA de documentacion | Codex | 2026-11-11 | Documentación de F-23 parte 2 revisada; bitácora publicada con resultados verificables de MinIO real y error real de IA; conformidad 0. Sin cambios posteriores a pruebas. (6d8793a) |
