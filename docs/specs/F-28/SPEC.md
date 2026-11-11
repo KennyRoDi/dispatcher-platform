@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion ffdd5de
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: _read_exact toma read()==None como EOF y cifra un objeto truncado sin error (media); KEK no-bytes da TypeError en vez de KeyUnavailable; chunk_size float/bool aceptado |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 4 hallazgos QA en envelope_cipher.py (134 lineas). Diff de tests solo quita 3 marcadores xfail (comprobado). Suite completa tras ffdd5de: 1825 passed, 8 skipped, 6 xfailed. (ffdd5de) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
