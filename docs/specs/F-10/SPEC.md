@@ -1,7 +1,7 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-10-1-estados-y-cierre
 **Verificación IA:** revision 5976303
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
