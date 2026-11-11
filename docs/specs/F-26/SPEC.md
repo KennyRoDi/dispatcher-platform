@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan c37a765
+**Verificación IA:** tests 37d4a9a
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
 
 ## Objetivo
@@ -138,3 +138,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-26 sin campos pendientes (grep), solo toca el SPEC, commit empujado. AD-33, SUP-28 y SUP-29 sin uso en ninguna rama remota (grep). Preguntas abiertas en CLAUDE.md con decision provisional. Matriz es interpretacion del arquitecto: no verificada contra el enunciado por mi. (c37a765) |
 | plan | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests/unit/test_rbac.py (mas log del SPEC); pytest: error de coleccion ImportError rbac (rojo por falta del modulo). Matriz 20 pares rol x accion contra tabla propia de la prueba. API asumida: Role, Action enums, can(), PERMISOS MappingProxyType; fijada por las pruebas. (37d4a9a) |
