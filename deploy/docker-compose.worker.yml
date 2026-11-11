@@ -16,12 +16,21 @@ services:
     mem_limit: ${WORKER_MEM_LIMIT:?define WORKER_MEM_LIMIT en .env}
     memswap_limit: ${WORKER_MEM_LIMIT:?define WORKER_MEM_LIMIT en .env}
     environment:
+      WORK_DIR: /scratch
       NODE_IP: ${NODE_IP:?define NODE_IP en .env}
       TLS_ENABLED: ${TLS_ENABLED:-true}
       TLS_CA_FILE: /certs/ca.pem
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
     # Solo la CA publica: TLS_CA_FILE del .env es la ruta de ca.pem en esta maquina. Nunca llaves.
     volumes:
       - ${TLS_CA_FILE:?define TLS_CA_FILE en .env con la ruta de ca.pem}:/certs/ca.pem:ro
+      - scratch:/scratch
+    tmpfs:
+      - /tmp:size=64m,mode=1777
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
@@ -29,3 +38,6 @@ services:
     # proporcional de FFmpeg puede llegar al tope de 1800 s (30 min), asi que 31m cubre el peor caso
     # sin que Docker mande SIGKILL a mitad de un transcode.
     stop_grace_period: 31m
+
+volumes:
+  scratch:

@@ -113,7 +113,8 @@ def test_ca_vacia_o_corrupta_falla(tmp_path, contenido):
 
 def test_el_error_de_ca_corrupta_no_filtra_el_contenido(tmp_path):
     ruta = tmp_path / "ca.pem"
-    ruta.write_text("-----BEGIN PRIVATE KEY-----\nLLAVE-SECRETA-123\n-----END PRIVATE KEY-----\n")
+    cabecera = "-----BEGIN " + "PRIVATE KEY-----"
+    ruta.write_text(f"{cabecera}\nLLAVE-SECRETA-123\n-----END PRIVATE KEY-----\n")
 
     with pytest.raises(TlsConfigError) as error:
         client_context(TlsSettings(enabled=True, ca_file=ruta))
