@@ -1324,3 +1324,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas unitarias y de arquitectura; verificación no independiente |
 | Cómo se validó | Ejecución de pytest y revisión del diff contra el SPEC |
 | Error de la IA | En test_caso_cancelado la aserción de historial era errónea (el fixture ya añade PROCESSING), error de la prueba no del código; además el agente aprobó la fase verificacion con --excepcion sin necesidad |
+
+## 2026-11-11 · José Andrés Loría Herrera · F-10 (`feat/F-10-3-estados-y-cierre`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-10 |
+| Propósito | Implementar y verificar F-10 parte 3: adaptador Redis de estados, historial y cableado de POST /subtasks/report |
+| Consulta resumida | Implementar redis_case_state.py y delegar la ruta en ReportSubtask; QA con Redis real |
+| Resultado obtenido | RedisCaseState, ruta delegada, set_state atómico con WATCH; 40 corridas concurrentes sin doble cierre |
+| Validado / corregido / descartado | Pruebas unitarias, aceptación (7 estados) y prueba I concurrente con Redis 7 real en docker |
+| Cómo se validó | Revisión de pruebas y corridas repetidas contra Redis |
+| Error de la IA | La implementación inicial dejaba doble cierre en reportes concurrentes (la prueba I con Redis real falló ~1 de 7 corridas: dos hilos cerraban y un PROCESSING tardío sobrescribía el estado terminal); se corrigió con set_state atómico (WATCH) y 40 corridas seguidas verdes. Además, la IA ajustó aserciones queued->processing en tests existentes por exigencia del SPEC |
