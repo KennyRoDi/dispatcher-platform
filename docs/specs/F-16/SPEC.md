@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** verificacion 0a878ef
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -118,3 +118,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Codex | 2026-11-10 | Implementación del hallazgo NODE_NAME: revisé fix 7d7ce7b y fixtures; validate_config exige NODE_NAME presente e igual a service.hostname antes de validar NODE_IP y presupuesto. La prueba roja de revisión detecta mismatch. Reproduje py -m pytest -q -m "not integration and not acceptance": 1162 passed, 2 skipped, 3 deselected, 1 warning preexistente Starlette, 47.17s. git diff --check base...HEAD limpio y árbol limpio. Sin Docker nuevo ni mediciones B/C/D; limitación humana previa sigue vigente. (7d7ce7b) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Codex | 2026-11-10 | QA final verificada en informe 0a878ef: reproduje 77 pruebas focalizadas, todas pasan. Fix 7d7ce7b exige NODE_NAME == hostname; la regresión falló antes como esperado. Suite completa 1162 passed, 2 skipped, 3 deselected, 1 warning Starlette, reproducida tras fix. QA mantiene tres cgroups locales claramente separados; Tailscale alcanza por ping hp-nahum/magdalena, SSH no responde, faltan .env de nodos; B/C/D y runtime GPU pendientes por excepción humana. git diff --check limpio y árbol limpio. (0a878ef) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
