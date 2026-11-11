@@ -17,7 +17,7 @@ Que el analista consulte, para un caso, un reporte JSON con hallazgos, categorí
 - Adaptadores Redis de `FindingStore` (escritura y lectura; lo prometido en `docs/CONTRATOS.md` a Kenni) y de `CaseCatalog` (solo lectura de los hashes del coordinador).
 - Ruta `GET /cases/{case_id}/consolidated-report` en un archivo nuevo, con una línea `include_router` en `main.py`.
 - Serialización a JSON separada del dominio (refactor de IMPLEMENTACION §4).
-- JSON de ejemplo sintético en `docs/evidencia/` como evidencia de la prueba A.
+- JSON de ejemplo sintético en `docs/ejemplos/` (generado por la prueba de aceptación con `F13_EJEMPLO_JSON`) como evidencia de la prueba A.
 
 **No incluye:**
 - Cablear a los workers para que escriban hallazgos en el `FindingStore` (código de José, `src/workers/`); queda como contacto declarado, ver preguntas.
