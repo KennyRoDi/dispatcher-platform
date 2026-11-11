@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 45f017b
+**Verificación IA:** tests b9209c2
 **Historia:** US-31 · **Requisitos:** RF-40 (B.5 M5) · **Responsable:** J
 
 ## Objetivo
@@ -69,3 +69,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-31 completo sin campos …, plan de 1 PR, medición pendiente anotada (45f017b) |
 | plan | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de tests | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | 3 archivos de prueba nuevos, sin código; unitarias fallan por módulos ausentes (rojo) (b9209c2) |
