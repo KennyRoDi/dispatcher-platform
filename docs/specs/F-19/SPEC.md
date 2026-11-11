@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** implementacion 5034bb8
+**Verificación IA:** verificacion 55915e7
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -122,3 +122,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La prueba real de Whisper y ForkProcessRuntime requieren POSIX; marcar la integración real como skip en Windows para evitar fallo de colección/ejecución local. |
 | verificación IA de implementacion | Codex | 2026-11-10 | Hallazgo revisión: test integración real omitido en Windows vía skipif POSIX. Verificado en Windows: pytest tests/integration/test_fork_runtime.py -q → 5 skipped (0.15 s); en Docker Linux sigue válido el resultado previo de 5 passed. git diff --check limpio. No independiente. (5034bb8) |
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| verificación IA de verificacion | Codex | 2026-11-10 | QA confirma criterios y hallazgo Windows resuelto: la suite Linux con Whisper real pasó 5/5 en Docker; la integración de procesos se omite correctamente en Windows (5 skipped). 51 unitarias ya verdes, sin repetir. Sin diferencia ni pérdida de resultados en código de proceso. Revisión misma sesión, no independiente; límites y fallo fork constan en QA-parte-2.md. (55915e7) |
