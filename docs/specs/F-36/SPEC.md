@@ -1,6 +1,6 @@
 # SPEC F-36: Cancelación en curso
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-36-1-cancelacion-en-curso
 **Verificación IA:** revision bf38e59
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
@@ -105,3 +105,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code Sonnet 5.5, no independiente | 2026-11-11 | Ficha docs/evidencia/F-36_cancelacion_en_curso.md; bitacora publicada en estado; medicion B.6 en nodos reales: Medicion pendiente, sin datos inventados (3d9175d) |
 | documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de revision | Claude Code (Sonnet 5.5), sin subagente independiente | 2026-11-11 | Revisión del diff contra la parte 2 del SPEC: escenario, integración Linux y ficha con medición pendiente; 14 pruebas verdes, sin desviaciones (bf38e59) |
+| revision | José Andrés Loría Herrera | 2026-11-11 |  |
