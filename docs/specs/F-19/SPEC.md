@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion aa73b49
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -99,3 +99,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Codex | 2026-11-10 | Revision independiente de 54912ab contra SPEC parte 1: solo dos archivos nuevos de pruebas, seleccion y validacion estrategia/N y protocolo con fabrica/runtime inyectados, sin implementacion. python -m pytest -q tests/unit/test_model_loading.py tests/unit/test_model_loader.py --tb=short: 46 failed por ModuleNotFoundError de src.domain.model_loading ausente; coleccion correcta sin skip ni xfail. git diff --check limpio; conformidad repo 0 problemas; arbol limpio y HEAD igual upstream. Suite general bloqueada por fallo preexistente Windows os.geteuid en test_dataset_sintetico_qa2.py:46. No procesos reales ni mediciones; pendientes partes 2 y 3. (54912ab) |
 | tests | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de implementacion | Codex | 2026-11-10 | Revision independiente de aa73b49 contra SPEC parte 1: 83 lineas de producto en dominio e infraestructura, tests intactos desde 54912ab. Ejecucion propia pytest focal y arquitectura: 50 passed; conformidad repo 0 problemas; diff check limpio, arbol limpio y HEAD igual upstream. Suite general bloqueada por os.geteuid Windows preexistente. Subagente ejecuto complementaria sin ese archivo: 1611 passed, 2 failed, 4 skipped, 13 xfailed, 8 deselected. Reproduje independientemente ambos fallos en baseline 887f2c7: ruta /etc/passwd y XPASS strict nombre malicioso, 2 failed 2 passed. Sin regresiones nuevas detectadas; suite general no verde y aprobacion ordinaria bloqueada. No procesos reales ni mediciones; parte 2 pendiente. (aa73b49) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 | Autorizado por la persona: suite general bloqueada por os.geteuid en Windows y dos fallos preexistentes reproducidos en baseline 887f2c7; pruebas focales y arquitectura 50 passed, sin cambios en tests |
