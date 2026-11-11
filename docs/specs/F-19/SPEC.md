@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** revision
+**Fase:** implementacion
 **Base:** feat/F-19-1-estrategias-de-carga
 **Verificación IA:** documentacion 10d4b01
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de documentacion | Codex | 2026-11-10 | Documentación parte 2: resumen y enlace al QA Linux en SPEC; QA-parte-2.md conserva timeout real de fork, prueba completa workers_compartidos y límites. Bitácora IA publicada por flujo.py; error real de edición en worktree incorrecto registrado y revertido. Sin pruebas repetidas; verificación documental según flujo y no independiente. (10d4b01) |
 | documentacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
+| devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | La prueba real de Whisper y ForkProcessRuntime requieren POSIX; marcar la integración real como skip en Windows para evitar fallo de colección/ejecución local. |
