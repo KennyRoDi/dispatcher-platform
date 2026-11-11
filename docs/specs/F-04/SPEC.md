@@ -1,8 +1,8 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** pr
-**Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
-**Verificación IA:** revision 5d4b147
+**Fase:** cerrada
+**Base:** feat/F-04-3-verdad-de-referencia-y-procedencia
+**Verificación IA:** revision 29b8271
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
 
 ## Objetivo
@@ -131,7 +131,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | 1 | `feat(F-04): comparador de aciertos y errores por categoría` | `src/domain/ground_truth.py` (≈ 110 líneas) y sus pruebas. Documentos: registro de AD-40 en `docs/ARQUITECTURA.md` §8 y de SUP-26 y SUP-27 en `docs/REQUERIMIENTOS.md` |
 | 2 | `feat(F-04): validador de procedencia y licencia` | `src/domain/provenance.py` (≈ 90 líneas) y sus pruebas |
 | 3 | `feat(F-04): lectores, CLI de procedencia y comparación` | `src/adapters/dataset_truth_files.py` y `scripts/dataset_verdad.py` (≈ 250 líneas), pruebas unitarias de la CLI y la prueba de aceptación |
-| 4 | `docs(F-04): procedencia por fuente y tabla de aciertos en dataset.md` | Sección de procedencia y licencia con el recuento real del manifiesto de F-03 y la salida real de `procedencia`. La tabla de aciertos va solo si hay salidas reales de análisis sobre la muestra; si no, queda «pendiente: sin salidas reales de análisis». Bitácora de IA |
+| 4 | `docs(F-04): procedencia por fuente y tabla de aciertos en dataset.md` | Sección de procedencia y licencia con el recuento real del manifiesto de F-03 y la salida real de `procedencia`. La tabla de aciertos va solo si hay salidas reales de análisis sobre la muestra; si no, queda «pendiente: sin salidas reales de análisis». Bitácora de IA. Hecha: sección de procedencia con recuento y salida reales en `docs/dataset.md`; la tabla de aciertos queda pendiente (sin salidas reales de análisis) |
 
 Las partes 1 y 2 son independientes entre sí; la 3 depende de ambas. Si la parte 3 supera 400 líneas, se divide en lectores y CLI.
 
@@ -189,4 +189,14 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo SPEC y ARQUITECTURA (AD-40 una clausula); SPEC con tamaño normal tras el incidente de edicion que el documentador revirtio antes del commit (comprobado con wc y diff --stat). conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). (b904fdd) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes; reprodujo 3 limites declarados y ejecuto pytest 1800 passed/20 xfailed, aceptacion 2 passed y conformidad 0. Sin commits de codigo desde la documentacion (comprobado). (5d4b147) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte 4 solo documental (docs/dataset.md): sin pruebas ni codigo. Rama sin cambios de src/scripts/tests respecto de la parte 3. Verificacion no independiente. (89bb871) |
+| tests | Kenni Rodriguez | 2026-11-10 | parte solo documental; aprobacion delegada por la persona |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; sin subagente) | 2026-11-10 | Parte 4 solo documental (docs/dataset.md): sin pruebas ni codigo. Rama sin cambios de src/scripts/tests respecto de la parte 3. Verificacion no independiente. (9b2bc15) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | parte solo documental; aprobacion delegada por la persona |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; sin subagente: verificacion no independiente) | 2026-11-10 | Ejecute PYTHONPATH=. python -m scripts.dataset_verdad procedencia --manifiesto dataset/sintetico/manifest.json: '490 fuentes cumplen la procedencia', rc 0. Recuento del manifiesto: 490 filas con origen sintetico y licencia MIT (300 imagenes, 150 audios, 25 textos, 10 documentos, 5 videos). Caso negativo con una copia del manifiesto sin licencia en la primera fila: rc 1 y se imprime el defecto (salida guardada). No hay salidas reales de analisis: la tabla de aciertos queda pendiente. (d1b6d10) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | verificacion del orquestador sin QA independiente: parte solo documental; aprobacion delegada por la persona |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo docs/dataset.md (+42) y fila 4 del SPEC. Texto cotejado con la salida real que ejecute (490 fuentes rc 0; caso negativo rc 1). Tabla de aciertos marcada pendiente, sin datos inventados. conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). (2dc0c29) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin hallazgos; reprodujo procedencia (490 fuentes, rc 0), recuento por tipo, conformidad 0 y diff sin cambios en src/scripts/tests. No reprodujo el caso negativo (lo ejecute yo en verificacion, salida guardada). (29b8271) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
