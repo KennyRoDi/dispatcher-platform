@@ -97,15 +97,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 - Validez: los patrones sintéticos no equivalen a fotos reales; F-08 mide detección sobre ellos y la limitación se declara en `docs/dataset.md`.
 - Distribución: el enlace de Google Drive depende de la persona y queda fuera del repo; si no se sube, los demás integrantes deben regenerar los casos en local.
 
-**Límites declarados de la parte 6.** La opción C (limpieza de huérfanos) no se garantiza ante `SIGTERM` ni una señal fatal: el proceso termina con código 143 y quedan archivos huérfanos; tras ello se borra `--out` y se repite la generación. El comando correcto desde la raíz es `PYTHONPATH=. python -m scripts.dataset_sintetico`.
+**Límites declarados de la parte 6.** La opción C (limpieza de huérfanos) se garantiza ante `SIGTERM` (código 143, desde las correcciones posteriores) pero no ante `SIGKILL` ni una señal fatal, que dejan archivos huérfanos; tras ello se borra `--out` y se repite la generación. El comando correcto desde la raíz es `PYTHONPATH=. python -m scripts.dataset_sintetico`.
 
 **Límites declarados de la parte 7.**
 - Tras un fallo a mitad de la generación se borran los archivos creados en esa ejecución; el `manifest.json` previo ya se borró y no se restaura.
 - No se detecta un enlace simbólico creado durante la ejecución: la comprobación ocurre una sola vez, antes de generar.
-- Se rechaza cualquier enlace simbólico dentro de `--out`, aunque no sea de un caso; es más estricto que lo pedido y está cubierto por un xfail estricto en `tests/unit/test_dataset_parte7_qa.py`.
-- Pendientes aceptados, con xfail estricto en el mismo archivo: un `--out` con `..` tras un segmento inexistente hace que `rmdir` del directorio actual lance `OSError` y tape el error original, y deja el padre creado; un `mkdir(parents=True)` que falla a mitad de la cadena (nombre demasiado largo) deja los padres ya creados.
-- Pendiente aceptado, sin prueba: `DatasetParams` no tiene tope superior, así que valores enormes se aceptan y agotan tiempo o disco.
-- `SIGTERM` sigue sin manejarse (ver los límites de la parte 6).
+- Se rechaza cualquier enlace en `--out`, aunque no sea de un caso (decisión aceptada, más estricta que lo pedido), con error de uso (`parser.error`, código 2) y sin traza; lo cubre `test_un_enlace_ajeno_a_los_casos_dentro_de_out_se_rechaza_sin_tocar_nada`.
+- Cerrado en las correcciones posteriores (`fix/F-03-pendientes`): `--out` se normaliza con `resolve()` antes de crear padres, `mkdir` corre dentro del `try` y la limpieza (`_remove_created`) es de mejor esfuerzo: un `rmdir` fallido no tapa el error original.
+- Cerrado: `DatasetParams` tiene topes superiores (`MAX_CASES`, `MAX_MESSAGES`, `MAX_IMAGES`, `MAX_AUDIOS`, `MAX_HEAVY_BYTES`) y acepta enteros de numpy.
+- Cerrado: `main` convierte `SIGTERM` en `SystemExit(143)` mientras genera, de modo que la limpieza corre y `subprocess.run` mata a ffmpeg; un `SIGKILL` sigue sin limpiarse. Un `TimeoutExpired` de ffmpeg termina con código 1 y mensaje, y un ffmpeg ausente da `RuntimeError` claro.
 
 **Preguntas abiertas.** Ninguna.
 

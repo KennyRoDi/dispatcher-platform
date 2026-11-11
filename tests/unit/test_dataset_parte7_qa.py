@@ -34,7 +34,6 @@ def test_un_out_que_es_un_enlace_roto_se_rechaza_con_error_de_uso(tmp_path):
         _generate(out, tmp_path)
 
 
-@pytest.mark.xfail(strict=True, reason="out.mkdir(parents=True) corre fuera del try: si falla a mitad de cadena (nombre demasiado largo) los padres recien creados quedan")
 def test_si_mkdir_falla_a_mitad_de_la_cadena_no_quedan_padres_creados(tmp_path):
     out = tmp_path / "a" / "b" / ("x" * 300)
     with pytest.raises(OSError):
@@ -43,7 +42,6 @@ def test_si_mkdir_falla_a_mitad_de_la_cadena_no_quedan_padres_creados(tmp_path):
     assert not (tmp_path / "a").exists()
 
 
-@pytest.mark.xfail(strict=True, reason="con '..' tras un segmento inexistente, created_dirs incluye 'rel/..' (el cwd): rmdir lanza OSError que tapa el error original y deja 'rel'")
 def test_un_out_con_punto_punto_conserva_el_error_original_y_no_deja_padres(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with pytest.raises(RuntimeError, match="ffmpeg fallo"):
@@ -64,14 +62,15 @@ def test_rechazar_un_enlace_no_borra_el_manifiesto_previo(tmp_path):
     assert (out / MANIFEST_NAME).read_text(encoding="utf-8") == "[]"
 
 
-@pytest.mark.xfail(strict=True, reason="el SPEC declara aceptado que _generate rechace cualquier enlace simbolico bajo --out, aunque no sea de un caso")
-def test_un_enlace_ajeno_a_los_casos_dentro_de_out_no_impide_generar(tmp_path):
+def test_un_enlace_ajeno_a_los_casos_dentro_de_out_se_rechaza_sin_tocar_nada(tmp_path):
     outside = tmp_path / "fuera"
     outside.mkdir()
     out = tmp_path / "out"
     out.mkdir()
     (out / "notas").symlink_to(outside)
 
-    assert _generate(out, tmp_path) == 0
+    with pytest.raises(SystemExit):
+        _generate(out, tmp_path)
+
     assert list(outside.iterdir()) == []
     assert (out / "notas").is_symlink()
