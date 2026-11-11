@@ -9,6 +9,18 @@ from src.domain.finding import Finding
 from src.domain.severity import SeverityRules
 
 
+def cargar_ajustes_de_texto(ruta: Path) -> TextSettings:
+    with open(ruta, "rb") as archivo:
+        datos = tomllib.load(archivo)
+    return TextSettings(
+        SeverityRules.from_dict(datos),
+        datos.get("temas", {}),
+        tamano_lote=datos.get("tamano_lote", 50),
+        n_palabras_clave=datos.get("n_palabras_clave", 5),
+        umbral_ofensa=datos.get("umbral_ofensa", 0.5),
+    )
+
+
 class TextAnalyzer:
     def __init__(
         self,
@@ -26,16 +38,15 @@ class TextAnalyzer:
 
     @classmethod
     def from_config(cls, parser: ConversationParser, models: TextModels, ruta: Path) -> "TextAnalyzer":
-        with open(ruta, "rb") as archivo:
-            datos = tomllib.load(archivo)
+        ajustes = cargar_ajustes_de_texto(ruta)
         return cls(
             parser,
             models,
-            SeverityRules.from_dict(datos),
-            datos.get("temas", {}),
-            tamano_lote=datos.get("tamano_lote", 50),
-            n_palabras_clave=datos.get("n_palabras_clave", 5),
-            umbral_ofensa=datos.get("umbral_ofensa", 0.5),
+            ajustes.reglas,
+            ajustes.lexico,
+            ajustes.tamano_lote,
+            ajustes.n_palabras_clave,
+            ajustes.umbral_ofensa,
         )
 
     def analyze(self, path: Path) -> list[Finding]:

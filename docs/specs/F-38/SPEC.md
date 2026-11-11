@@ -1,8 +1,8 @@
 # SPEC F-38: Despliegue en tres nodos
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
-**Verificación IA:** revision 97219bd
+**Verificación IA:** revision a545358
 **Historia:** US-38 · **Requisitos:** RNF-01, RNF-22; [B.2], [B.8], [B.10] · **Responsable:** K
 
 ## Objetivo
@@ -218,3 +218,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-05 |  |
 | verificación IA de revision | Claude Code (Opus 5.5), orquestador; revisor en subagente | 2026-11-05 | Verificacion de revision sobre 97219bd. Revisor: DEVUELTO en la primera ronda con 6 hallazgos de documentos, todos confirmados por mi; corregidos por el documentador; APROBADO en la segunda ronda. Lei el delta de SPEC, DECISIONES_DISENO y la lista 5.6 de la guia; el resto del diff lo lei en las fases previas. Suite: 682 passed, 3 skipped, 1 deselected; conformidad: 0 problemas. Quedan para Kenni: python3.13 en el venv, cifra de lineas de la bitacora, hallazgos preexistentes. Sin comprobar: Docker, Compose, imagen, PowerShell, Tailscale, run_load real; US-38 y RNF-01 quedan para la Parte 2. (97219bd) |
 | revision | Kenni Rodriguez | 2026-11-05 |  |
+| verificación IA de tests | orquestador | 2026-11-11 | Simulacion local corrida por agente; evidencia en docs/evidencia/F-38_tres_nodos_simulacion_local_2026-11-11.md (4d3d79b); 0 contenedores restantes; sin pruebas nuevas (SPEC fila 2) (4d3d79b) |
+| tests | Kenni Rodriguez | 2026-11-11 | aprobación delegada; el SPEC admite sin pruebas si la corrida no revela errores de código |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Sin cambios de codigo en src (diff solo docs/evidencia) (40e1a3e) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código |
+| verificación IA de verificacion | orquestador | 2026-11-11 | Sin QA independiente: parte de evidencia; hallazgo real de la guia (variables F-17 omitidas) pasa a documentacion; captura real y Tailscale pendientes (1f343ad) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin código que romper |
+| verificación IA de documentacion | orquestador | 2026-11-11 | Docs revisadas: variables F-17 en .env.example y DEPLOY_WORKERS (nombres coinciden con config.py:196, env_file las pasa al worker), sin valores inventados; bitacora en estado (10adc18) |
+| documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | orquestador | 2026-11-11 | Revision del diff contra el SPEC (fila 2 de la pila): evidencia marcada simulacion local, no acredita B.2 ni Tailscale; correcciones de guia; sin subagente revisor, verificacion no independiente (a545358) |
+| revision | Kenni Rodriguez | 2026-11-11 | aprobación delegada; sin subagente revisor |

@@ -119,7 +119,7 @@ POST /uploads/{id}/complete
 
 Decisiones que aplica: AD-10 (protocolo propio, chunk provisional de 4 MiB), SUP-13 (el chunk es solo unidad de transferencia; la dedup es por archivo, F-23), SUP-17 (el tamaño se calibra midiendo). Decisión nueva propuesta, que se registra en `docs/ARQUITECTURA.md` §8 al aprobar este plan:
 
-- **AD-28 (provisional).** Staging de chunks en disco del Nodo A, un archivo por chunk, con reensamblado por flujo hacia `ObjectStore`. Alternativas: retener los chunks en memoria; *multipart upload* de MinIO. Criterio: acota la RAM a un chunk por petición [B.5 M3] y deja el control del hash en la aplicación; *multipart* ataría F-22 al adaptador de F-23 y su ETag no es SHA-256. Costo: el archivo se escribe dos veces en disco. **Medición pendiente:** ficha M3.
+- **AD-42 (provisional).** Staging de chunks en disco del Nodo A, un archivo por chunk, con reensamblado por flujo hacia `ObjectStore`. Alternativas: retener los chunks en memoria; *multipart upload* de MinIO. Criterio: acota la RAM a un chunk por petición [B.5 M3] y deja el control del hash en la aplicación; *multipart* ataría F-22 al adaptador de F-23 y su ETag no es SHA-256. Costo: el archivo se escribe dos veces en disco. **Medición pendiente:** ficha M3.
 
 Código del I Proyecto que reutiliza: la aplicación FastAPI y el patrón de routers de `src/coordinator/`. `src/workers/storage.py` no se toca.
 
@@ -167,6 +167,8 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | 2 | `feat(F-22): recibir archivos por chunks en la api` | `src/coordinator/rutas_archivos.py`, `include_router`, `scripts/subir_por_chunks.py`, prueba de integración. Estimado: ~220 líneas |
 | 3 | `docs(F-22): medir throughput por tamano de chunk` | `scripts/measure/m3_chunks.py`, ficha M3 con datos medidos entre nodos, AD-10 actualizado |
 
+**Renumeración:** AD-28 pasó a AD-42 al integrar `main`: F-09 ya ocupa AD-28 para Whisper y AD-29–AD-41 también están asignadas. La decisión de staging conserva sus alternativas, criterio y estado provisional; el número se verificó libre en `main` el 2026-11-11.
+
 ## Riesgos y preguntas abiertas
 
 1. **Archivos nuevos fuera de la tabla de dueños.** `docs/CONTRATOS.md` asigna a Melany `rutas_archivos.py`, `chunks.py` y `minio_object_store.py`. Este plan agrega `src/application/chunked_upload.py` y `src/adapters/disk_chunk_staging.py`. ¿Se aprueban y se agregan a la tabla?
@@ -174,7 +176,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 3. **Tamaño máximo de chunk aceptado.** Propuesta: 64 MiB, para acotar la memoria por petición y permitir medir 16 MiB con margen.
 4. **Subidas abandonadas.** Quedan en disco hasta un `DELETE` o reinicio manual. ¿Se acepta para el alcance, o se agrega una expiración (por ejemplo 24 h) en una parte posterior?
 5. **Ubicación del staging.** Un volumen del Compose del Nodo A (`deploy/` es de Kenni). Hay que coordinar con él la línea del volumen.
-6. **Doble escritura en disco** (staging y luego MinIO): puede bajar el throughput medido. Se reporta en la ficha; si pesa demasiado, se revisa AD-28.
+6. **Doble escritura en disco** (staging y luego MinIO): puede bajar el throughput medido. Se reporta en la ficha; si pesa demasiado, se revisa AD-42.
 7. **Prueba entre nodos** depende de que F-38 (despliegue en tres nodos) esté disponible.
 8. **`put` aborta por excepción (desviación aceptada en verificación).** QA encontró que leer el staging dos veces, una para el hash y otra para el `put`, permitía que un chunk cambiado entre ambas pasadas llegara a `ObjectStore` bajo un SHA-256 ajeno (H1). Ahora el hash se calcula sobre el mismo flujo que lee `put`, y si no coincide la lectura lanza `IntegrityMismatch` antes del último byte. Por eso `put` sí se llama, pero termina en excepción. **Requisito para F-23 (MinIO) y F-28 (cifrado):** el adaptador de `ObjectStore` no debe confirmar el objeto si la lectura de `content` lanza una excepción. Falta llevarlo al contrato en `docs/CONTRATOS.md` y a `comprobar_object_store`, en una PR aparte según «Cambiar un contrato». Aprobado por Melany Vindas.
 9. **Carrera entre `receive` y `discard` (H2, baja).** Un `receive` concurrente que llega después de `discard` vuelve a crear la carpeta de la subida con un chunk y sin manifiesto. Se resuelve en la parte 2, junto con las subidas abandonadas de la pregunta 4.

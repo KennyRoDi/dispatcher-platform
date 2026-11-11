@@ -40,25 +40,50 @@ Contratos respetados
 from __future__ import annotations
 
 import logging
+import os
+from collections.abc import Mapping
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 
-from src.coordinator import rutas_casos, rutas_monitoreo, rutas_subtareas
+from src.coordinator import rutas_alertas, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
+from src.coordinator.seguridad import AutenticacionPrevia, autorizar
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 
-app = FastAPI(
-    title="Nodo Coordinador — Plataforma Distribuida de Procesamiento Multimedia",
-    version="4.0.0",
-    description=(
-        "Orquesta casos de procesamiento multimedia, encola sub-tareas en Redis "
-        "y consolida resultados mediante el patrón Barrier/Join."
-    ),
-)
+VALORES_QUE_DESACTIVAN = frozenset({"0", "false", "no", "off"})
 
-app.include_router(rutas_casos.router)
-app.include_router(rutas_subtareas.router)
-app.include_router(rutas_monitoreo.router)
+
+def auth_habilitada(env: Mapping[str, str]) -> bool:
+    return env.get("AUTH_ENABLED", "").strip().lower() not in VALORES_QUE_DESACTIVAN
+
+
+def crear_app(env: Mapping[str, str] | None = None) -> FastAPI:
+    env = os.environ if env is None else env
+    protegida = auth_habilitada(env)
+    app = FastAPI(
+        title="Nodo Coordinador — Plataforma Distribuida de Procesamiento Multimedia",
+        version="4.0.0",
+        description=(
+            "Orquesta casos de procesamiento multimedia, encola sub-tareas en Redis "
+            "y consolida resultados mediante el patrón Barrier/Join."
+        ),
+    )
+    dependencias = [Depends(autorizar)] if protegida else []
+    routers = (
+        rutas_casos.router,
+        rutas_subtareas.router,
+        rutas_monitoreo.router,
+        rutas_alertas.router,
+        rutas_reporte.router,
+    )
+    for router in routers:
+        app.include_router(router, dependencies=dependencias)
+    if protegida:
+        app.add_middleware(AutenticacionPrevia)
+    return app
+
+
+app = crear_app()

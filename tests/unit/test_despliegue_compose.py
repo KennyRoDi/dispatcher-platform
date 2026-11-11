@@ -88,7 +88,7 @@ def test_nodo_a_no_ejecuta_workers(nodo_a):
 
 
 def test_reaper_apunta_al_coordinador_del_compose(nodo_a):
-    assert _entorno(_servicio(nodo_a, "reaper")).get("COORDINATOR_URL") == "http://coordinator:8000"
+    assert _entorno(_servicio(nodo_a, "reaper")).get("COORDINATOR_URL") == "https://coordinator:8443"
 
 
 @pytest.mark.parametrize("variable, valor", [
@@ -100,8 +100,8 @@ def test_coordinador_usa_los_servicios_del_compose(nodo_a, variable, valor):
 
 
 @pytest.mark.parametrize("nombre, destino", [
-    ("coordinator", "8000"),
-    ("redis", "6379"),
+    ("coordinator", "8443"),
+    ("redis", "6380"),
     ("minio", "9000"),
 ])
 def test_nodo_a_publica_el_puerto_en_node_ip(nodo_a, nombre, destino):
@@ -171,7 +171,7 @@ def test_coordinador_arranca_la_app_en_todas_las_interfaces_del_contenedor(nodo_
     assert "src.coordinator.main:app" in comando
     assert (RAIZ / "src/coordinator/main.py").is_file()
     assert comando[comando.index("--host") + 1] == "0.0.0.0"
-    assert comando[comando.index("--port") + 1] == "8000"
+    assert comando[comando.index("--port") + 1] == "8443"
 
 
 def test_reaper_usa_el_redis_del_compose_con_su_clave(nodo_a):
@@ -193,7 +193,7 @@ def test_imagen_arranca_el_worker_por_defecto():
 
 @pytest.mark.parametrize("variable, valor", [
     ("REDIS_HOST", "<IP_TAILSCALE_NODO_A>"),
-    ("COORDINATOR_URL", "http://<IP_TAILSCALE_NODO_A>:8000"),
+    ("COORDINATOR_URL", "https://<IP_TAILSCALE_NODO_A>:8443"),
     ("MINIO_ENDPOINT", "<IP_TAILSCALE_NODO_A>:9000"),
 ])
 def test_env_example_apunta_al_nodo_a_por_tailscale(variable, valor):

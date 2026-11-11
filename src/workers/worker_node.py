@@ -3,8 +3,10 @@ from __future__ import annotations
 import importlib
 import json
 import logging
+import os
 import shutil
 import signal
+import sys
 import threading
 import time
 from datetime import datetime, timezone
@@ -12,9 +14,13 @@ from pathlib import Path
 
 import redis.exceptions
 
-from src.workers.config import Settings, make_redis
+from src.domain.admission import FootprintTable, admits
+from src.domain.oom_policy import ExitCause, GiveUp, OomPolicy, classify_exit
+from src.infrastructure.cgroup_resources import CgroupResourceReader, read_memory_events
+from src.workers.cancelacion import SubprocesosPorCaso, escuchar_cancelaciones
+from src.workers.config import Settings, load_admission_config, make_redis
 from src.workers.heartbeat import Heartbeat, WorkerStats
-from src.workers.recovery import ACTIVE_STATES, recover_subtask
+from src.workers.recovery import ACTIVE_STATES, _requeue, recover_subtask
 from src.workers.reporter import Reporter
 from src.workers.storage import Storage, StorageError
 
@@ -37,8 +43,21 @@ class Worker:
         reporter: Reporter | None = None,
         heartbeat_enabled: bool = True,
         ffmpeg_info: tuple[str, str] | None = None,
+        supervisor=None,
+        resource_reader=None,
+        footprints: FootprintTable | None = None,
+        admission_margin: int | None = None,
+        events_reader=None,
+        oom_policy: OomPolicy | None = None,
     ):
         self.settings = settings
+        self.resource_reader = resource_reader
+        self.footprints = footprints
+        self.admission_margin = admission_margin
+        self.events_reader = events_reader
+        self.oom_policy = oom_policy if oom_policy is not None else OomPolicy()
+        self._reserva_activa = 0
+        self._reserva_lock = threading.Lock()
         self.redis = redis_client if redis_client is not None else make_redis(settings)
         self.storage = storage if storage is not None else Storage(settings)
         if processor is None:
@@ -47,16 +66,21 @@ class Worker:
         self.reporter = reporter if reporter is not None else Reporter(settings, self.redis)
         self.heartbeat_enabled = heartbeat_enabled
         self.ffmpeg_info = ffmpeg_info
+        self.subprocesos = SubprocesosPorCaso(supervisor) if supervisor is not None else None
         self.stats = WorkerStats()
         self.stop_event = threading.Event()
         self.host = settings.node_name
         self.heartbeat: Heartbeat | None = None
         self._consumers: list[threading.Thread] = []
         self._flusher: threading.Thread | None = None
+        self._listener: threading.Thread | None = None
         self._inflight_key = f"worker:{settings.worker_id}:inflight"
 
     def start(self) -> None:
         self.recover_own_inflight()
+        self._borrar_temporales_huerfanos()
+        if self.subprocesos is not None:
+            self._listener = escuchar_cancelaciones(self.redis, self.subprocesos, self.stop_event)
 
         try:
             self.storage.ensure_buckets()
@@ -93,8 +117,16 @@ class Worker:
             thread.join(timeout)
         if self._flusher is not None:
             self._flusher.join(timeout)
+        if self._listener is not None:
+            self._listener.join(timeout)
         if self.heartbeat is not None:
             self.heartbeat.join(timeout)
+
+    def _borrar_temporales_huerfanos(self) -> None:
+        if not self.settings.work_dir.is_dir():
+            return
+        for orfano in self.settings.work_dir.iterdir():
+            shutil.rmtree(orfano, ignore_errors=True)
 
     def recover_own_inflight(self) -> dict:
         """Recovers this worker's own leftover inflight subtasks (e.g. a restart with the same worker_id)."""
@@ -163,7 +195,24 @@ class Worker:
             except Exception:
                 logger.exception("error al vaciar reportes pendientes")
 
+    def _fits_in_memory(self) -> bool:
+        try:
+            usage = self.resource_reader.read()
+            footprint = self.footprints.minimum(self.settings.worker_queues)
+            return admits(
+                current=usage.memory_current,
+                max=usage.memory_max,
+                footprint=footprint + self._reserva_activa,
+                margin=self.admission_margin,
+            )
+        except Exception:
+            logger.exception("no se pudo evaluar la admisión; no se consume")
+            return False
+
     def poll_once(self, timeout: int = 1) -> bool:
+        if self.resource_reader is not None and not self._fits_in_memory():
+            self.stop_event.wait(timeout)
+            return False
         item = self.redis.blpop(self.settings.queue_keys(), timeout=timeout)
         if item is None:
             return False
@@ -269,6 +318,12 @@ class Worker:
         output_bytes = 0
         encoder: str | None = None
 
+        subprocesos = self.subprocesos.para_subtarea(data["case_id"]) if self.subprocesos else None
+        reserva = int(data.get("mem_reserve") or 0)
+        self._ajustar_reserva(reserva)
+        oom_base = self._oom_kill()
+        fallo: Exception | None = None
+
         try:
             src = self.storage.download(data["file_path"], in_dir)
             started_at = datetime.now(timezone.utc).isoformat()
@@ -282,6 +337,10 @@ class Worker:
             ):
                 params["hwaccel"] = self.settings.hwaccel
             on_progress = self._make_progress_callback(subtask_key)
+            if subprocesos is not None:
+                extra = {"supervisor": subprocesos}
+            else:
+                extra = {}
 
             result = self.processor.process(
                 data["operation"],
@@ -291,6 +350,7 @@ class Worker:
                 on_progress=on_progress,
                 threads=self.settings.threads_per_job(),
                 timeout=self.settings.ffmpeg_timeout,
+                **extra,
             )
             outputs = self.storage.upload_outputs(result.outputs, data["case_id"], subtask_id)
             status = "completed"
@@ -302,6 +362,7 @@ class Worker:
             error = str(e)
             error_type = "StorageError"
         except Exception as e:
+            fallo = e
             status = "failed"
             error = str(e)
             processing_error_cls = getattr(self.processor, "ProcessingError", None)
@@ -311,7 +372,15 @@ class Worker:
                 error_type = "InternalError"
                 logger.exception("error interno procesando %s", subtask_id)
         finally:
+            self._ajustar_reserva(-reserva)
+            if subprocesos is not None:
+                subprocesos.cerrar()
             shutil.rmtree(work_dir, ignore_errors=True)
+
+        if fallo is not None and self._es_oom(fallo, oom_base):
+            if self._reencolar_por_oom(subtask_id, data, reserva):
+                return None
+            error_type = "oom"
 
         finished_at = datetime.now(timezone.utc).isoformat()
         processing_s = round(time.monotonic() - started_monotonic, 3)
@@ -344,6 +413,45 @@ class Worker:
 
         return payload
 
+    def _ajustar_reserva(self, delta: int) -> None:
+        with self._reserva_lock:
+            self._reserva_activa += delta
+
+    def _oom_kill(self) -> int | None:
+        if self.events_reader is None:
+            return None
+        try:
+            return self.events_reader().oom_kill
+        except Exception:
+            logger.exception("no se pudo leer memory.events")
+            return None
+
+    def _es_oom(self, fallo: Exception, oom_base: int | None) -> bool:
+        codigo = getattr(fallo, "exit_code", None)
+        actual = self._oom_kill()
+        if codigo is None or oom_base is None or actual is None:
+            return False
+        return classify_exit(codigo, actual - oom_base) is ExitCause.OOM
+
+    def _reencolar_por_oom(self, subtask_id: str, data: dict, reserva: int) -> bool:
+        """True si la sub-tarea quedó reencolada (o su caso cancelado); False si la política se rindió."""
+        subtask_key = f"subtask:{subtask_id}"
+        oom_count = int(self.redis.hget(subtask_key, "oom_count") or 0)
+        if not reserva and self.footprints is not None:
+            reserva = self.footprints.minimum([data["operation"]])
+        decision = self.oom_policy.decide(oom_count, reserva)
+        if isinstance(decision, GiveUp):
+            return False
+        _requeue(
+            self.redis, subtask_id, data.get("case_id"), data["operation"], data.get("priority"), "oom"
+        )
+        self.redis.hset(subtask_key, mapping={"oom_count": oom_count + 1, "mem_reserve": decision.reserve})
+        self.redis.hincrby(subtask_key, "attempts", -1)
+        self.redis.srem(self._inflight_key, subtask_id)
+        self.stats.task_finished(False)
+        logger.warning("subtarea %s terminada por OOM, reencolada con reserva %d", subtask_id, decision.reserve)
+        return True
+
     def _parse_params(self, raw: str | None, subtask_id: str) -> dict:
         try:
             params = json.loads(raw) if raw else {}
@@ -374,7 +482,28 @@ def main() -> None:
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(threadName)s %(name)s: %(message)s",
     )
-    Worker(Settings.from_env()).run_forever()
+    settings = Settings.from_env()
+    footprints, margin = load_admission_config(os.environ, settings.worker_queues)
+    reader = CgroupResourceReader(
+        cgroup_path=os.environ.get("CGROUP_PATH", "/sys/fs/cgroup"),
+        worker_id=settings.worker_id,
+    )
+    cgroup_path = os.environ.get("CGROUP_PATH", "/sys/fs/cgroup")
+    supervisor = None
+    if sys.platform != "win32":
+        from src.adapters.posix_process_runner import PosixProcessRunner
+        from src.application.process_supervisor import ProcessSupervisor
+        from src.infrastructure.clock import SystemClock
+
+        supervisor = ProcessSupervisor(PosixProcessRunner(), SystemClock(), time.sleep)
+    Worker(
+        settings,
+        supervisor=supervisor,
+        resource_reader=reader,
+        footprints=footprints,
+        admission_margin=margin,
+        events_reader=lambda: read_memory_events(cgroup_path),
+    ).run_forever()
 
 
 if __name__ == "__main__":
