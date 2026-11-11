@@ -126,7 +126,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 2. **Rol `servicio` (AD-33).** El enunciado menciona tres roles; el cuarto es técnico para los workers. Alternativa: dejar `POST /subtasks/report` sin proteger hasta F-27 (mTLS), lo cual deja el endpoint abierto. Requiere coordinar con José Andrés, que debe configurar el token en los workers (variable de entorno); sin su cambio, los workers fallan con 401 al activar la parte 3. Decidir si se activa con una variable `AUTH_ENABLED` por defecto activa.
 3. **Dashboard de Streamlit** (Melany) llama a `GET /cases`, `/workers`, `/stats`: necesitará un token de rol supervisor; se avisa al dueño. No se toca `dashboard/`.
 4. **Mediciones previas.** F-26 añade una verificación de firma por petición; no se estima su costo. Si M1 a M3 ya tienen mediciones, evaluar si repetirlas (`docs/IMPLEMENTACION.md` §7).
-5. **Rutas futuras** (`rutas_archivos.py`, alertas) quedan fuera de la matriz y la prueba `test_toda_ruta_esta_clasificada` obligará a clasificarlas al fusionarse, lo que puede bloquear a su dueño: confirmar que se acepta.
+5. **Rutas futuras** (nuevas rutas de alertas) deben agregarse a la matriz y la prueba `test_toda_ruta_esta_clasificada` las detecta. F-22 clasificó `POST`/`PUT /uploads` como `CREAR_CASO` y `GET /uploads/{upload_id}` como `CONSULTAR_CASO`; solo analistas y administradores pueden subir, y la consulta permite los roles que ya tienen acceso a casos.
 6. **Expiración de 60 min y HS256** son provisionales (SUP-28, AD-33); no hay dato que las respalde.
 7. **PyJWT:** versión exacta se fija en la parte 2 tras comprobarla con `pip`; no se afirma aquí.
 
