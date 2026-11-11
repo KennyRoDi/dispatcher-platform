@@ -1,6 +1,6 @@
 # SPEC F-32: Routing por tipo de nodo
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests deb3e93
 **Historia:** US-32 · **Requisitos:** RF-41 (B.5 M5, Conexión con Unidad 1) · **Responsable:** J
@@ -74,3 +74,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | SPEC F-32 completo, plan de 1 PR, medición pendiente anotada (8fe6903) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (Sonnet 5.5), no independiente | 2026-11-10 | Pruebas nuevas en rojo (ModuleNotFoundError routing y routing_config), sin código de producción (deb3e93) |
+| tests | José Andrés Loría Herrera | 2026-11-10 |  |
