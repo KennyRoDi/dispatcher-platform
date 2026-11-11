@@ -17,11 +17,11 @@ Las cuatro máquinas se comunican por **Tailscale**. El Nodo A publica estos pue
 
 | Puerto | Servicio |
 |---|---|
-| 8000 | Coordinador (`/docs`, `/stats`, `/workers`) |
-| 6379 | Redis |
+| 8443 | Coordinador (HTTPS) (`/docs`, `/stats`, `/workers`) |
+| 6380 | Redis (TLS, `rediss://`) |
 | 9000, 9001 | MinIO: API y consola |
 
-Estos puertos van sin TLS hasta F-27: Tailscale no sustituye a TLS. Un cortafuegos como `ufw` no basta para limitarlos, porque las reglas de Docker para puertos publicados pueden saltárselo; por eso se publican solo en esa IP. Los workers solo abren conexiones salientes, de modo que los nodos Windows no necesitan reglas de entrada.
+Coordinador y Redis van con TLS 1.3 (F-27); MinIO también, con su propio certificado. Tailscale no sustituye a TLS. Un cortafuegos como `ufw` no basta para limitarlos, porque las reglas de Docker para puertos publicados pueden saltárselo; por eso se publican solo en esa IP. Los workers solo abren conexiones salientes, de modo que los nodos Windows no necesitan reglas de entrada.
 
 **Reparto.** Nadie asigna tareas a un nodo: cada worker toma trabajo (`BLPOP`) de las colas de `WORKER_QUEUES` cuando tiene capacidad (`WORKER_CONCURRENCY`), primero de las `queue:{op}:high` y luego de las `queue:{op}`. El nodo más rápido termina procesando más. `threads_per_job` es `cpu_count // WORKER_CONCURRENCY`. La justificación está en `docs/DECISIONES_DISENO.md`, decisiones 3 y 4.
 
@@ -93,8 +93,9 @@ Cada máquina tiene su propio `.env` en la raíz del repositorio. **Nunca se ver
 | `NODE_NAME` | Salida de `hostname` de esa máquina. Único entre nodos | No |
 | `NODE_IP` | Salida de `tailscale ip -4` de esa máquina | No |
 | `WORKER_MEM_LIMIT` | Límite de memoria medido para ese worker, en formato admitido por Compose | No |
+| `TLS_CA_FILE` | Ruta de `ca.pem` en esa máquina (la copia desde el Nodo A) | Sí |
 | `REDIS_HOST` | `<IP_TAILSCALE_NODO_A>` | Sí |
-| `COORDINATOR_URL` | `http://<IP_TAILSCALE_NODO_A>:8000` | Sí |
+| `COORDINATOR_URL` | `https://<IP_TAILSCALE_NODO_A>:8443` | Sí |
 | `MINIO_ENDPOINT` | `<IP_TAILSCALE_NODO_A>:9000` | Sí |
 | `REDIS_PASSWORD` | Obligatorio; el Compose del Nodo A no arranca sin él | Sí |
 | `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY` | Propias, no `minioadmin`, que es un valor público | Sí |
@@ -151,14 +152,22 @@ El orden importa: primero el Nodo A, después cada worker.
 
 Tailscale debe estar activo antes de `docker compose up`, porque los puertos se publican en esa IP.
 
+**Certificados (F-27).** Antes de levantar, genera la CA y el certificado del Nodo A, fuera del repo (requiere `openssl` y `python3`):
+
+```bash
+NODE_IP=$(tailscale ip -4) NODE_NAME=$(hostname) CERTS_DIR=$HOME/.ms-certs bash deploy/tls/generar_certs.sh
+```
+
+En el `.env` del Nodo A: `CERTS_DIR` (la misma ruta), `CERTS_UID=$(id -u)` y `CERTS_GID=$(id -g)`. Con ellos `coordinator`, `redis` y `minio` corren con ese UID para leer `server.key` (0600); no se probó con las imágenes reales. A cada worker copia **solo** `ca.pem` (nunca `ca.key` ni `server.key`) y fija `TLS_CA_FILE` con su ruta en su `.env`.
+
 ```bash
 tailscale ip -4    # debe coincidir con NODE_IP
 docker compose up -d --build
 docker compose ps
-curl -s -o /dev/null -w "%{http_code}\n" "http://<IP_TAILSCALE_NODO_A>:8000/openapi.json"
+curl -s -o /dev/null -w "%{http_code}\n" "https://<IP_TAILSCALE_NODO_A>:8443/openapi.json"
 ```
 
-Esperado: `redis`, `minio` y `coordinator` en `healthy`, `reaper` corriendo y código `200`. Consola de MinIO: `http://<IP_TAILSCALE_NODO_A>:9001`, con las credenciales de tu `.env`.
+Esperado: `redis`, `minio` y `coordinator` en `healthy`, `reaper` corriendo y código `200`. Consola de MinIO: `https://<IP_TAILSCALE_NODO_A>:9001`, con las credenciales de tu `.env`.
 
 MinIO dejó de publicar imágenes públicas, por eso el Compose usa `cgr.dev/chainguard/minio:latest`. Si dejara de estar disponible, define otra en `.env` con `MINIO_IMAGE=...`.
 
@@ -185,10 +194,10 @@ docker compose --env-file .env -f deploy/docker-compose.worker.yml logs -f
 ### Comprobar los tres workers, desde el Nodo A
 
 ```bash
-curl -s "http://<IP_TAILSCALE_NODO_A>:8000/workers" | python3 -m json.tool
+curl -s "https://<IP_TAILSCALE_NODO_A>:8443/workers" | python3 -m json.tool
 ```
 
-Debe haber tres entradas con `alive: true`, y en cada una `host` y `hostname` iguales a su `NODE_NAME`, e `ip` igual a su `NODE_IP`. Desde Windows: `Invoke-RestMethod http://<IP_TAILSCALE_NODO_A>:8000/workers`.
+Debe haber tres entradas con `alive: true`, y en cada una `host` y `hostname` iguales a su `NODE_NAME`, e `ip` igual a su `NODE_IP`. Desde Windows: `Invoke-RestMethod https://<IP_TAILSCALE_NODO_A>:8443/workers`.
 
 ### Detener
 
@@ -221,7 +230,7 @@ También reescribe `dataset/manifest.json`, `cases.json` y `README.md`, que est�
 
 ```bash
 source .venv/bin/activate
-curl -s "http://<IP_TAILSCALE_NODO_A>:8000/workers" | python3 -m json.tool
+curl -s "https://<IP_TAILSCALE_NODO_A>:8443/workers" | python3 -m json.tool
 tailscale status
 docker compose exec redis redis-cli CLIENT LIST
 python3 -m scripts.run_load --dataset dataset --upload --limit 20
@@ -236,7 +245,7 @@ Escribe `docs/evidencia/carga_<AAAAMMDD_HHMMSS>.json` y `.md`, e imprime la ruta
 Con los workers todavía activos, porque la prueba consulta `GET /workers`:
 
 ```bash
-COORDINATOR_URL="http://<IP_TAILSCALE_NODO_A>:8000" \
+COORDINATOR_URL="https://<IP_TAILSCALE_NODO_A>:8443" \
 RUN_LOAD_JSON="docs/evidencia/carga_<AAAAMMDD_HHMMSS>.json" \
 python3 -m pytest -q -m acceptance tests/acceptance/test_tres_nodos.py
 ```
@@ -302,7 +311,7 @@ Ninguna fila se ha reproducido sobre nodos reales. «Sin comprobar» marca lo qu
 
 | Síntoma | Causa | Qué hacer |
 |---|---|---|
-| `check_connectivity` falla en el contenedor, pero en el host `Test-NetConnection <IP_TAILSCALE_NODO_A> -Port 6379` responde | **Sin comprobar.** Un contenedor de Docker Desktop en WSL2 no alcanza la red Tailscale del host. Es la base de esta topología | **La Parte 2 se detiene** y se devuelve a `plan`: `python scripts/flujo.py devolver plan "motivo"`. No improvises otra red |
+| `check_connectivity` falla en el contenedor, pero en el host `Test-NetConnection <IP_TAILSCALE_NODO_A> -Port 6380` responde | **Sin comprobar.** Un contenedor de Docker Desktop en WSL2 no alcanza la red Tailscale del host. Es la base de esta topología | **La Parte 2 se detiene** y se devuelve a `plan`: `python scripts/flujo.py devolver plan "motivo"`. No improvises otra red |
 | `Test-NetConnection` tampoco responde | Tailscale inactivo en alguna máquina, o el Nodo A sin levantar | `tailscale status`, `tailscale ping <IP_TAILSCALE_NODO_A>` y, en el Nodo A, `docker compose ps` |
 | `docker compose up` falla al publicar puertos en el Nodo A | **Sin comprobar.** Tailscale inactivo o `NODE_IP` distinto de `tailscale ip -4`. También podría ocurrir tras reiniciar, si Docker arranca antes que Tailscale | Activa Tailscale, corrige `NODE_IP` y repite `docker compose up -d` |
 | `required variable NODE_NAME is missing a value` | Falta `--env-file .env`, comando fuera de la raíz o `.env` sin completar | Repite desde la raíz con `--env-file .env` |
@@ -364,14 +373,14 @@ Al llegar a un estado terminal imprime el reporte consolidado: prioridad, totale
 Casos aleatorios adicionales, de 100 a 500, con archivos del manifiesto ya subidos:
 
 ```bash
-python -m scripts.generate_dataset --url http://<IP_TAILSCALE_NODO_A>:8000 --seed 1
+python -m scripts.generate_dataset --url https://<IP_TAILSCALE_NODO_A>:8443 --seed 1
 python -m scripts.generate_dataset --dry-run    # solo muestra los payloads
 ```
 
 ### Monitorear
 
 ```bash
-BASE=http://<IP_TAILSCALE_NODO_A>:8000
+BASE=https://<IP_TAILSCALE_NODO_A>:8443
 curl "$BASE/stats"                       # colas, casos por estado, workers vivos
 curl "$BASE/workers"                     # heartbeat de cada worker, con "alive"
 curl "$BASE/cases?status=retrying"       # casos por estado

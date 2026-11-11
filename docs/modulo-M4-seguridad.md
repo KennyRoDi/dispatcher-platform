@@ -1,6 +1,6 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 y 2). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 a 3). **Mediciones pendientes**: no hay salidas reales en este documento. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
 
 ## 1. Qué se implementó
 
@@ -116,6 +116,19 @@ Implementado en `src/adapters/encrypted_object_store.py` (`EncryptedObjectStore`
 - Coordinador y scripts: URLs `https://`. Redis: `rediss://`. MinIO: `MINIO_SECURE=true`.
 - Con TLS activo, una URL `http://` o `redis://`, o `MINIO_SECURE=false`, se rechaza al arrancar, sin degradar a texto claro.
 - Salidas reales de un arranque con TLS y de un rechazo: pendiente (sin captura ni ejecución medida).
+
+**Parte 3: certificados y Compose.**
+
+- `deploy/tls/generar_certs.sh` crea la CA (EC P-256, `pathlen:0`, 365 días) y el certificado del Nodo A (90 días) en `CERTS_DIR`, fuera del repo. Si a la CA le quedan 91 días o menos, se regenera y hay que redistribuir `ca.pem` a los workers.
+- Coordinador `8443` y Redis `6380` con TLS; MinIO con su certificado. Pasos en `docs/DEPLOY_WORKERS.md`.
+
+**Límites declarados.**
+
+- Redis y MinIO reales no se han probado con TLS: sin salida medida.
+- `coordinator`, `redis` y `minio` del Nodo A corren con `user: CERTS_UID:CERTS_GID` para leer `server.key` (0600). No se probó con las imágenes reales; el coordinador no escribe en disco (se revisó el código de `src/coordinator`), pero Redis y MinIO pueden requerir un `chown` único de `redis-data` y `minio-data`.
+- Con `TLS_ENABLED=false` el worker igual exige `TLS_CA_FILE`.
+- Pendientes de otros dueños: `dashboard/app.py:23` y `scripts/generate_dataset.py:18,291` aún apuntan a `http` y 8000.
+- Sin evidencia medida, M4 máximo 2.
 
 ### F-29 Cadena de custodia
 
