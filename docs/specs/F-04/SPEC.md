@@ -18,7 +18,7 @@ F-03 dejó el manifiesto con `etiqueta`, `categoria`, `positivo`, `origen`, `lic
 - **Validador de procedencia y licencia** (dominio puro): cada fuente debe tener un origen admitido (`sintetico`, `propio` o `publico`) y una licencia no vacía; una fuente `publico` exige además una licencia de una lista admitida (SUP-27). Una fuente sin licencia hace fallar la validación. Devuelve todos los defectos, no solo el primero.
 - **Forma de la muestra etiquetada**: un JSON propio de F-04 (ver Diseño) y una conversión desde las filas de imagen del manifiesto de F-03 (`positivo` → `{categoria}`, `neutro` → `{}`).
 - **Lectores y CLI** `scripts/dataset_verdad.py`: `procedencia` valida el manifiesto o una muestra; `comparar` valida la procedencia de la muestra, lee las salidas del análisis desde un JSON y escribe la tabla en texto o Markdown.
-- Registro de la decisión (AD-32) y de los supuestos (SUP-26, SUP-27) en `docs/ARQUITECTURA.md` §8 y `docs/REQUERIMIENTOS.md`.
+- Registro de la decisión (AD-40) y de los supuestos (SUP-26, SUP-27) en `docs/ARQUITECTURA.md` §8 y `docs/REQUERIMIENTOS.md`.
 - Sección de procedencia y licencia por fuente en `docs/dataset.md`, con el recuento real del manifiesto de F-03. La tabla de aciertos solo se escribe si existe una salida real de análisis sobre la muestra; si no, queda marcada «pendiente».
 
 **No incluye:**
@@ -63,7 +63,7 @@ Derivados del enunciado y de este diseño:
 **Qué mide la comparación sobre el dataset sintético.** Las imágenes de F-03 son colores sólidos y sus categorías (`objetos`, `paisajes`, `documentos`, `personas`) son las del generador, no las de un detector. Comparar con ellas valida el mecanismo, no la calidad de un modelo. La calidad real se reporta con muestras propias o públicas con licencia documentada (por ejemplo, las 20 imágenes de F-08), cuando existan sus salidas como dato.
 
 **Decisiones.**
-- AD-32 (nueva, se propone aquí y se registra en `docs/ARQUITECTURA.md` §8 en la parte 1): comparador y validador de procedencia en dominio puro, con entrada por datos. Alternativas: ampliar `validate_manifest` de F-03 (mezcla mínimos con procedencia y la deja atada a `ffmpeg`); un comparador que ejecute los analizadores (acopla F-04 a F-07 a F-09 y a modelos pesados). Criterio: «módulos independientes» y pruebas sin red, reloj ni modelos. Fuente: [B.3]; `docs/specs/F-03/SPEC.md`.
+- AD-40 (nueva, se propone aquí y se registra en `docs/ARQUITECTURA.md` §8 en la parte 1): comparador y validador de procedencia en dominio puro, con entrada por datos. Alternativas: ampliar `validate_manifest` de F-03 (mezcla mínimos con procedencia y la deja atada a `ffmpeg`); un comparador que ejecute los analizadores (acopla F-04 a F-07 a F-09 y a modelos pesados). Criterio: «módulos independientes» y pruebas sin red, reloj ni modelos. Fuente: [B.3]; `docs/specs/F-03/SPEC.md`.
 - SUP-26 (supuesto): la verdad de referencia mínima de B.3 («al menos una muestra») se cumple con una muestra de imágenes etiquetadas; texto y audio se agregan solo si existen etiquetas con procedencia y licencia declaradas. Los tonos y el ruido del dataset sintético son una etiqueta de origen del audio, no de contenido, y no entran a la comparación.
 - SUP-27 (supuesto, provisional): orígenes admitidos `sintetico`, `propio` y `publico`; una licencia en blanco o con un valor de relleno (`desconocida`, `ninguna`, `sin licencia`, `n/a`, `-`) se rechaza; una fuente `publico` exige una de `CC0-1.0`, `CC-BY-4.0`, `CC-BY-SA-4.0`, `MIT`, `Apache-2.0`. El enunciado dice «licencia que permita su uso académico» sin enumerarlas; la lista la confirma la persona.
 
@@ -103,7 +103,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-04): comparador de aciertos y errores por categoría` | `src/domain/ground_truth.py` (≈ 110 líneas) y sus pruebas. Documentos: registro de AD-32 en `docs/ARQUITECTURA.md` §8 y de SUP-26 y SUP-27 en `docs/REQUERIMIENTOS.md` |
+| 1 | `feat(F-04): comparador de aciertos y errores por categoría` | `src/domain/ground_truth.py` (≈ 110 líneas) y sus pruebas. Documentos: registro de AD-40 en `docs/ARQUITECTURA.md` §8 y de SUP-26 y SUP-27 en `docs/REQUERIMIENTOS.md` |
 | 2 | `feat(F-04): validador de procedencia y licencia` | `src/domain/provenance.py` (≈ 90 líneas) y sus pruebas |
 | 3 | `feat(F-04): lectores, CLI de procedencia y comparación` | `src/adapters/dataset_truth_files.py` y `scripts/dataset_verdad.py` (≈ 250 líneas), pruebas unitarias de la CLI y la prueba de aceptación |
 | 4 | `docs(F-04): procedencia por fuente y tabla de aciertos en dataset.md` | Sección de procedencia y licencia con el recuento real del manifiesto de F-03 y la salida real de `procedencia`. La tabla de aciertos va solo si hay salidas reales de análisis sobre la muestra; si no, queda «pendiente: sin salidas reales de análisis». Bitácora de IA |
@@ -118,7 +118,7 @@ Las partes 1 y 2 son independientes entre sí; la 3 depende de ambas. Si la part
 - **Duplicación con `aciertos_imagen.py` y `aciertos_texto.py`** (de José Andrés). Se deja sin tocar para no invadir su módulo; queda dos veces la lógica de VP/FP/FN/VN hasta que se decida migrar.
 - **Lista de licencias (SUP-27).** Una lista errónea acepta una fuente que el profesor no admite, o rechaza una válida. Es provisional.
 - **Solapamiento con `validate_manifest` de F-03**, que ya rechaza todo origen distinto de `sintetico`. Los dos coexisten: el de F-03 es estricto para el dataset sintético, el de F-04 es el general. Un dataset con fuentes públicas deberá relajar el de F-03.
-- **Colisión de identificadores.** SUP-25 ya lo usa la rama de F-19 (aún no fusionada); AD-31 lo usa la rama de F-12 (aún no fusionada), así que este SPEC usa AD-32; SUP-26 y SUP-27 están libres en todas las ramas a la fecha. Si otra rama fusiona antes, se renumera en la parte 1.
+- **Colisión de identificadores.** SUP-25 ya lo usa la rama de F-19 (aún no fusionada); AD-31 lo usa la rama de F-12 (aún no fusionada), así que este SPEC usó primero AD-32; main lo asignó después a F-32 (routing por tipo de nodo), por lo que se renumeró a AD-40; SUP-26 y SUP-27 están libres en todas las ramas a la fecha. Si otra rama fusiona antes, se renumera en la parte 1.
 
 **Preguntas abiertas para quien aprueba.**
 1. ¿Se confirma la lista de orígenes y licencias de SUP-27, en particular `propio` como origen admitido y si `MIT` y `Apache-2.0` cuentan como licencias de datos?
@@ -133,7 +133,7 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
-| verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-04 sin campos pendientes (grep), solo toca el SPEC respecto a F-03 parte 8, commit empujado. SUP-26/27 y AD-32 sin uso en origin/main (grep). Preguntas abiertas registradas en CLAUDE.md con decision provisional. No ejecute pruebas (sin codigo). (dd607f2) |
+| verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-04 sin campos pendientes (grep), solo toca el SPEC respecto a F-03 parte 8, commit empujado. SUP-26/27 y AD-40 sin uso en origin/main (grep). Preguntas abiertas registradas en CLAUDE.md con decision provisional. No ejecute pruebas (sin codigo). (dd607f2) |
 | plan | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests/unit/test_ground_truth.py (mas log del SPEC). pytest da ModuleNotFoundError src.domain.ground_truth (rojo por falta del modulo). Cubre VP/FP/FN/VN, precision/exhaustividad None, exactitud, ValueError y Finding. Sin codigo de implementacion. (d6a4d71) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
@@ -141,7 +141,7 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 2 xfail estrictos nuevos (accuracy con total 0, ids de tipos mezclados) en test_ground_truth_qa.py; src intacto. Ejecute test_ground_truth y _qa: 14 pasan/xfail segun lo esperado. Hallazgos menores a pendientes; accuracy global se declara en documentacion. No repeti la prueba de 200000 elementos (dato del QA). (b0f1c19) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
-| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca ARQUITECTURA (AD-32), REQUERIMIENTOS (SUP-26/27 provisional) y SPEC. conformidad.py: 0 problemas (ejecutado por mi). Numeros libres en main segun grep del documentador. No repeti pytest (solo docs). (8095761) |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo toca ARQUITECTURA (AD-40), REQUERIMIENTOS (SUP-26/27 provisional) y SPEC. conformidad.py: 0 problemas (ejecutado por mi). Numeros libres en main segun grep del documentador. No repeti pytest (solo docs). (8095761) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
-| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO con observaciones. Hallazgo medio (AD-31 usado por la rama de F-12) reproducido con grep en todas las ramas remotas: AD-32 libre; renumerado en ARQUITECTURA y SPEC. conformidad 0 problemas. Revisor ejecuto pytest 1649 passed/5 xfailed (no repetido tras el cambio de texto). (bb7a2ce) |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO con observaciones. Hallazgo medio (AD-31 usado por la rama de F-12) reproducido con grep en todas las ramas remotas: AD-40 libre; renumerado en ARQUITECTURA y SPEC. conformidad 0 problemas. Revisor ejecuto pytest 1649 passed/5 xfailed (no repetido tras el cambio de texto). (bb7a2ce) |
 | revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |

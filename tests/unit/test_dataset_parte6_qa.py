@@ -39,7 +39,10 @@ def test_una_ruta_con_nul_se_reporta_como_problema(tmp_path):
     assert any("a\x00b" in problem or "invalida" in problem for problem in problems)
 
 
-@pytest.mark.skipif(os.geteuid() == 0, reason="root ignora los permisos")
+@pytest.mark.skipif(
+    os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
+    reason="Windows no aplica chmod como permisos POSIX y root ignora los permisos",
+)
 def test_un_directorio_sin_permiso_se_reporta_como_problema(tmp_path):
     out, rows = _generated(tmp_path)
     blocked = out / rows[0]["path"].split("/")[0]
@@ -75,6 +78,7 @@ def test_si_falla_se_conserva_un_directorio_de_caso_vacio_preexistente(tmp_path)
     assert (out / "caso-01").is_dir()
 
 
+@pytest.mark.usefixtures("symlink_capable")
 def test_si_falla_no_quedan_huerfanos_detras_de_un_enlace_preexistente(tmp_path):
     outside = tmp_path / "fuera"
     outside.mkdir()
