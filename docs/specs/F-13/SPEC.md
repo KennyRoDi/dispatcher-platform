@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-13-2-reporte-consolidado
-**Verificación IA:** implementacion 13afce3
+**Verificación IA:** implementacion 12e1d1a
 **Historia:** US-13 · **Requisitos:** RF-13, RF-14 (B.4 Reporte consolidado, SUP-09, SUP-18) · **Responsable:** K
 
 ## Objetivo
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Adaptadores Redis y ruta implementados (13afce3, 133 lineas src); suite verde; obtener_almacen responde 503 hasta F-23; JSON de ejemplo sintetico en docs/ejemplos (13afce3) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: Redis caido da 500 (debe 503), hallazgo corrupto tumba reporte, fuente por file_path sale con sha vacio, fechas malformadas, bytes no UTF-8, case_id que colisiona con claves de lista |
+| verificación IA de implementacion | orquestador | 2026-11-11 | 14 hallazgos QA corregidos en 12e1d1a; suite verde; una asercion cambiada por error real (test_error_500); toca build_report.py de la parte 2 (_source con replace); hallazgos corruptos se omiten con warning de recuento (12e1d1a) |
