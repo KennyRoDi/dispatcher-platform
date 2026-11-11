@@ -76,7 +76,7 @@ En Docker Linux 29.7.2, Python 3.13.18, faster-whisper 1.2.1, PyAV 18.1.0 y CTra
 
 ## Resultados de parte 3
 
-Implementación de lectura RSS/PSS/cgroup y CLI terminada; pruebas locales focales verdes. Las mediciones M1 siguen pendientes: Docker no está disponible, WSL está denegado y no hay nodo worker Linux accesible. Ver [QA-parte-3.md](QA-parte-3.md); AD-07 sigue provisional.
+Implementación de lectura RSS/PSS/cgroup y CLI terminada. Preflight y 20 ejecuciones M1 en Docker Desktop Linux/WSL2 (4 GiB, sin swap) completadas; con N=2, `workers_compartidos` registró PSS medio 281929728 bytes frente a 420311450 para `por_proceso`. Es evidencia de esta carga y entorno, no de workers desplegados ni de otros modelos. Ver [QA-parte-3.md](QA-parte-3.md) y JSON crudos allí referenciados; AD-07 se apoya provisionalmente en esta medición.
 
 ## Plan de pila
 
