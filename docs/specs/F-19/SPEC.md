@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 1ada1d3
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -141,3 +141,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de verificacion | Codex | 2026-11-10 | PENDIENTE: unitarias focales ya verdes; integración POSIX requiere Linux. Docker npipe no existe y WSL devuelve E_ACCESSDENIED; no hay nodo Linux/cgroup v2 limitado. No se ejecutaron preflight ni repeticiones M1; QA-parte-3 documenta comandos y recurso faltante. No aprobar hasta lecturas reales PSS/memory.current. (0ca579a) |
 | verificación IA de verificacion | Codex | 2026-11-10 | Verificación de F-19 parte 3: preflight POSIX y 20 ejecuciones M1 reales en Docker Linux/WSL2 (N=1/2, dos estrategias, cinco repeticiones), cgroup v2 4 GiB sin swap y usuario no-root; PSS y memory.current están en JSON crudos y resumidos en QA-parte-3. Unitarias focales previamente verdes; 3 integraciones omitidas en Windows por POSIX. git diff --check limpio. Alcance limitado a Whisper CPU y este contenedor; la verificación la hizo el mismo agente, no independiente. (1ada1d3) |
+| verificacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
