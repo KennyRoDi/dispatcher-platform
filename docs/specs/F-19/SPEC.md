@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-19-1-estrategias-de-carga
-**Verificación IA:** tests 17ed894
+**Verificación IA:** implementacion b7b5b1d
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
 
 ## Objetivo
@@ -108,3 +108,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Codex | 2026-11-10 | Pruebas parte2 escritas y ejecutadas en Docker Linux python:3.13-slim: 4 failed exclusivamente por ModuleNotFoundError src.infrastructure.fork_runtime ausente; runtime aun no existe. Solo se agrego tests/integration/test_fork_runtime.py, sin implementacion. Casos POSIX de resultado, rechazo spawn, excepcion hija y timeout/terminacion/recoleccion. (17ed894) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat; tests rojos por implementación ausente |
+| verificación IA de implementacion | Codex GPT-6 Luna | 2026-11-10 | 51 unitarias model_loading/model_loader y QA pasaron en Windows; 5 integraciones incl. Whisper real pasaron en Docker Linux Python 3.13, faster-whisper 1.2.1/CTranslate2 4.9.0; git diff --check limpio. Verificación en misma sesión, no independiente. ADD/SPEC actualizadas por fork incompatible. (b7b5b1d) |
