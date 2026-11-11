@@ -1,6 +1,6 @@
 # SPEC F-04: Verdad de referencia y procedencia
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-04-2-verdad-de-referencia-y-procedencia
 **Verificación IA:** documentacion b904fdd
 **Historia:** US-04 · **Requisitos:** RF-23, RNF-04, RNF-05, RNF-06 · **Responsable:** K
@@ -187,3 +187,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA: 4 xfail estrictos nuevos en test_dataset_verdad_qa.py; src y scripts intactos (diff). Ejecute esa prueba: 4 xfailed. CLI real sobre manifiesto de 490 filas dio 0 segun QA (no repetido por mi). Hallazgos menores a pendientes y a documentar en parte 4. (f80a91b) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff solo SPEC y ARQUITECTURA (AD-32 una clausula); SPEC con tamaño normal tras el incidente de edicion que el documentador revirtio antes del commit (comprobado con wc y diff --stat). conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). (b904fdd) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
