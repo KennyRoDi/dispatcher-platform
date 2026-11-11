@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** documentacion 9d885e8
+**Verificación IA:** implementacion 4106891
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -174,3 +174,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Medicion del QA marcada sin re-medir. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (9d885e8) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de revision | Kenni Rodriguez | 2026-11-11 | Revisor: tolerar 1 entrada sin ancla (A2) permite truncar un log largo a su primera entrada y borrar el ancla sin deteccion (regresion frente a la parte 1) |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-11 | Ancla genesis: src y 13 pruebas nuevas; unico cambio en tests existentes: 2->3 en el conteo de os.replace (comprobado por diff). Suite completa tras 4106891: 1954 passed, 8 skipped, 6 xfailed. Developer reporta ademas una carrera al crear el log (1 de 60 corridas) cerrada en 4106891 (_create_log); el commit anterior estuvo empujado con la carrera. (4106891) |
