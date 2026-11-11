@@ -866,3 +866,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas, sin verificación humana independiente |
 | Cómo se validó | El orquestador revisó diffs y ejecutó la suite; los subagentes no son verificación humana |
 | Error de la IA | El lector del decorador devolvía como válido el claro ya descifrado tras un DecryptionError y su read(n) era cuadrático; QA lo detectó y se corrigió |
+
+## 2026-11-10 · Kenni Rodriguez · F-29 (`feat/F-29-1-cadena-de-custodia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (subagentes developer, qa-tester, documentador) |
+| Componente | F-29 |
+| Propósito | Parte 1 de F-29: cadena de custodia HMAC (dominio) |
+| Consulta resumida | Escribir pruebas, implementar custody_chain, atacarla y documentar AD-35 y SUP-31 |
+| Resultado obtenido | Dominio con seal y verify_chain; límites en el SPEC |
+| Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificación humana independiente |
+| Cómo se validó | Verificación del orquestador con pytest y revisión de los subagentes |
+| Error de la IA | verify_chain lanzaba RecursionError/UnicodeEncodeError ante líneas manipuladas en vez de reportar violación; lo detectó QA y se corrigió |
