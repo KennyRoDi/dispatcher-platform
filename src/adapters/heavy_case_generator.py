@@ -3,7 +3,7 @@ import random
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.adapters.media_generator import BITEXACT, FFMPEG_BASE, LICENSE_NAME, ORIGIN, Runner, _produce, run_ffmpeg
+from src.adapters.media_generator import BITEXACT, FFMPEG_BASE, LICENSE_NAME, ORIGIN, Runner, produce, run_ffmpeg
 from src.domain.dataset_plan import DatasetPlan, checked_case_name
 
 VIDEO_KIND = "video"
@@ -35,7 +35,7 @@ def generate_heavy_cases(plan: DatasetPlan, out_dir: Path, runner: Runner = run_
         if not case.heavy_bytes:
             continue
         path = out_dir / checked_case_name(case.name) / f"{case.name}-video-001.{VIDEO_EXTENSION}"
-        _produce(runner, _video_args(rng.randrange(NOISE_SEED_LIMIT), case.heavy_bytes, path), path, min_bytes=case.heavy_bytes)
+        produce(runner, _video_args(rng.randrange(NOISE_SEED_LIMIT), case.heavy_bytes, path), path, min_bytes=case.heavy_bytes)
         files.append(HeavyFile(case.name, VIDEO_KIND, path, path.stat().st_size, ORIGIN, LICENSE_NAME, plan.seed))
     return files
 

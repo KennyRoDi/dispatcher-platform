@@ -75,13 +75,13 @@ def generate_media(plan: DatasetPlan, out_dir: Path, runner: Runner = run_ffmpeg
         for index in range(case.images):
             categoria, etiqueta, color = next(image_slots)
             path = case_dir / f"{case.name}-imagen-{index + 1:03d}.{next(image_formats)}"
-            _produce(runner, _image_args(color, path), path)
+            produce(runner, _image_args(color, path), path)
             files.append(_media(plan, case.name, "imagen", path, etiqueta, categoria=categoria))
         for index in range(case.audios):
             duration = next(durations)
             path = case_dir / f"{case.name}-audio-{index + 1:03d}.{next(audio_formats)}"
             etiqueta, args = _audio_args(rng, duration, path)
-            _produce(runner, args, path)
+            produce(runner, args, path)
             files.append(_media(plan, case.name, "audio", path, etiqueta, duration=duration))
     return files
 
@@ -142,7 +142,8 @@ def _audio_args(rng: random.Random, duration: int, path: Path) -> tuple[str, lis
 
 
 # Se borra el archivo previo para que un ejecutor que no produjo nada no pase por uno de otra ejecucion.
-def _produce(runner: Runner, args: list[str], path: Path, min_bytes: int = 0) -> None:
+def produce(runner: Runner, args: list[str], path: Path, min_bytes: int = 0) -> None:
+    parent_existed = path.parent.exists()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.unlink(missing_ok=True)
     try:
@@ -153,7 +154,8 @@ def _produce(runner: Runner, args: list[str], path: Path, min_bytes: int = 0) ->
             raise ValueError(f"{path} mide {path.stat().st_size} bytes y no alcanza {min_bytes // MIB} MiB")
     except BaseException:
         path.unlink(missing_ok=True)
-        _remove_if_empty(path.parent)
+        if not parent_existed:
+            _remove_if_empty(path.parent)
         raise
 
 

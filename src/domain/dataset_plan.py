@@ -37,6 +37,8 @@ class DatasetParams:
 
     def __post_init__(self) -> None:
         for name, value in vars(self).items():
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise ValueError(f"{name} debe ser un entero: {value!r}")
             if value < 0:
                 raise ValueError(f"{name} no puede ser negativo: {value}")
         if self.cases < 1:
@@ -92,7 +94,7 @@ def plan_dataset(seed: int, params: DatasetParams) -> DatasetPlan:
 
 # Un nombre con separadores, absoluto o ".." saldria del directorio de salida.
 def checked_case_name(name: str) -> str:
-    if name in ("", ".", "..") or "/" in name or "\\" in name:
+    if name in ("", ".", "..") or "/" in name or "\\" in name or "\x00" in name:
         raise ValueError(f"nombre de caso invalido: {name!r}")
     return name
 
