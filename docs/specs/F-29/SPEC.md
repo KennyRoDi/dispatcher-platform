@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** implementacion a984328
+**Verificación IA:** implementacion 3ee2eac
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -130,3 +130,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo src/domain/custody_chain.py (116 lineas) y SPEC; tests intactos. Suite completa tras a984328: 1813 passed, 8 skipped, 3 xfailed. Decisiones: verify_chain devuelve solo la primera violacion y no revisa el ancla si hay una. (a984328) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: RecursionError y UnicodeEncodeError en verify_chain ante linea manipulada (media); U+2028/2029/0085 sin escapar; seal acepta no-str; claves duplicadas; ancla seq negativo; ancla atrasada N; Anchor mac no str |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de 8 hallazgos QA en custody_chain.py (146 lineas); diff de tests solo quita marcadores xfail (comprobado). Suite completa tras 3ee2eac: 1879 passed, 8 skipped, 5 xfailed. (3ee2eac) |
