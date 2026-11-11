@@ -184,3 +184,17 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | Diff aeaf130 solo tests/unit/test_cableado_qa.py (src intacto). Ejecute el archivo: ver salida de pytest. QA sin bypass de autenticacion; 7 hallazgos bajos (OverflowError en --minutos, sub vacio, root_path, doble verify, sin aviso con AUTH_ENABLED=false, JWT_SECRET no UTF-8 filtra caracter, .gitignore parcial) como xfail strict, a declarar como limites. Salto por dependency_overrides no alcanzable por red (no reproduje yo el analisis). (aeaf130) |
 | verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+
+Límites declarados de la parte 3 (QA `aeaf130`, 14 `xfail` en `tests/unit/test_cableado_qa.py`):
+
+- `scripts/emitir_token.py --minutos` enorme da `OverflowError` con traza.
+- `--sub` vacío emite un token que el coordinador luego rechaza.
+- Con `root_path` (proxy con prefijo) `/health` deja de ser pública.
+- `verify` corre dos veces por petición (middleware y dependencia).
+- Sin aviso en el registro con `AUTH_ENABLED=false`.
+- `JWT_SECRET` con un byte inválido filtra un carácter al registro.
+- `.gitignore` solo cubre `jwt.secret`, `*.key` y `.env`; otros nombres de archivo de secreto no.
+- El middleware salta la verificación si `app.dependency_overrides` contiene `autorizar`. No es alcanzable por red, pero es un olor de diseño: producción conoce el mecanismo de pruebas.
+- `scripts/submit_case.py` y `scripts/run_load.py` no envían token.
+- Los workers necesitan un token con rol `servicio` (responsable: José).
+- El dashboard necesita un token de supervisor (responsable: Melany).
