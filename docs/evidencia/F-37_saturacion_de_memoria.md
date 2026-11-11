@@ -1,4 +1,4 @@
-# F-37 · Evidencia de saturación de memoria
+﻿# F-37 · Evidencia de saturación de memoria
 
 ## Qué cubre el escenario
 
@@ -37,7 +37,7 @@ El módulo no lanza la corrida real: planifica, muestrea y evalúa. La corrida l
 ## Límites
 
 - Las pruebas unitarias usan datos simulados; no prueban el comportamiento real del sistema operativo.
-- Las pruebas de integración usan procesos POSIX y Redis. En Windows no se ejecutaron.
+- La prueba de integración exige POSIX y `REDIS_URL`; se ejecutó en un contenedor Linux con Redis real, pero no ejercita `WorkerNode` (ver tabla). En Windows se omite.
 - La aceptación se ejecutó solo sobre el JSON del arnés en contenedor (ver más abajo), no sobre nodos reales.
 - El umbral de 3 heartbeats es provisional (SUP-37).
 
@@ -50,12 +50,14 @@ El módulo no lanza la corrida real: planifica, muestrea y evalúa. La corrida l
 | Aceptación sobre JSON de corrida real | Medido: `test_memory_saturation_aceptacion.py` pasa sobre la repetición 1 (1 pasa) |
 | Comparación sin admisión (SUP-38) | Medido, una repetición, en el contenedor aislado |
 | Gráfico de `memory.current` y sub-tareas admitidas | Hecho: [F-37_grafico_rep1.svg](mediciones-f36-f37/F-37_grafico_rep1.svg), repetición 1 |
-| Integración Linux con `WorkerNode` real y Redis (`REDIS_URL`) | Medición pendiente: no se levantó el stack |
-| Corrida M1 y B.6 en tres nodos WSL2 (F-38) | Medición pendiente: requiere los tres nodos |
+| Integración Linux (`test_saturacion_worker_linux.py`) con Redis 7 real en Docker y `REDIS_URL` | Medido el 2026-11-11: pasa (1 pasa). **Alcance real:** esa prueba solo verifica `planificar_carga` y `huecos_heartbeat`; no usa `WorkerNode` ni se conecta a Redis (solo exige que `REDIS_URL` exista). Salida cruda en `mediciones-f37-integracion/` |
+| Aceptación con `MEMORY_SATURATION_JSON` y `REDIS_URL` definidos, en `python:3.13` | Medido el 2026-11-11: pasa (1 pasa) sobre la repetición 1 |
+| `WorkerNode` real con Redis y cola, límite bajo | Medición pendiente: ninguna prueba del repositorio lo ejercita; el arnés tampoco |
+| Corrida M1 y B.6 en tres nodos WSL2 separados (F-38) | Medición pendiente: no es posible en esta máquina (un solo host Docker). Comando para quien tenga los nodos, con la ficha M1 vigente: `py -m scenarios.memory_saturation --salida docs/evidencia/F-37_<fecha>.json`, tres repeticiones |
 
 ## Medición real en un contenedor aislado (2026-11-11)
 
-**Entorno:** un único host Docker Desktop (Linux, WSL2 kernel 6.18.33.2, 16 CPUs, 15,6 GB), cgroup v2, un contenedor con `--memory=256m --memory-swap=256m` (`memory.max` = 268 435 456 B), Python 3.13.18, usuario no root, commit base `63f6b62`. **No son tres nodos.** El OOM de la comparación queda contenido en ese contenedor (SUP-38, autorizado por José).
+**Entorno:** un único host Docker Desktop (Linux, WSL2 kernel 6.18.33.2, 16 CPUs, 15,6 GB), cgroup v2, un contenedor con `--memory=256m --memory-swap=256m` (`memory.max` = 268 435 456 B), Python 3.13.18, usuario no root, commit base `63f6b62`. **No son tres nodos.** El OOM de la comparación queda contenido en ese contenedor (SUP-38 cumplida en esta corrida: aislamiento confirmado, contenedor con memoria limitada y sin otros nodos; José autorizó terminar las mediciones).
 
 **Qué es el arnés** (`mediciones-f36-f37/medir_f37.py`): usa la admisión real (`admits`, `CgroupResourceReader`, `read_memory_events`) y `scenarios.memory_saturation` (plan, muestras, `evaluar`). **No es `WorkerNode`**: no hay Redis ni cola, el heartbeat es un hilo del arnés (no la clase `Heartbeat`) y las sub-tareas son procesos hijos que reservan y tocan 64 MiB reales. Huella 64 MiB y margen 32 MiB son **valores declarados, no medidos** (la huella M1/F-17 sigue pendiente). Plan: cupo 3, 7 sub-tareas. Heartbeat cada 1 s.
 
@@ -74,3 +76,11 @@ docker run --rm --memory=256m --memory-swap=256m -v "<repo>:/app:ro" -w /app -e 
 JSON crudos: `mediciones-f36-f37/F-37_corrida_con_admision_rep{1,2,3}_2026-11-11.json` y `F-37_corrida_sin_admision_2026-11-11.json`. Cada corrida con admisión dura unos 12,8 s con 64 muestras cada 0,2 s. Sin ningún hueco de heartbeat mayor que 3 s (tolerancia SUP-37).
 
 **Lectura:** con admisión, el contenedor nunca superó 224 MB de 256 MiB, admitió como máximo 3 sub-tareas simultáneas y las 7 terminaron al liberarse capacidad. Sin admisión, el kernel mató 4 de 7 procesos. **Límites:** un host, sin cola real ni worker completo; el heartbeat del arnés solo prueba que el proceso principal no se bloquea, no la clase `Heartbeat`; los umbrales siguen siendo provisionales (SUP-36 y SUP-37).
+
+## Integración con Redis real (2026-11-11)
+
+Redis `redis:7-alpine` en una red Docker local sin puertos publicados, y `python:3.13` (3.13.18, uid 0, kernel Linux de Docker Desktop) con el repositorio montado:
+
+```ndocker run --rm --network f37net -e REDIS_URL=redis://f37redis:6379/0 -e MEMORY_SATURATION_JSON=docs/evidencia/mediciones-f36-f37/F-37_corrida_con_admision_rep1_2026-11-11.json -v "<repo>:/app" -w /app python:3.13 python -m pytest tests/integration/test_saturacion_worker_linux.py tests/acceptance/test_memory_saturation_aceptacion.py -v
+```n
+Resultado: 2 pasan en 0,55 s ([salida cruda](mediciones-f37-integracion/salida_cruda_2026-11-11.txt)). Hallazgo: la prueba de integración no usa `WorkerNode` ni Redis, así que no sustituye una prueba con el worker real.
