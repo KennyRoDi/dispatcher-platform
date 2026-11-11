@@ -1,6 +1,6 @@
 # SPEC F-28: Cifrado en reposo
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-28-2-cifrado-en-reposo
 **Verificación IA:** implementacion f386d47
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
@@ -171,3 +171,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff solo tests (unit decorador, integracion MinIO, historial); src intacto. Ejecute: test_encrypted_object_store error de coleccion ModuleNotFoundError (rojo); integracion tambien error de coleccion; test_historial_sin_llaves 2 passed (no depende del modulo nuevo). Decision del developer: regex del historial exige asignacion al inicio de linea y admite minioadmin (riesgo 7 del SPEC). Prueba I no ejecutada contra MinIO real. (217ccec) |
 | tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests; src: encrypted_object_store.py (78 lineas). Suite completa tras el commit: 5 corridas verdes (1953 passed, 8 skipped, 9 xfailed) y 1 con 1 failed no identificado (2 de 7 corridas del proyecto dieron 1 failed, ambas justo despues de que un subagente hizo commit; hipotesis: pruebas que leen el historial de git). Limite: open descifra el primer chunk al abrir. Integracion MinIO solo se colecta y salta. (f386d47) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
