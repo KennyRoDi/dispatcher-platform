@@ -83,7 +83,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
 | 1 | `feat(F-24): frenar productores con colas acotadas` | `QueueLimit`, `transaccion_acotada` y el cambio en `create_case`; pruebas unitarias e integración de la API. Estimado: ~120 líneas |
-| 2 | `feat(F-24): mover al scheduler solo con espacio en la cola` | `mover_acotado` con Lua, `fakeredis[lua]` y su integración. Estimado: ~60 líneas |
+| 2 | `feat(F-24): mover al scheduler solo con espacio en la cola` | `mover_acotado` con Lua y su integración (`fakeredis[lua]` ya entró en la parte 1). Estimado: ~60 líneas |
 | 3 | `docs(F-24): medir backpressure con y sin limite` | Script de medición y sección de la ficha M3 con datos medidos |
 
 ## Riesgos y preguntas abiertas
@@ -91,10 +91,11 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 1. **Archivo de Nahúm.** `create_case` es de Nahúm. El cambio solo envuelve su transacción; hay que avisarle antes de la parte 1 y verificar que nadie más lo esté cambiando.
 2. **Valores por defecto.** Propuesta: `QUEUE_MAX_DEPTH=1000` y `QUEUE_RETRY_AFTER=5`. Se ajustan con la medición; Kenni los agrega a `deploy/` y `.env.example`.
 3. **Escritura a medias (H4 de QA, baja, previo a F-24).** Lua no revierte los comandos ya ejecutados si uno falla. Solo ocurre si un `case_id` choca con una clave de otro tipo (por ejemplo `a:subtasks` y `a`); el pipeline original tampoco lo evita. Lo reproduce `test_error_a_mitad_del_script_no_deja_rastro`, marcada `xfail`. Se propone validar el `case_id` en una feature aparte.
-7. **Redis sin scripts (H5 de QA, baja).** Si un ACL prohíbe `@scripting`, con límite activo cada caso da 500. El despliegue actual (`redis:7-alpine` sin ACL) lo permite.
 4. **Integración con F-20 y F-06.** `mover_acotado` queda listo, pero el scheduler y `RedisWorkQueue` no existen todavía. Cuando Nahúm los implemente, deben usarlo; hasta entonces el criterio del scheduler se demuestra sobre la primitiva.
 5. **Workers con `BLPOP`.** El worker actual consume con `BLPOP` (AD-03 prevé `BLMOVE`, F-06). No afecta al límite: consumir solo reduce la profundidad.
 6. **Medición.** Necesita un coordinador y un Redis con los workers detenidos. La puede correr cualquier integrante; los números se miden, nunca se estiman.
+7. **Redis sin scripts (H5 de QA, baja).** Si un ACL prohíbe `@scripting`, con límite activo cada caso da 500. El despliegue actual (`redis:7-alpine` sin ACL) lo permite.
+8. **Claves en `ARGV` (revisión, baja).** El script recibe colas y claves por `ARGV` y se evalúa con `numkeys = 0`. En el Redis standalone del despliegue funciona; en Redis Cluster o con ACL por claves habría que pasarlas en `KEYS`.
 
 ## Aprobaciones
 
