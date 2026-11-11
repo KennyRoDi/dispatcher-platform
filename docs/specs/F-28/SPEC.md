@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-28-2-cifrado-en-reposo
-**Verificación IA:** implementacion f386d47
+**Verificación IA:** implementacion 6a4b7ac
 **Historia:** US-28 · **Requisitos:** RF-37, RNF-08 · **Responsable:** K
 
 ## Objetivo
@@ -173,3 +173,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests; src: encrypted_object_store.py (78 lineas). Suite completa tras el commit: 5 corridas verdes (1953 passed, 8 skipped, 9 xfailed) y 1 con 1 failed no identificado (2 de 7 corridas del proyecto dieron 1 failed, ambas justo despues de que un subagente hizo commit; hipotesis: pruebas que leen el historial de git). Limite: open descifra el primer chunk al abrir. Integracion MinIO solo se colecta y salta. (f386d47) |
 | implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA: tras DecryptionError el siguiente read devuelve claro como valido (media); read(n) cuadratico; sin readinto; read tras close devuelve datos y close no usa try/finally |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Correccion de puntos 1-4 de QA; diff de tests solo quita 5 marcadores xfail (comprobado). Suite completa: 1974 passed, 8 skipped, 15 xfailed (1 corrida). (6a4b7ac) |
