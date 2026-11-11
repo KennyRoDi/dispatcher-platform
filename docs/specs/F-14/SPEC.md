@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-14-2-alertas
-**Verificación IA:** implementacion 7bea224
+**Verificación IA:** implementacion 8ee78c6
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -149,3 +149,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | pytest + revision | 2026-11-11 | Llamada protegida de cierre en rutas_subtareas.py (7bea224, +12/-2); suite verde; sin ediciones a pruebas; toca archivo de Nahum (7bea224) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: log de alerta usa %s con case_id controlado por el cliente (inyeccion de lineas); previos de Nahum quedan como limites declarados |
+| verificación IA de implementacion | orquestador | 2026-11-11 | Log de alerta con %r (8ee78c6); suite verde; 3 xfail previos de Nahum quedan estrictos con reason actualizado (8ee78c6) |
