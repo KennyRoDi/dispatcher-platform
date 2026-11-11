@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion e929c9a
+**Verificación IA:** verificacion dc78bf8
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -97,3 +97,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5, misma sesión, no independiente) | 2026-11-11 | case_state.py en dominio, 67 pruebas en verde (test_case_state, test_arquitectura), 52 líneas (e929c9a) |
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; suite completa falla en 3 pruebas TLS ajenas a F-10 (Windows); pruebas del módulo 67 en verde |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 1: criterios del dominio verificados; 7 pruebas de borde añadidas (duplicado con otro resultado, orden, caso vacío, autotransición, cancelado). 75 pruebas verdes. Hallazgo: caso de uso/CaseStateStore (parte 2) y adaptador Redis/cableado (parte 3) pendientes por plan de pila; Barrier(0) cierra de inmediato y final_state(0,0)=completed. (dc78bf8) |
