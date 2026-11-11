@@ -1,6 +1,6 @@
 # SPEC F-16: Límites por worker
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-16-1-limites-por-worker
 **Verificación IA:** tests 2776de2
 **Historia:** US-16 · **Requisitos:** RF-24, RNF-14 · **Responsable:** J
@@ -114,3 +114,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | devuelta de revision | José Andrés Loría Herrera | 2026-11-10 | Revisión final detectó que validate_config no compara service.hostname con environment.NODE_NAME; Compose puede arrancar con identidad divergente si PowerShell sobrescribe el .env. Añadir prueba roja y validar la igualdad en preflight. |
 | verificación IA de tests | Codex | 2026-11-10 | Hallazgo revisión: contrasté test/unit diff 2776de2, solo agrega regresión NODE_NAME != hostname. Reproduje py -m pytest -q tests/unit/test_f16_preflight.py -k node_name_distinto --tb=short: 1 failed con DID NOT RAISE ValueError, 21 deselected, fallo exacto esperado por hueco. git show --check limpio, árbol limpio. (2776de2) |
+| tests | José Andrés Loría Herrera | 2026-11-10 | Autorización humana: la fase tests se repite tras hallazgo de revisión, pero la rama ya contiene implementación previamente aprobada; la regresión nueva sí quedó aislada y roja antes del fix. |
