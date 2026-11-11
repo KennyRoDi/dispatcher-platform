@@ -20,7 +20,7 @@ from pathlib import Path
 
 import requests
 
-from scripts.submit_case import FINISHED_STATUSES, build_case_payload
+from scripts.submit_case import FINISHED_STATUSES, build_case_payload, sesion_autenticada
 from src.workers.config import Settings, make_redis
 from src.workers.storage import Storage, StorageError
 
@@ -433,7 +433,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=Path("docs/evidencia"))
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-    code, md_path = run_load(args, Settings.from_env())
+    code, md_path = run_load(args, Settings.from_env(), session=sesion_autenticada())
     print(md_path)
     return code
 
