@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
-**Verificación IA:** documentacion 8637cca
+**Verificación IA:** revision f43e9aa
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
 
 ## Objetivo
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (ARQUITECTURA AD-36, REQUERIMIENTOS SUP-32, modulo-M4 nuevo, SPEC); push comprobado (rama alineada con origen); AD-36/SUP-32 sin uso en otras ramas (git grep). Salidas de M4 marcadas pendientes. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (8637cca) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-11 | Revisor APROBADO sin bloqueantes: criterio cumplido en Dockerfile y 2 compose, compose local conserva env/depends_on/restart, demo.yml valido, test editado justificado; pytest segun revisor 1827 passed/3 xfailed y verificador rc=0; src intacto. Menor 1 corregido por mi (nombre del archivo de integracion en el SPEC). Menores 2 y 3 aceptados. Pendiente de evidencia real: id -u, touch /x y sub-tarea en tres nodos; M4 max 2. WORKER_ID distinto por replica no confirmado por el revisor. (f43e9aa) |
