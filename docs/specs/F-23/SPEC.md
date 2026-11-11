@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-23-4-deduplicar-subidas-antes-de-transferir
 **Verificación IA:** implementacion 7ab2471c
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 14 pruebas: is_stored, POST 200 stored sin staging, cliente sin chunks, dos fuentes iguales un objeto (US-23), composicion desde entorno (sin MINIO_ENDPOINT None, bucket creado, STAGING_DIR obligatorio, TLS exige MinIO seguro, KEK envuelve con cifrado) y 503 si falla al arrancar. Rojo 13/14 por funcionalidad ausente. Contra borrador: 14/14, suite 3746 verde en Linux. (eb396b8c) |
 | tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-23. |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 14 pruebas: is_stored, POST 200 stored sin staging, cliente sin chunks, dos fuentes iguales un objeto (US-23), composicion desde entorno (sin MINIO_ENDPOINT None, bucket creado, STAGING_DIR obligatorio, TLS exige MinIO seguro, KEK envuelve con cifrado) y 503 si falla al arrancar. Rojo 13/14 por funcionalidad ausente. Contra borrador: 14/14, suite 3746 verde en Linux. (7ab2471c) |
+| implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-23. |
