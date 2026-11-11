@@ -22,3 +22,11 @@ servidor_central.log
 
 # Pesos de modelos: se descargan aparte y se verifican por sha256 (F-08)
 *.pt
+
+# Certificados y llaves de TLS (F-27): se generan fuera del repo con deploy/tls/generar_certs.sh
+*.pem
+*.key
+*.crt
+*.srl
+certs/
+.ms-certs/

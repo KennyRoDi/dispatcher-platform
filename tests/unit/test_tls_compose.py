@@ -40,7 +40,7 @@ def _volumenes(servicio: dict) -> list[tuple[str, str, bool]]:
     montajes = []
     for volumen in servicio.get("volumes") or []:
         assert isinstance(volumen, str), f"se espera la forma corta origen:destino[:ro]: {volumen}"
-        partes = volumen.split(":")
+        partes = re.split(r":(?![^{]*\})", volumen)  # los dos puntos de ${VAR:?msg} no separan
         montajes.append((partes[0], partes[1], partes[-1] == "ro"))
     return montajes
 
