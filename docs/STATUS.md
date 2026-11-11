@@ -16,7 +16,7 @@
 | F-11 | pendiente |
 | F-12 | hecha |
 | F-13 | en-pr |
-| F-14 | tests |
+| F-14 | implementacion |
 | F-15 | pendiente |
 | F-16 | hecha |
 | F-17 | hecha |
