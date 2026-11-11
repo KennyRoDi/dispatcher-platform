@@ -40,7 +40,7 @@
 | F-35 | pendiente |
 | F-36 | verificacion |
 | F-37 | pendiente |
-| F-38 | revision |
+| F-38 | en-pr |
 | F-39 | pendiente |
 | F-40 | en-pr |
 | F-41 | pendiente |
