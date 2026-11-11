@@ -11,6 +11,7 @@ import dotenv
 import redis
 
 from src.domain.admission import FootprintTable
+from src.infrastructure.tls import TlsSettings, redis_kwargs
 
 OPERATIONS = (
     "transcode_video",
@@ -199,7 +200,8 @@ def load_admission_config(
     return FootprintTable(footprints), margin
 
 
-def make_redis(settings: Settings) -> redis.Redis:
+def make_redis(settings: Settings, tls: TlsSettings | None = None) -> redis.Redis:
+    tls = tls if tls is not None else TlsSettings.from_env()
     return redis.Redis(
         host=settings.redis_host,
         port=settings.redis_port,
@@ -207,4 +209,5 @@ def make_redis(settings: Settings) -> redis.Redis:
         decode_responses=True,
         socket_keepalive=True,
         health_check_interval=30,
+        **redis_kwargs(tls),
     )

@@ -55,6 +55,48 @@ La misma semilla produce el mismo plan y el mismo manifiesto: nombres, conteos y
 - Se rechaza con error cualquier enlace simbólico dentro de `--out`, aunque no sea de un caso. No se detecta uno creado durante la ejecución.
 - `generate_heavy_cases` usado directo: si falla el caso N, quedan en disco los archivos de los casos anteriores; bórrelos antes de repetir.
 
+## Procedencia y licencia por fuente
+
+Recuento real del manifiesto `dataset/sintetico/manifest.json` (490 filas):
+
+| Tipo | Fuentes | Origen | Licencia |
+|---|---|---|---|
+| Imágenes | 300 | `sintetico` | `MIT` |
+| Audios | 150 | `sintetico` | `MIT` |
+| Textos (chats) | 25 | `sintetico` | `MIT` |
+| Documentos | 10 | `sintetico` | `MIT` |
+| Videos | 5 | `sintetico` | `MIT` |
+
+Validación (F-04, `src/domain/provenance.py`):
+
+```bash
+PYTHONPATH=. python -m scripts.dataset_verdad procedencia --manifiesto dataset/sintetico/manifest.json
+```
+
+Salida real, código de salida 0: `490 fuentes cumplen la procedencia`.
+
+Caso negativo: una copia del manifiesto con la licencia de la primera fila en `null` terminó con código 1 y la salida `caso-01/caso-01-audio-001.mp3: falta la licencia`.
+
+Reglas (SUP-27, **provisional**: la lista la confirma la persona):
+
+- Orígenes admitidos: `sintetico`, `propio`, `publico`.
+- Licencia en blanco o de relleno (`desconocida`, `ninguna`, `sin licencia`, `n/a`, `-`): rechazada.
+- Una fuente `publico` exige una de `CC0-1.0`, `CC-BY-4.0`, `CC-BY-SA-4.0`, `MIT`, `Apache-2.0`.
+
+## Verdad de referencia y comparación
+
+- La muestra son las imágenes del manifiesto, derivada con `sample_from_manifest` (`src/adapters/dataset_truth_files.py`). Una imagen `positivo` espera `{categoria}`; una `neutro` espera `{}`.
+- Límite: las imágenes son colores sólidos; validan el mecanismo de comparación, no la calidad de un analizador.
+- Límites de las partes 2 y 3 (listas cerradas de rellenos, lectores): ver [SPEC de F-04](specs/F-04/SPEC.md).
+
+### Tabla de aciertos
+
+**Pendiente: requiere las salidas reales del analizador de imágenes (lo aporta la persona o el responsable del módulo).** No hay datos medidos todavía y no se estima ninguno. Se generará con:
+
+```bash
+PYTHONPATH=. python -m scripts.dataset_verdad comparar --muestra muestra.json --salidas salidas.json --formato markdown
+```
+
 ## Ubicación y distribución
 
 - Local: `dataset/sintetico/`, excluido del repo por `.gitignore`. Los archivos de `dataset/` del I Proyecto (`README.md`, `cases.json`, `manifest.json`) no se tocan.
