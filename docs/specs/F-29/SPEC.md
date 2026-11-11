@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-29-1-cadena-de-custodia
-**Verificación IA:** verificacion f1fde64
+**Verificación IA:** documentacion 9d885e8
 **Historia:** US-29 · **Requisitos:** RF-38, RF-39, RNF-08, QA-07 · **Responsable:** K
 
 ## Objetivo
@@ -171,3 +171,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-11 | QA 1726a84: 11 xfail, 8 corregidos; queda A9 (ingreso con result!=evidence se acepta; decision: limite). Costo cuadratico medido por QA (1000 entradas 7,5 s; 4000 entradas 121,4 s acumulado) ya corregido en implementacion (no re-medido por mi). 6 procesos concurrentes sin ruptura segun QA. (f1fde64) |
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-11 | Diff solo docs (SPEC, ARQUITECTURA AD-35, REQUERIMIENTOS SUP-31). Medicion del QA marcada sin re-medir. Bitacora en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (9d885e8) |
