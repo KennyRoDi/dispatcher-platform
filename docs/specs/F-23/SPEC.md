@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 1b40fed
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. Parte solo de contrato: comprobar_object_store exige KeyError en open inexistente y que un put cuya lectura falla no deje objeto; fila de ObjectStore en CONTRATOS.md. Pasan con FakeObjectStore y EncryptedObjectStore, como preveia el SPEC. Mutantes: almacen que confirma tras fallo y open sin KeyError, ambos detectados. Suite 3432 verde; 3 fallos preexistentes de main ajenos (process_supervisor, tls_cableado). (8b99f88) |
 | tests | Melany Vindas | 2026-11-11 | Parte solo de contrato: las pruebas pasan porque el doble y EncryptedObjectStore ya cumplen; no hay codigo que implementar |
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Parte solo de contrato, sin codigo de implementacion: el doble y EncryptedObjectStore ya cumplen. Sin cambios desde la fase tests. (1b40fed) |
+| implementacion | Melany Vindas | 2026-11-11 | Parte solo de contrato: no hay codigo que implementar |
