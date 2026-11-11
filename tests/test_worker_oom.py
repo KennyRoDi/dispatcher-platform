@@ -40,6 +40,7 @@ def preparar(tmp_path, codigo, sube_oom, **campos):
     )
     worker.events_reader = eventos
     seed_subtask(redis_client, storage, "s1")
+    redis_client.delete("queue:transcode_video")
     if campos:
         redis_client.hset("subtask:s1", mapping=campos)
     return worker, redis_client, reporter

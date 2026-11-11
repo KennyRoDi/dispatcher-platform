@@ -43,6 +43,8 @@ logger = logging.getLogger(__name__)
 class ProcessingError(Exception):
     """Base de todos los errores del procesador. El worker captura solo esta."""
 
+    exit_code: int | None = None
+
 
 class UnsupportedFormatError(ProcessingError):
     """Falta el stream requerido, o el formato u operación no es válido."""
@@ -606,6 +608,7 @@ def _run(cmd: list[str], timeout: float, name: str, tracker: Optional[_ProgressT
             f"{name}: FFmpeg falló (código {returncode}): {_stderr_tail(stderr)}"
         )
         error.stderr = stderr
+        error.exit_code = returncode
         raise error
     return stderr
 
