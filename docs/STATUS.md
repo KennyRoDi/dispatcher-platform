@@ -39,7 +39,7 @@
 | F-34 | pendiente |
 | F-35 | pendiente |
 | F-36 | en-pr |
-| F-37 | pendiente |
+| F-37 | plan |
 | F-38 | en-pr |
 | F-39 | pendiente |
 | F-40 | hecha |
