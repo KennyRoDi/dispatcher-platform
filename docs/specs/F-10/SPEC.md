@@ -1,6 +1,6 @@
 # SPEC F-10: Estados y cierre
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-10-2-estados-y-cierre
 **Verificación IA:** documentacion 6b048b9
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 3: con Redis 7 real (docker, puerto 6390) la prueba concurrente falló 1/17 (doble cierre y PROCESSING sobrescribiendo estado terminal: bug de mi implementación). Corregido: set_state con WATCH rechaza escrituras sobre estado terminal y devuelve bool; ReportSubtask no cierra si no se aplicó. 40/40 corridas concurrentes verdes; 74 pruebas del módulo y 462 del coordinador verdes; +2 unitarias; aserciones queued->processing en tests/test_coordinator.py. Redis ajeno con contraseña no se usó (aac1cd9) |
 | verificacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; pruebas rápidas solo fallan por TLS ajeno (test_tls_cableado, test_tls_cableado_qa), sin relación con F-10 |
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Documentación parte 3: AD-43 actualizado con RedisCaseState, HSETNX/SADD, historial y WATCH; 40 corridas concurrentes; bitácora publicada con el error real de doble cierre; sin AD/SUP nuevos ni ids duplicados (6b048b9) |
+| documentacion | José Andrés Loría Herrera | 2026-11-11 |  |
