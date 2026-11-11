@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-10-2-estados-y-cierre
-**Verificación IA:** implementacion 0af6c06
+**Verificación IA:** verificacion 2e9198b
 **Historia:** US-10 · **Requisitos:** RF-09, RF-10 · **Responsable:** N
 
 ## Objetivo
@@ -117,3 +117,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-11 |  |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | Parte 3 impl: RedisCaseState (HSETNX+SADD, historial), ruta delega en ReportSubtask; 4 archivos de la parte en verde; tests/unit 2822 verdes, 2 fallos TLS preexistentes; ajustada aserción de test_cierre_alertas (queued->processing tras reporte parcial, por SPEC). Riesgo: doble cierre en carrera entre los dos últimos reportes (ReportSubtask, parte 2) (0af6c06) |
 | implementacion | José Andrés Loría Herrera | 2026-11-11 | aprobación delegada por José en el chat; comprobación de pruebas omitida: 2 fallos TLS ajenos preexistentes (test_tls_cableado) y flujo.py falla con stdout None al capturar pytest en Windows |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), verificación no independiente | 2026-11-11 | QA parte 3: con Redis 7 real (docker, puerto 6390) la prueba concurrente falló 1/17 (doble cierre y PROCESSING sobrescribiendo estado terminal: bug de mi implementación). Corregido: set_state con WATCH rechaza escrituras sobre estado terminal y devuelve bool; ReportSubtask no cierra si no se aplicó. 40/40 corridas concurrentes verdes; 74 pruebas del módulo verdes, 462 del coordinador verdes; +2 pruebas unitarias. Redis ajeno con contraseña no se usó (2e9198b) |
