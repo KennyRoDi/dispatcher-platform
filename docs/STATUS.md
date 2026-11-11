@@ -24,7 +24,7 @@
 | F-19 | hecha |
 | F-20 | pendiente |
 | F-21 | pendiente |
-| F-22 | en-pr |
+| F-22 | tests |
 | F-23 | en-pr |
 | F-24 | pendiente |
 | F-25 | pendiente |
