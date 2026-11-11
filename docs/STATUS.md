@@ -7,7 +7,7 @@
 | F-02 | pendiente |
 | F-03 | hecha |
 | F-04 | hecha |
-| F-05 | plan |
+| F-05 | tests |
 | F-06 | pendiente |
 | F-07 | hecha |
 | F-08 | hecha |
