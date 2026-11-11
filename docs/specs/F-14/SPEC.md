@@ -1,6 +1,6 @@
 # SPEC F-14: Alertas
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** feat/F-14-1-alertas
 **Verificación IA:** verificacion 2353fd7
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | orquestador | 2026-11-11 | 6 hallazgos QA corregidos en c0fa551; suite verde; integracion pasa con redis:7-alpine; limite: relectura en crudo ante bytes no UTF-8 solo probada con fakeredis (c0fa551) |
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de verificacion | orquestador | 2026-11-11 | QA 6 defectos reproducidos como xfail, corregidos y en verde; sin segundo QA (2353fd7) |
+| verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
