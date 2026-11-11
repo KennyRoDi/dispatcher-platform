@@ -1,6 +1,6 @@
 # SPEC F-36: Cancelación en curso
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-38-1-despliegue-en-tres-nodos
 **Verificación IA:** tests ab8cd75
 **Historia:** US-36 · **Requisitos:** RF-45, RF-12 · **Responsable:** J
@@ -86,3 +86,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | SPEC completo; 2 PR de pila; cubre puntos abiertos de F-12; medicion B.6 como Medicion pendiente. Rama con origin/main fusionado. (7a7f81d) |
 | plan | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: NO independiente | 2026-11-10 | 9 pruebas nuevas en tests/unit/test_cancelacion_en_curso.py, sin codigo de produccion; 8 en rojo por la razon esperada, 1 (run sin supervisor) en verde por conservar el comportamiento (ab8cd75) |
+| tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
