@@ -53,8 +53,8 @@ class Comparison:
     exact_matches: int
 
     @property
-    def accuracy(self) -> float:
-        return self.exact_matches / self.total
+    def accuracy(self) -> float | None:
+        return _ratio(self.exact_matches, self.total)
 
 
 def _ratio(numerator: int, denominator: int) -> float | None:
@@ -64,7 +64,7 @@ def _ratio(numerator: int, denominator: int) -> float | None:
 def _require_unique(ids: Sequence[str], label: str) -> None:
     repeated = [item_id for item_id, n in Counter(ids).items() if n > 1]
     if repeated:
-        raise ValueError(f"{label} repetidos: {sorted(repeated)}")
+        raise ValueError(f"{label} repetidos: {sorted(repeated, key=repr)}")
 
 
 def _score(category: str, pairs: Sequence[tuple[frozenset[str], frozenset[str]]]) -> CategoryScore:

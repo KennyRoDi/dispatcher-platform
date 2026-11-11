@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from src.adapters.dataset_truth_files import (
 from src.domain.ground_truth import compare
 from src.domain.provenance import SourceRecord, validate_provenance
 
+INTERRUPTED = 130
 RENDERERS = {"texto": render_text, "markdown": render_markdown}
 
 
@@ -20,6 +22,11 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         return args.run(args)
+    except BrokenPipeError:
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        return 1
+    except KeyboardInterrupt:
+        return INTERRUPTED
     except (ValueError, OSError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
@@ -39,6 +46,7 @@ def _report_provenance(records: list[SourceRecord]) -> int:
 
 def _comparar(args: argparse.Namespace) -> int:
     muestra = Path(args.muestra)
+    _require_distinct_output(args.salida, muestra, Path(args.salidas))
     defects = validate_provenance(read_sample_records(muestra))
     if defects:
         print("\n".join(defects))
@@ -50,6 +58,17 @@ def _comparar(args: argparse.Namespace) -> int:
     else:
         print(table)
     return 0
+
+
+def _require_distinct_output(output: str | None, *inputs: Path) -> None:
+    if output and any(_same_file(Path(output), source) for source in inputs):
+        raise ValueError(f"--salida {output} es una de las entradas; elige otro archivo")
+
+
+def _same_file(first: Path, second: Path) -> bool:
+    return first.resolve() == second.resolve() or (
+        first.exists() and second.exists() and first.samefile(second)
+    )
 
 
 def _parser() -> argparse.ArgumentParser:
