@@ -34,10 +34,11 @@ class DiskChunkStaging:
             raise KeyError(upload_id) from None
 
     def received(self, upload_id: str) -> set[int]:
-        carpeta = self._carpeta(upload_id)
-        if not carpeta.is_dir():
+        try:
+            nombres = [p.name for p in self._carpeta(upload_id).iterdir()]
+        except FileNotFoundError:
             return set()
-        return {int(m.group(1)) for p in carpeta.iterdir() if (m := _CHUNK.fullmatch(p.name))}
+        return {int(m.group(1)) for nombre in nombres if (m := _CHUNK.fullmatch(nombre))}
 
     def open_chunk(self, upload_id: str, index: int) -> BinaryIO:
         try:
