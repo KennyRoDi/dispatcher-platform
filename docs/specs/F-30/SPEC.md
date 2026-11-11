@@ -1,7 +1,7 @@
 # SPEC F-30: Workers sin privilegios
 
 **Fase:** pr
-**Base:** feat/F-38-1-despliegue-en-tres-nodos
+**Base:** main
 **Verificación IA:** revision f43e9aa
 **Historia:** US-30 · **Requisitos:** RNF-07, RNF-12 · **Responsable:** K
 
