@@ -1,6 +1,6 @@
 # SPEC F-26: Autenticación y roles
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-26-1-autenticacion-y-roles
 **Verificación IA:** revision 06103eb
 **Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
@@ -177,3 +177,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | orquestador (sin subagente documentador, verificación no independiente) | 2026-11-10 | SPEC con limites declarados y entrada de bitacora publicada (c6271f6) |
 | documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
 | verificación IA de revision | orquestador + revisor (subagente APROBADO, 3 menores corregidos) | 2026-11-10 | orden de imports y precisiones del SPEC aplicadas (06103eb) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
