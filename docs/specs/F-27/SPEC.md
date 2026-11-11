@@ -1,6 +1,6 @@
 # SPEC F-27: TLS entre nodos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-27-2-tls-entre-nodos
 **Verificación IA:** implementacion 81e0d56
 **Historia:** US-27 · **Requisitos:** RF-36 (cifrado en tránsito); [B.5 M4], [B.7 Seguridad] · **Responsable:** K
@@ -198,3 +198,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-11 | QA: defectos 1-4 (UID de llaves en redis/MinIO, feeder sin TLS_ENABLED=false, validacion de NODE_IP, pathlen y CA por vencer) |
 | verificación IA de implementacion | pytest + revision manual | 2026-11-11 | Corregidos 16 hallazgos QA (commit 81e0d56); suite 2013 passed, 9 skipped, 4 xfailed; user: con CERTS_UID/CERTS_GID sin probar con imagenes reales (81e0d56) |
+| implementacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
