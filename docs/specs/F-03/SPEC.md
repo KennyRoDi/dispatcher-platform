@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion b2f65c2
+**Verificación IA:** revision 4d96edc
 **Historia:** US-03 · **Requisitos:** RF-18, RF-19, RF-20, RF-21, RF-22, RNF-04, RNF-05 · **Responsable:** K
 
 ## Objetivo
@@ -189,3 +189,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-10 |  |
 | verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff 91debbf..HEAD solo toca README.md y SPEC. Comprobe por grep: 'uso academico' y 'provisional' solo quedan en filas historicas de la tabla de verificaciones; parrafo de limites SIGTERM presente (SPEC:99); README añade frase MIT. Errores (a) y (b) del borrador contrastados por el documentador contra git; el (c) se degrada a desviacion del SPEC. Sin docs/dataset.md ni AD-25 (parte 7). Sin cambios de codigo. (b2f65c2) |
 | documentacion | Kenni Rodriguez | 2026-11-10 |  |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes; 5 menores. Verifique: arbol limpio, sin commits nuevos desde b2f65c2, import de _produce en heavy_case_generator.py:6 y checked_case_name en dominio. Reporte de pytest 1576 passed/9 xfailed coincide con mi ejecucion previa; no lo repeti. (4d96edc) |
