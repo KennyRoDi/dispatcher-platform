@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-12-1-cancelacion-real
-**Verificación IA:** verificacion f952e04
+**Verificación IA:** documentacion 594083a
 **Historia:** US-12 · **Requisitos:** RF-12, RF-45 (mecanismo) · **Responsable:** J
 
 ## Objetivo
@@ -77,3 +77,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | José Andrés Loría Herrera | 2026-11-10 |  |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), sin subagente: verificación NO independiente | 2026-11-10 | Docker python:3.13-slim (Linux): pytest test_process_supervisor + test_worker_cancelacion + test_coordinator = 49 passed, incluidos los 4 @posix de la parte 1 (nunca corridos en Windows). Demo ps/ls en contenedor con supervisor real: antes 3 procesos 'sleep 60' (shell ignora SIGTERM + 2 hijos) y /scratch/t1; despues 0 procesos, sin zombies, /scratch vacio. Diff src parte 2 = ~102 lineas (<=400). (f952e04) |
 | verificacion | José Andrés Loría Herrera | 2026-11-10 |  |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5) | 2026-11-10 | Diff revisado: AD-30, reutilizacion.md y evidencia medida; verificacion no independiente (594083a) |
