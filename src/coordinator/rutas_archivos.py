@@ -44,14 +44,27 @@ def iniciar(cuerpo: InicioSubida, subidas: ChunkedUpload = Depends(obtener_subid
 @router.put("/{upload_id}/chunks/{index}", status_code=204)
 async def recibir(upload_id: str, index: int, request: Request,
                   x_chunk_sha256: str = Header(...), subidas: ChunkedUpload = Depends(obtener_subidas)) -> Response:
-    datos = await request.body()
     try:
+        datos = await _leer_chunk(request, subidas.expected_size(upload_id, index))
         subidas.receive(upload_id, index, datos, x_chunk_sha256)
     except UploadNotFound:
         raise _no_existe(upload_id) from None
     except ChunkRejected as error:
         raise HTTPException(422, str(error)) from None
     return Response(status_code=204)
+
+
+async def _leer_chunk(request: Request, esperado: int) -> bytes:
+    # Se corta apenas el cuerpo supera el chunk esperado: nunca más de un chunk en memoria [B.5 M3].
+    declarado = request.headers.get("content-length")
+    if declarado and declarado.isdigit() and int(declarado) > esperado:
+        raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
+    datos = bytearray()
+    async for parte in request.stream():
+        datos += parte
+        if len(datos) > esperado:
+            raise HTTPException(413, f"el chunk excede los {esperado} bytes esperados")
+    return bytes(datos)
 
 
 @router.get("/{upload_id}")

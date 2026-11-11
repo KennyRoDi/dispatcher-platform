@@ -13,6 +13,8 @@ from src.domain.chunks import (
 )
 
 MAX_CHUNK_SIZE = 64 * 1024 * 1024
+# Acota la lista de faltantes y el conjunto de índices que se materializan en status y complete.
+MAX_CHUNKS = 100_000
 BLOQUE_LECTURA = 1 << 20
 
 
@@ -26,9 +28,14 @@ class ChunkedUpload:
         manifest = UploadManifest(sha256, size, chunk_size)
         if manifest.chunk_size > self._max_chunk_size:
             raise ValueError(f"chunk_size {chunk_size} excede el máximo {self._max_chunk_size}")
+        if manifest.chunk_count > MAX_CHUNKS:
+            raise ValueError(f"{manifest.chunk_count} chunks exceden el máximo {MAX_CHUNKS}; usa un chunk_size mayor")
         upload_id = uuid.uuid4().hex
         self._staging.save_manifest(upload_id, manifest.to_dict())
         return upload_id, manifest.chunk_count
+
+    def expected_size(self, upload_id: str, index: int) -> int:
+        return self._manifest(upload_id).expected_size(index)
 
     def receive(self, upload_id: str, index: int, data: bytes, sha256: str) -> None:
         verify_chunk(self._manifest(upload_id), index, data, sha256)
@@ -46,9 +53,14 @@ class ChunkedUpload:
         manifest = self._manifest(upload_id)
         faltantes = missing_chunks(manifest, self._staging.received(upload_id))
         if faltantes:
+            # Otro complete pudo descartar la subida entre leer el manifiesto y listar los chunks.
+            self._manifest(upload_id)
             raise MissingChunks(faltantes)
-        with self._flujo(upload_id, manifest) as flujo:
-            self._object_store.put(manifest.sha256, flujo, manifest.size)
+        try:
+            with self._flujo(upload_id, manifest) as flujo:
+                self._object_store.put(manifest.sha256, flujo, manifest.size)
+        except KeyError:
+            raise UploadNotFound(upload_id) from None
         self._staging.discard(upload_id)
         return manifest.sha256, manifest.size
 
