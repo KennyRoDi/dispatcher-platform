@@ -828,3 +828,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; sin verificacion humana independiente |
 | Cómo se validó | Orquestador reviso el diff y ejecuto pruebas tras cada fase |
 | Error de la IA | La primera implementacion dejaba un descriptor abierto si KEK_FILE era un directorio y aceptaba modos 0500/0700; lo detecto QA y se corrigio en b2aef68 |
+
+## 2026-11-10 · José Andrés Loría Herrera · F-36 (`feat/F-36-1-cancelacion-en-curso`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5, subagente Haiku para docs) |
+| Componente | F-36 |
+| Propósito | Cablear ProcessSupervisor en el worker (F-36 parte 1) y documentarlo |
+| Consulta resumida | Implementar cancelación en curso con TDD y documentar AD-31 |
+| Resultado obtenido | Supervisor cableado en process/_run/main (POSIX), cancel idempotente, poll en puerto, SystemClock; 1731 passed en Docker |
+| Validado / corregido / descartado | Sí |
+| Cómo se validó | Pruebas unitarias y ejecución en Docker Linux; revisión del diff |
