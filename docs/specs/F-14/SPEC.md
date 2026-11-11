@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-14-2-alertas
-**Verificación IA:** documentacion be6051f
+**Verificación IA:** revision d9439e3
 **Historia:** US-14 · **Requisitos:** RF-15, RF-16 (B.4 Alertas, SUP-35) · **Responsable:** K
 
 ## Objetivo
@@ -155,3 +155,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
 | verificación IA de documentacion | orquestador | 2026-11-11 | Limites de la parte 3 en AD-39 (AlertingFindingStore sin cablear: verificado con grep), prueba A con reloj sintetico, previos de Nahum declarados; bitacora en estado; sin cambios de codigo (be6051f) |
 | documentacion | Kenni Rodriguez | 2026-11-11 | aprobación delegada |
+| verificación IA de revision | revisor + orquestador | 2026-11-11 | Revisor APROBADO parte 3: +12/-2 src, respuesta sin cambios, prueba A con FakeClock sin inventar valores, AD-39 honesto (AlertingFindingStore sin cablear); 2 menores no bloqueantes anotados en CLAUDE.md local (d9439e3) |
