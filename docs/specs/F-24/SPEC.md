@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** implementacion 9593443d
+**Verificación IA:** implementacion 9d2249d2
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -107,3 +107,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. QueueLimit (dominio), transaccion_acotada con WATCH/MULTI/EXEC y 5 reintentos (adaptador), create_case envuelto sin cambiar sus comandos y 503 con Retry-After. Sin limite no hay WATCH. Unitarias 21/21, integracion con Redis real 3/3, test_coordinator 40/40, suite 3773 verde en Linux, conformidad 0. (9593443d) |
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | devuelta de verificacion | Melany Vindas | 2026-11-11 | QA: H1 WATCH daba 503 por contencion con la cola lejos del limite; H2 config invalida daba 500; H3 caso mas grande que el limite recibia 503 |
+| verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Arreglo de devuelta QA: admision con script Lua atomico en vez de WATCH (0 % de 503 lejos del limite, antes 7-25 %), QueueLimit validado al arrancar, CaseTooLarge da 422. Suite 3778 verde en Linux, integracion 5/5. (9d2249d2) |
