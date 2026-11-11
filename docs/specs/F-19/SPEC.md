@@ -1,6 +1,6 @@
 # SPEC F-19: Estrategias de carga
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 93b09fb
 **Historia:** US-19 · **Requisitos:** RF-27, RNF-09 (comparación), RNF-14 · **Responsable:** J
@@ -134,3 +134,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Codex | 2026-11-10 | Pruebas TDD rojas en Windows: test_model_memory.py y test_comparar_carga.py fallan al importar los módulos de producción aún no creados (2 errores de colección; ninguna implementación). git diff --check limpio; verificación same-session, no independiente. (430e8db) |
 | tests | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
 | verificación IA de implementacion | Codex | 2026-11-10 | 42 unitarias de WhisperTranscriber (incluye hilos/num_workers), 16 unitarias de memoria/CLI y 8 unitarias del lector pasaron en Windows; la integración POSIX nueva se omite en Windows (3 skipped). git diff --check limpio; código de producción bajo 400 líneas. No se ejecutó ninguna medición: Docker daemon apagado y no hay acceso al nodo Linux/cgroup. Verificación misma sesión, no independiente. (93b09fb) |
+| implementacion | José Andrés Loría Herrera | 2026-11-10 | aprobación delegada por José en el chat |
