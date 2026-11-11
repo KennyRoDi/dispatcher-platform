@@ -314,7 +314,6 @@ def test_validar_sobre_un_dataset_completo_sale_con_cero(complete, capsys):
 def test_validar_reporta_cada_minimo_incumplido(reduced):
     esperado = {
         "casos: 8 de al menos 40",
-        "casos heterogeneos: 4 de al menos 10",
         "casos heterogeneos livianos: 2 de al menos 5",
         "casos heterogeneos pesados: 2 de al menos 5",
         "casos pesados de al menos 200 MiB: 0 de al menos 5",

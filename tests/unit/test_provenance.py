@@ -87,3 +87,10 @@ def test_politica_personalizada_cambia_lo_admitido():
     assert validate_provenance([_record(origin="sintetico")], policy)
     assert validate_provenance([_record(origin="publico", license="MIT")], policy)
     assert validate_provenance([_record(origin="publico", license="CC0-1.0")], policy) == []
+
+
+@pytest.mark.parametrize("field", ["admitted_origins", "public_licenses", "rejected_licenses"])
+@pytest.mark.parametrize("bad", ["sintetico", None, ("sintetico", 5), ("sintetico", ""), ("  ",)])
+def test_politica_con_campos_mal_tipados_se_rechaza(field, bad):
+    with pytest.raises(ValueError, match=field):
+        ProvenancePolicy(**{field: bad})

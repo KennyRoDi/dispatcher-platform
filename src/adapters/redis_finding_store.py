@@ -18,12 +18,16 @@ class RedisFindingStore:
         pipe.rpush(_key(case_id), *(_encode(f) for f in findings))
         pipe.execute()
 
-    def list(self, case_id: str) -> list[Finding]:
+    def list_with_omitted(self, case_id: str) -> tuple[list[Finding], int]:
         decoded = [_decode(raw) for raw in self._client.lrange(_key(case_id), 0, -1)]
         valid = [finding for finding in decoded if finding is not None]
-        if len(valid) < len(decoded):
-            logger.warning("Caso %s: %d hallazgos ilegibles omitidos", case_id, len(decoded) - len(valid))
-        return valid
+        omitted = len(decoded) - len(valid)
+        if omitted:
+            logger.warning("Caso %s: %d hallazgos ilegibles omitidos", case_id, omitted)
+        return valid, omitted
+
+    def list(self, case_id: str) -> list[Finding]:
+        return self.list_with_omitted(case_id)[0]
 
 
 def _key(case_id: str) -> str:
@@ -51,8 +55,7 @@ def _decode(raw: str) -> Finding | None:
         confidence = data["confidence"]
         if not all(isinstance(text, str) for text in texts) or isinstance(confidence, bool) or not isinstance(confidence, (int, float)):
             return None
-        return Finding(
-            data["category"], Severity(data["severity"]), confidence, EvidenceRef(data["sha256"], data["position"]), data["detail"]
-        )
+        evidence = EvidenceRef(data["sha256"], data["position"])
+        return Finding(data["category"], Severity(data["severity"]), confidence, evidence, data["detail"])
     except (ValueError, TypeError, KeyError):
         return None
