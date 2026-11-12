@@ -1402,3 +1402,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado; el adaptador Redis y los dos limites QA-1 y QA-2 quedan pendientes. |
 | Cómo se validó | El orquestador verifico cada fase sin fiarse del informe del subagente (pytest ejecutado por el, grep contra ARQUITECTURA.md y el codigo, git diff para comprobar que no se debilito ninguna prueba, reproduccion propia de los hallazgos del QA y de una mutacion). Suite completa en verde: 3467 passed, 0 failed. La persona autorizo en esta ronda trabajar de corrido sin pedir su aprobacion en cada fase; el orquestador ejecuto aprobar bajo esa delegacion, de modo que la persona no reviso cada fase por separado. |
 | Error de la IA | (a) el arquitecto cito AD-18 como respaldo de las colas por tipo cuando AD-18 es el routing por clase de nodo de F-32; lo detecto el orquestador contra ARQUITECTURA.md linea 227. (b) el arquitecto afirmo que sus listas de extensiones se alineaban con src/coordinator/router.py:35-40 pero omitian .flv, .wmv, .m4v y .wma; lo detecto el orquestador. (c) el developer de las pruebas informo 28 casos y 19 extensiones cuando el recuento real es 35 casos y 22 extensiones. (d) el developer de la implementacion llamo intermitente a un fallo de test_auth_habilitada.py que depende del .env local (dotenv.load_dotenv vuelca el MinIO del Nodo A en os.environ) y a otros por disco lleno por directorios temporales de pytest, no por azar; lo detecto el orquestador. (e) la prueba de capacidad del developer solo tenia llena la primera cola en orden alfabetico y una mutacion (revisar solo la primera) sobrevivia; lo detecto el QA con 16 mutaciones y se agrego la prueba por posicion. (f) el orquestador escribio el caracter de puntos suspensivos en el resumen de verificacion del plan y el script rechazo la aprobacion del SPEC; se corrigio con un commit normal y se registro de nuevo la verificacion. |
+
+## 2026-11-11 · Kenni Rodriguez · F-05 (`feat/F-05-1-descomponer-y-enrutar`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), subagente documentador |
+| Componente | F-05 |
+| Propósito | Complemento a la entrada de F-05: anonimizar la evidencia del log de routing antes de abrir la PR. |
+| Consulta resumida | Revision del diff completo por el orquestador y por el revisor antes del cierre. |
+| Resultado obtenido | La ruta local del rootdir se sustituyo por un marcador en docs/evidencia/F-05_log_de_routing_2026-11-11.md; el arbol de la rama ya no contiene el nombre de usuario local. |
+| Validado / corregido / descartado | Validado y corregido; el nombre de usuario sigue en el historial del commit 686c2e8, y quitarlo exige reescribir historia con force push, que no se hizo. |
+| Cómo se validó | git grep de C:\Users y del nombre de usuario sobre el arbol de la rama da 0 menciones; git diff entre los commits de fase y la cabeza toca solo ese archivo. |
+| Error de la IA | (g) el documentador pego la salida cruda de pytest sin quitar el rootdir con la ruta local del usuario de Windows en un repositorio publico; ninguna otra evidencia del repositorio incluye rutas locales; lo detecto el orquestador al releer el diff, el revisor lo califico de menor, y se anonimizo en dos commits porque el primer reemplazo fallo sin avisar. |
