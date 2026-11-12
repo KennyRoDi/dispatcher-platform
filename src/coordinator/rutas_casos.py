@@ -7,10 +7,14 @@ import uuid
 from collections import Counter, defaultdict
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from src.adapters.redis_backpressure import transaccion_acotada
-from src.coordinator import conexion
+from src.adapters.redis_case_catalog import CASE_ID_FORMAT
+from src.adapters.redis_type_queue import RedisTypeQueue
+from src.application.chunked_upload import ChunkedUpload
+from src.application.create_case import CreateMultiSourceCase, FuenteNoSubida
+from src.coordinator import conexion, rutas_archivos
 from src.coordinator.apoyo import (
     TERMINAL_CASE_STATUSES,
     fetch_subtasks,
@@ -22,16 +26,63 @@ from src.coordinator.apoyo import (
 )
 from src.coordinator.modelos import CaseRequest, SubtaskRequest
 from src.coordinator.router import classify, queue_key, resolve_task_type
-from src.domain.backpressure import CaseTooLarge, QueueLimit
+from src.domain.backpressure import PROFUNDIDAD_POR_DEFECTO, CaseTooLarge, QueueLimit
+from src.domain.priority import Priority
 from src.domain.subtask import QueueFull
+from src.infrastructure.clock import SystemClock
+
+_PRIORIDAD_POR_TEXTO = {"normal": Priority.MEDIA, "high": Priority.ALTA}
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _validar_case_id(case_id: str) -> None:
+    """QA-2 de AD-46 (F-05): un case_id sin sanear puede inyectar al log de routing
+    (p. ej. saltos de línea) o colisionar con claves de Redis. Mismo formato que
+    ``RedisCaseCatalog`` ya exige al leer (F-01 lo aplica también al crear)."""
+    if not CASE_ID_FORMAT.fullmatch(case_id):
+        raise HTTPException(422, f"case_id inválido: debe cumplir {CASE_ID_FORMAT.pattern!r}")
+
+
+def _obtener_subidas_opcional() -> ChunkedUpload | None:
+    """None si el almacén de objetos no está configurado, en vez de un 503.
+
+    El camino heredado (``subtasks``) nunca necesita el almacén; solo el
+    camino nuevo (``sources``, F-01) lo exige, y solo en ese momento.
+    """
+    try:
+        return rutas_archivos.obtener_subidas()
+    except HTTPException:
+        return None
+
+
+def _create_multi_source_case(case_req: CaseRequest, subidas: ChunkedUpload | None) -> dict:
+    """F-01: camino nuevo, fuentes clasificadas automáticamente (AD-47)."""
+    if subidas is None:
+        raise HTTPException(503, "almacén de objetos no configurado")
+    priority = _PRIORIDAD_POR_TEXTO[case_req.priority]
+    cola = RedisTypeQueue(conexion.redis_client, capacity=PROFUNDIDAD_POR_DEFECTO)
+    caso_de_uso = CreateMultiSourceCase(conexion.redis_client, cola, SystemClock(), subidas)
+    if case_req.case_id:
+        _validar_case_id(case_req.case_id)
+    case_id = case_req.case_id or str(uuid.uuid4())
+    try:
+        return caso_de_uso.execute(case_id, case_req.sources, priority, case_req.metadata)
+    except FuenteNoSubida as error:
+        raise HTTPException(422, str(error)) from None
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from None
+    except QueueFull as error:
+        raise HTTPException(503, "cola llena: reintente más tarde") from None
+
+
 @router.post("/cases", status_code=201, response_model=dict, tags=["Cases"])
 @router.post("/cases/", status_code=201, response_model=dict, tags=["Cases"], include_in_schema=False)
-def create_case(case_req: CaseRequest) -> dict:
+def create_case(
+    case_req: CaseRequest,
+    subidas: ChunkedUpload | None = Depends(_obtener_subidas_opcional),
+) -> dict:
     """
     Create a processing case and enqueue each sub-task atomically.
 
@@ -41,9 +92,17 @@ def create_case(case_req: CaseRequest) -> dict:
     Fix 3  — ``RPUSH case:{id}:subtasks <sid>`` persists the subtask list so
              the dashboard and report endpoints don't need SCAN.
     Fix 4  — auto-routing via router.resolve_task_type() (rubric requirement).
+
+    F-01  — ``sources`` (fuentes clasificadas automáticamente, F-05/F-06) es una
+             alternativa a ``subtasks`` (operación FFmpeg manual, heredado).
     """
+    if case_req.sources:
+        return _create_multi_source_case(case_req, subidas)
+
     if not case_req.subtasks:
         raise HTTPException(status_code=422, detail="El caso debe tener al menos una sub-tarea.")
+    if case_req.case_id:
+        _validar_case_id(case_req.case_id)
 
     # --- resolve + validate all task types before touching Redis ---
     priority = case_req.priority
