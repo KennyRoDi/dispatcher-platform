@@ -35,7 +35,7 @@
 | F-30 | hecha |
 | F-31 | hecha |
 | F-32 | hecha |
-| F-33 | implementacion |
+| F-33 | verificacion |
 | F-34 | en-pr |
 | F-35 | verificacion |
 | F-36 | hecha |
