@@ -37,7 +37,7 @@
 | F-32 | hecha |
 | F-33 | verificacion |
 | F-34 | hecha |
-| F-35 | verificacion |
+| F-35 | documentacion |
 | F-36 | hecha |
 | F-37 | hecha |
 | F-38 | hecha |
