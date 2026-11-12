@@ -1,6 +1,6 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision b54da91
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
@@ -131,3 +131,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), subagente documentador; verificación del orquestador | 2026-11-12 | AD-50 en ARQUITECTURA.md y SUP-46 en REQUERIMIENTOS.md existen; AD-50/SUP-46 libres en ramas remotas (git grep); DEMO.md documenta opciones reales; sin ficha de evidencia ni cifras; bitácora publicada con errores reales de la IA (b184c70) (b184c70) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | verificación IA de revision | Claude Code (Sonnet 5.5), subagente revisor; verificación del orquestador | 2026-11-12 | Revisor: APROBADO con menores; pytest burst+arquitectura 65 passed, 1 skipped, 3 xfailed; diff sin cambios en src/ ni run_load.py; menores 1-3 (estado final con partially_completed, cita FINISHED_STATUSES, --out) corregidos en SPEC y SUP-46 (b54da91); menores 4-5 aceptados; sin cambios de código tras la prueba (b54da91) |
+| revision | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
