@@ -152,6 +152,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-42 | **Provisional:** el id de sub-tarea es `{case_id}:{sha256}:{kind}`. | Es determinista y trazable a caso, fuente y tipo (RF-04, RF-05); ver AD-46. |
 | SUP-43 | **Provisional:** la misma fuente repetida en un caso produce una sola sub-tarea. | Evita duplicar evidencia idéntica y permite reintentar sin duplicar; ver AD-46. |
 | SUP-44 | Un timestamp sin huso horario explícito en una exportación de WhatsApp o Telegram se interpreta como UTC. | No hay dato en el archivo que permita detectar el huso real; el dataset sintético de F-03 ya se genera en UTC. Exportaciones reales en otro huso deben convertirse antes de ingresar; ver AD-48. |
+| SUP-45 | **Provisional:** N, el máximo configurable de reintentos, es el número total de intentos de la sub-tarea, igual que `attempts < max_attempts` en `recovery.py`. Con N = 3 hay 1 intento inicial y 2 reintentos, el tercer fallo marca `failed` y hay N − 1 esperas. | RF-11 y [B.4] piden un «número máximo configurable» sin precisar si cuenta el intento inicial; reutilizar la semántica de `recovery.py` evita dos límites distintos; ver AD-48. |
 
 ## 4. Discrepancias detectadas al contrastar con el documento
 

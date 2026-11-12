@@ -251,3 +251,24 @@ class FakeCaseStateStore:
 
     def history(self, case_id):
         return list(self._historial[case_id])
+
+
+class FakeRetryScheduler:
+    def __init__(self, clock):
+        self._clock = clock
+        self._vencimientos = {}
+        self.programadas = []
+
+    def schedule(self, subtask_id, delay_s):
+        self.programadas.append((subtask_id, delay_s))
+        self._vencimientos[subtask_id] = self._clock.now().timestamp() + delay_s
+
+    def promote_due(self, now):
+        vencidas = sorted(
+            (vencimiento, subtask_id)
+            for subtask_id, vencimiento in self._vencimientos.items()
+            if vencimiento <= now.timestamp()
+        )
+        for _, subtask_id in vencidas:
+            del self._vencimientos[subtask_id]
+        return [subtask_id for _, subtask_id in vencidas]
