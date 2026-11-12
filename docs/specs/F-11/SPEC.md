@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-11-1-reintentos
 **Verificación IA:** implementacion b78c8d29
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -172,3 +172,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes (fakeredis sin Lua eval, generadores de 200 MiB); tests/test_contract.py falla igual en main; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-12 | QA halló duplicación de ejecución si el worker muere tras schedule (riesgo 12), reencolado de casos cancelados, entrada corrupta que bloquea promote_due y NaN/inf aceptados en RETRY_BASE_S/CAP_S |
 | verificación IA de implementacion | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente tras devolver la fase por hallazgos de QA. Ejecuté yo --runxfail antes (6 fallaban) y ahora 205 passed y 4 xfailed en los archivos de F-11 y módulos tocados. El diff de tests desde dc2723b3 solo quita marcadores xfail, sin cambiar aserciones. Leí el diff de src: ZREM en _requeue, promote_due aislado por id y sin encolar casos cancelados o sub-tareas no pendientes, isfinite en config, ValueError del jitter tratado como GiveUp. No verifiqué la suite completa de Windows. (b78c8d29) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes (test_contract falla igual en main); las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
