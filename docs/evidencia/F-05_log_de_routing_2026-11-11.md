@@ -16,6 +16,8 @@ Es una ejecución local sobre `FakeWorkQueue` y `FakeClock` (`tests/dobles.py`) 
 
 ## Salida cruda
 
+La ruta local del `rootdir` se sustituyó por `<raíz del repositorio>`; el resto es la salida tal cual.
+
 ```text
 ============================= test session starts =============================
 platform win32 -- Python 3.13.17, pytest-9.1.1, pluggy-1.7.0
