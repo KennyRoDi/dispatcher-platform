@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion a7fe69e
+**Verificación IA:** revision 0ea8476
 **Historia:** US-06 · **Requisitos:** RF-04, RF-05 (confiabilidad de la cola de B.4 Cola y distribución), AD-03 · **Responsable:** N
 
 ## Objetivo
@@ -109,3 +109,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-06 |
 | verificación IA de documentacion | claude | 2026-11-11 | Documentacion completa: AD-03 refinada con BLMOVE a lista para camino nuevo, limitacion del heredado declarada; docs/reutilizacion.md con linea estandar; bitacora registrada en rama estado DECLARANDO el error real de F-20 (Priority duplicada) via --error-ia (a7fe69e) |
 | documentacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-06 |
+| verificación IA de revision | claude | 2026-11-11 | Diff F-06 vs SPEC: objetivo OK (adaptador real entregado), alcance OK (incluye correccion de Priority aprobada), criterios OK (atomicidad BLMOVE), diseno OK, pruebas OK (nombres exactos), plan de pila OK (1 parte, 109 lineas). APROBADO (0ea8476) |
