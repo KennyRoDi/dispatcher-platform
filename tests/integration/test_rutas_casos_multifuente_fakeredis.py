@@ -7,7 +7,7 @@ import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 
-from src.coordinator import conexion, rutas_archivos
+from src.coordinator import conexion, rutas_casos
 import src.coordinator.main as main
 
 
@@ -29,9 +29,9 @@ def fake(monkeypatch):
 @pytest.fixture
 def client(fake, sin_autorizacion):
     subidas = _SubidasFalsas({"sha-texto", "sha-imagen", "sha-audio", "sha-video"})
-    main.app.dependency_overrides[rutas_archivos.obtener_subidas] = lambda: subidas
+    main.app.dependency_overrides[rutas_casos._obtener_subidas_opcional] = lambda: subidas
     yield TestClient(main.app)
-    main.app.dependency_overrides.pop(rutas_archivos.obtener_subidas, None)
+    main.app.dependency_overrides.pop(rutas_casos._obtener_subidas_opcional, None)
 
 
 @pytest.mark.integration

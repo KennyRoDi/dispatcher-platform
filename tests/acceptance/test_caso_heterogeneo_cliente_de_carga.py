@@ -23,10 +23,11 @@ def fake(monkeypatch):
 
 @pytest.fixture
 def client(fake, sin_autorizacion):
-    subidas = ChunkedUpload(FakeChunkStaging(), FakeObjectStore(), max_chunk_size=1 << 20)
-    main.app.dependency_overrides[rutas_archivos.obtener_subidas] = lambda: subidas
+    # Configuracion real (no dependency_overrides): ejercita el mismo camino
+    # que produccion para /uploads y para POST /cases con "sources".
+    rutas_archivos.configurar(ChunkedUpload(FakeChunkStaging(), FakeObjectStore(), max_chunk_size=1 << 20))
     yield TestClient(main.app)
-    main.app.dependency_overrides.pop(rutas_archivos.obtener_subidas, None)
+    rutas_archivos.configurar(None)
 
 
 def _subir(client, contenido, nombre):

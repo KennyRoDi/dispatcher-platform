@@ -19,11 +19,24 @@ class SubtaskRequest(BaseModel):
     metadata: Optional[dict[str, Any]] = None
 
 
+class SourceRef(BaseModel):
+    """Referencia a una fuente ya subida (F-01): sha256 de un objeto existente + nombre original."""
+
+    sha256: str
+    name: str
+
+
 class CaseRequest(BaseModel):
-    """Payload for POST /cases."""
+    """Payload for POST /cases.
+
+    ``subtasks`` es el camino heredado (operación FFmpeg explícita por sub-tarea).
+    ``sources`` (F-01) es el camino nuevo: fuentes que el sistema clasifica y
+    decompone automáticamente (F-05/F-06). Se envía uno u otro, no ambos.
+    """
 
     case_id: Optional[str] = None       # auto-generated if not provided
-    subtasks: List[SubtaskRequest]
+    subtasks: List[SubtaskRequest] = []
+    sources: Optional[List[SourceRef]] = None
     priority: Literal["normal", "high"] = "normal"
     metadata: Optional[dict[str, Any]] = None
 
