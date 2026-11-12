@@ -307,6 +307,7 @@ def test_stats(client, fake):
     stats = client.get("/stats").json()
     expected_queues = {f"queue:{op}": 0 for op in OPS}
     expected_queues.update({f"queue:{op}:high": 0 for op in OPS})
+    expected_queues.update({"queue:text": 0, "queue:image": 0, "queue:audio": 0})
     expected_queues["queue:transcode_video"] = 2
     expected_queues["queue:convert_audio:high"] = 1
     assert stats["queues"] == expected_queues
