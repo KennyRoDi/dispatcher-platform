@@ -1,6 +1,6 @@
 # SPEC F-39: Reutilización y correcciones
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 8d6e3f7
 **Historia:** US-39 · **Requisitos:** RNF-02, RNF-03, RNF-24 · **Responsable:** N
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | claude | 2026-11-12 | QA independiente: 12 modificado y 3 nuevo correctos contra git diff, 29 hashes y PR existen; corregidos 2 hallazgos de documento (fila heartbeat, lista minioadmin); pytest 22 passed. Test debil (no cruza estado con git diff) declarado como limite (7308c3a) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada |
 | verificación IA de documentacion | claude | 2026-11-12 | Bitacora publicada en estado con uso de IA y error real; sin cambios de codigo (8d6e3f7) |
+| documentacion | Kenni Rodriguez | 2026-11-12 |  |
