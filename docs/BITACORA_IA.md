@@ -1620,3 +1620,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; medicion real ejecutada (3 repeticiones), no simulada ni inventada |
 | Cómo se validó | pytest de tests/unit/test_coordinator_restart.py y tests/integration/test_coordinator_restart_real.py (7 passed); ejecucion real del escenario 3 veces, revision manual de los JSON antes de redactar la ficha |
 | Error de la IA | Sin error de logica propio de F-35 (QA de edge cases en evaluar()/tiempo_de_arranque() no encontro bugs). Se detecto que main.py (fusionado por otra sesion durante el desarrollo de F-35) ahora exige TLS_ENABLED y autorizacion JWT por defecto; el escenario de medicion fallaba por esto, ajeno a la logica medida. Se ajusto el script para desactivar TLS y sortear la autorizacion, igual que ya hacen tests/conftest.py y el fixture sin_autorizacion de las pruebas, porque F-35 no mide esos aspectos |
+
+## 2026-11-12 · Kenni Rodriguez · F-33 ráfaga parte 2: evidencia en simulación local (docs/evidencia/F-33_*, SPEC, DEMO.md) (`feat/F-33-2-rafaga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5): subagentes medidor y documentador; verificación del orquestador |
+| Componente | F-33 ráfaga parte 2: evidencia en simulación local (docs/evidencia/F-33_*, SPEC, DEMO.md) |
+| Propósito | Ejecutar la ráfaga B.6 (3 repeticiones de 20 casos y una de 40) en Nodo A y tres workers en contenedores de una sola máquina, con CSV, gráficos y ficha |
+| Consulta resumida | Eres QA y medidor/documentador de F-33 parte 2, con el SPEC y la receta de simulación local de F-38 |
+| Resultado obtenido | Cuatro corridas con veredicto cumple true, CSV, gráficos, ficha con aviso de simulación local y límites documentados |
+| Validado / corregido / descartado | Orquestador releyó los JSON crudos y recalculó el throughput de rep3; documentador contrastó con grep las referencias de código; .env intacto y sin secretos. NO se probó en tres nodos reales (B.2/Tailscale): sigue pendiente y la simulación se acepta provisionalmente por decisión de la persona. Aprobaciones delegadas; verificación no independiente de la sesión |
+| Cómo se validó | Simulación local autorizada por la persona; aprobaciones delegadas |
+| Error de la IA | El medidor adaptó la receta F-38 por TLS/JWT y renombró container_name; su ficha decía 429 donde el código da 503 y atribuía a DEMO.md una declaración inexistente de partially_completed (detectado por el documentador con grep y corregido) |
