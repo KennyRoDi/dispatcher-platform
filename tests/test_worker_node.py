@@ -184,7 +184,7 @@ def test_each_processing_error_subclass_marks_failed(tmp_path):
 
 
 def test_missing_dataset_object_is_storage_error(tmp_path):
-    worker, redis_client, storage, processor, reporter = make_worker(tmp_path)
+    worker, redis_client, storage, processor, reporter = make_worker(tmp_path, MAX_ATTEMPTS="1")
     redis_client.hset("subtask:sid1", mapping={
         "subtask_id": "sid1", "case_id": "c1", "file_path": "c1/sid1/missing.bin",
         "operation": "transcode_video", "status": "pending",
@@ -200,7 +200,7 @@ def test_missing_dataset_object_is_storage_error(tmp_path):
 
 def test_upload_failure_is_storage_error(tmp_path):
     storage = FakeStorage(fail_upload=True)
-    worker, redis_client, storage, processor, reporter = make_worker(tmp_path, storage=storage)
+    worker, redis_client, storage, processor, reporter = make_worker(tmp_path, storage=storage, MAX_ATTEMPTS="1")
     seed_subtask(redis_client, storage, "sid1")
 
     payload = worker.handle_subtask("sid1")
