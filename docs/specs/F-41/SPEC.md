@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 3fec3cde
+**Verificación IA:** tests a649c769
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
 
 ## Objetivo
@@ -91,3 +91,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Codex | 2026-11-12 | Revision independiente del arquitecto en una ronda: diff completo contra origin/main solo SPEC; criterios US-41 y RNF-09 a RNF-14 cotejados con enunciado y backlog; sin marcadores; git diff --check limpio; cinco fichas pasan revisar_ficha. Verificados flags CLI m5. Brechas y errores M1/M2/M5 registrados; sin ejecutar mediciones ni acreditar reproduccion en otra maquina. (3fec3cde) |
 | plan | José Andrés Loría Herrera | 2026-11-12 |  |
+| verificación IA de tests | Codex | 2026-11-12 | Revision independiente de COMPROBACION: cubre productos RNF09-14 y cinco reproducciones; estados parciales no se declaran cumplidos; diff solo documental y diff --check limpio. pytest tests/unit/test_conformidad.py: 28 passed. F41 no lleva TDD segun IMPLEMENTACION116; sin codigo ni pruebas rojas artificiales. (a649c769) |
