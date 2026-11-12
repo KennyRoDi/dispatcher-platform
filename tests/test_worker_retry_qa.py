@@ -131,3 +131,37 @@ def test_recovery_con_huerfanas_sigue_reencolando_inmediato_y_falla_al_limite():
     assert redis_client.lrange("queue:x", 0, -1) == ["a"]
     assert recover_subtask(redis_client, settings, reporte, "b", "worker_lost") == "failed"
     assert reporte.payloads[0]["error_type"] == "WorkerLostError"
+
+
+def test_reintento_extremo_a_extremo_vuelve_a_la_cola_con_scheduler_real(tmp_path):
+    worker, redis_client, reporter = preparar(tmp_path, TimeoutError("t"))
+    reloj = FakeClock()
+    worker.retry_scheduler = RedisRetryScheduler(redis_client, reloj)
+    worker.jitter = lambda: 0.0
+    assert worker.handle_subtask("s1") is None
+    assert redis_client.zscore(SCHEDULED_KEY, "s1") is not None
+    reloj.advance(timedelta(hours=1))
+    assert worker.retry_scheduler.promote_due(reloj.now()) == ["s1"]
+    assert redis_client.lrange("queue:transcode_video", 0, -1) == ["s1"]
+    assert redis_client.zscore(SCHEDULED_KEY, "s1") is None
+
+
+@pytest.mark.xfail(strict=True, reason="ventana teórica: promote ve status running entre schedule y hset pending")
+def test_reintento_se_pierde_si_promote_corre_entre_schedule_y_status_pending(tmp_path):
+    worker, redis_client, reporter = preparar(tmp_path, TimeoutError("t"))
+    reloj = FakeClock()
+    real = RedisRetryScheduler(redis_client, reloj)
+    promovidas = []
+
+    class Intercalado:
+        def schedule(self, sid, delay):
+            real.schedule(sid, delay)
+            reloj.advance(timedelta(hours=1))
+            promovidas.extend(real.promote_due(reloj.now()))
+
+    worker.retry_scheduler = Intercalado()
+    worker.handle_subtask("s1")
+    en_cola = redis_client.lrange("queue:transcode_video", 0, -1)
+    assert en_cola == ["s1"] or redis_client.zscore(SCHEDULED_KEY, "s1") is not None, (
+        "reintento perdido: promote descartó la subtarea con status running"
+    )
