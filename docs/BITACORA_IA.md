@@ -1698,3 +1698,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
 | Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
 | Error de la IA | El source_ref de los hallazgos de Telegram queda fuente.json y no el nombre original, y la prueba de tres nodos es una simulación con fakeredis |
+
+## 2026-11-12 · Kenni Rodriguez · F-43 parte 6 (`feat/F-43-6-despliegue`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes developer |
+| Componente | F-43 parte 6 |
+| Propósito | Despliegue de workers de análisis por nodo |
+| Consulta resumida | Implementación directa de la parte según docs/specs/F-43/SPEC.md |
+| Resultado obtenido | Dockerfile.analisis, compose por tipo con perfiles, KEK y staging en el Nodo A, preflight y documentación; 130 pruebas pasan |
+| Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
+| Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
+| Error de la IA | La imagen no se construyó por falta de daemon de Docker y los 10 minutos de stop_grace_period y 64 MB de tmpfs son valores sin medir |
