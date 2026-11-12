@@ -10,9 +10,11 @@ from src.application.ports import CaseCatalog, Clock, FindingStore, ObjectStore
 from src.application.report_json import report_to_dict
 from src.coordinator import conexion
 from src.infrastructure.clock import SystemClock
+from src.infrastructure.object_store import crear_almacen_lectura
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+_almacen: ObjectStore | None = None
 
 
 def obtener_hallazgos() -> FindingStore:
@@ -24,8 +26,14 @@ def obtener_catalogo() -> CaseCatalog:
 
 
 def obtener_almacen() -> ObjectStore:
-    # Aún no hay adaptador de ObjectStore (F-23, Melany); no se inventa uno.
-    raise HTTPException(status_code=503, detail="Almacén de objetos no configurado (pendiente F-23).")
+    global _almacen
+    if _almacen is None:
+        try:
+            _almacen = crear_almacen_lectura()
+        except Exception as error:
+            logger.error("Almacén de objetos no disponible para el reporte: %s", type(error).__name__)
+            raise HTTPException(status_code=503, detail="Almacén de objetos no configurado o no disponible.")
+    return _almacen
 
 
 def obtener_reloj() -> Clock:

@@ -26,12 +26,10 @@ from src.coordinator.apoyo import (
 )
 from src.coordinator.modelos import CaseRequest, SubtaskRequest
 from src.coordinator.router import classify, queue_key, resolve_task_type
-from src.domain.backpressure import PROFUNDIDAD_POR_DEFECTO, CaseTooLarge, QueueLimit
+from src.domain.backpressure import CaseTooLarge, QueueLimit
 from src.domain.priority import Priority
 from src.domain.subtask import QueueFull
 from src.infrastructure.clock import SystemClock
-
-_PRIORIDAD_POR_TEXTO = {"normal": Priority.MEDIA, "high": Priority.ALTA}
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -61,8 +59,9 @@ def _create_multi_source_case(case_req: CaseRequest, subidas: ChunkedUpload | No
     """F-01: camino nuevo, fuentes clasificadas automáticamente (AD-47)."""
     if subidas is None:
         raise HTTPException(503, "almacén de objetos no configurado")
-    priority = _PRIORIDAD_POR_TEXTO[case_req.priority]
-    cola = RedisTypeQueue(conexion.redis_client, capacity=PROFUNDIDAD_POR_DEFECTO)
+    priority = Priority.from_contract(case_req.priority)
+    limite = QueueLimit.from_env(os.environ)
+    cola = RedisTypeQueue(conexion.redis_client, capacity=limite.max_depth)
     caso_de_uso = CreateMultiSourceCase(conexion.redis_client, cola, SystemClock(), subidas)
     if case_req.case_id:
         _validar_case_id(case_req.case_id)
@@ -74,7 +73,8 @@ def _create_multi_source_case(case_req: CaseRequest, subidas: ChunkedUpload | No
     except ValueError as error:
         raise HTTPException(422, str(error)) from None
     except QueueFull as error:
-        raise HTTPException(503, "cola llena: reintente más tarde") from None
+        raise HTTPException(503, "cola llena: reintente más tarde",
+                            headers={"Retry-After": str(limite.retry_after)}) from None
 
 
 @router.post("/cases", status_code=201, response_model=dict, tags=["Cases"])

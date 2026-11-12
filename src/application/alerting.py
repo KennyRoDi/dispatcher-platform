@@ -35,6 +35,13 @@ class AlertingFindingStore:
         self._inner.add(case_id, findings)
         _publish_all(self._publisher, high_incident_alerts(case_id, findings))
 
+    def add_once(self, case_id: str, subtask_id: str, findings: Sequence[Finding]) -> bool:
+        findings = list(findings)
+        if not self._inner.add_once(case_id, subtask_id, findings):
+            return False
+        _publish_all(self._publisher, high_incident_alerts(case_id, findings))
+        return True
+
     def list(self, case_id: str) -> list[Finding]:
         return self._inner.list(case_id)
 

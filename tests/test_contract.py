@@ -491,7 +491,9 @@ def test_workers_and_stats_reflect_real_heartbeat(env):
     assert stats["subtasks_active"] == 0
     assert stats["cases_by_status"] == {"completed": 1}
     assert set(stats["queues"]) == (
-        {f"queue:{op}" for op in OPERATIONS} | {f"queue:{op}:high" for op in OPERATIONS}
+        {f"queue:{op}" for op in OPERATIONS}
+        | {f"queue:{op}:high" for op in OPERATIONS}
+        | {"queue:text", "queue:image", "queue:audio"}
     )
     assert all(v == 0 for v in stats["queues"].values())
 
