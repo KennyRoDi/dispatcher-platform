@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 08b0802
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -165,3 +165,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación contra 7f0c31b: solo AD-48, SUP-44, fila RetryScheduler en CONTRATOS y SPEC; sin tocar BITACORA, Fase ni Aprobaciones; confirmé que AD-48 describe solo lo que existe (parte 1) y que no hay caracteres de puntos suspensivos nuevos. El borrador de bitácora es veraz: errores de IA reales (mi resumen con el carácter que bloqueó el script, 4 defectos de QA, desviación de decide_retry). (5851084) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; solo se documentó. Autorizado por la persona |
 | verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. Releí el diff completo contra el SPEC y la parte 1 del plan: 78 líneas de código, 13 archivos esperados, 48 passed y 4 xfailed ejecutados por mí antes y por el revisor, documentación coherente con lo implementado. Observaciones menores aceptadas: puntos suspensivos en la tabla de aprobaciones por la excepción de plan; suite completa de Windows sin re-ejecutar, la valida CI. (08b0802) |
+| revision | Kenni Rodriguez | 2026-11-12 |  |
