@@ -25,7 +25,7 @@ Un cgroup v2 contabiliza memoria y permite que el kernel imponga un límite por 
 
 Referencia bibliográfica: Silberschatz, Galvin y Gagne, *Operating System Concepts*, 10.ª ed., capítulo 10, «Virtual Memory»; edición del curso por confirmar según SUP-16. Referencia específica: documentación del Kernel Linux, *Control Group v2*, sección «Memory», R4 de [ARQUITECTURA](ARQUITECTURA.md#10-referencias), para `memory.current`, `memory.max` y `memory.swap.max`. Son fundamentos del diseño; esta parte aún no contrasta teoría con mediciones del kernel.
 
-Para F-19, fork/CoW es el concepto que se pretende contrastar con memoria compartida y privada: R2 capítulo 10 y R6 de ARQUITECTURA. La precarga por sí sola no demuestra compartición efectiva ni seguridad de los hilos nativos de CTranslate2; esa compatibilidad se comprobará en Linux en la parte 2. La comparación física pertenece a la parte 3.
+F-19 comparó carga por proceso y pesos compartidos mediante `inter_threads` de CTranslate2 (AD-07). La precarga con fork de un modelo con hilos nativos se rechazó por bloqueo en la prueba Linux: no se presenta como estrategia compartida validada. R2 capítulo 10 y R6 fundamentan memoria compartida/privada; la medición física final de parte 3 está en la sección 4.2.
 
 ## 3. Método de medición
 
@@ -56,9 +56,9 @@ docker exec <id> cat /sys/fs/cgroup/memory.swap.max
 
 Comparar `memory.max` con `mem_limit` y verificar que `memory.swap.max` coincida con `memswap_limit` (el Compose fija ambos al mismo valor). Registrar también fallos de configuración o arranque; no estimar los valores faltantes.
 
-### F-19: método pendiente
+### F-19: método ejecutado en parte 3
 
-No se hicieron mediciones de F-19 parte 1. Los comandos del [SPEC F-19](specs/F-19/SPEC.md#mediciones) describen una interfaz futura, todavía no disponible. Parte 2 debe validar igualdad real y compatibilidad de Whisper tras fork; parte 3 implementará lector/CLI y ejecutará la comparación en Linux/WSL2 no root, con supervisor e hijos en el mismo cgroup limitado. Se conservarán crudos de `smaps_rollup` por PID y `memory.current`, antes de cargar, tras cargar y tras inferir, con cinco repeticiones por variante para N=1/N=2. Hasta entonces no corresponde ejecutar esos comandos como si el script existiera ni registrar cifras de memoria.
+Parte 1 no midió SO. Las partes posteriores implementaron `scripts/measure/comparar_carga.py` y compararon `por_proceso` con `workers_compartidos`, no fork del modelo ya cargado, conforme AD-07. El comando exacto ejecutado y las condiciones están en [QA parte 3](specs/F-19/QA-parte-3.md). Hay cinco repeticiones por variante para N=1/N=2, supervisor incluido y crudos de RSS/PSS y `memory.current` en `docs/evidencia/F-19/`. Es un contenedor Linux/WSL2 no root con cgroup limitado, no un worker desplegado. La sección 4.2 recoge sus resultados; huellas de otros modelos y ráfaga por worker siguen pendientes.
 
 ## 4. Resultados
 
@@ -103,7 +103,7 @@ La comparación de parte 3 usó Whisper CPU, Python 3.13.18, faster-whisper 1.2.
 
 Las pruebas respaldan el cálculo de presupuesto, la validación estática del cableado y la lectura estricta de archivos con el contrato actual. La medición F-19 confirma el límite configurado por el cgroup del contenedor en el entorno WSL2; no permite concluir que los nodos desplegados soporten la carga. AD-29 tiene aprobación de diseño; SUP-24 sigue siendo supuesto pendiente de validación y la calibración de límites sigue pendiente según SUP-17.
 
-La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D bajo la carga definida y decidir `WORKER_MEM_LIMIT` por nodo. La validación local con 1 GiB sintético no acredita esos valores. Los demás productos obligatorios de M1 siguen pendientes por feature: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM provocado y recuperación (medido solo en un contenedor, ver más abajo; falta en nodos WSL2); F-19, huella RSS/PSS por modelo y comparación de estrategias de carga. F-37 cubre saturación del nodo (B.6).
+La evidencia real del arranque y los límites de F-16 parte 2 sigue pendiente hasta medir B/C/D bajo la carga definida y decidir `WORKER_MEM_LIMIT` por nodo. La validación local con 1 GiB sintético no acredita esos valores. Los productos incompletos de M1 son: F-17, admisión basada en huella y memoria durante ráfaga; F-18, OOM con worker desplegado (el arnés local está medido, ver más abajo); F-19, huella de todos los modelos usados. La comparación de estrategias para Whisper CPU sí está medida, con el alcance de la sección 4.2. F-37 cubre saturación del nodo (B.6).
 
 F-19 partes 1–3 respaldan el protocolo, la compatibilidad con Whisper y la comparación medida en el entorno indicado. A N=2, `workers_compartidos` presentó menor PSS y `memory.current` promedio que `por_proceso`; mantener esta estrategia es provisional y acotado a esa carga. La medición no demuestra ahorro para otros modelos, ausencia general de zombies ni desempeño de workers desplegados. La aprobación de SUP-25 fija el alcance experimental y sus parámetros iniciales.
 
