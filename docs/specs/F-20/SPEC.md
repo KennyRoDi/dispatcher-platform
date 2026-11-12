@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion ce6b8b5
+**Verificación IA:** documentacion 45f670a
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -125,3 +125,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Nahúm Murillo | 2026-11-11 | errores de colección preexistentes en tests de TLS/seguridad; F-20 tests verdes |
 | verificación IA de verificacion | claude | 2026-11-11 | Criterios verificados: orden por puntaje✓, aging evita inanición✓, bonos lineales✓. Tests verdes (20 passed). Redis ZSET order correcto. Sin fallos al romper (priority enum rechaza valores inválidos, scheduler maneja colas vacías) (ce6b8b5) |
 | verificacion | Nahúm Murillo | 2026-11-11 | errores preexistentes |
+| verificación IA de documentacion | claude | 2026-11-11 | Documentación: BITACORA_IA.md actualizada en rama estado. SPEC completo con plan de 3 PRs. No requiere cambios en ARQUITECTURA.md (usa Decision AD-04 existente) (45f670a) |
