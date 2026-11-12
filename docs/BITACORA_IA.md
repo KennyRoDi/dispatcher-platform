@@ -1542,3 +1542,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por verificación de cada fase y aprobación de la persona; el SPEC se corrigió a next_delay(attempts+1); 4 defectos menores aceptados como riesgos; base 1 s y tope 30 s sin medir |
 | Cómo se validó | El orquestador ejecutó test_retry, test_retry_subtask, las pruebas QA y test_arquitectura; diff de pruebas vacío entre fases; reproducción del OverflowError y del NaN; en Windows la suite completa tiene fallos de entorno preexistentes y CI en Linux valida el resto |
 | Error de la IA | El resumen de verificación del plan incluyó el carácter de puntos suspensivos y el script rechazó la aprobación (resuelto con excepción autorizada); QA halló 4 defectos menores: OverflowError con attempt mayor a 1000 y base float, RetryPolicy acepta NaN, caso inexistente da AttributeError por case_state.py de F-10 y el estado cambia a retrying antes de schedule; la implementación mostró que decide_retry calcula la espera con next_delay(attempts+1) y el SPEC se corrigió |
+
+## 2026-11-12 · Nahúm Murillo · F-34 (`feat/F-34-1-caida-de-un-worker`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-34 |
+| Propósito | Disenar SPEC, investigar el mecanismo real de heartbeat/reaper, escribir pruebas TDD e implementar la medicion real de caida de worker para F-34 |
+| Consulta resumida | Demostrar con datos medidos que, ante la caida de un worker, el sistema detecta por heartbeat, reasigna la sub-tarea y el caso cierra correcto, sin perdidas ni duplicados |
+| Resultado obtenido | scenarios/worker_crash.py mide contra el Reaper heredado real (sin modificarlo); 15.05s con muestreo rapido, 20.0s con el reaper_interval real de produccion, refinando la estimacion informal de docs/DEMO.md |
+| Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; medicion real ejecutada (6 repeticiones), no simulada ni inventada |
+| Cómo se validó | pytest de tests/unit/test_worker_crash.py y tests/integration/test_worker_crash_reaper_real.py (11 passed); ejecucion real del escenario 6 veces, revision manual de los JSON antes de redactar la ficha |
+| Error de la IA | La IA (yo mismo) escribio un mensaje de error confuso en evaluar() cuando terminadas>creadas (mostraba 'faltan -2' en vez de explicar el exceso); detectado en QA manual deliberada y corregido con un mensaje distinto para ese caso, mas una prueba de regresion |
