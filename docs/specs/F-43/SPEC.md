@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion ba631a75
+**Verificación IA:** documentacion 47cc60b7
 **Historia:** US-43 · **Requisitos:** RF-04 a RF-12, RF-13 y RF-14 (reporte con evidencias), RF-15, RF-16, RF-24 y RF-25 (admisión en el worker tipado); RNF-01, RNF-07, RNF-08, RNF-24, RNF-25; AD-03, AD-05, AD-06, AD-11, AD-26 a AD-28, AD-43, AD-46 a AD-49 (aplica); AD-51 a AD-54 (propone) · **Responsable:** K
 
 ## Objetivo
@@ -314,3 +314,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-12 | Modo rápido autorizado por la persona (supervisión con autonomía total y falta de tiempo): fase implementacion sin subagente independiente; la suite completa de Windows tiene fallos de entorno ajenos y la valida CI en Linux |
 | verificación IA de verificacion | Claude Sonnet 5.5, orquestador | 2026-11-12 | Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión. Ejecuté las pruebas de la parte 1 (68 passed) y las de regresión, y corregí dos pruebas existentes de /stats. La suite completa la valida CI en Linux. (ba631a75) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | Modo rápido autorizado por la persona (supervisión con autonomía total y falta de tiempo): fase verificacion sin subagente independiente; la suite completa de Windows tiene fallos de entorno ajenos y la valida CI en Linux |
+| verificación IA de documentacion | Claude Sonnet 5.5, orquestador | 2026-11-12 | Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión. Ejecuté las pruebas de la parte 1 (68 passed) y las de regresión, y corregí dos pruebas existentes de /stats. La suite completa la valida CI en Linux. (47cc60b7) |
