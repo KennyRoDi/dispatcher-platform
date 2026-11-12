@@ -1,6 +1,6 @@
 # SPEC F-41: Fichas de evidencia
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 4c3c6e38
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
@@ -100,3 +100,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Codex | 2026-11-12 | Documentacion M1-M5, AD04, QA, COMPROBACION y recalculos revisados; bitacora F41 publicada en estado; git diff --check limpio; enlaces locales existentes; 3030 unitarias en verde. Pendientes medidos explicitamente, usuario acepta entrega parcial. (31a0e058) |
 | documentacion | José Andrés Loría Herrera | 2026-11-12 |  |
 | verificación IA de revision | Codex | 2026-11-12 | Revision independiente QA en docs/specs/F-41/QA.md comparo diff completo origin/main...HEAD con SPEC; correcciones documentales aprobadas, aceptacion RNF parcial devuelta. Usuario autorizo cierre y merge con faltantes explicitos; sin llaves ni datos privados, diff --check limpio y 3030 unitarias verdes. (4c3c6e38) |
+| revision | José Andrés Loría Herrera | 2026-11-12 | Jose autoriza fusionar F41 con evidencia parcial; revisor QA aprobo correcciones documentales pero devolvio aceptacion total. Se acepta deuda RNF09-13 y cinco reproducciones listada en QA/COMPROBACION; esta excepcion registra decision sin afirmar mediciones inexistentes. |
