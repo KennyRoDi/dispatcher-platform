@@ -1465,3 +1465,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Revise los resultados y la ficha; pruebas en verde |
 | Cómo se validó | Ajustes revisados y aplicados con git am |
 | Error de la IA | El primer grafico mostraba caidas falsas a 0 en segundos sin muestra; se corrigio dejandolos vacios |
+
+## 2026-11-11 · Melany Vindas · F-25 (`feat/F-25-2-medir-latencia-durante-subidas-grandes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-25 |
+| Propósito | Medir latencia de la API durante subidas grandes (F-25) |
+| Consulta resumida | Escribir el script, ejecutarlo 3 veces con subidas de 256 MiB y documentar en la ficha M3 |
+| Resultado obtenido | Script, CSV, grafico y seccion F-25 en la ficha M3 |
+| Validado / corregido / descartado | Revise los resultados y la ficha; pruebas en verde |
+| Cómo se validó | Ajustes revisados y aplicados con git am |
+| Error de la IA | La primera corrida se colgo: sin KEK la subida fallaba y el muestreo nunca paraba; se agrego try/finally y una prueba |
