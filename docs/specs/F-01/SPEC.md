@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 7005101
+**Verificación IA:** verificacion a5b285e
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
 
 ## Objetivo
@@ -106,3 +106,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Nahúm Murillo | 2026-11-11 | error de proceso del orquestador: se implemento el codigo sin ejecutar aprobar tras tu si de la fase tests; las pruebas ya estan en verde (no en rojo) por eso, no porque la fase no aplique |
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: CreateMultiSourceCase (77 lineas) integra DispatchCase/RedisTypeQueue con persistencia heredada; SourceRef en modelos.py; rutas_casos.py con dependencia opcional _obtener_subidas_opcional (no rompe el camino heredado, bug encontrado y corregido durante la implementacion: el Depends inicial era obligatorio y rompio 24 tests heredados). 6 tests nuevos verdes, 287 passed en regresion amplia (2 fallos preexistentes confirmados no relacionados: classify_source identico a origin/main, TLS ambiental). 148 lineas de codigo (7005101) |
 | implementacion | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 (identicos a origin/main) |
+| verificación IA de verificacion | claude | 2026-11-11 | QA: encontrado y corregido bug real - CreateMultiSourceCase.execute([]) creaba un caso con 0 sub-tareas en silencio, ahora rechaza con ValueError. Verificado: sha256 duplicado con mismo kind dedupe correctamente (ultimo nombre gana, aceptable para contenido identico por sha256), un solo source funciona (no solo heterogeneos), sources+subtasks juntos no crashea (sources prioriza, documentado). 84 passed en regresion final (a5b285e) |
