@@ -81,7 +81,7 @@ TDD aplica a la lógica de `scenarios/burst.py` (Parte 1). La corrida en nodos n
 
 ## Mediciones
 
-B.6 Ráfaga. **Medición pendiente:** corrida en tres nodos worker reales (F-38 parte 2 sin nodos reales) y la ficha `docs/evidencia/F-33_rafaga.md`. Sin cifras inventadas.
+B.6 Ráfaga. **Estado (2026-11-12):** corrida hecha en **simulación local** (tres contenedores worker en una sola máquina): 3 repeticiones de 20 casos y 1 opcional de 40, las cuatro con `cumple: true`. Ficha y datos crudos: `docs/evidencia/F-33_rafaga.md`. La prueba en tres nodos worker reales sigue **PENDIENTE** (F-38 con nodos reales); por decisión de la persona la simulación se acepta provisionalmente como criterio de cierre y no acredita B.2.
 
 1. Con los tres workers activos (`GET /workers` muestra tres hosts): `PYTHONPATH=. python -m scenarios.burst --dataset dataset --limit 20 --concurrency 20 --timeout 1800 --out docs/evidencia/F-33_<fecha>` (el defecto de `--out` es `docs/evidencia`, según `scenarios/burst.py`).
 2. Tres repeticiones; se reporta cada una, no solo la mejor. Opcional: 40 casos para ver saturación.
@@ -107,9 +107,9 @@ Recomendación entre paréntesis; el orquestador las acepta por autonomía deleg
 3. **Un caso `failed` cuenta como estado final.** (Sí; el veredicto no lo reporta aparte: límite declarado, aparece solo en `case_status_counts` del JSON de `run_load`, ver `docs/DEMO.md`. El criterio habla de estado final, no de éxito.)
 4. **Tres hosts distintos como prueba de tres nodos.** (Sí; la simulación local lo cumple con hosts declarados y no acredita B.2.)
 5. **Gráficos:** se generan a partir de los CSV con matplotlib si ya es dependencia; si no, solo CSV y tabla en la ficha. (Verificar dependencias antes de la parte 2.)
-6. **Corrida real:** depende de F-38 con nodos reales y del dataset de F-03; hasta entonces «Medición pendiente».
+6. **Corrida real:** depende de F-38 con nodos reales y del dataset de F-03. Hecha en simulación local (2026-11-12), aceptada provisionalmente por la persona como criterio de cierre; la corrida en nodos reales sigue «Medición pendiente».
 7. **Dependencias de F-24 (backpressure):** una ráfaga puede recibir 429 del coordinador; `submit_error` hace fallar la evaluación. (Dejarlo así y documentarlo; reintentos serían decisión de F-24.)
-8. **Costo de la ráfaga en una sola máquina:** puede saturar el equipo de desarrollo. (Usar `--limit 20` y poco tamaño en simulación local.)
+8. **Costo de la ráfaga en una sola máquina:** puede saturar el equipo de desarrollo. (Usar `--limit 20` y poco tamaño en simulación local.) Resultado: con 40 casos el CPU del host llegó a casi 99 %; con 20 no saturó. El veredicto da `cumple: true` aun con un caso `partially_completed` (límite declarado).
 
 ## Aprobaciones
 
