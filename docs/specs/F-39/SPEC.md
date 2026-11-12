@@ -104,6 +104,10 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 9. **Verificación de las clasificaciones.** Las referencias a commits (`5a11a66`, `f792c68`, etc.) se tomaron de `git log bc6bab6..origin/main`; no se contó con subagente independiente para repetirlas. Propuesta: la fase de verificación las repite con el comando del documento.
 10. **Licencia del código del I Proyecto.** El repositorio actual tiene `LICENSE` MIT (`tests/unit/test_licencia_mit.py`), pero no se verificó la licencia con que se publicó el I Proyecto. Propuesta: la fila lo declara «por confirmar» y la persona indica la licencia real o confirma que es el mismo equipo y repositorio.
 
+## Respuestas de la persona (2026-11-12)
+
+1. Aceptada la propuesta (`fix/` aparte para `minioadmin`). 2. Usar `parcial`. 3. El cableado de analizadores lo actualiza José después. 4, 6, 9. Aceptadas las propuestas. 5. No hubo retroalimentación de la evaluación. 7. Aceptada. 8. Se deja en la tabla. 10. El I Proyecto no tiene licencia: la fila de terceros dice «sin licencia (el I Proyecto no declaró una)».
+
 ## Aprobaciones
 
 Las registra `scripts/flujo.py`. No editar.
