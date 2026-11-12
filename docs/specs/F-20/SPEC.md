@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 02381d3
+**Verificación IA:** verificacion ce6b8b5
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -123,3 +123,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de implementacion | claude | 2026-11-11 | Implementación completada: Priority enum, SchedulingPolicy, SchedulerState, RedisScheduler. Código limpio, tests verdes (20 passed) (02381d3) |
 | implementacion | Nahúm Murillo | 2026-11-11 | errores de colección preexistentes en tests de TLS/seguridad; F-20 tests verdes |
+| verificación IA de verificacion | claude | 2026-11-11 | Criterios verificados: orden por puntaje✓, aging evita inanición✓, bonos lineales✓. Tests verdes (20 passed). Redis ZSET order correcto. Sin fallos al romper (priority enum rechaza valores inválidos, scheduler maneja colas vacías) (ce6b8b5) |
