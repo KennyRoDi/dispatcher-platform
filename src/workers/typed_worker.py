@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 import time
 from dataclasses import replace
 from datetime import datetime, timezone
@@ -19,10 +20,13 @@ from src.adapters.redis_case_state import RedisCaseState
 from src.adapters.redis_finding_store import RedisFindingStore
 from src.adapters.redis_type_queue import RedisTypeQueue
 from src.application.alerting import AlertingFindingStore
+from src.adapters.hashing import sha256_de_archivo
 from src.application.analyze_subtask import AnalyzeSubtask
+from src.application.analyze_video import AnalyzeVideo
 from src.application.retry_subtask import RetrySubtask
 from src.domain.admission import FootprintTable
 from src.domain.decomposition import queue_for
+from src.domain.frame_sampling import FrameSampling
 from src.domain.retry import GiveUp, Retry, RetryPolicy
 from src.domain.subtask import ContentKind, Subtask
 from src.infrastructure.analizadores import crear_analizador
@@ -31,6 +35,7 @@ from src.infrastructure.clock import SystemClock
 from src.infrastructure.object_store import crear_almacen_lectura
 from src.workers.config import Settings, load_admission_config, make_redis
 from src.workers.fallos import es_transitorio
+from src.workers.multimedia_processor import FfmpegFrameExtractor
 from src.workers.worker_node import Worker
 
 logger = logging.getLogger(__name__)
@@ -46,6 +51,39 @@ def caso_cancelado(redis_client: redis.Redis):
         return bool(redis_client.exists(f"cancel:{case_id}")) or redis_client.hget(f"case:{case_id}", "status") == "cancelled"
 
     return cancelado
+
+
+class _VideoDeSubtarea:
+    def __init__(self, analizador: AnalyzeVideo, supervisor) -> None:
+        self._analizador = analizador
+        self._supervisor = supervisor
+
+    def analyze(self, path):
+        try:
+            return self._analizador.analyze(path)
+        finally:
+            if self._supervisor is not None:
+                self._supervisor.cerrar()
+
+
+def video_por_subtarea(
+    env, subprocesos, analizador_de_imagen, cancelado, sha256_of=sha256_de_archivo, extractor=FfmpegFrameExtractor
+):
+    """Un AnalyzeVideo por sub-tarea: su supervisor registra los PID del caso para que la cancelación llegue a FFmpeg."""
+    muestreo = FrameSampling.from_env(env)
+
+    def crear(subtask: Subtask) -> _VideoDeSubtarea:
+        registro = subprocesos()
+        supervisor = registro.para_subtarea(subtask.case_id) if registro is not None else None
+        analizador = AnalyzeVideo(
+            extractor(muestreo, supervisor),
+            analizador_de_imagen,
+            sha256_of,
+            lambda: cancelado(subtask.case_id),
+        )
+        return _VideoDeSubtarea(analizador, supervisor)
+
+    return crear
 
 
 class TypedWorker(Worker):
@@ -204,6 +242,16 @@ class TypedWorker(Worker):
         self.queue.acknowledge(self.settings.worker_id, subtask)
 
 
+def crear_analisis(
+    kind: ContentKind, analizador, almacen, findings, work_dir, cancelado, env, subprocesos,
+    extractor=FfmpegFrameExtractor,
+) -> AnalyzeSubtask:
+    video_for = None
+    if kind is ContentKind.IMAGE:
+        video_for = video_por_subtarea(env, subprocesos, analizador, cancelado, extractor=extractor)
+    return AnalyzeSubtask(almacen, {kind: analizador}, findings, work_dir, cancelado, video_for=video_for)
+
+
 def main() -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -218,14 +266,18 @@ def main() -> None:
         RedisFindingStore(redis_client), RedisAlertStream(redis_client, SystemClock())
     )
     kind = ContentKind(settings.worker_kind)
-    analyze = AnalyzeSubtask(
-        crear_almacen_lectura(os.environ),
-        {kind: crear_analizador(settings.worker_kind, os.environ)},
-        findings,
-        settings.work_dir,
-        caso_cancelado(redis_client),
+    cancelado = caso_cancelado(redis_client)
+    analyze = crear_analisis(
+        kind, crear_analizador(settings.worker_kind, os.environ), crear_almacen_lectura(os.environ), findings,
+        settings.work_dir, cancelado, os.environ, lambda: worker.subprocesos,
     )
-    TypedWorker(
+    supervisor = None
+    if sys.platform != "win32":
+        from src.adapters.posix_process_runner import PosixProcessRunner
+        from src.application.process_supervisor import ProcessSupervisor
+
+        supervisor = ProcessSupervisor(PosixProcessRunner(), SystemClock(), time.sleep)
+    worker = TypedWorker(
         settings,
         analyze,
         RedisTypeQueue(redis_client, 0),
@@ -235,7 +287,9 @@ def main() -> None:
         ),
         footprints=footprints,
         admission_margin=margin,
-    ).run_forever()
+        supervisor=supervisor,
+    )
+    worker.run_forever()
 
 
 if __name__ == "__main__":

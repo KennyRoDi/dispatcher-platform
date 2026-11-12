@@ -47,6 +47,7 @@ class AnalyzeSubtask:
         work_dir: Path,
         is_cancelled: Callable[[str], bool],
         video_analyzer: VideoAnalyzer | None = None,
+        video_for: Callable[[Subtask], VideoAnalyzer] | None = None,
     ) -> None:
         self._store = store
         self._analyzers = analyzers
@@ -54,6 +55,7 @@ class AnalyzeSubtask:
         self._work_dir = Path(work_dir)
         self._is_cancelled = is_cancelled
         self._video_analyzer = video_analyzer
+        self._video_for = video_for
 
     def execute(self, subtask: Subtask, source_name: str) -> bool:
         """True si escribió los hallazgos; False si el caso se canceló y se descartaron."""
@@ -66,7 +68,7 @@ class AnalyzeSubtask:
             directory.mkdir(parents=True, exist_ok=True)
             path = directory / f"fuente{extension}"
             self._descargar(subtask.source_sha256, path)
-            found = self._analizar(subtask.kind, analyzer, path, extension)
+            found = self._analizar(subtask, analyzer, path, extension)
             if self._is_cancelled(subtask.case_id):
                 return False
             self._findings.add_once(subtask.case_id, subtask.id, found)
@@ -83,9 +85,10 @@ class AnalyzeSubtask:
         if digest.hexdigest() != sha256:
             raise ShaDistinto(f"el objeto descargado no coincide con el SHA-256 {sha256}")
 
-    def _analizar(self, kind: ContentKind, analyzer: Analyzer, path: Path, extension: str) -> list[Finding]:
-        if kind is ContentKind.IMAGE and extension in VIDEO_EXTENSIONS:
-            if self._video_analyzer is None:
+    def _analizar(self, subtask: Subtask, analyzer: Analyzer, path: Path, extension: str) -> list[Finding]:
+        if subtask.kind is ContentKind.IMAGE and extension in VIDEO_EXTENSIONS:
+            video = self._video_for(subtask) if self._video_for is not None else self._video_analyzer
+            if video is None:
                 raise VideoNoSoportado(f"este worker no analiza video ({extension})")
-            return list(self._video_analyzer.analyze(path))
+            return list(video.analyze(path))
         return list(analyzer.analyze(path))
