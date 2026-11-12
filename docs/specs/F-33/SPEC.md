@@ -1,6 +1,6 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-33-1-rafaga
 **Verificación IA:** documentacion 7403b38
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
@@ -139,3 +139,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), subagente medidor; verificación del orquestador | 2026-11-12 | Releí los JSON crudos de rep1-3 y 40 casos: estados, subtasks_per_host, throughput y latencia máx. coinciden con el informe; recalculé throughput de rep3 (135/20,572*60=393,7); veredicto cumple true en las 4; .env intacto, sin secretos en docs/evidencia, git limpio. No verifiqué por mi cuenta la corrida Docker (SIMULACIÓN LOCAL, no acredita B.2); heartbeat mide el host entero (límite) (1db32ff) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), subagente documentador; verificación del orquestador | 2026-11-12 | Ficha y DEMO contrastadas: 503+Retry-After en rutas_casos.py:184 verificado; SPEC marca nodos reales PENDIENTE y simulación como criterio provisional; cifras sin alterar; bitácora publicada con errores reales de la IA (7403b38) |
+| documentacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
