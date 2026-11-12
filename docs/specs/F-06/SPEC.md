@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 8538cea
 **Historia:** US-06 · **Requisitos:** RF-04, RF-05 (confiabilidad de la cola de B.4 Cola y distribución), AD-03 · **Responsable:** N
 
 ## Objetivo
@@ -95,3 +95,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | claude | 2026-11-11 | SPEC F-06 completado tras investigar el codigo real: hallazgo clave es que F-05 dejo el adaptador real de WorkQueue pendiente para F-06 (declarado en su propio SPEC y en CONTRATOS.md), y que el camino heredado (worker_node.py) es un sistema de colas DISTINTO que no se toca (mayor riesgo, en produccion via F-07/08/09 ya hecha). Diseno: RedisTypeQueue con BLMOVE atomico a inflight (lista), reencolar_huerfanas reutilizando queue_for de F-05. Plan de 1 parte, ~150 lineas (8538cea) |
