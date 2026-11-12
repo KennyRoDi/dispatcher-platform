@@ -1,7 +1,7 @@
 # SPEC F-24: Backpressure
 
-**Fase:** pr
-**Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
+**Fase:** tests
+**Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
 **Verificación IA:** revision 70b97e4e
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
