@@ -1594,3 +1594,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por verificación de cada fase y aprobación de la persona; la fase de verificación se devolvió una vez por hallazgos de QA y se repitió; riesgos residuales documentados en el SPEC; base 1 s y tope 30 s sin medir |
 | Cómo se validó | El orquestador reprodujo los 6 hallazgos de QA con --runxfail, comprobó en un worktree de main que test_contract falla igual sin estos cambios y ejecutó las pruebas de F-11 y de los módulos tocados; la suite completa de Windows tiene fallos de entorno preexistentes y la valida CI en Linux |
 | Error de la IA | QA ronda 1 halló que la sub-tarea se ejecutaba dos veces si el worker moría entre schedule y srem, que promote_due reencolaba casos cancelados, que una entrada corrupta bloqueaba a las demás y que RETRY_BASE_S y RETRY_CAP_S aceptaban NaN e infinito; el developer lo corrigió y la fase se devolvió; el developer modificó 2 pruebas existentes con MAX_ATTEMPTS=1 por el cambio de StorageError; QA ronda 2 halló una ventana de microsegundos entre schedule y hset(pending) en que promote_due puede descartar el reintento, aceptada porque el reaper recupera la sub-tarea por max_age |
+
+## 2026-11-12 · Kenni Rodriguez · F-33 ráfaga: scenarios/burst.py, tests/unit/test_burst*.py, SPEC, AD-50, SUP-46, DEMO.md (`feat/F-33-1-rafaga`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5): subagentes arquitecto, developer, QA y documentador; verificación del orquestador |
+| Componente | F-33 ráfaga: scenarios/burst.py, tests/unit/test_burst*.py, SPEC, AD-50, SUP-46, DEMO.md |
+| Propósito | Escenario de ráfaga de al menos 20 casos concurrentes sobre tres nodos (B.6) que envuelve run_load, evalúa su JSON y exporta CSV |
+| Consulta resumida | Eres el arquitecto/developer/QA/documentador de F-33 parte 1, con el SPEC y el rol correspondiente |
+| Resultado obtenido | SPEC, pruebas rojas, scenarios/burst.py, 3 hallazgos de QA corregidos, 3 límites en xfail estricto, AD-50, SUP-46 y sección en DEMO.md |
+| Validado / corregido / descartado | Pruebas unitarias, de integración y arquitectura en verde ejecutadas por el orquestador; numeración verificada con git grep en ramas remotas; corrida real en tres nodos NO ejecutada (Medición pendiente). Aprobaciones delegadas por la persona (autonomía total); la verificación del orquestador no es independiente de la sesión |
+| Cómo se validó | Revisión del diff contra el SPEC por el orquestador; aprobaciones delegadas |
+| Error de la IA | El arquitecto dejó Base obsoleta (feat/F-20) y declaró AD-49/SUP-45 libres cuando feat/F-11-2-reintentos ya los usaba (se pasó a AD-50/SUP-46); QA halló en el código del developer: --limit menor a 20 con traza, --out sin validar antes de 1800 s de corrida y CSV vacío sin encabezado (corregidos) |
