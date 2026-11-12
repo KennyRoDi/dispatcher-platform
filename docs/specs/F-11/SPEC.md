@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-11-1-reintentos
-**Verificación IA:** documentacion f5630591
+**Verificación IA:** revision 7f4a301b
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
 
 ## Objetivo
@@ -187,3 +187,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
 | verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación: AD-48 reescrito (no duplicado), SPEC con riesgos 13 a 17 y enlace a la evidencia, fila de CONTRATOS, y .env.example con RETRY_BASE_S y RETRY_CAP_S sin secretos. Sin cambios en Fase, Verificación IA ni Aprobaciones, sin caracteres de puntos suspensivos nuevos. Lo documentado existe en el código y la evidencia fue generada por la prueba. Borrador de bitácora veraz con los errores reales de QA y del developer. (f5630591) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; solo se documentó. Autorizado por la persona |
+| verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. 124 líneas de código, capas correctas, pruebas con nombres exactos, 206 passed y 5 xfailed ejecutados por el revisor, evidencia generada por la prueba, sin secretos. Las dos pruebas existentes modificadas solo agregan MAX_ATTEMPTS=1 sin tocar aserciones. Pendiente de persona: avisar a José por los archivos de src/workers. Suite completa de Windows no re-ejecutada. (7f4a301b) |
