@@ -1452,3 +1452,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | SchedulingPolicy.desde_configuracion, scripts/measure/m2_sched.py y m2_plot.py, docs/modulo-M2-planificacion.md con datos medidos reales (3 semillas), AD-04 actualizada |
 | Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; pruebas corridas localmente; medicion ejecutada y revisada antes de escribir la ficha |
 | Cómo se validó | pytest de tests/unit/test_scheduling.py y tests/integration/test_m2_sched.py (15 passed, 1 skipped); ejecucion manual de scripts/measure/m2_sched.py con 3 semillas y revision de los CSV resultantes antes de redactar la interpretacion |
+
+## 2026-11-11 · Melany Vindas · F-24 (`feat/F-24-3-medir-backpressure-con-y-sin-limite`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code |
+| Componente | F-24 |
+| Propósito | Medir backpressure con y sin limite de cola (F-24) |
+| Consulta resumida | Escribir el script de medicion, ejecutarlo 3 veces con y sin limite y documentar en la ficha M3 |
+| Resultado obtenido | Script, CSV, grafico y seccion F-24 en la ficha M3 |
+| Validado / corregido / descartado | Revise los resultados y la ficha; pruebas en verde |
+| Cómo se validó | Ajustes revisados y aplicados con git am |
+| Error de la IA | El primer grafico mostraba caidas falsas a 0 en segundos sin muestra; se corrigio dejandolos vacios |
