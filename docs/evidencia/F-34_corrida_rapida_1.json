@@ -1,0 +1,11 @@
+{
+  "creadas": 1,
+  "terminadas": 1,
+  "perdidas": 0,
+  "duplicadas": 0,
+  "estado_caso": "completed",
+  "tiempo_deteccion_s": 15.053401899989694,
+  "tiempo_reasignacion_s": 15.053401899989694,
+  "fuente_redis": "fakeredis (no se pudo conectar a redis real)",
+  "intervalo_muestreo_s": 0.5
+}
