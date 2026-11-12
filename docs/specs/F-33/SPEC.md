@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-33-1-rafaga
-**Verificación IA:** documentacion 7403b38
+**Verificación IA:** revision 984e384
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
 ## Objetivo
@@ -140,3 +140,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), subagente documentador; verificación del orquestador | 2026-11-12 | Ficha y DEMO contrastadas: 503+Retry-After en rutas_casos.py:184 verificado; SPEC marca nodos reales PENDIENTE y simulación como criterio provisional; cifras sin alterar; bitácora publicada con errores reales de la IA (7403b38) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
+| verificación IA de revision | Claude Code (Sonnet 5.5), subagente revisor; verificación del orquestador | 2026-11-12 | Revisor: APROBADO con menores; diff sin src/scenarios/tests; ficha con aviso SIMULACIÓN LOCAL y nodos reales PENDIENTE; cifras recalculadas desde crudos coinciden; sin secretos; menor (521,67 vs 521,68) aceptado por estar explicado (984e384) |
