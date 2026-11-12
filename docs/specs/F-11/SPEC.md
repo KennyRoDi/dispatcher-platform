@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-11-1-reintentos
 **Verificación IA:** revision 7f4a301b
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
