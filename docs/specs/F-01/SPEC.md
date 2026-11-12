@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 7137d09
+**Verificación IA:** verificacion f154e25
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
 
 ## Objetivo
@@ -111,3 +111,4 @@ Las registra `scripts/flujo.py`. No editar.
 | devuelta de documentacion | Nahúm Murillo | 2026-11-11 | QA-2 de AD-46 (F-05) asigna explicitamente a F-01 validar el formato de case_id para evitar inyeccion en el log de routing; no se habia implementado |
 | verificación IA de implementacion | claude | 2026-11-11 | Agregada validacion de case_id (QA-2 de AD-46, asignada explicitamente a F-01): reutiliza CASE_ID_FORMAT de RedisCaseCatalog, aplicada en ambos caminos (nuevo y heredado) cuando el cliente suministra case_id manualmente. Prueba nueva confirma rechazo de salto de linea en el log de routing. 43 passed en regresion de rutas_casos/coordinator. 157 lineas de codigo total (7137d09) |
 | implementacion | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 |
+| verificación IA de verificacion | claude | 2026-11-11 | QA final: limites del regex CASE_ID_FORMAT confirmados (vacio, 129 chars, espacios y slash rechazados; 128 chars y uuid aceptados). Criterio de aceptacion verificado end-to-end: caso con 4 fuentes heterogeneas queda queued con 5 sub-tareas enlazadas (video expande), consultable por GET /cases/{id} sin modificar ese endpoint. 8 passed en la suite de F-01 (f154e25) |
