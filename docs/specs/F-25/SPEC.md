@@ -1,6 +1,6 @@
 # SPEC F-25: Recepción no bloqueante
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-25-1-responder-durante-subidas-grandes
 **Verificación IA:** documentacion 529aac5d
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
@@ -97,3 +97,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Code | 2026-11-11 | Medicion real: durante subidas de 256 MiB la API respondio 1095/1095 sin errores, p50 ~2.4 ms (2c2fdaf0) |
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
 | verificación IA de documentacion | Claude Code | 2026-11-11 | Ficha M3 con seccion F-25 y bitacora registrada (529aac5d) |
+| documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
