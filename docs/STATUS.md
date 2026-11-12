@@ -35,7 +35,7 @@
 | F-30 | hecha |
 | F-31 | hecha |
 | F-32 | hecha |
-| F-33 | pendiente |
+| F-33 | plan |
 | F-34 | en-pr |
 | F-35 | verificacion |
 | F-36 | hecha |
