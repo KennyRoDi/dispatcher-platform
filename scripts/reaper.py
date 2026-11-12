@@ -7,6 +7,8 @@ import threading
 import time
 from datetime import datetime, timezone
 
+from src.adapters.redis_retry_scheduler import RedisRetryScheduler
+from src.infrastructure.clock import SystemClock
 from src.workers.recovery import ACTIVE_STATES, recover_subtask
 
 logger = logging.getLogger(__name__)
@@ -19,14 +21,19 @@ def _now_iso() -> str:
 
 
 class Reaper:
-    def __init__(self, settings, redis_client, reporter, clock=time.time):
+    def __init__(self, settings, redis_client, reporter, clock=time.time, retry_scheduler=None):
         self.settings = settings
         self.redis = redis_client
         self.reporter = reporter
         self.clock = clock
+        self.retry_scheduler = retry_scheduler or RedisRetryScheduler(redis_client, SystemClock())
 
     def run_once(self) -> dict:
         counts = {"requeued": 0, "failed": 0, "workers_removed": 0, "cleaned": 0}
+        try:
+            self.retry_scheduler.promote_due(datetime.fromtimestamp(self.clock(), timezone.utc))
+        except Exception:
+            logger.exception("no se pudieron promover los reintentos vencidos")
         try:
             worker_ids = list(self.redis.smembers("workers:registry"))
         except Exception:
