@@ -1,6 +1,6 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 02381d3
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
@@ -122,3 +122,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | claude | 2026-11-11 | Diff F-20 vs SPEC: objetivo ✓, alcance ✓, criterios ✓, diseño ✓, tests ✓, mediciones ✓, plan 1/3 ✓, riesgos ✓. Listo para mergear (42dbc50) |
 | revision | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de implementacion | claude | 2026-11-11 | Implementación completada: Priority enum, SchedulingPolicy, SchedulerState, RedisScheduler. Código limpio, tests verdes (20 passed) (02381d3) |
+| implementacion | Nahúm Murillo | 2026-11-11 | errores de colección preexistentes en tests de TLS/seguridad; F-20 tests verdes |
