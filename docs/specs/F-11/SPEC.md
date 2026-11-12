@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 13e5689
+**Verificación IA:** tests f9a8d62
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
 
 ## Objetivo
@@ -142,3 +142,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Sonnet 5.5, subagente arquitecto | 2026-11-12 | Subagente independiente. Verifiqué: 0 campos … restantes; cada criterio de US-11 y RF-11 presente; diff solo toca docs/specs/F-11/SPEC.md; contrastado en código que max_attempts=3 en config.py y recovery.py:66 usa attempts<max_attempts, que src/domain/retry.py no existe y que CONTRATOS asigna retry.py a Nahúm y src/workers a José; último SUP-43 confirmado en REQUERIMIENTOS; pila de 2 PR (~170 y ~230 líneas). No verificado: líneas reales, solo estimadas. (13e5689) |
 | plan | Kenni Rodriguez | 2026-11-12 | El único … del SPEC está en el texto de la fila de verificación IA (mi resumen decía 'campos … restantes'), no en un campo sin completar; autorizado por la persona |
+| verificación IA de tests | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: test_retry.py 10 failed y test_retry_subtask.py error de colección, ambos por ImportError de lo no implementado; test_arquitectura 5 passed. Diff vs main solo toca tests/ y el SPEC, sin código en src/. Cada prueba de la parte 1 del SPEC con su nombre exacto. No verifiqué: los 119 fallos de la suite completa (el subagente los atribuye a entorno Windows/fakeredis tras comparar solo 2 archivos). (f9a8d62) |
