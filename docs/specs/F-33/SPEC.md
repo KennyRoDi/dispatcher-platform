@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-33-1-rafaga
-**Verificación IA:** implementacion 7ef2f16
+**Verificación IA:** verificacion 1db32ff
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
 ## Objetivo
@@ -136,3 +136,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-12 | Parte 2 sin código por SPEC: git diff feat/F-33-1-rafaga no toca src/ ni scenarios/; la corrida y la evidencia van en verificación y documentación (7ef2f16) |
 | implementacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), subagente medidor; verificación del orquestador | 2026-11-12 | Releí los JSON crudos de rep1-3 y 40 casos: estados, subtasks_per_host, throughput y latencia máx. coinciden con el informe; recalculé throughput de rep3 (135/20,572*60=393,7); veredicto cumple true en las 4; .env intacto, sin secretos en docs/evidencia, git limpio. No verifiqué por mi cuenta la corrida Docker (SIMULACIÓN LOCAL, no acredita B.2); heartbeat mide el host entero (límite) (1db32ff) |
