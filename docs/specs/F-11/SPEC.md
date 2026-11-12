@@ -28,7 +28,9 @@ F-11 entrega esa decisión como lógica pura de dominio (`next_delay` con aleato
 - Integración mínima con el camino actual: en `worker_node.py`, un fallo del analizador que sea **transitorio** (ver pregunta 3) pasa por `decide_retry`; si es `Retry`, la sub-tarea se programa con su espera en vez de reportarse `failed` y se registra un log con el intento, la espera y el motivo; si es `GiveUp`, se reporta `failed` igual que hoy.
 - `recovery.py` toma la misma decisión de límite desde `decide_retry` (el «Unificar con `recovery.py`» de `docs/IMPLEMENTACION.md` §4) en lugar de su comparación propia `attempts < max_attempts`, sin cambiar su comportamiento para huérfanas (reencolado inmediato, mismos estados de caso y mismo reporte `WorkerLostError`).
 - Configuración: se reutiliza `MAX_ATTEMPTS`; se agregan `RETRY_BASE_S` y `RETRY_CAP_S` en `src/workers/config.py`, con validación (> 0 y base ≤ tope).
-- Evidencia de log con los tiempos entre intentos (prueba A, ver Pruebas).
+- Evidencia de log con los tiempos entre intentos (prueba A, ver Pruebas). Generada en [docs/evidencia/F-11_reintentos_2026-11-12.md](../../evidencia/F-11_reintentos_2026-11-12.md) por `test_reintentos_registran_tiempos_entre_intentos`.
+
+**Lo implementado en la parte 2 difiere del plan en estos puntos:** `TRANSIENT_FAILURES` en `worker_node.py` no incluye el `ProcessingError` de FFmpeg (riesgo 15); `_promote` solo reencola sub-tareas `pending` o sin estado cuyo caso no esté `cancelled`; `recovery._requeue` hace `ZREM retry:scheduled`; `Worker` programa con `schedule` antes de dejar la sub-tarea `pending`; un `ValueError` del `jitter` se trata como `GiveUp`; `RETRY_BASE_S` y `RETRY_CAP_S` también deben ser finitos. Dos pruebas existentes de `tests/test_worker_node.py` usan `MAX_ATTEMPTS="1"` porque `StorageError` ahora es transitorio y con el valor por defecto se reintentaría en vez de reportar `failed`.
 
 **No incluye:**
 - Cambiar la tabla de transiciones ni `CaseState` (AD-43, F-10).
@@ -145,8 +147,16 @@ Defectos menores hallados por QA, documentados como `xfail` estricto en `tests/u
 
 9. `next_delay` lanza `OverflowError` con `attempt` de unos 1000 en adelante si `base` es `float` (`2 ** (attempt − 1)` desborda al multiplicar). Con N pequeño no ocurre; queda por acotar el exponente.
 10. `RetryPolicy` acepta `NaN` en `base` o `cap`, porque las comparaciones con `NaN` son falsas y la validación no lo rechaza.
-11. Un caso inexistente da `AttributeError` y no un error de dominio: viene de `case_state.py` (F-10, línea ~33), no de F-11.
-12. `RetrySubtask` pasa el caso a `retrying` **antes** de `schedule`. Si `schedule` falla, el caso queda en `retrying` sin sub-tarea programada. Es relevante para la atomicidad del adaptador Redis de la parte 2: estado y ZSET deben escribirse en una sola transacción o el orden debe invertirse con compensación.
+11. Un caso inexistente da `AttributeError` y no un error de dominio: viene de `case_state.py` (F-10, línea ~33), no de F-11. **Sigue abierto** (xfail estricto, depende de F-10).
+12. **Resuelto en la parte 2 para el camino actual del worker:** `Worker` llama a `schedule` antes de cambiar el estado, así que si muere en medio la sub-tarea sigue en `inflight` y la recupera el reaper, y `_requeue` hace `ZREM` para no duplicarla; QA ronda 2 lo confirmó. `RetrySubtask` (camino nuevo de F-05/F-06, aún sin conectar a `POST /cases`) conserva el orden original. Descripción original: `RetrySubtask` pasa el caso a `retrying` **antes** de `schedule`. Si `schedule` falla, el caso queda en `retrying` sin sub-tarea programada. Es relevante para la atomicidad del adaptador Redis de la parte 2: estado y ZSET deben escribirse en una sola transacción o el orden debe invertirse con compensación.
+
+## Riesgos conocidos de la parte 2 (QA)
+
+13. Los riesgos 9 (overflow con `attempt` ~1000 y `base` float), 10 (`NaN` en `RetryPolicy`) y 11 (caso inexistente de F-10) de la parte 1 siguen abiertos como xfail estricto; con la configuración validada en `config.py` (finita) el 10 no se alcanza desde el worker. Con el riesgo 12 son los 4 xfail de la parte 1 (el 12 ya resuelto en el worker).
+14. Ventana de microsegundos entre `schedule` y `hset(status=pending)` en `worker_node.py`: si `promote_due` corre justo ahí, ve la sub-tarea en un estado distinto de `pending` y descarta la entrada del ZSET sin reencolarla. La sub-tarea sigue en `inflight` y la recupera el reaper por `REAPER_MAX_AGE`, con retraso pero sin pérdida definitiva. Documentado como xfail estricto `test_reintento_se_pierde_si_promote_corre_entre_schedule_y_status_pending`.
+15. `ProcessingError` de FFmpeg no está en `TRANSIENT_FAILURES`, pese a que la pregunta 3 aprobó reintentar el de código de salida distinto de entrada inválida; no se distingue por código y se reporta `failed`. Queda por clasificar.
+16. `StorageError` es transitorio, así que un objeto faltante (permanente) se reintenta N − 1 veces antes de fallar.
+17. El log del reintento escribe `str(fallo)`, que puede incluir rutas; es coherente con `payload["error"]`, que ya las lleva.
 
 ## Aprobaciones
 
