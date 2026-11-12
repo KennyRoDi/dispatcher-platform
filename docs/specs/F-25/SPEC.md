@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion be567ec8
+**Verificación IA:** revision 054552e8
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -88,3 +88,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-25. |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: SPEC ajustado (peticiones seguidas, prueba con disco real); sin ficha, la medicion es la parte 2; bitacora con un error real de la IA. (be567ec8) |
 | documentacion | Melany Vindas | 2026-11-11 |  |
+| verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 2 lineas de codigo en rutas_archivos.py y 3 archivos de prueba; cumple el SPEC parte 1 sin agregados; capas y commits correctos. (054552e8) |
