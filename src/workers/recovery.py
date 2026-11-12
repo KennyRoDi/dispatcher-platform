@@ -9,6 +9,8 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 
+from src.domain.retry import Retry, RetryPolicy, decide_retry
+
 logger = logging.getLogger(__name__)
 
 ACTIVE_STATES = ("assigned", "running")
@@ -28,6 +30,7 @@ def _requeue(redis_client, sid: str, case_id: str | None, operation: str, priori
     def txn(pipe):
         case_status = pipe.hget(case_key, "status") if case_id else None
         pipe.multi()
+        pipe.zrem("retry:scheduled", sid)
         if case_status == "cancelled":
             pipe.hset(subtask_key, "status", "cancelled")
             return "cleaned"
@@ -63,7 +66,8 @@ def recover_subtask(redis_client, settings, reporter, sid: str, reason: str, rep
     attempts = int(data.get("attempts") or 0)
     operation = data.get("operation")
 
-    if attempts < settings.max_attempts:
+    policy = RetryPolicy(settings.max_attempts, settings.retry_base_s, settings.retry_cap_s)
+    if isinstance(decide_retry(attempts, policy, lambda: 0.0), Retry):
         if not operation:
             logger.error("subtarea %s sin operation, no se puede reencolar", sid)
             return "skipped"

@@ -239,3 +239,22 @@ def test_worker_token_ausente_o_vacio_es_none():
 
 def test_worker_token_no_aparece_en_el_repr():
     assert "secreto-del-token" not in repr(Settings.from_env({"WORKER_TOKEN": "secreto-del-token"}))
+
+
+def test_retry_defaults_y_env():
+    s = Settings.from_env({})
+    assert (s.retry_base_s, s.retry_cap_s) == (1, 30)
+    s = Settings.from_env({"RETRY_BASE_S": "0.5", "RETRY_CAP_S": "8"})
+    assert (s.retry_base_s, s.retry_cap_s) == (0.5, 8.0)
+
+
+@pytest.mark.parametrize("env", [
+    {"RETRY_BASE_S": "0"},
+    {"RETRY_BASE_S": "-1"},
+    {"RETRY_CAP_S": "0"},
+    {"RETRY_CAP_S": "-5"},
+    {"RETRY_BASE_S": "10", "RETRY_CAP_S": "5"},
+])
+def test_retry_invalido_se_rechaza(env):
+    with pytest.raises(ValueError):
+        Settings.from_env(env)

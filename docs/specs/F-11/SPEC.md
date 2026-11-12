@@ -1,8 +1,8 @@
 # SPEC F-11: Reintentos
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision 08b0802
+**Fase:** cerrada
+**Base:** feat/F-11-1-reintentos
+**Verificación IA:** revision 7f4a301b
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-49 (propone) · **Responsable:** N
 
 ## Objetivo
@@ -28,7 +28,9 @@ F-11 entrega esa decisión como lógica pura de dominio (`next_delay` con aleato
 - Integración mínima con el camino actual: en `worker_node.py`, un fallo del analizador que sea **transitorio** (ver pregunta 3) pasa por `decide_retry`; si es `Retry`, la sub-tarea se programa con su espera en vez de reportarse `failed` y se registra un log con el intento, la espera y el motivo; si es `GiveUp`, se reporta `failed` igual que hoy.
 - `recovery.py` toma la misma decisión de límite desde `decide_retry` (el «Unificar con `recovery.py`» de `docs/IMPLEMENTACION.md` §4) en lugar de su comparación propia `attempts < max_attempts`, sin cambiar su comportamiento para huérfanas (reencolado inmediato, mismos estados de caso y mismo reporte `WorkerLostError`).
 - Configuración: se reutiliza `MAX_ATTEMPTS`; se agregan `RETRY_BASE_S` y `RETRY_CAP_S` en `src/workers/config.py`, con validación (> 0 y base ≤ tope).
-- Evidencia de log con los tiempos entre intentos (prueba A, ver Pruebas).
+- Evidencia de log con los tiempos entre intentos (prueba A, ver Pruebas). Generada en [docs/evidencia/F-11_reintentos_2026-11-12.md](../../evidencia/F-11_reintentos_2026-11-12.md) por `test_reintentos_registran_tiempos_entre_intentos`.
+
+**Lo implementado en la parte 2 difiere del plan en estos puntos:** `TRANSIENT_FAILURES` en `worker_node.py` no incluye el `ProcessingError` de FFmpeg (riesgo 15); `_promote` solo reencola sub-tareas `pending` o sin estado cuyo caso no esté `cancelled`; `recovery._requeue` hace `ZREM retry:scheduled`; `Worker` programa con `schedule` antes de dejar la sub-tarea `pending`; un `ValueError` del `jitter` se trata como `GiveUp`; `RETRY_BASE_S` y `RETRY_CAP_S` también deben ser finitos. Dos pruebas existentes de `tests/test_worker_node.py` usan `MAX_ATTEMPTS="1"` porque `StorageError` ahora es transitorio y con el valor por defecto se reintentaría en vez de reportar `failed`.
 
 **No incluye:**
 - Cambiar la tabla de transiciones ni `CaseState` (AD-43, F-10).
@@ -145,8 +147,16 @@ Defectos menores hallados por QA, documentados como `xfail` estricto en `tests/u
 
 9. `next_delay` lanza `OverflowError` con `attempt` de unos 1000 en adelante si `base` es `float` (`2 ** (attempt − 1)` desborda al multiplicar). Con N pequeño no ocurre; queda por acotar el exponente.
 10. `RetryPolicy` acepta `NaN` en `base` o `cap`, porque las comparaciones con `NaN` son falsas y la validación no lo rechaza.
-11. Un caso inexistente da `AttributeError` y no un error de dominio: viene de `case_state.py` (F-10, línea ~33), no de F-11.
-12. `RetrySubtask` pasa el caso a `retrying` **antes** de `schedule`. Si `schedule` falla, el caso queda en `retrying` sin sub-tarea programada. Es relevante para la atomicidad del adaptador Redis de la parte 2: estado y ZSET deben escribirse en una sola transacción o el orden debe invertirse con compensación.
+11. Un caso inexistente da `AttributeError` y no un error de dominio: viene de `case_state.py` (F-10, línea ~33), no de F-11. **Sigue abierto** (xfail estricto, depende de F-10).
+12. **Resuelto en la parte 2 para el camino actual del worker:** `Worker` llama a `schedule` antes de cambiar el estado, así que si muere en medio la sub-tarea sigue en `inflight` y la recupera el reaper, y `_requeue` hace `ZREM` para no duplicarla; QA ronda 2 lo confirmó. `RetrySubtask` (camino nuevo de F-05/F-06, aún sin conectar a `POST /cases`) conserva el orden original. Descripción original: `RetrySubtask` pasa el caso a `retrying` **antes** de `schedule`. Si `schedule` falla, el caso queda en `retrying` sin sub-tarea programada. Es relevante para la atomicidad del adaptador Redis de la parte 2: estado y ZSET deben escribirse en una sola transacción o el orden debe invertirse con compensación.
+
+## Riesgos conocidos de la parte 2 (QA)
+
+13. Los riesgos 9 (overflow con `attempt` ~1000 y `base` float), 10 (`NaN` en `RetryPolicy`) y 11 (caso inexistente de F-10) de la parte 1 siguen abiertos como xfail estricto; con la configuración validada en `config.py` (finita) el 10 no se alcanza desde el worker. Con el riesgo 12 son los 4 xfail de la parte 1 (el 12 ya resuelto en el worker).
+14. Ventana de microsegundos entre `schedule` y `hset(status=pending)` en `worker_node.py`: si `promote_due` corre justo ahí, ve la sub-tarea en un estado distinto de `pending` y descarta la entrada del ZSET sin reencolarla. La sub-tarea sigue en `inflight` y la recupera el reaper por `REAPER_MAX_AGE`, con retraso pero sin pérdida definitiva. Documentado como xfail estricto `test_reintento_se_pierde_si_promote_corre_entre_schedule_y_status_pending`.
+15. `ProcessingError` de FFmpeg no está en `TRANSIENT_FAILURES`, pese a que la pregunta 3 aprobó reintentar el de código de salida distinto de entrada inválida; no se distingue por código y se reporta `failed`. Queda por clasificar.
+16. `StorageError` es transitorio, así que un objeto faltante (permanente) se reintenta N − 1 veces antes de fallar.
+17. El log del reintento escribe `str(fallo)`, que puede incluir rutas; es coherente con `payload["error"]`, que ya las lleva.
 
 ## Aprobaciones
 
@@ -166,3 +176,16 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; solo se documentó. Autorizado por la persona |
 | verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. Releí el diff completo contra el SPEC y la parte 1 del plan: 78 líneas de código, 13 archivos esperados, 48 passed y 4 xfailed ejecutados por mí antes y por el revisor, documentación coherente con lo implementado. Observaciones menores aceptadas: puntos suspensivos en la tabla de aprobaciones por la excepción de plan; suite completa de Windows sin re-ejecutar, la valida CI. (08b0802) |
 | revision | Kenni Rodriguez | 2026-11-12 |  |
+| verificación IA de tests | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: los 3 archivos nuevos fallan en colección por falta de redis_retry_scheduler, y en los 4 existentes fallan 9 pruebas nuevas mientras 121 previas siguen pasando. El diff fuera de tests/ solo toca el SPEC (fila de verificación). Cada prueba de la parte 2 del SPEC con su nombre exacto más extras razonables. No ejecuté la de aceptación, que no colecciona aún. (5ab9c77) |
+| tests | Kenni Rodriguez | 2026-11-12 |  |
+| verificación IA de implementacion | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: 182 passed y 4 xfailed en archivos de F-11, arquitectura, recovery, worker, config y reaper; 3 passed en integración y aceptación. Comprobé en un worktree de main que tests/test_contract.py falla igual (14 failed) sin estos cambios. Revisé el diff de tests: solo cambian 2 líneas en test_worker_node.py (MAX_ATTEMPTS=1 en dos pruebas de StorageError, justificado porque StorageError ahora es transitorio por lista aprobada). Evidencia docs/evidencia/F-11_reintentos_2026-11-12.md generada por la prueba. No verifiqué la suite completa de Windows. (a6fa98d) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes (fakeredis sin Lua eval, generadores de 200 MiB); tests/test_contract.py falla igual en main; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-12 | QA halló duplicación de ejecución si el worker muere tras schedule (riesgo 12), reencolado de casos cancelados, entrada corrupta que bloquea promote_due y NaN/inf aceptados en RETRY_BASE_S/CAP_S |
+| verificación IA de implementacion | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente tras devolver la fase por hallazgos de QA. Ejecuté yo --runxfail antes (6 fallaban) y ahora 205 passed y 4 xfailed en los archivos de F-11 y módulos tocados. El diff de tests desde dc2723b3 solo quita marcadores xfail, sin cambiar aserciones. Leí el diff de src: ZREM en _requeue, promote_due aislado por id y sin encolar casos cancelados o sub-tareas no pendientes, isfinite en config, ValueError del jitter tratado como GiveUp. No verifiqué la suite completa de Windows. (b78c8d29) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes (test_contract falla igual en main); las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
+| verificación IA de verificacion | Claude Sonnet 5.5, subagente qa-tester | 2026-11-12 | QA independiente en dos rondas. Ronda 1 devolvió la fase con un defecto real de duplicación y 4 menores, corregidos por el developer. Ronda 2 APROBADA: confirmó las correcciones y un flujo extremo a extremo con RedisRetryScheduler real (status pending coincide con el filtro). Ejecuté yo 163 passed y 1 xfailed. Hallazgo menor aceptado: ventana de microsegundos entre schedule y hset(pending) en que promote_due puede descartar el reintento; la sub-tarea sigue en inflight y la recupera el reaper por max_age. Observaciones documentables: log con str(fallo), ProcessingError de FFmpeg fuera de TRANSIENT_FAILURES, StorageError transitorio. (b53d9e5c) |
+| verificacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
+| verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación: AD-49 reescrito (no duplicado), SPEC con riesgos 13 a 17 y enlace a la evidencia, fila de CONTRATOS, y .env.example con RETRY_BASE_S y RETRY_CAP_S sin secretos. Sin cambios en Fase, Verificación IA ni Aprobaciones, sin caracteres de puntos suspensivos nuevos. Lo documentado existe en el código y la evidencia fue generada por la prueba. Borrador de bitácora veraz con los errores reales de QA y del developer. (f5630591) |
+| documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; solo se documentó. Autorizado por la persona |
+| verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. 124 líneas de código, capas correctas, pruebas con nombres exactos, 206 passed y 5 xfailed ejecutados por el revisor, evidencia generada por la prueba, sin secretos. Las dos pruebas existentes modificadas solo agregan MAX_ATTEMPTS=1 sin tocar aserciones. Pendiente de persona: avisar a José por los archivos de src/workers. Suite completa de Windows no re-ejecutada. (7f4a301b) |
+| revision | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; la revisión ejecutó las pruebas de F-11 y de los módulos tocados. Autorizado por la persona |
