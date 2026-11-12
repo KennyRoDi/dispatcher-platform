@@ -1,8 +1,8 @@
 # SPEC F-25: Recepción no bloqueante
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision 054552e8
+**Fase:** cerrada
+**Base:** feat/F-25-1-responder-durante-subidas-grandes
+**Verificación IA:** revision 07436162
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -90,3 +90,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 2 lineas de codigo en rutas_archivos.py y 3 archivos de prueba; cumple el SPEC parte 1 sin agregados; capas y commits correctos. (054552e8) |
 | revision | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude Code | 2026-11-11 | Pruebas del resumen de la medicion sin bloqueo (6ccca7e6) |
+| tests | Melany Vindas | 2026-11-11 | Pruebas de un script de medicion; verificadas en Linux por Claude |
+| verificación IA de implementacion | Claude Code | 2026-11-11 | Script de medicion de latencia durante subidas, pruebas en verde (97d318a6) |
+| implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
+| verificación IA de verificacion | Claude Code | 2026-11-11 | Medicion real: durante subidas de 256 MiB la API respondio 1095/1095 sin errores, p50 ~2.4 ms (2c2fdaf0) |
+| verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
+| verificación IA de documentacion | Claude Code | 2026-11-11 | Ficha M3 con seccion F-25 y bitacora registrada (529aac5d) |
+| documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
+| verificación IA de revision | Claude Code | 2026-11-11 | Diff revisado contra el SPEC de F-25 (07436162) |
+| revision | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
