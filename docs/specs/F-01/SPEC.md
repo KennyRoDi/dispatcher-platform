@@ -1,6 +1,6 @@
 # SPEC F-01: Crear caso multifuente
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision bc7ae3a
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
@@ -116,3 +116,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-11 | Documentacion completa: AD-47 agregada (coexistencia de esquemas), QA-2 de AD-46 marcada resuelta, bitacora registrada en rama estado declarando 2 errores propios de IA (Depends obligatorio, caso vacio silencioso) y 1 limite heredado resuelto (db97ec5) |
 | documentacion | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 |
 | verificación IA de revision | claude | 2026-11-11 | Diff F-01 vs SPEC: objetivo OK, alcance OK (incluye correccion de caso vacio y validacion de case_id aprobadas durante el ciclo), criterios OK (verificado end-to-end), diseno OK, pruebas OK (5 nombres exactos), plan de pila OK (1 parte, 157 lineas). APROBADO (bc7ae3a) |
+| revision | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 |
