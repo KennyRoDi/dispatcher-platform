@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import os
 import socket
 import tempfile
@@ -144,7 +145,7 @@ class Settings:
 
         retry_base_s = _float(env, "RETRY_BASE_S", cls.retry_base_s)
         retry_cap_s = _float(env, "RETRY_CAP_S", cls.retry_cap_s)
-        if retry_base_s <= 0 or retry_cap_s < retry_base_s:
+        if not (math.isfinite(retry_base_s) and math.isfinite(retry_cap_s)) or retry_base_s <= 0 or retry_cap_s < retry_base_s:
             raise ValueError(f"RETRY_BASE_S debe ser > 0 y <= RETRY_CAP_S: {retry_base_s}, {retry_cap_s}")
 
         raw_work_dir = _optional_str(env, "WORK_DIR")

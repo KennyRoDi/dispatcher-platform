@@ -434,7 +434,11 @@ class Worker:
         """True si la sub-tarea quedó programada para reintento; False si se agotaron los intentos."""
         settings = self.settings
         policy = retry_policy.RetryPolicy(settings.max_attempts, settings.retry_base_s, settings.retry_cap_s)
-        decision = retry_policy.decide_retry(attempts, policy, self.jitter)
+        try:
+            decision = retry_policy.decide_retry(attempts, policy, self.jitter)
+        except ValueError:
+            logger.exception("jitter inválido para %s, se reporta como fallida", subtask_id)
+            return False
         if isinstance(decision, retry_policy.GiveUp):
             return False
         case_id = data.get("case_id")

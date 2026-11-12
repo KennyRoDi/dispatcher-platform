@@ -107,11 +107,6 @@ def test_puntaje_exacto_en_el_limite_se_promueve(redis_falso, reloj):
     assert planificador.promote_due(reloj.now()) == ["s1"]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA F-11 parte 2: un caso cancelado se reencola al vencer la espera; el worker lo limpia recien al "
-           "reclamarla (no ejecuta trabajo, solo gasta un turno de cola)",
-)
 def test_subtarea_de_caso_cancelado_no_se_reencola(redis_falso, reloj):
     redis_falso.hset("case:c1", "status", "cancelled")
     redis_falso.hset("subtask:s1", mapping={"operation": "transcode_video", "case_id": "c1", "status": "pending"})
@@ -121,11 +116,6 @@ def test_subtarea_de_caso_cancelado_no_se_reencola(redis_falso, reloj):
     assert redis_falso.llen("queue:transcode_video") == 0
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA F-11 parte 2: una clave subtask:<id> de tipo equivocado lanza WRONGTYPE y promote_due aborta; "
-           "las demas vencidas quedan bloqueadas en cada ciclo del reaper",
-)
 def test_una_entrada_corrupta_no_bloquea_a_las_demas(redis_falso, reloj):
     redis_falso.set("subtask:malo", "no-es-un-hash")
     redis_falso.hset("subtask:bueno", mapping={"operation": "transcode_video"})

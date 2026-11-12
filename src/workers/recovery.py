@@ -30,6 +30,7 @@ def _requeue(redis_client, sid: str, case_id: str | None, operation: str, priori
     def txn(pipe):
         case_status = pipe.hget(case_key, "status") if case_id else None
         pipe.multi()
+        pipe.zrem("retry:scheduled", sid)
         if case_status == "cancelled":
             pipe.hset(subtask_key, "status", "cancelled")
             return "cleaned"

@@ -32,20 +32,11 @@ def test_variables_de_reintento_invalidas_se_rechazan(env):
         Settings.from_env(env)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA F-11 parte 2: RETRY_BASE_S=nan pasa la validacion (comparaciones con NaN son falsas); "
-           "es el riesgo 10 del SPEC ahora en la configuracion",
-)
 def test_nan_en_retry_base_se_rechaza():
     with pytest.raises(ValueError):
         Settings.from_env({"RETRY_BASE_S": "nan"})
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA F-11 parte 2: RETRY_BASE_S=inf y RETRY_CAP_S=inf pasan la validacion y programan esperas infinitas",
-)
 def test_inf_en_retry_base_se_rechaza():
     with pytest.raises(ValueError):
         Settings.from_env({"RETRY_BASE_S": "inf", "RETRY_CAP_S": "inf"})
@@ -89,11 +80,6 @@ def test_motivo_del_fallo_con_ruta_se_copia_tal_cual_al_log_de_reintento(tmp_pat
     assert "/srv/secreto/clave.pem" in " ".join(r.getMessage() for r in caplog.records)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA F-11 parte 2: un jitter que devuelve 1.0 hace que next_delay lance ValueError dentro de "
-           "handle_subtask; la sub-tarea no se reporta ni se programa y queda inflight",
-)
 def test_jitter_fuera_de_rango_no_deja_la_subtarea_huerfana(tmp_path):
     worker, redis_client, reporter = preparar(tmp_path, TimeoutError("t"), jitter=lambda: 1.0)
     try:
@@ -103,11 +89,6 @@ def test_jitter_fuera_de_rango_no_deja_la_subtarea_huerfana(tmp_path):
     assert not redis_client.sismember("worker:w1:inflight", "s1")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="QA F-11 riesgo 12: si el worker muere tras schedule y antes de srem, el reaper reencola de inmediato y "
-           "luego promote_due lo encola otra vez: la sub-tarea se ejecuta dos veces",
-)
 def test_muerte_entre_schedule_y_cambio_de_estado_no_duplica_la_subtarea(tmp_path):
     worker, redis_client, storage, _, reporter = make_worker(tmp_path, MAX_ATTEMPTS="3")
     reloj = FakeClock()
