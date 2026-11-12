@@ -1,6 +1,6 @@
 # SPEC F-15: Dashboard
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 8f5384ca
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
@@ -63,7 +63,7 @@ No aplica: F-15 no mide SO. La evidencia es la captura de la demo.
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
 | 1 | `feat(F-15): mostrar recursos por nodo en el dashboard` | Heartbeat con cgroup, `resumen_por_nodo` y la sección del Monitor. Estimado: ~80 líneas |
-| 2 | `docs(F-15): demostrar el dashboard con tres nodos` | Captura y comando de carga |
+| 2 | `docs(F-15): demostrar el dashboard con tres nodos` | Captura y comando de carga. **Cerrada con excepción: aún sin evidencia (sin captura ni demo con tres nodos); pendiente de entregar antes de la entrega final** |
 
 ## Riesgos y preguntas abiertas
 

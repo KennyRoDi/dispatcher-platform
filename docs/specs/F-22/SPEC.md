@@ -1,6 +1,6 @@
 # SPEC F-22: Chunks verificados
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-22-3-medicion-throughput
 **Verificación IA:** revision a70f68a
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V

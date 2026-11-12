@@ -1,6 +1,6 @@
 # SPEC F-21: Comparación de políticas
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 72e13c2
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
