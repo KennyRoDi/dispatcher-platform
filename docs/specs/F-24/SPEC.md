@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** revision
+**Fase:** pr
 **Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
 **Verificación IA:** revision 2e15cb8c
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -137,3 +137,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code | 2026-11-11 | Ficha M3 con seccion F-24 y bitacora registrada (af0138e2) |
 | documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de revision | Claude Code | 2026-11-11 | Diff revisado contra el SPEC de F-24 (2e15cb8c) |
+| revision | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
