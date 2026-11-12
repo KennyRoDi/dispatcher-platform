@@ -1,6 +1,6 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion dec0052
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
@@ -118,3 +118,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de tests | claude | 2026-11-11 | Tests en rojo completados: 10 pruebas unitarias + 6 de integración con Redis. Todas fallan hasta implementar Priority, SchedulingPolicy, SchedulerState. TDD: pruebas puras sin red, reloj simulado con mock, no usan sleep ni reloj real. Commit 9717ad2. (9717ad2) |
 | verificación IA de documentacion | claude | 2026-11-11 | F-20 fase documentacion: BITACORA_IA.md debera actualizarse post-merge en rama estado (dec0052) |
+| documentacion | Nahúm Murillo | 2026-11-11 |  |
