@@ -106,8 +106,10 @@ class Heartbeat(threading.Thread):
         ffmpeg_info: tuple[str, str] | None = None,
         processor=None,
         gpu_info: dict | None = None,
+        resource_reader=None,
     ):
         super().__init__(daemon=True, name="heartbeat")
+        self.resource_reader = resource_reader
         self.settings = settings
         self.redis = redis_client
         self.stats = stats
@@ -168,12 +170,24 @@ class Heartbeat(threading.Thread):
         # Only publish gpu_percent when NVML is available (avoids storing "" in Redis)
         if gpu_pct is not None:
             mapping["gpu_percent"] = gpu_pct
+        mapping.update(self._memoria_de_cgroup())
 
         pipe = self.redis.pipeline()
         pipe.hset(self.key, mapping=mapping)
         pipe.expire(self.key, self.settings.heartbeat_ttl)
         pipe.sadd("workers:registry", self.settings.worker_id)
         pipe.execute()
+
+    def _memoria_de_cgroup(self) -> dict:
+        # Sin lector o si cgroups falla, el heartbeat se publica igual: el dashboard solo omite la memoria (F-15).
+        if self.resource_reader is None:
+            return {}
+        try:
+            uso = self.resource_reader.read()
+        except Exception as e:
+            logger.warning("no se pudo leer la memoria del cgroup: %s", e)
+            return {}
+        return {"cgroup_memory_current": uso.memory_current, "cgroup_memory_max": uso.memory_max}
 
     def run(self) -> None:
         try:

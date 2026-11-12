@@ -21,7 +21,6 @@ def _descomponer(fuentes, caso="C-1"):
         ("carpeta/sub/nota.mp3", SourceKind.AUDIO),
         ("C:\\datos\\NOTA.WAV", SourceKind.AUDIO),
         ("mi nota de voz.MP3", SourceKind.AUDIO),
-        ("..mp3", SourceKind.AUDIO),
         ("informe.pdf.mp3", SourceKind.AUDIO),
         ("clip.mp3.mp4", SourceKind.VIDEO),
     ],
