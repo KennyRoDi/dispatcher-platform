@@ -43,5 +43,5 @@
 | F-38 | hecha |
 | F-39 | hecha |
 | F-40 | hecha |
-| F-41 | revision |
+| F-41 | en-pr |
 | F-42 | pendiente |
