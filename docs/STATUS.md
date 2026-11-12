@@ -37,7 +37,7 @@
 | F-32 | hecha |
 | F-33 | hecha |
 | F-34 | hecha |
-| F-35 | en-pr |
+| F-35 | hecha |
 | F-36 | hecha |
 | F-37 | hecha |
 | F-38 | hecha |
