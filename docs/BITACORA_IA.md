@@ -1491,3 +1491,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; investigacion del codigo real verificada con grep antes de disenar (hallazgo: F-05 dejo el adaptador pendiente para F-06, y hay dos sistemas de colas paralelos) |
 | Cómo se validó | pytest de tests/unit/test_redis_type_queue.py y tests/integration/test_redis_type_queue_reaper.py (6 passed); suite ampliada de scheduling/decomposition/dispatch_case/arquitectura (91 passed); QA manual con casos borde (acknowledge inexistente, capacidad exacta, workers aislados, reencolado multi-kind) |
 | Error de la IA | La IA (yo mismo, en F-20) habia creado una clase Priority duplicada en src/domain/scheduling.py en vez de reutilizar la canonica de src/domain/priority.py que ya existia desde antes. Se detecto al escribir las pruebas de F-06 (necesitaban Subtask, que usa la canonica) y se corrigio unificando ambas sin romper ningun import existente |
+
+## 2026-11-11 · Nahúm Murillo · F-01 (`feat/F-01-1-crear-caso-multifuente`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-01 |
+| Propósito | Disenar SPEC, investigar codigo existente a fondo, escribir pruebas TDD e implementar la creacion de caso multifuente para F-01, integrando F-05/F-06 con el esquema heredado |
+| Consulta resumida | Crear un caso a partir de fuentes (texto/imagen/audio/video) clasificadas automaticamente, enlazadas a sus objetos ya subidos, que quede queued y consultable |
+| Resultado obtenido | CreateMultiSourceCase integra DispatchCase/RedisTypeQueue con la persistencia heredada; GET /cases/{id} y /report siguen funcionando sin modificarse; AD-47 documenta la coexistencia de esquemas |
+| Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; investigacion verificada con grep antes de disenar (hallazgo: nadie consume aun queue:text/image/audio); encontre y corregi 2 problemas propios durante el desarrollo (Depends obligatorio rompiendo el camino heredado, caso con 0 sub-tareas en silencio) mas 1 limite ya documentado por otra feature (QA-2 de AD-46, case_id sin sanear) |
+| Cómo se validó | pytest de tests/unit/test_create_multisource_case.py, tests/integration/test_rutas_casos_multifuente_fakeredis.py y tests/acceptance/test_caso_heterogeneo_cliente_de_carga.py (8 passed); regresion amplia de tests/test_coordinator.py y relacionados (43+ passed); QA manual con limites del regex de case_id |
+| Error de la IA | La IA (yo mismo) agrego Depends(ChunkedUpload) como parametro obligatorio del route en el primer intento, lo cual exigia el almacen de objetos incluso en el camino heredado (subtasks) que nunca lo necesita, rompiendo 24 pruebas existentes. Se detecto al correr la regresion completa y se corrigio con una dependencia opcional que solo se exige cuando sources esta presente. Tambien se encontro que CreateMultiSourceCase.execute([]) creaba un caso con 0 sub-tareas en silencio; se corrigio para que rechace explicitamente |
