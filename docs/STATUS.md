@@ -13,7 +13,7 @@
 | F-08 | hecha |
 | F-09 | hecha |
 | F-10 | hecha |
-| F-11 | en-pr |
+| F-11 | hecha |
 | F-12 | hecha |
 | F-13 | hecha |
 | F-14 | hecha |
@@ -35,7 +35,7 @@
 | F-30 | hecha |
 | F-31 | hecha |
 | F-32 | hecha |
-| F-33 | verificacion |
+| F-33 | documentacion |
 | F-34 | en-pr |
 | F-35 | verificacion |
 | F-36 | hecha |
