@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-11-1-reintentos
 **Verificación IA:** documentacion f5630591
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -186,3 +186,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Sonnet 5.5, subagente qa-tester | 2026-11-12 | QA independiente en dos rondas. Ronda 1 devolvió la fase con un defecto real de duplicación y 4 menores, corregidos por el developer. Ronda 2 APROBADA: confirmó las correcciones y un flujo extremo a extremo con RedisRetryScheduler real (status pending coincide con el filtro). Ejecuté yo 163 passed y 1 xfailed. Hallazgo menor aceptado: ventana de microsegundos entre schedule y hset(pending) en que promote_due puede descartar el reintento; la sub-tarea sigue en inflight y la recupera el reaper por max_age. Observaciones documentables: log con str(fallo), ProcessingError de FFmpeg fuera de TRANSIENT_FAILURES, StorageError transitorio. (b53d9e5c) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
 | verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación: AD-48 reescrito (no duplicado), SPEC con riesgos 13 a 17 y enlace a la evidencia, fila de CONTRATOS, y .env.example con RETRY_BASE_S y RETRY_CAP_S sin secretos. Sin cambios en Fase, Verificación IA ni Aprobaciones, sin caracteres de puntos suspensivos nuevos. Lo documentado existe en el código y la evidencia fue generada por la prueba. Borrador de bitácora veraz con los errores reales de QA y del developer. (f5630591) |
+| documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; solo se documentó. Autorizado por la persona |
