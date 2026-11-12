@@ -1,6 +1,6 @@
 # SPEC F-41: Fichas de evidencia
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 4c3c6e38
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
