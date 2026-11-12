@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 8afff1d
+**Verificación IA:** tests 1af0d27
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
 ## Objetivo
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude Code (Sonnet 5.5), subagente arquitecto lanzado; verificación del orquestador | 2026-11-12 | SPEC sin campos pendientes; criterios de US-33 copiados; campos de run_load citados existen (grep); AD-49 y SUP-45 libres en todas las ramas remotas; matplotlib en requirements-dev; pila de 2 partes; sin cambios fuera del SPEC (8afff1d) (8afff1d) |
 | plan | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
+| verificación IA de tests | Claude Code (Sonnet 5.5), subagente developer; verificación del orquestador | 2026-11-12 | pytest de los 3 archivos nuevos falla con ImportError: cannot import name 'burst' (falta la funcionalidad); diff solo en tests/ (354 líneas), sin scenarios/burst.py; 33 pruebas unitarias cubren evaluar, filas, csv y ejecutar_rafaga (1af0d27) (1af0d27) |
