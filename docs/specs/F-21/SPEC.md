@@ -1,6 +1,6 @@
 # SPEC F-21: Comparación de políticas
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 59685a4
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
@@ -108,3 +108,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | claude | 2026-11-11 | QA: politica invalida rechazada con mensaje claro (exit 2), high-rate/low en 0 o negativo rechazados, CSV inexistente en m2_plot rechazado, determinismo confirmado (misma semilla produce CSV identico byte a byte). Criterios de aceptacion cumplidos: misma carga + semilla fija -> espera/turnaround/throughput por nivel y politica (3 repeticiones, docs/evidencia/). Espera maxima de baja bajo aging (245.8ms) dentro de la cota teorica de AD-04 (400ms) (332147b) |
 | verificacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-21 |
 | verificación IA de documentacion | claude | 2026-11-11 | Documentacion completa: ficha docs/modulo-M2-planificacion.md con 5 secciones (que se implemento, concepto SO, metodo, resultados, interpretacion), AD-04 actualizada con la medicion real, bitacora registrada en rama estado con uso real de IA declarado (59685a4) |
+| documentacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-21 |
