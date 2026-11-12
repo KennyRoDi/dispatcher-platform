@@ -3,7 +3,7 @@
 
 | Feature | Estado |
 |---|---|
-| F-01 | implementacion |
+| F-01 | verificacion |
 | F-02 | pendiente |
 | F-03 | hecha |
 | F-04 | hecha |
@@ -26,7 +26,7 @@
 | F-21 | en-pr |
 | F-22 | en-pr |
 | F-23 | verificacion |
-| F-24 | en-pr |
+| F-24 | hecha |
 | F-25 | en-pr |
 | F-26 | hecha |
 | F-27 | hecha |
