@@ -8,7 +8,7 @@
 | F-03 | hecha |
 | F-04 | hecha |
 | F-05 | en-pr |
-| F-06 | revision |
+| F-06 | en-pr |
 | F-07 | hecha |
 | F-08 | hecha |
 | F-09 | hecha |
