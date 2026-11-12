@@ -12,6 +12,8 @@ _MENSAJES = re.compile(rf"mensajes ({_INDICES})", re.ASCII)
 _SEGMENTO = re.compile(rf"segmento ({_ENTERO}) t=({_TRAMO})", re.ASCII)
 _SEGMENTOS = re.compile(rf"segmentos ({_INDICES}) t=({_TRAMO}(?:,{_TRAMO})*)", re.ASCII)
 _CAJA = re.compile(rf"caja ({_ENTERO}),({_ENTERO}),({_ENTERO}),({_ENTERO})", re.ASCII)
+_SEGUNDOS = rf"{_ENTERO}(?:\.{_ENTERO})?"
+_FOTOGRAMA = re.compile(rf"fotograma t=({_SEGUNDOS})s (caja .+)", re.ASCII)
 _LOTE = re.compile(r"(?:mensajes \d+-\d+|segmentos \d+-\d+ t=.+)", re.ASCII)
 _ENTRADA_DE_DETALLE = re.compile(rf"({_ENTERO}) (\S+) (.*)", re.ASCII)
 
@@ -39,18 +41,24 @@ class BoxLocator:
 
 
 @dataclass(frozen=True)
+class FrameLocator:
+    t_s: float
+    box: BoxLocator
+
+
+@dataclass(frozen=True)
 class UnknownLocator:
     raw: str
 
 
-Locator = MessageLocator | SegmentLocator | BoxLocator | UnknownLocator
+Locator = MessageLocator | SegmentLocator | BoxLocator | FrameLocator | UnknownLocator
 
 
 def parse_position(finding: Finding) -> tuple[Locator, ...]:
     posicion = finding.evidence.position
     if _LOTE.fullmatch(posicion):
         return ()
-    locadores = _mensajes(posicion, finding.detail) or _segmentos(posicion) or _caja(posicion)
+    locadores = _mensajes(posicion, finding.detail) or _segmentos(posicion) or _caja(posicion) or _fotograma(posicion)
     return locadores or (UnknownLocator(posicion),)
 
 
@@ -82,6 +90,17 @@ def _caja(posicion: str) -> tuple[BoxLocator, ...]:
         return ()
     x1, y1, x2, y2 = (int(valor) for valor in coincidencia.groups())
     return (BoxLocator(x1, y1, x2, y2),) if x1 <= x2 and y1 <= y2 else ()
+
+
+def _fotograma(posicion: str) -> tuple[FrameLocator, ...]:
+    coincidencia = _FOTOGRAMA.fullmatch(posicion)
+    caja = _caja(coincidencia[2]) if coincidencia else ()
+    return (FrameLocator(float(coincidencia[1]), caja[0]),) if caja else ()
+
+
+def frame_position(t_s: float, box_position: str) -> str:
+    segundos = f"{t_s:.3f}".rstrip("0").rstrip(".")
+    return f"fotograma t={segundos}s {box_position}"
 
 
 def _enteros(texto: str) -> list[int]:

@@ -7,9 +7,11 @@ from src.application.analyze_text import MessagePositions
 from src.domain.chat_message import ChatMessage
 from src.domain.evidence_position import (
     BoxLocator,
+    FrameLocator,
     MessageLocator,
     SegmentLocator,
     UnknownLocator,
+    frame_position,
     parse_position,
 )
 from src.domain.finding import EvidenceRef, Finding, Severity
@@ -80,3 +82,26 @@ def test_parse_position_desconocida_no_lanza(posicion):
 def test_los_localizadores_son_inmutables():
     with pytest.raises(AttributeError):
         BoxLocator(1, 2, 3, 4).x1 = 9
+
+
+def test_posicion_de_fotograma_se_interpreta_como_localizador_de_fotograma():
+    assert parse_position(hallazgo("arma", "fotograma t=10s caja 10,20,110,220")) == (
+        FrameLocator(10.0, BoxLocator(10, 20, 110, 220)),
+    )
+    assert parse_position(hallazgo("arma", "fotograma t=2.5s caja 1,2,3,4")) == (
+        FrameLocator(2.5, BoxLocator(1, 2, 3, 4)),
+    )
+
+
+@pytest.mark.parametrize(
+    "posicion",
+    ["fotograma t=-1s caja 1,2,3,4", "fotograma t=5s caja 9,2,3,4", "fotograma t=5s", "fotograma t=5 caja 1,2,3,4"],
+)
+def test_posicion_de_fotograma_malformada_sigue_siendo_desconocida(posicion):
+    assert parse_position(hallazgo("arma", posicion)) == (UnknownLocator(posicion),)
+
+
+@pytest.mark.parametrize("t_s", [0.0, 5.0, 12.5, 100.125])
+def test_frame_position_se_interpreta_de_vuelta(t_s):
+    posicion = frame_position(t_s, "caja 1,2,3,4")
+    assert parse_position(hallazgo("arma", posicion)) == (FrameLocator(t_s, BoxLocator(1, 2, 3, 4)),)
