@@ -1,6 +1,6 @@
 # SPEC F-02: Validar y normalizar
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 81906c0
 **Historia:** US-02 · **Requisitos:** RF-02 (exportaciones de chat), RNF-06 (normalización) · **Responsable:** N
@@ -103,3 +103,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: FormatoDeChatInvalido (7 lineas), WhatsAppParser (39 lineas, regex de cabecera + continuacion multilinea), TelegramParser (51 lineas, valida JSON/messages/campos). 10 tests nuevos verdes a la primera, 58 passed en regresion (puertos, arquitectura, coordinator). 97 lineas de codigo total (53d802e) |
 | implementacion | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
 | verificación IA de verificacion | claude | 2026-11-12 | QA: archivo vacio rechazado, body con dos puntos no confunde el parser, JSON Telegram no-dict (lista) rechazado, mensaje con text_entities (lista en vez de string) rechazado. Archivo inexistente lanza FileNotFoundError sin envolver (decision deliberada: no es un problema de formato, es una precondicion distinta). 10 passed en la suite de F-02 (81906c0) |
+| verificacion | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
