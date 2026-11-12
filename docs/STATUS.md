@@ -25,7 +25,7 @@
 | F-20 | en-pr |
 | F-21 | en-pr |
 | F-22 | en-pr |
-| F-23 | verificacion |
+| F-23 | hecha |
 | F-24 | hecha |
 | F-25 | en-pr |
 | F-26 | hecha |
