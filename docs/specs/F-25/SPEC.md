@@ -1,6 +1,6 @@
 # SPEC F-25: Recepción no bloqueante
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 3532dc6b
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
@@ -84,3 +84,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente. expected_size en run_in_threadpool (1 linea). Unitarias 43/43, integracion uvicorn 3/3, suite 3610 verde en Linux. (444da75f) |
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-25. |
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) APROBADO: pruebas 3/3; con DiskChunkStaging real y uvicorn real, GET responde en menos de 0.5 s durante un chunk lento; mutante sin run_in_threadpool detectado; no quedan llamadas bloqueantes en handlers async. Agrego prueba con disco real porque la de integracion usaba el doble. (3532dc6b) |
+| verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-25. |
