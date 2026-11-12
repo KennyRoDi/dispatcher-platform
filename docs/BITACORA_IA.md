@@ -1504,3 +1504,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; investigacion verificada con grep antes de disenar (hallazgo: nadie consume aun queue:text/image/audio); encontre y corregi 2 problemas propios durante el desarrollo (Depends obligatorio rompiendo el camino heredado, caso con 0 sub-tareas en silencio) mas 1 limite ya documentado por otra feature (QA-2 de AD-46, case_id sin sanear) |
 | Cómo se validó | pytest de tests/unit/test_create_multisource_case.py, tests/integration/test_rutas_casos_multifuente_fakeredis.py y tests/acceptance/test_caso_heterogeneo_cliente_de_carga.py (8 passed); regresion amplia de tests/test_coordinator.py y relacionados (43+ passed); QA manual con limites del regex de case_id |
 | Error de la IA | La IA (yo mismo) agrego Depends(ChunkedUpload) como parametro obligatorio del route en el primer intento, lo cual exigia el almacen de objetos incluso en el camino heredado (subtasks) que nunca lo necesita, rompiendo 24 pruebas existentes. Se detecto al correr la regresion completa y se corrigio con una dependencia opcional que solo se exige cuando sources esta presente. Tambien se encontro que CreateMultiSourceCase.execute([]) creaba un caso con 0 sub-tareas en silencio; se corrigio para que rechace explicitamente |
+
+## 2026-11-12 · Nahúm Murillo · F-02 (`feat/F-02-1-validar-y-normalizar`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-02 |
+| Propósito | Disenar SPEC, investigar codigo existente e implementar los parsers de WhatsApp y Telegram para F-02 |
+| Consulta resumida | Validar y normalizar exportaciones de WhatsApp/Telegram: timestamp UTC, remitente, texto UTF-8, rechazo explicito de formatos no validos |
+| Resultado obtenido | WhatsAppParser y TelegramParser implementan ConversationParser; formato reconstruido del generador sintetico de F-03; AD-48/SUP-44 documentan la interpretacion UTC |
+| Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; formato verificado contra el generador sintetico real |
+| Cómo se validó | pytest de los parsers y de integracion/aceptacion (10 passed); QA manual con archivo vacio, JSON malformado, text_entities de Telegram |
