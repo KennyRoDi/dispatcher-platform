@@ -4,7 +4,7 @@
 | Feature | Estado |
 |---|---|
 | F-01 | hecha |
-| F-02 | en-pr |
+| F-02 | hecha |
 | F-03 | hecha |
 | F-04 | hecha |
 | F-05 | hecha |
@@ -36,7 +36,7 @@
 | F-31 | hecha |
 | F-32 | hecha |
 | F-33 | en-pr |
-| F-34 | en-pr |
+| F-34 | hecha |
 | F-35 | verificacion |
 | F-36 | hecha |
 | F-37 | hecha |
