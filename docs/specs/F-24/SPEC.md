@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
-**Verificación IA:** implementacion c5169357
+**Verificación IA:** verificacion ba8da238
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -132,3 +132,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Melany Vindas | 2026-11-11 | Pruebas de un script de medicion; verificadas en Linux por Claude |
 | verificación IA de implementacion | Claude Code | 2026-11-11 | Script de medicion de backpressure, pruebas en verde (c5169357) |
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de verificacion | Claude Code | 2026-11-11 | Medicion real: con limite 200 la cola no supera 200; sin limite llega a ~55 mil (ba8da238) |
