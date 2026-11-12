@@ -3,7 +3,7 @@
 
 | Feature | Estado |
 |---|---|
-| F-01 | verificacion |
+| F-01 | documentacion |
 | F-02 | pendiente |
 | F-03 | hecha |
 | F-04 | hecha |
