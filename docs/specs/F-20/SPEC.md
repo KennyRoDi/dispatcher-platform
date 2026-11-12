@@ -1,6 +1,6 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan f1711b4
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
@@ -104,3 +104,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-20 completado: objetivo, alcance, criterios de aceptación, diseño (AD-04), pruebas (U, I), mediciones y plan de pila con 3 PR hasta 400 líneas cada una (f1711b4) |
+| plan | Nahúm Murillo | 2026-11-11 |  |
