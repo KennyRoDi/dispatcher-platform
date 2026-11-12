@@ -1415,3 +1415,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado y corregido; el nombre de usuario sigue en el historial del commit 686c2e8, y quitarlo exige reescribir historia con force push, que no se hizo. |
 | Cómo se validó | git grep de C:\Users y del nombre de usuario sobre el arbol de la rama da 0 menciones; git diff entre los commits de fase y la cabeza toca solo ese archivo. |
 | Error de la IA | (g) el documentador pego la salida cruda de pytest sin quitar el rootdir con la ruta local del usuario de Windows en un repositorio publico; ninguna otra evidencia del repositorio incluye rutas locales; lo detecto el orquestador al releer el diff, el revisor lo califico de menor, y se anonimizo en dos commits porque el primer reemplazo fallo sin avisar. |
+
+## 2026-11-11 · Melany Vindas · F-15 (`feat/F-15-1-mostrar-recursos-por-nodo-en-el-dashboard`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) |
+| Componente | F-15 |
+| Propósito | F-15: recursos por nodo en el dashboard |
+| Consulta resumida | Planificar, probar e implementar memoria de cgroup en el heartbeat y la vista por nodo |
+| Resultado obtenido | Heartbeat con memoria de cgroup, resumen_por_nodo y seccion Por nodo en el Monitor |
+| Validado / corregido / descartado | Corregido: QA detecto que ninguna prueba cubria el paso del lector al heartbeat |
+| Cómo se validó | Pruebas unitarias, Monitor renderizado con AppTest, mutantes; suite verde en Linux |
+| Error de la IA | 1) La IA escribio una prueba que esperaba gpu 'none' para un worker sin ese campo; se corrigio a None. 2) No cubrio con pruebas que Worker.start pasara el lector al Heartbeat; QA lo detecto con un mutante. |
