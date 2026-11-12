@@ -1,6 +1,6 @@
 # SPEC F-43: Integración de workers tipados
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 53423529
 **Historia:** US-43 · **Requisitos:** RF-04 a RF-12, RF-13 y RF-14 (reporte con evidencias), RF-15, RF-16, RF-24 y RF-25 (admisión en el worker tipado); RNF-01, RNF-07, RNF-08, RNF-24, RNF-25; AD-03, AD-05, AD-06, AD-11, AD-26 a AD-28, AD-43, AD-46 a AD-49 (aplica); AD-51 a AD-54 (propone) · **Responsable:** K
