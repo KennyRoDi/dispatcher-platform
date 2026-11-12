@@ -1,0 +1,13 @@
+{
+  "creadas": 2,
+  "contadas_antes": {
+    "9c08f41e-ef37-438a-906d-d2981bb1b27f": "pending",
+    "e9414a6d-b904-4713-812d-0a8a4118e350": "pending"
+  },
+  "contadas_despues": {
+    "9c08f41e-ef37-438a-906d-d2981bb1b27f": "pending",
+    "e9414a6d-b904-4713-812d-0a8a4118e350": "pending"
+  },
+  "tiempo_arranque_s": 0.009758699918165803,
+  "fuente_redis": "fakeredis (no se pudo conectar a redis real)"
+}

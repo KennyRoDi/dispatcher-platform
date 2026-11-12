@@ -184,7 +184,7 @@ def test_each_processing_error_subclass_marks_failed(tmp_path):
 
 
 def test_missing_dataset_object_is_storage_error(tmp_path):
-    worker, redis_client, storage, processor, reporter = make_worker(tmp_path)
+    worker, redis_client, storage, processor, reporter = make_worker(tmp_path, MAX_ATTEMPTS="1")
     redis_client.hset("subtask:sid1", mapping={
         "subtask_id": "sid1", "case_id": "c1", "file_path": "c1/sid1/missing.bin",
         "operation": "transcode_video", "status": "pending",
@@ -200,7 +200,7 @@ def test_missing_dataset_object_is_storage_error(tmp_path):
 
 def test_upload_failure_is_storage_error(tmp_path):
     storage = FakeStorage(fail_upload=True)
-    worker, redis_client, storage, processor, reporter = make_worker(tmp_path, storage=storage)
+    worker, redis_client, storage, processor, reporter = make_worker(tmp_path, storage=storage, MAX_ATTEMPTS="1")
     seed_subtask(redis_client, storage, "sid1")
 
     payload = worker.handle_subtask("sid1")
@@ -714,3 +714,48 @@ def test_dos_workers_con_limite_bajo_dejan_la_subtarea_al_otro(tmp_path):
     assert redis_client.llen("queue:extract_audio") == 1
     assert libre.poll_once(timeout=1) is True
     assert redis_client.llen("queue:extract_audio") == 0
+
+
+def test_fallo_transitorio_programa_reintento_y_permanente_falla(tmp_path, caplog):
+    from dobles import FakeClock, FakeRetryScheduler
+
+    def preparar(subdir, fallo, **env):
+        worker, redis_client, storage, _, reporter = make_worker(
+            tmp_path / subdir, processor=make_fake_processor(outcome=fallo),
+            MAX_ATTEMPTS="3", RETRY_BASE_S="1", RETRY_CAP_S="30", **env,
+        )
+        planificador = FakeRetryScheduler(FakeClock())
+        worker.retry_scheduler = planificador
+        worker.jitter = lambda: 0.0
+        seed_subtask(redis_client, storage, "s1")
+        redis_client.hset("case:c1", "status", "queued")
+        redis_client.lpop("queue:transcode_video")
+        return worker, redis_client, reporter, planificador
+
+    transitorios = [TimeoutError, MemoryError, BlockingIOError, InterruptedError, PermissionError, StorageError]
+    for tipo in transitorios:
+        caplog.clear()
+        worker, redis_client, reporter, planificador = preparar(tipo.__name__, tipo("boom"))
+
+        with caplog.at_level("INFO"):
+            assert worker.handle_subtask("s1") is None
+
+        assert reporter.calls == [], tipo.__name__
+        assert planificador.programadas == [("s1", 1.0)], tipo.__name__
+        assert redis_client.hget("case:c1", "status") == "retrying"
+        assert redis_client.lrange("queue:transcode_video", 0, -1) == []
+        assert not redis_client.sismember("worker:w1:inflight", "s1")
+        mensaje = " ".join(r.getMessage() for r in caplog.records if "reintento" in r.getMessage())
+        assert "s1" in mensaje and "intento 1" in mensaje and "espera 1.00 s" in mensaje
+        assert tipo.__name__ in mensaje
+
+    worker, redis_client, reporter, planificador = preparar("permanente", ValueError("entrada ilegible"))
+    payload = worker.handle_subtask("s1")
+    assert payload["status"] == "failed"
+    assert planificador.programadas == []
+
+    worker, redis_client, reporter, planificador = preparar("agotado", TimeoutError("boom"))
+    redis_client.hset("subtask:s1", "attempts", 2)
+    payload = worker.handle_subtask("s1")
+    assert payload["status"] == "failed" and payload["attempts"] == 3
+    assert planificador.programadas == []

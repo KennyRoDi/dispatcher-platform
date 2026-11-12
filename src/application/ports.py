@@ -34,6 +34,13 @@ class CaseStateStore(Protocol):
 
 
 @runtime_checkable
+class RetryScheduler(Protocol):
+    def schedule(self, subtask_id: str, delay_s: float) -> None: ...
+
+    def promote_due(self, now: datetime) -> list[str]: ...
+
+
+@runtime_checkable
 class Analyzer(Protocol):
     def analyze(self, path: Path) -> list[Finding]: ...
 

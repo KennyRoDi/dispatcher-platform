@@ -362,3 +362,27 @@ def test_high_priority_subtask_requeued_to_high_queue(redis_client):
     assert counts["requeued"] == 1
     assert redis_client.lrange("queue:transcode_video:high", 0, -1) == ["sid-hi"]
     assert redis_client.lrange("queue:transcode_video", 0, -1) == []
+
+
+def test_reaper_promueve_los_reintentos_vencidos_en_cada_ciclo():
+    from datetime import datetime, timezone
+
+    class PlanificadorEspia:
+        def __init__(self):
+            self.instantes = []
+
+        def schedule(self, subtask_id, delay_s):
+            pass
+
+        def promote_due(self, now):
+            self.instantes.append(now)
+            return []
+
+    planificador = PlanificadorEspia()
+    reaper = Reaper(
+        make_settings(), fakeredis.FakeRedis(decode_responses=True), FakeReporter(),
+        clock=lambda: 1000.0, retry_scheduler=planificador,
+    )
+    reaper.run_once()
+    reaper.run_once()
+    assert planificador.instantes == [datetime.fromtimestamp(1000.0, timezone.utc)] * 2

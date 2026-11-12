@@ -30,6 +30,7 @@ Cada módulo se desarrolla de principio a fin sin esperar a otro. Los módulos s
 | `AlertPublisher` | Kenni, F-14 | Coordinador, workers |
 | `AlertReader` | Kenni, F-14 | Dashboard (F-15) |
 | `Clock` | Infraestructura de quien lo necesite | Todos |
+| `RetryScheduler` | Nahúm, F-11 (agregado, sin modificar contratos existentes); conformidad: `comprobar_retry_scheduler` en `tests/contratos.py`. `schedule(subtask_id, delay_s)` programa la sub-tarea y `promote_due(now)` devuelve las vencidas | `RetrySubtask` (F-11); el reaper de José Andrés llama a `promote_due` en cada ciclo (parte 2, adaptador `RedisRetryScheduler`) |
 
 ## Quién toca qué
 
