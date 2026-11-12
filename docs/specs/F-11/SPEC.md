@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion 5851084
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -163,3 +163,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude Sonnet 5.5, subagente qa-tester | 2026-11-12 | QA independiente: criterios de la parte 1 cumplidos; 4 defectos menores (OverflowError con attempt muy grande, NaN aceptado en RetryPolicy, caso inexistente da AttributeError por case_state.py de F-10, estado cambia antes de schedule) documentados como xfail estricto. Reproduje yo el Overflow y el NaN; ejecuté 48 passed y 4 xfailed. Sin cambios en src/. Defectos de severidad baja aceptados y pendientes de registrar en documentación; no verifiqué la suite completa de Windows. (7f0c31b) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | Misma razón que implementacion: la suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; 48 passed y 4 xfailed en las pruebas de F-11. Autorizado por la persona |
 | verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación contra 7f0c31b: solo AD-48, SUP-44, fila RetryScheduler en CONTRATOS y SPEC; sin tocar BITACORA, Fase ni Aprobaciones; confirmé que AD-48 describe solo lo que existe (parte 1) y que no hay caracteres de puntos suspensivos nuevos. El borrador de bitácora es veraz: errores de IA reales (mi resumen con el carácter que bloqueó el script, 4 defectos de QA, desviación de decide_retry). (5851084) |
+| documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; solo se documentó. Autorizado por la persona |
