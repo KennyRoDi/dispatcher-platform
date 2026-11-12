@@ -230,3 +230,18 @@ def comprobar_case_state_store(almacen):
         (CaseState.PROCESSING, inicio),
         (CaseState.COMPLETED, inicio + timedelta(seconds=1)),
     ]
+
+
+def comprobar_retry_scheduler(planificador, reloj):
+    assert planificador.promote_due(reloj.now()) == []
+    planificador.schedule("s1", 10)
+    planificador.schedule("s2", 5)
+    assert planificador.promote_due(reloj.now()) == []
+    reloj.advance(timedelta(seconds=4))
+    assert planificador.promote_due(reloj.now()) == []
+    reloj.advance(timedelta(seconds=1))
+    assert planificador.promote_due(reloj.now()) == ["s2"]
+    assert planificador.promote_due(reloj.now()) == []
+    reloj.advance(timedelta(seconds=5))
+    assert planificador.promote_due(reloj.now()) == ["s1"]
+    assert planificador.promote_due(reloj.now()) == []

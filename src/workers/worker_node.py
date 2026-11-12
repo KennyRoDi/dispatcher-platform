@@ -4,6 +4,7 @@ import importlib
 import json
 import logging
 import os
+import random
 import shutil
 import signal
 import sys
@@ -15,12 +16,15 @@ from pathlib import Path
 import redis.exceptions
 
 from src.domain.admission import FootprintTable, admits
+from src.adapters.redis_retry_scheduler import RedisRetryScheduler
+from src.domain import retry as retry_policy
 from src.domain.oom_policy import ExitCause, GiveUp, OomPolicy, classify_exit
 from src.infrastructure.cgroup_resources import CgroupResourceReader, read_memory_events
+from src.infrastructure.clock import SystemClock
 from src.workers.cancelacion import SubprocesosPorCaso, escuchar_cancelaciones
 from src.workers.config import Settings, load_admission_config, make_redis
 from src.workers.heartbeat import Heartbeat, WorkerStats
-from src.workers.recovery import ACTIVE_STATES, _requeue, recover_subtask
+from src.workers.recovery import ACTIVE_STATES, RETRYABLE_CASE_STATES, _requeue, recover_subtask
 from src.workers.reporter import Reporter
 from src.workers.storage import Storage, StorageError
 
@@ -29,6 +33,9 @@ logger = logging.getLogger(__name__)
 FLUSH_INTERVAL = 15.0
 MAX_BACKOFF = 30.0
 TERMINAL_SUBTASK_STATES = ("completed", "failed", "cancelled")
+TRANSIENT_FAILURES = (
+    TimeoutError, MemoryError, BlockingIOError, InterruptedError, PermissionError, StorageError,
+)
 
 
 class Worker:
@@ -49,6 +56,8 @@ class Worker:
         admission_margin: int | None = None,
         events_reader=None,
         oom_policy: OomPolicy | None = None,
+        retry_scheduler=None,
+        jitter=None,
     ):
         self.settings = settings
         self.resource_reader = resource_reader
@@ -59,6 +68,10 @@ class Worker:
         self._reserva_activa = 0
         self._reserva_lock = threading.Lock()
         self.redis = redis_client if redis_client is not None else make_redis(settings)
+        self.jitter = jitter if jitter is not None else random.random
+        self.retry_scheduler = (
+            retry_scheduler if retry_scheduler is not None else RedisRetryScheduler(self.redis, SystemClock())
+        )
         self.storage = storage if storage is not None else Storage(settings)
         if processor is None:
             processor = importlib.import_module("src.workers.multimedia_processor")
@@ -358,6 +371,7 @@ class Worker:
             output_bytes = result.output_bytes
             encoder = getattr(result, "encoder", None)
         except StorageError as e:
+            fallo = e
             status = "failed"
             error = str(e)
             error_type = "StorageError"
@@ -381,6 +395,9 @@ class Worker:
             if self._reencolar_por_oom(subtask_id, data, reserva):
                 return None
             error_type = "oom"
+
+        if isinstance(fallo, TRANSIENT_FAILURES) and self._programar_reintento(subtask_id, data, attempts, fallo):
+            return None
 
         finished_at = datetime.now(timezone.utc).isoformat()
         processing_s = round(time.monotonic() - started_monotonic, 3)
@@ -412,6 +429,34 @@ class Worker:
             logger.exception("error al finalizar subtarea %s", subtask_id)
 
         return payload
+
+    def _programar_reintento(self, subtask_id: str, data: dict, attempts: int, fallo: Exception) -> bool:
+        """True si la sub-tarea quedó programada para reintento; False si se agotaron los intentos."""
+        settings = self.settings
+        policy = retry_policy.RetryPolicy(settings.max_attempts, settings.retry_base_s, settings.retry_cap_s)
+        try:
+            decision = retry_policy.decide_retry(attempts, policy, self.jitter)
+        except ValueError:
+            logger.exception("jitter inválido para %s, se reporta como fallida", subtask_id)
+            return False
+        if isinstance(decision, retry_policy.GiveUp):
+            return False
+        case_id = data.get("case_id")
+        case_key = f"case:{case_id}"
+        # Programar antes de cambiar el estado: si el worker muere entre ambos, la sub-tarea sigue en
+        # inflight y el reaper la recupera; al revés quedaría un caso retrying sin nada programado.
+        self.retry_scheduler.schedule(subtask_id, decision.delay)
+        self.redis.hset(f"subtask:{subtask_id}", mapping={"status": "pending", "worker_id": "", "progress": 0})
+        if case_id and self.redis.hget(case_key, "status") in RETRYABLE_CASE_STATES:
+            self.redis.hset(case_key, "status", "retrying")
+            self.redis.hincrby(case_key, "retries", 1)
+        self.redis.srem(self._inflight_key, subtask_id)
+        self.stats.task_finished(False)
+        logger.warning(
+            "reintento %s: intento %d, espera %.2f s, motivo %s: %s",
+            subtask_id, attempts, decision.delay, type(fallo).__name__, fallo,
+        )
+        return True
 
     def _ajustar_reserva(self, delta: int) -> None:
         with self._reserva_lock:

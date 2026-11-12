@@ -1,5 +1,7 @@
 # M3 · E/S y almacenamiento
 
+**Responsable:** Melany Vindas (`Mel28Vinso`, V).
+
 ## Qué se implementó
 
 F-22 agrega `scripts/measure/m3_chunks.py` para medir throughput de subida por tamaño de chunk. F-23 conecta MinIO cifrado, evita transferir contenido ya almacenado y guarda chunks temporalmente en el volumen `STAGING_DIR` del Nodo A.
@@ -9,6 +11,8 @@ F-24 acota la profundidad de cada cola de Redis (`QUEUE_MAX_DEPTH`): `POST /case
 F-25 garantiza que la API siga respondiendo durante subidas grandes: `PUT /uploads/{id}/chunks/{index}` lee el cuerpo con `async for`, y la lectura del manifiesto y la escritura del chunk corren en el pool de hilos (AD-13). `scripts/measure/m3_no_bloqueo.py` mide la latencia de `GET /health` antes, durante y después de una subida lenta.
 
 ## Concepto de Sistemas Operativos
+
+Para throughput se debe declarar la conversión: MB/s = bytes/s ÷ 1 000 000; MiB/s = bytes/s ÷ 1 048 576. Un parámetro de chunk en MiB no cambia por sí solo la unidad de throughput. No hay cifras de throughput distribuido que convertir mientras F-22 siga pendiente.
 
 El coordinador escribe los chunks en disco para limitar RAM, reensambla por flujo y transmite el objeto a MinIO. El SHA-256 permite evitar almacenamiento y transferencia repetidos. Para F-22, el runner mide los bytes por tiempo de subida y reporta por separado la duración de `complete` (reensamblado y hash).
 
@@ -85,7 +89,7 @@ Todos los `503` llevaron `Retry-After`. En la condición sin límite el muestrea
 
 La medición de throughput requiere un medio sintético de al menos 200 MiB y un worker remoto en otro nodo. La tasa de deduplicación sí cuenta con datos medidos; queda pendiente únicamente el throughput distribuido de F-22 para cerrar AD-10.
 
-**F-24:** con el límite, la profundidad se mantuvo exactamente en 200 durante los 60 s de las tres repeticiones y el excedente se rechazó con `503`; sin límite, la cola creció de forma sostenida a unas 900 subtareas por segundo y superó las 52,000 sin señal para los productores. La latencia de `POST /cases` fue similar en ambas condiciones (p95 de unos 37 a 40 ms), así que el rechazo no encarece la admisión. La medición es local y sin workers: muestra el mecanismo, no la capacidad del sistema distribuido.
+**F-24:** con el límite, el máximo muestreado fue 200 en las tres repeticiones; esto no afirma ocupación continua exactamente igual a 200 y el excedente se rechazó con `503`; sin límite, la cola creció de forma sostenida a unas 900 subtareas por segundo y superó las 52,000 sin señal para los productores. La latencia de `POST /cases` fue similar en ambas condiciones (p95 de unos 37 a 40 ms), así que el rechazo no encarece la admisión. La medición es local y sin workers: muestra el mecanismo, no la capacidad del sistema distribuido.
 
 **F-25:** durante las tres subidas de 256 MiB la API respondió las 1,095 peticiones sin errores, con una mediana de unos 2.4 ms, igual que antes y después de subir. Los máximos aislados de 18 a 22 ms coinciden con el cierre de cada chunk (hash y escritura en el pool de hilos) y siguen dos órdenes de magnitud por debajo de la duración de la subida. Es una medición local de un solo coordinador: demuestra que la recepción no bloquea, no mide la red entre nodos.
 

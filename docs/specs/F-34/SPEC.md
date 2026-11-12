@@ -1,6 +1,6 @@
 # SPEC F-34: Caída de un worker
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 42a37c2
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
