@@ -51,6 +51,7 @@ Criterios adicionales derivados de los requisitos:
 | Unitaria | `test_heartbeat_incluye_memoria_de_cgroup`, sin lector no publica los campos, lector que falla no rompe el heartbeat | Heartbeat |
 | Unitaria | `GET /workers` con un heartbeat que trae los campos de cgroup (fakeredis) | API |
 | Unitaria | `resumen_por_nodo`: agrupa por `host`, ignora muertos en promedios, suma memoria de cgroup, GPU si existe, sin workers da lista vacía, valores faltantes o no numéricos no rompen | Formato separado de la vista |
+| Unitaria | `test_qa_worker_pasa_lector.py` y `test_qa_monitor_por_nodo.py` (QA): el worker pasa su lector al heartbeat; el Monitor renderiza con nodos sin cgroup, hosts nulos, todos muertos y 150 nodos | Cableado real y vista sin errores |
 | Aceptación | Demo: tres nodos, ráfaga con `scripts/submit_case.py`, captura del dashboard junto al comando | Criterio de US-15 |
 
 ## Mediciones
@@ -67,7 +68,8 @@ No aplica: F-15 no mide SO. La evidencia es la captura de la demo.
 ## Riesgos y preguntas abiertas
 
 1. **Archivos de workers.** `heartbeat.py` y `worker_node.py` son de Kenni; el cambio es aditivo (un parámetro opcional y dos campos). Hay que avisar.
-2. **Demo.** Necesita los tres nodos levantados (F-38); la puede hacer cualquier integrante.
+2. **Nodo con workers mixtos (QA, baja).** Si en un nodo unos workers reportan cgroup y otros no, «Uso cgroup» suma solo los que reportan y puede verse menor que el real. En el despliegue todos los workers tienen lector (F-16).
+3. **Demo.** Necesita los tres nodos levantados (F-38); la puede hacer cualquier integrante.
 
 ## Aprobaciones
 
