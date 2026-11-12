@@ -258,3 +258,28 @@ def test_retry_defaults_y_env():
 def test_retry_invalido_se_rechaza(env):
     with pytest.raises(ValueError):
         Settings.from_env(env)
+
+
+def test_settings_acepta_worker_kind_y_rechaza_valores_invalidos():
+    assert Settings.from_env({}).worker_kind is None
+    for kind in ("text", "image", "audio"):
+        env = {"WORKER_KIND": kind, f"FOOTPRINT_{kind.upper()}_BYTES": "1000"}
+        assert Settings.from_env(env).worker_kind == kind
+    with pytest.raises(ValueError, match="WORKER_KIND"):
+        Settings.from_env({"WORKER_KIND": "video", "FOOTPRINT_VIDEO_BYTES": "1000"})
+
+
+def test_settings_tipado_exige_la_huella_del_tipo_sin_valor_por_defecto():
+    with pytest.raises(ValueError, match="FOOTPRINT_TEXT_BYTES"):
+        Settings.from_env({"WORKER_KIND": "text"})
+    with pytest.raises(ValueError, match="FOOTPRINT_IMAGE_BYTES"):
+        Settings.from_env({"WORKER_KIND": "image", "FOOTPRINT_TEXT_BYTES": "1000"})
+    with pytest.raises(ValueError, match="FOOTPRINT_AUDIO_BYTES"):
+        Settings.from_env({"WORKER_KIND": "audio", "FOOTPRINT_AUDIO_BYTES": "abc"})
+
+
+def test_settings_tipado_rechaza_concurrencia_mayor_que_uno():
+    env = {"WORKER_KIND": "text", "FOOTPRINT_TEXT_BYTES": "1000", "WORKER_CONCURRENCY": "2"}
+    with pytest.raises(ValueError, match="WORKER_CONCURRENCY"):
+        Settings.from_env(env)
+    assert Settings.from_env({**env, "WORKER_CONCURRENCY": "1"}).worker_concurrency == 1

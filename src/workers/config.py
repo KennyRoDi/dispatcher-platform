@@ -22,6 +22,8 @@ OPERATIONS = (
     "extract_metadata",
 )
 
+WORKER_KINDS = ("text", "image", "audio")
+
 _TRUE_VALUES = {"1", "true", "yes", "on"}
 _HWACCEL_VALUES = ("nvenc",)
 
@@ -97,6 +99,19 @@ def _parse_hwaccel(raw: str | None) -> str | None:
     return value
 
 
+def _typed_worker_settings(env: Mapping[str, str], worker_concurrency: int) -> str | None:
+    kind = _optional_str(env, "WORKER_KIND")
+    if kind is None:
+        return None
+    if kind not in WORKER_KINDS:
+        raise ValueError(f"invalid WORKER_KIND: {kind!r} (accepted: {', '.join(WORKER_KINDS)})")
+    # spaCy, transformers, YOLO and CTranslate2 are not known to be thread-safe sharing one model.
+    if worker_concurrency != 1:
+        raise ValueError(f"WORKER_CONCURRENCY must be 1 with WORKER_KIND: {worker_concurrency}")
+    _required_bytes(env, f"FOOTPRINT_{kind.upper()}_BYTES")
+    return kind
+
+
 @dataclass(frozen=True)
 class Settings:
     redis_host: str = "localhost"
@@ -125,6 +140,7 @@ class Settings:
     hwaccel: str | None = None
     node_ip: str | None = None
     worker_token: str | None = field(default=None, repr=False)
+    worker_kind: str | None = None
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -147,6 +163,8 @@ class Settings:
         retry_cap_s = _float(env, "RETRY_CAP_S", cls.retry_cap_s)
         if not (math.isfinite(retry_base_s) and math.isfinite(retry_cap_s)) or retry_base_s <= 0 or retry_cap_s < retry_base_s:
             raise ValueError(f"RETRY_BASE_S debe ser > 0 y <= RETRY_CAP_S: {retry_base_s}, {retry_cap_s}")
+
+        worker_kind = _typed_worker_settings(env, worker_concurrency)
 
         raw_work_dir = _optional_str(env, "WORK_DIR")
         work_dir = Path(raw_work_dir) if raw_work_dir is not None else cls.work_dir
@@ -181,6 +199,7 @@ class Settings:
             hwaccel=_parse_hwaccel(env.get("HWACCEL")),
             node_ip=_optional_str(env, "NODE_IP"),
             worker_token=_optional_str(env, "WORKER_TOKEN"),
+            worker_kind=worker_kind,
         )
 
     def queue_keys(self) -> list[str]:
