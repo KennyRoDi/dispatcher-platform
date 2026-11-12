@@ -1,6 +1,6 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-33-1-rafaga
 **Verificación IA:** implementacion 7ef2f16
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
@@ -135,3 +135,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-12 | Parte 2 es solo evidencia (SPEC Plan de pila: sin código); las pruebas del escenario ya están en la parte 1 (PR 144); no hay pruebas nuevas que escribir; excepción de la fase tests (f161348) |
 | tests | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-12 | Parte 2 sin código por SPEC: git diff feat/F-33-1-rafaga no toca src/ ni scenarios/; la corrida y la evidencia van en verificación y documentación (7ef2f16) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
