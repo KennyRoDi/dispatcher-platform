@@ -3,7 +3,7 @@
 **Fase:** cerrada
 **Base:** feat/F-11-1-reintentos
 **Verificación IA:** revision 7f4a301b
-**Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
+**Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-49 (propone) · **Responsable:** N
 
 ## Objetivo
 
@@ -52,7 +52,7 @@ Copiados de `docs/backlog/estados-reporte-dashboard.md` (US-11):
 **Pruebas:** U `test_backoff_crece_y_respeta_maximo`. I analizador que falla N veces.
 **Demuestra:** prueba I. **Evidencia:** log con tiempos entre intentos.
 
-Interpretación (SUP-44, provisional): N es el **número total de intentos** de la sub-tarea, igual que `attempts < max_attempts` en `recovery.py`. Con N = 3 hay el intento inicial y 2 reintentos; el tercer fallo marca `failed`. Entre los intentos hay N − 1 esperas.
+Interpretación (SUP-45, provisional): N es el **número total de intentos** de la sub-tarea, igual que `attempts < max_attempts` en `recovery.py`. Con N = 3 hay el intento inicial y 2 reintentos; el tercer fallo marca `failed`. Entre los intentos hay N − 1 esperas.
 
 ## Diseño
 
@@ -81,7 +81,7 @@ Interpretación (SUP-44, provisional): N es el **número total de intentos** de 
 
 **`decide_retry(attempts, policy, jitter)`**: `attempts` es el número de intentos ya realizados. Si `attempts < policy.max_attempts` devuelve `Retry(delay=next_delay(attempts + 1, ...))`; si no, `GiveUp`. Con `attempts + 1`, el primer reintento (tras el intento 1) espera entre `base` y `2 · base`, no entre `base/2` y `base`; hay N − 1 esperas entre los N intentos (implementado y probado así en la parte 1). Es la única comparación del límite en todo el código, usada por el worker y por `recovery.py`.
 
-**Decisión nueva propuesta, AD-48 (provisional), a registrar en `docs/ARQUITECTURA.md` §8 en la fase de documentación:**
+**Decisión nueva propuesta, AD-49 (provisional), a registrar en `docs/ARQUITECTURA.md` §8 en la fase de documentación:**
 - *Decisión:* reintento con backoff exponencial y jitter acotado, decidido por una función pura de dominio y ejecutado con una **espera programada fuera del worker** (ZSET `retry:scheduled` más promoción por el reaper), con N como total de intentos.
 - *Alternativas:* (a) dormir en el worker con `stop_event.wait(delay)`, como el bucle de conexión: simple, pero el worker ocupa un slot sin trabajar y pierde la espera si muere; (b) reencolar de inmediato como hace `recovery.py`: no cumple «esperas crecientes» y satura ante un fallo persistente; (c) backoff lineal o sin jitter: sincroniza reintentos de muchos casos a la vez.
 - *Criterio:* RF-11 pide esperas crecientes y máximo configurable; la espera programada no consume memoria ni slot, coherente con AD-06 (admisión antes de sacar de la cola) y AD-03 (entrega al menos una vez); el jitter evita reintentos simultáneos tras un fallo común.
@@ -123,7 +123,7 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 | Parte | PR (título en Conventional Commits) | Contenido | Líneas aprox |
 |---|---|---|---|
 | 1 | `feat(F-11): política de reintento con backoff en el dominio` | `src/domain/retry.py` (`RetryPolicy`, `next_delay`, `decide_retry`) y `src/application/retry_subtask.py`; puerto `RetryScheduler` con su doble y su prueba de contrato; sin Redis ni cambios en el worker | ~170 |
-| 2 | `feat(F-11): reintentar sub-tareas fallidas en el worker y el reaper` | `RedisRetryScheduler`, integración en `worker_node.py` y `recovery.py`, configuración, llamada en `scripts/reaper.py`, prueba de integración con analizador que falla N veces y log de evidencia; registro de AD-48 y SUP-44 en la documentación | ~230 |
+| 2 | `feat(F-11): reintentar sub-tareas fallidas en el worker y el reaper` | `RedisRetryScheduler`, integración en `worker_node.py` y `recovery.py`, configuración, llamada en `scripts/reaper.py`, prueba de integración con analizador que falla N veces y log de evidencia; registro de AD-49 y SUP-45 en la documentación | ~230 |
 
 ## Riesgos y preguntas abiertas
 
@@ -133,13 +133,13 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
    **Decisión de la persona:** lo hace el reaper (`promote_due` en su ciclo).
 3. **Qué fallos son transitorios.** Propuesta: reintentar `TimeoutError`, `MemoryError`, `BlockingIOError`, `InterruptedError`, `PermissionError`, `StorageError` y el `ProcessingError` de FFmpeg con código de salida distinto de entrada inválida; no reintentar `ValueError` (entrada ilegible, permanente). Hoy `handle_subtask` trata todo igual. ¿Se aprueba esa lista, o se reintenta cualquier excepción hasta N, a riesgo de repetir fallos permanentes?
    **Decisión de la persona:** se aprueba la lista propuesta de fallos transitorios.
-4. **Valores por defecto de `base` y `tope`.** No hay un dato medido que los fundamente. Se proponen provisionales `RETRY_BASE_S=1` y `RETRY_CAP_S=30` (el mismo orden que `MAX_BACKOFF` del worker) y se marca «Medición pendiente» en AD-48. ¿Se aceptan?
-   **Decisión de la persona:** se aprueban `RETRY_BASE_S=1` y `RETRY_CAP_S=30` (sin medir, «Medición pendiente» en AD-48).
-5. **Semántica de N (SUP-44).** Se toma como total de intentos, igual que `recovery.py`; «N reintentos» daría un intento más. ¿Se acepta?
-   **Decisión de la persona:** N es el total de intentos (SUP-44, registrado en `docs/REQUERIMIENTOS.md`).
+4. **Valores por defecto de `base` y `tope`.** No hay un dato medido que los fundamente. Se proponen provisionales `RETRY_BASE_S=1` y `RETRY_CAP_S=30` (el mismo orden que `MAX_BACKOFF` del worker) y se marca «Medición pendiente» en AD-49. ¿Se aceptan?
+   **Decisión de la persona:** se aprueban `RETRY_BASE_S=1` y `RETRY_CAP_S=30` (sin medir, «Medición pendiente» en AD-49).
+5. **Semántica de N (SUP-45).** Se toma como total de intentos, igual que `recovery.py`; «N reintentos» daría un intento más. ¿Se acepta?
+   **Decisión de la persona:** N es el total de intentos (SUP-45, registrado en `docs/REQUERIMIENTOS.md`).
 6. **Camino nuevo vs camino actual.** Hoy el worker real usa `queue:{operacion}`, `attempts` en el hash `subtask:{id}` y estado en el hash `case:{id}`, mientras que `RetrySubtask` opera sobre `CaseStateStore` (F-10) para el camino de F-05/F-06 aún sin conectar a `POST /cases`. Se implementan ambos con la misma decisión de dominio, pero el camino actual escribe el estado `retrying` por el hash, como ya hace `_requeue`. ¿Se acepta ese doble cableado hasta que F-01 conecte el camino nuevo?
 7. **Entrega al menos una vez.** Un reintento vuelve a ejecutar el análisis; la idempotencia por id de sub-tarea (AD-21, citada en AD-03) debe evitar hallazgos duplicados. F-13 aún no persiste `Finding` desde los workers, así que no se prueba aquí; queda declarado como límite.
-8. **Ramas relacionadas.** Se revisó `git branch -r`: no hay ramas de F-11 de Nahúm distintas de la actual; `feat/F-10-3-estados-y-cierre` es la base (estados) y `feat/F-18-*` toca el reencolado por OOM. SUP-44 y AD-48 se numeran contra `main` (último AD-47, último SUP-43); si otra rama los usa antes, se renumeran en la parte 2.
+8. **Ramas relacionadas.** Se revisó `git branch -r`: no hay ramas de F-11 de Nahúm distintas de la actual; `feat/F-10-3-estados-y-cierre` es la base (estados) y `feat/F-18-*` toca el reencolado por OOM. SUP-45 y AD-49 se numeran contra `main` (último AD-47, último SUP-43); si otra rama los usa antes, se renumeran en la parte 2.
 
 ## Riesgos conocidos de la parte 1 (QA)
 
@@ -172,7 +172,7 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-12 | En Windows la suite unitaria completa tiene 121 fallos de entorno preexistentes (fakeredis, generadores de 200 MiB; 144 en la base sin estos cambios) y el script se cae al leer su salida; las 19 pruebas de F-11 pasan y CI en Linux valida la suite completa. Autorizado por la persona |
 | verificación IA de verificacion | Claude Sonnet 5.5, subagente qa-tester | 2026-11-12 | QA independiente: criterios de la parte 1 cumplidos; 4 defectos menores (OverflowError con attempt muy grande, NaN aceptado en RetryPolicy, caso inexistente da AttributeError por case_state.py de F-10, estado cambia antes de schedule) documentados como xfail estricto. Reproduje yo el Overflow y el NaN; ejecuté 48 passed y 4 xfailed. Sin cambios en src/. Defectos de severidad baja aceptados y pendientes de registrar en documentación; no verifiqué la suite completa de Windows. (7f0c31b) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | Misma razón que implementacion: la suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; 48 passed y 4 xfailed en las pruebas de F-11. Autorizado por la persona |
-| verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación contra 7f0c31b: solo AD-48, SUP-44, fila RetryScheduler en CONTRATOS y SPEC; sin tocar BITACORA, Fase ni Aprobaciones; confirmé que AD-48 describe solo lo que existe (parte 1) y que no hay caracteres de puntos suspensivos nuevos. El borrador de bitácora es veraz: errores de IA reales (mi resumen con el carácter que bloqueó el script, 4 defectos de QA, desviación de decide_retry). (5851084) |
+| verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación contra 7f0c31b: solo AD-49, SUP-45, fila RetryScheduler en CONTRATOS y SPEC; sin tocar BITACORA, Fase ni Aprobaciones; confirmé que AD-49 describe solo lo que existe (parte 1) y que no hay caracteres de puntos suspensivos nuevos. El borrador de bitácora es veraz: errores de IA reales (mi resumen con el carácter que bloqueó el script, 4 defectos de QA, desviación de decide_retry). (5851084) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; solo se documentó. Autorizado por la persona |
 | verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. Releí el diff completo contra el SPEC y la parte 1 del plan: 78 líneas de código, 13 archivos esperados, 48 passed y 4 xfailed ejecutados por mí antes y por el revisor, documentación coherente con lo implementado. Observaciones menores aceptadas: puntos suspensivos en la tabla de aprobaciones por la excepción de plan; suite completa de Windows sin re-ejecutar, la valida CI. (08b0802) |
 | revision | Kenni Rodriguez | 2026-11-12 |  |
@@ -185,7 +185,7 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes (test_contract falla igual en main); las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
 | verificación IA de verificacion | Claude Sonnet 5.5, subagente qa-tester | 2026-11-12 | QA independiente en dos rondas. Ronda 1 devolvió la fase con un defecto real de duplicación y 4 menores, corregidos por el developer. Ronda 2 APROBADA: confirmó las correcciones y un flujo extremo a extremo con RedisRetryScheduler real (status pending coincide con el filtro). Ejecuté yo 163 passed y 1 xfailed. Hallazgo menor aceptado: ventana de microsegundos entre schedule y hset(pending) en que promote_due puede descartar el reintento; la sub-tarea sigue en inflight y la recupera el reaper por max_age. Observaciones documentables: log con str(fallo), ProcessingError de FFmpeg fuera de TRANSIENT_FAILURES, StorageError transitorio. (b53d9e5c) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
-| verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación: AD-48 reescrito (no duplicado), SPEC con riesgos 13 a 17 y enlace a la evidencia, fila de CONTRATOS, y .env.example con RETRY_BASE_S y RETRY_CAP_S sin secretos. Sin cambios en Fase, Verificación IA ni Aprobaciones, sin caracteres de puntos suspensivos nuevos. Lo documentado existe en el código y la evidencia fue generada por la prueba. Borrador de bitácora veraz con los errores reales de QA y del developer. (f5630591) |
+| verificación IA de documentacion | Claude Sonnet 5.5, subagente documentador | 2026-11-12 | Subagente independiente. Leí el diff de documentación: AD-49 reescrito (no duplicado), SPEC con riesgos 13 a 17 y enlace a la evidencia, fila de CONTRATOS, y .env.example con RETRY_BASE_S y RETRY_CAP_S sin secretos. Sin cambios en Fase, Verificación IA ni Aprobaciones, sin caracteres de puntos suspensivos nuevos. Lo documentado existe en el código y la evidencia fue generada por la prueba. Borrador de bitácora veraz con los errores reales de QA y del developer. (f5630591) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; solo se documentó. Autorizado por la persona |
 | verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. 124 líneas de código, capas correctas, pruebas con nombres exactos, 206 passed y 5 xfailed ejecutados por el revisor, evidencia generada por la prueba, sin secretos. Las dos pruebas existentes modificadas solo agregan MAX_ATTEMPTS=1 sin tocar aserciones. Pendiente de persona: avisar a José por los archivos de src/workers. Suite completa de Windows no re-ejecutada. (7f4a301b) |
 | revision | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes; la revisión ejecutó las pruebas de F-11 y de los módulos tocados. Autorizado por la persona |
