@@ -1672,3 +1672,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
 | Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
 | Error de la IA | El agente no volvió a correr test_worker_node, test_recovery ni test_reaper tras su último cambio de configuración; las pruebas de extremo a extremo de la parte 5 lo cubrieron |
+
+## 2026-11-12 · Kenni Rodriguez · F-43 parte 4 (`feat/F-43-4-video-por-fotogramas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes developer |
+| Componente | F-43 parte 4 |
+| Propósito | Video por fotogramas en el worker de imagen |
+| Consulta resumida | Implementación directa de la parte según docs/specs/F-43/SPEC.md |
+| Resultado obtenido | FrameSampling, extract_frames con FFmpeg real, AnalyzeVideo y FrameLocator en el reporte; 250 pruebas pasan |
+| Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
+| Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
+| Error de la IA | El agente tocó consolidated_report.py fuera de la lista del SPEC y AnalyzeVideo no recibe el muestreo como indicaba el encargo; el supervisor por sub-tarea quedó para el cableado de la parte 5 |
