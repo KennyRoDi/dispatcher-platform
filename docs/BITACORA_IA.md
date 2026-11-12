@@ -1568,3 +1568,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Revision independiente de diff completo, enlaces locales, cinco estructuras y calculos M1/M2/M3/M5; 28 tests conformidad pasan. Suite global interrumpida por esperas existentes en Reporter; no se declara verde. Unitarias separadas en curso |
 | Cómo se validó | Comparacion con ENUNCIADO Parte I5 B5 Anexo2; Python stdlib sobre JSON/CSV historicos; git diff --check; pytest. Se instalo lupa que faltaba en fakeredis[lua] ya declarado. No se ejecutaron mediciones remotas |
 | Error de la IA | El developer produjo temporalmente texto con codificacion incorrecta al editar sin UTF8 y copio una frase de cifrado en la seccion custodia. Validacion estructural y revision independiente detectaron ambos y se corrigieron antes de cerrar la implementacion; no se modificaron crudos historicos |
+
+## 2026-11-12 · José Andrés Loría Herrera · F-41 (`feat/F-41-1-fichas-de-evidencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex con auditor independiente |
+| Componente | F-41 |
+| Propósito | Registrar resultado final de verificacion documental F-41 |
+| Consulta resumida | Completar autonomamente las correcciones y comprobaciones disponibles |
+| Resultado obtenido | Cinco fichas y AD04 corregidas; recalculos reproducidos; QA documental aprobado y aceptacion total devuelta por evidencia pendiente |
+| Validado / corregido / descartado | 3030 passed,82 skipped,37 xfailed,5 deselected en tests/unit; 28 tests conformidad pasan; enlaces existentes y diff --check limpio. Suite global interrumpida por esperas Reporter, no declarada verde |
+| Cómo se validó | Python3.14 pytest tests/unit fuera sandbox, con REQUESTS_CA_BUNDLE y CURL_CA_BUNDLE retiradas solo del proceso para aislar CA PostgreSQL; dependencia Lua de fakeredis completada segun requirements-dev; ejecucion literal recalculos.md reproduce cifras |
+| Error de la IA | Edicion temporal sin UTF8 y frase de cifrado copiada a custodia detectadas y corregidas por validacion y revision independiente antes de finalizar documentos |
