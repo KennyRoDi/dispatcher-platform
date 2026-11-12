@@ -1,6 +1,6 @@
 # SPEC F-39: Reutilización y correcciones
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 42726a5
 **Historia:** US-39 · **Requisitos:** RNF-02, RNF-03, RNF-24 · **Responsable:** N
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-12 | Bitacora publicada en estado con uso de IA y error real; sin cambios de codigo (8d6e3f7) |
 | documentacion | Kenni Rodriguez | 2026-11-12 |  |
 | verificación IA de revision | claude | 2026-11-12 | Revisor independiente: APROBADO; diff solo docs/reutilizacion.md, SPEC y test; pytest 22 passed (42726a5) |
+| revision | Kenni Rodriguez | 2026-11-12 | aprobación delegada |
