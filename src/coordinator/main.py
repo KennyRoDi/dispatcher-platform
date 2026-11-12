@@ -47,6 +47,7 @@ from fastapi import Depends, FastAPI
 
 from src.coordinator import rutas_alertas, rutas_archivos, rutas_casos, rutas_monitoreo, rutas_reporte, rutas_subtareas
 from src.coordinator.seguridad import AutenticacionPrevia, autorizar
+from src.domain.backpressure import QueueLimit
 from src.coordinator import rutas_archivos
 from src.infrastructure.object_store import crear_subidas
 
@@ -64,6 +65,8 @@ def auth_habilitada(env: Mapping[str, str]) -> bool:
 
 def crear_app(env: Mapping[str, str] | None = None) -> FastAPI:
     env = os.environ if env is None else env
+    # Un límite de cola mal configurado falla al arrancar y no con un 500 en cada caso (H2 de QA F-24).
+    QueueLimit.from_env(env)
     if all(env.get(nombre, "").strip() for nombre in ("MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY")):
         try:
             rutas_archivos.configurar(crear_subidas(env))

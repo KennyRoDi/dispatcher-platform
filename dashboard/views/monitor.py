@@ -3,6 +3,7 @@ from collections import defaultdict, deque
 import pandas as pd
 import streamlit as st
 
+import nodos
 import ui
 
 MAX_HIST = 120
@@ -90,7 +91,25 @@ def render():
         else:
             st.caption("Acumulando datos...")
 
-        ui.section("Nodos")
+        ui.section("Por nodo")
+        resumen = nodos.resumen_por_nodo(workers)
+        if resumen:
+            tabla = pd.DataFrame(resumen)
+            for c in ("cgroup_memory_current", "cgroup_memory_max"):
+                tabla[c] = pd.to_numeric(tabla[c], errors="coerce") / (1 << 20)
+            st.dataframe(tabla, hide_index=True, width="stretch", column_config={
+                "nodo": "Nodo", "workers": "Workers", "workers_vivos": "Vivos", "activas": "Activas",
+                "cpu_percent": st.column_config.ProgressColumn("CPU", format="%.1f%%", min_value=0, max_value=100),
+                "mem_percent": st.column_config.ProgressColumn("RAM", format="%.1f%%", min_value=0, max_value=100),
+                "cgroup_memory_current": st.column_config.NumberColumn("Memoria cgroup", format="%.0f MiB"),
+                "cgroup_memory_max": st.column_config.NumberColumn("Límite cgroup", format="%.0f MiB"),
+                "cgroup_percent": st.column_config.ProgressColumn("Uso cgroup", format="%.1f%%",
+                                                                  min_value=0, max_value=100),
+                "gpu": "GPU",
+                "gpu_percent": st.column_config.ProgressColumn("GPU %", format="%.1f%%", min_value=0, max_value=100),
+            })
+
+        ui.section("Workers")
         if workers:
             df = pd.DataFrame(workers)
             df["estado"] = df["alive"].map(lambda a: "Activo" if a else "Inactivo")
