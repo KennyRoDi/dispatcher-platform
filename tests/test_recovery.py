@@ -237,3 +237,29 @@ def test_normal_priority_subtask_requeued_to_normal_queue(redis_client):
 
     assert redis_client.lrange("queue:transcode_video", 0, -1) == ["sid-1"]
     assert redis_client.lrange("queue:transcode_video:high", 0, -1) == []
+
+
+def test_recovery_usa_la_misma_decision_de_limite(redis_client, monkeypatch):
+    from src.domain.retry import GiveUp, Retry, RetryPolicy, decide_retry
+    from src.workers import recovery
+
+    settings = make_settings(max_attempts=3, retry_base_s=1.0, retry_cap_s=30.0)
+    politica = RetryPolicy(max_attempts=3, base=1.0, cap=30.0)
+    for intentos in range(0, 6):
+        make_subtask(redis_client, f"sid-{intentos}", status="running", attempts=intentos)
+        resultado = recover_subtask(redis_client, settings, FakeReporter(), f"sid-{intentos}", "worker_lost")
+        esperado = "requeued" if isinstance(decide_retry(intentos, politica, lambda: 0.0), Retry) else "failed"
+        assert resultado == esperado, intentos
+
+    consultas = []
+
+    def decision_falsa(attempts, policy, jitter):
+        consultas.append((attempts, policy))
+        return GiveUp() if attempts < 99 else Retry(delay=1.0)
+
+    monkeypatch.setattr(recovery, "decide_retry", decision_falsa)
+    make_subtask(redis_client, "sid-giveup", status="running", attempts=0)
+    make_subtask(redis_client, "sid-retry", status="running", attempts=99)
+    assert recover_subtask(redis_client, settings, FakeReporter(), "sid-giveup", "worker_lost") == "failed"
+    assert recover_subtask(redis_client, settings, FakeReporter(), "sid-retry", "worker_lost") == "requeued"
+    assert consultas == [(0, politica), (99, politica)]
