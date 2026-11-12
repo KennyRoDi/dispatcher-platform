@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 13e5689
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
 
 ## Objetivo
@@ -140,3 +140,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude Sonnet 5.5, subagente arquitecto | 2026-11-12 | Subagente independiente. Verifiqué: 0 campos … restantes; cada criterio de US-11 y RF-11 presente; diff solo toca docs/specs/F-11/SPEC.md; contrastado en código que max_attempts=3 en config.py y recovery.py:66 usa attempts<max_attempts, que src/domain/retry.py no existe y que CONTRATOS asigna retry.py a Nahúm y src/workers a José; último SUP-43 confirmado en REQUERIMIENTOS; pila de 2 PR (~170 y ~230 líneas). No verificado: líneas reales, solo estimadas. (13e5689) |
