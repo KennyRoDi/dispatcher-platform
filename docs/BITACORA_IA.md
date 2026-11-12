@@ -1581,3 +1581,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | 3030 passed,82 skipped,37 xfailed,5 deselected en tests/unit; 28 tests conformidad pasan; enlaces existentes y diff --check limpio. Suite global interrumpida por esperas Reporter, no declarada verde |
 | Cómo se validó | Python3.14 pytest tests/unit fuera sandbox, con REQUESTS_CA_BUNDLE y CURL_CA_BUNDLE retiradas solo del proceso para aislar CA PostgreSQL; dependencia Lua de fakeredis completada segun requirements-dev; ejecucion literal recalculos.md reproduce cifras |
 | Error de la IA | Edicion temporal sin UTF8 y frase de cifrado copiada a custodia detectadas y corregidas por validacion y revision independiente antes de finalizar documentos |
+
+## 2026-11-12 · Kenni Rodriguez · F-11 parte 2 (`feat/F-11-2-reintentos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes arquitecto, developer, QA tester y documentador |
+| Componente | F-11 parte 2 |
+| Propósito | Escribir pruebas en rojo, implementar el adaptador RedisRetryScheduler y la integración en worker, recovery, config y reaper, hacer pruebas de ruptura de QA en dos rondas y documentar |
+| Consulta resumida | Adaptador Redis de la espera programada, reintento de fallos transitorios en el worker, límite de recovery desde decide_retry, promoción por el reaper, correcciones de QA y documentación de AD-48 |
+| Resultado obtenido | RedisRetryScheduler, integración en worker_node, recovery, config y reaper, y evidencia docs/evidencia/F-11_reintentos_2026-11-12.md generada por la prueba de aceptación; 163 passed y 1 xfailed en la verificación de QA |
+| Validado / corregido / descartado | Validado por verificación de cada fase y aprobación de la persona; la fase de verificación se devolvió una vez por hallazgos de QA y se repitió; riesgos residuales documentados en el SPEC; base 1 s y tope 30 s sin medir |
+| Cómo se validó | El orquestador reprodujo los 6 hallazgos de QA con --runxfail, comprobó en un worktree de main que test_contract falla igual sin estos cambios y ejecutó las pruebas de F-11 y de los módulos tocados; la suite completa de Windows tiene fallos de entorno preexistentes y la valida CI en Linux |
+| Error de la IA | QA ronda 1 halló que la sub-tarea se ejecutaba dos veces si el worker moría entre schedule y srem, que promote_due reencolaba casos cancelados, que una entrada corrupta bloqueaba a las demás y que RETRY_BASE_S y RETRY_CAP_S aceptaban NaN e infinito; el developer lo corrigió y la fase se devolvió; el developer modificó 2 pruebas existentes con MAX_ATTEMPTS=1 por el cambio de StorageError; QA ronda 2 halló una ventana de microsegundos entre schedule y hset(pending) en que promote_due puede descartar el reintento, aceptada porque el reaper recupera la sub-tarea por max_age |
