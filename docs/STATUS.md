@@ -36,7 +36,7 @@
 | F-31 | hecha |
 | F-32 | hecha |
 | F-33 | pendiente |
-| F-34 | documentacion |
+| F-34 | revision |
 | F-35 | pendiente |
 | F-36 | hecha |
 | F-37 | hecha |
