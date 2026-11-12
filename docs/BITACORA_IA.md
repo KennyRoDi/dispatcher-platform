@@ -1478,3 +1478,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Revise los resultados y la ficha; pruebas en verde |
 | Cómo se validó | Ajustes revisados y aplicados con git am |
 | Error de la IA | La primera corrida se colgo: sin KEK la subida fallaba y el muestreo nunca paraba; se agrego try/finally y una prueba |
+
+## 2026-11-11 · Nahúm Murillo · F-06 (`feat/F-06-1-cola-confiable`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-06 |
+| Propósito | Disenar SPEC, investigar codigo existente, escribir pruebas TDD e implementar el adaptador Redis confiable de WorkQueue para F-06, mas corregir un bug de Priority duplicado encontrado en el camino |
+| Consulta resumida | Cerrar la ventana de perdida de F-05/WorkQueue: tomar una subtarea y marcarla en vuelo deben ser la misma operacion atomica (BLMOVE), con mecanismo de reencolado |
+| Resultado obtenido | RedisTypeQueue (take/enqueue/in_flight/acknowledge/reencolar_huerfanas) pasando comprobar_work_queue; Priority unificada entre scheduling.py y priority.py; AD-03 refinada |
+| Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; investigacion del codigo real verificada con grep antes de disenar (hallazgo: F-05 dejo el adaptador pendiente para F-06, y hay dos sistemas de colas paralelos) |
+| Cómo se validó | pytest de tests/unit/test_redis_type_queue.py y tests/integration/test_redis_type_queue_reaper.py (6 passed); suite ampliada de scheduling/decomposition/dispatch_case/arquitectura (91 passed); QA manual con casos borde (acknowledge inexistente, capacidad exacta, workers aislados, reencolado multi-kind) |
+| Error de la IA | La IA (yo mismo, en F-20) habia creado una clase Priority duplicada en src/domain/scheduling.py en vez de reutilizar la canonica de src/domain/priority.py que ya existia desde antes. Se detecto al escribir las pruebas de F-06 (necesitaban Subtask, que usa la canonica) y se corrigio unificando ambas sin romper ningun import existente |
