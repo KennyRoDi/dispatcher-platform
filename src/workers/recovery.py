@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 
+from src.adapters.redis_type_queue import destino_de_reencolado
 from src.domain.retry import Retry, RetryPolicy, decide_retry
 
 logger = logging.getLogger(__name__)
@@ -21,11 +22,14 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _requeue(redis_client, sid: str, case_id: str | None, operation: str, priority: str | None, reason: str) -> str:
+def _requeue(
+    redis_client, sid: str, case_id: str | None, operation: str, priority: str | None, reason: str,
+    payload: str | None = None,
+) -> str:
     """Requeues the subtask and flags its case as retrying in one WATCH/MULTI transaction."""
     subtask_key = f"subtask:{sid}"
     case_key = f"case:{case_id or ''}"
-    queue_key = f"queue:{operation}:high" if priority == "high" else f"queue:{operation}"
+    destino = destino_de_reencolado(operation, priority, payload, sid)
 
     def txn(pipe):
         case_status = pipe.hget(case_key, "status") if case_id else None
@@ -41,7 +45,7 @@ def _requeue(redis_client, sid: str, case_id: str | None, operation: str, priori
             "requeued_at": _now_iso(),
             "requeue_reason": reason,
         })
-        pipe.lpush(queue_key, sid)
+        pipe.lpush(*destino)
         if case_status in RETRYABLE_CASE_STATES:
             pipe.hset(case_key, "status", "retrying")
             pipe.hincrby(case_key, "retries", 1)
@@ -72,7 +76,9 @@ def recover_subtask(redis_client, settings, reporter, sid: str, reason: str, rep
             logger.error("subtarea %s sin operation, no se puede reencolar", sid)
             return "skipped"
         try:
-            outcome = _requeue(redis_client, sid, case_id, operation, data.get("priority"), reason)
+            outcome = _requeue(
+                redis_client, sid, case_id, operation, data.get("priority"), reason, data.get("payload")
+            )
         except Exception:
             logger.exception("no se pudo reencolar subtarea %s", sid)
             return "skipped"
