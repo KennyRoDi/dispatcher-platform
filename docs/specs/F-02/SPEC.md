@@ -1,6 +1,6 @@
 # SPEC F-02: Validar y normalizar
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 91729a7
 **Historia:** US-02 · **Requisitos:** RF-02 (exportaciones de chat), RNF-06 (normalización) · **Responsable:** N
@@ -107,3 +107,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-12 | Documentacion completa: AD-48/SUP-44 agregadas (interpretacion UTC de timestamps sin huso), bitacora registrada en rama estado con uso real de IA declarado (4c82e90) |
 | documentacion | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
 | verificación IA de revision | claude | 2026-11-12 | Diff F-02 vs SPEC: objetivo OK, alcance OK (todos los archivos del plan presentes), criterios OK, diseno OK, pruebas OK (nombres exactos), plan de pila OK (1 parte, 97 lineas). APROBADO (91729a7) |
+| revision | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
