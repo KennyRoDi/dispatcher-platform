@@ -3,7 +3,7 @@
 
 | Feature | Estado |
 |---|---|
-| F-01 | revision |
+| F-01 | en-pr |
 | F-02 | pendiente |
 | F-03 | hecha |
 | F-04 | hecha |
