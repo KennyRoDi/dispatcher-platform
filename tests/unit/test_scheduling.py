@@ -29,11 +29,12 @@ class TestPriorityEnum:
         # Importar una vez que exista
         from src.domain.scheduling import Priority
 
-        # Valores válidos
-        assert Priority.BAJA
-        assert Priority.MEDIA
-        assert Priority.ALTA
-        assert Priority.CRITICA
+        # Valores válidos: existen como miembros del enum (Priority es IntEnum,
+        # asi que BAJA=0 es falsy; se confirma la pertenencia, no la verdad booleana)
+        assert Priority.BAJA in Priority
+        assert Priority.MEDIA in Priority
+        assert Priority.ALTA in Priority
+        assert Priority.CRITICA in Priority
 
         # Valores no válidos lanzan ValueError o AttributeError
         with pytest.raises((ValueError, AttributeError, KeyError)):
