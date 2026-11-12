@@ -1,6 +1,6 @@
 # SPEC F-34: Caída de un worker
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 4dc2e35
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | claude | 2026-11-12 | SPEC F-34 completado tras investigar el mecanismo real de heartbeat/reaper (heartbeat_ttl=15s, reaper_interval=10s, verificado en heartbeat.py y reaper.py). Diseno: medir deteccion+reasignacion deteniendo los latidos (simula docker kill sin necesitar Docker/3 nodos), reutilizando el Reaper real sin modificarlo. Mismo patron que F-36/cancel_heavy.py (funciones puras + prueba de aceptacion que lee JSON de corrida real). Plan de 1 parte, ~140 lineas (d92b599) |
 | plan | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de tests | claude | 2026-11-12 | 8 pruebas unitarias en rojo (falta scenarios/worker_crash.py). 2 pruebas de integracion pasan de inmediato porque validan el Reaper heredado ya existente (no codigo nuevo), confirmando que mi configuracion de prueba es correcta contra el mecanismo real. 1 prueba de aceptacion omitida (sin WORKER_CRASH_JSON). Resto de la suite (49 passed) intacto (4dc2e35) |
+| tests | Nahúm Murillo | 2026-11-12 |  |
