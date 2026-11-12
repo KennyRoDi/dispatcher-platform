@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-25-1-responder-durante-subidas-grandes
-**Verificación IA:** documentacion 529aac5d
+**Verificación IA:** revision 07436162
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -98,3 +98,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
 | verificación IA de documentacion | Claude Code | 2026-11-11 | Ficha M3 con seccion F-25 y bitacora registrada (529aac5d) |
 | documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows fallan test_generar_certs y un caso de F-05, ajenos a F-25. |
+| verificación IA de revision | Claude Code | 2026-11-11 | Diff revisado contra el SPEC de F-25 (07436162) |
