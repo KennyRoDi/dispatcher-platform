@@ -1,6 +1,6 @@
 # SPEC F-15: Dashboard
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 9592d3a9
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
@@ -82,3 +82,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente. Heartbeat publica cgroup_memory_current y _max si hay lector; worker_node lo pasa; dashboard/nodos.py y seccion Por nodo en Monitor (MiB). 9/9, test_dashboard 22/22, vista renderizada sin excepciones, suite 3777 verde en Linux. 86 lineas. (b12cb67a) |
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-15. |
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) APROBADO: 89/89; Monitor renderizado en 6 escenarios sin excepciones (sin cgroup, hosts nulos, 150 nodos, todos muertos); cableado real del lector confirmado; mutante que quitaba el lector sobrevivia y ahora lo detecta una prueba nueva. (9592d3a9) |
+| verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-15. |
