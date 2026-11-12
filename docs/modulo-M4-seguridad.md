@@ -1,6 +1,8 @@
 # Módulo M4: seguridad
 
-Estado: borrador de F-30, F-26, F-28 (partes 1 a 3) y F-27 (partes 1 a 4). **Mediciones pendientes**: no hay salidas reales de nodos en este documento; la única de F-27 es una prueba local en una sola máquina, que no acredita M4. Sin datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+**Responsable:** Kenni Rodriguez (`KennyRoDi`).
+
+Estado: evidencia parcial de F-26 a F-30. Existen ejecuciones reales locales de roles, cifrado en reposo, custodia, TLS de servidores y worker sin privilegios (sección 4). No acreditan captura de tráfico entre nodos ni todos los controles del despliegue. La regla de Parte I §5 aplica a módulos sin ficha con datos medidos; los datos locales existentes no equivalen a cumplimiento completo de M4.
 
 ## 1. Qué se implementó
 
@@ -340,22 +342,22 @@ Salida real de una ejecución local sintética (una sola máquina, datos sintét
 
 ### F-30 Workers sin privilegios
 
-Pendiente. Las pruebas unitarias y `python -m scripts.verificar_workers` respaldan que la configuración está escrita, no que el kernel la aplique en los nodos. Sin evidencia medida en los tres nodos reales, el módulo M4 tiene máximo 2 [Parte I §5].
+La demo local registró UID 10001, raíz de solo lectura y restricciones efectivas (sección 4). Falta repetir en los workers desplegados; la configuración escrita y las unitarias no prueban esa ejecución remota.
 
 ### F-26 Autenticación y roles
 
-Pendiente. Las pruebas unitarias respaldan la matriz y la verificación del token, no el comportamiento medido en la demo. Límites conocidos: ver «Notas» en `docs/specs/F-26/SPEC.md`. Sin evidencia medida, el módulo M4 tiene máximo 2 [Parte I §5].
+La tabla local registra 401 para tokens inválidos y 403 para roles sin permiso. Los 409 de cancelación corresponden a autorización aceptada y estado del caso incompatible; no son denegaciones por rol. Una petición por celda, sin TLS, no demuestra el despliegue ni todos los cuerpos/cabeceras. Límites conocidos: `docs/specs/F-26/SPEC.md`.
 
 ### F-28 Cifrado en reposo
 
-Pendiente. Las pruebas unitarias respaldan el formato y la detección de alteraciones, no el costo de CPU en los nodos. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Pendiente. Las pruebas unitarias respaldan el formato y la detección de alteraciones, no el costo de CPU en los nodos. La prueba local con MinIO acredita cifrado y detección de alteración en ese entorno; no mide esos costos.
 
 ### F-27 TLS entre nodos
 
-Pendiente. La prueba local respalda que los servidores arrancan con TLS y UID propio y que el cliente verifica la CA, no que el tráfico entre nodos reales vaya cifrado: falta la captura con `tshark` y `strings`. Sin captura real no hay resultado de TLS y M4 no pasa de 2 [Parte I §5].
+Pendiente. La prueba local respalda que los servidores arrancan con TLS y UID propio y que el cliente verifica la CA, no que el tráfico entre nodos reales vaya cifrado: falta la captura con `tshark` y `strings`. Sin captura real entre nodos no se acredita ese producto RNF-12, aunque el arranque TLS local sí tiene resultados.
 
 **Repetir M3.** TLS puede alterar M1 a M3: hay que repetir al menos el throughput de M3 con TLS activo y reportar la diferencia (`docs/IMPLEMENTACION.md` §7). No se estima aquí.
 
 ### F-29 Cadena de custodia
 
-Parcial. La ejecución local sintética muestra que el verificador detecta cada manipulación probada y que falla cerrado con llave inválida o ausente; no demuestra la prueba A en nodos reales. Las pruebas unitarias respaldan la lógica de sellado y detección. Límites declarados (SUP-31): el verificador carga todo el log en memoria; quien posea la llave puede forjar la cadena (HMAC simétrico) y un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta mientras el ancla viva en el mismo disco. Sin ficha con datos medidos, el módulo M4 tiene máximo 2 [Parte I §5].
+Parcial. La ejecución local sintética muestra que el verificador detecta cada manipulación probada y que falla cerrado con llave inválida o ausente; no demuestra la prueba A en nodos reales. Las pruebas unitarias respaldan la lógica de sellado y detección. Límites declarados (SUP-31): el verificador carga todo el log en memoria; quien posea la llave puede forjar la cadena (HMAC simétrico) y un ancla antigua repuesta junto con un log truncado al mismo punto no se detecta mientras el ancla viva en el mismo disco. La prueba local con MinIO acredita cifrado y detección de alteración en ese entorno; no mide esos costos.
