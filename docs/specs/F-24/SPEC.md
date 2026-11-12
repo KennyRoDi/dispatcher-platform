@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
-**Verificación IA:** verificacion ba8da238
+**Verificación IA:** documentacion af0138e2
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -134,3 +134,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de verificacion | Claude Code | 2026-11-11 | Medicion real: con limite 200 la cola no supera 200; sin limite llega a ~55 mil (ba8da238) |
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de documentacion | Claude Code | 2026-11-11 | Ficha M3 con seccion F-24 y bitacora registrada (af0138e2) |
