@@ -17,11 +17,11 @@
 
 ## Criterios de aceptación
 
-… Copiados de `docs/BACKLOG.md`, en Dado/Cuando/Entonces.
+… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
 
 ## Diseño
 
-… Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+… Contratos de `docs/CONTRATOS.md` que implementa y que usa. Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
 
 ## Pruebas
 

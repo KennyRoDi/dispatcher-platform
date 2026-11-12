@@ -63,14 +63,14 @@ main
 - **Última parte:** `flujo.py cierre --final` marca el SPEC como cerrado. Al fusionar esa PR, la feature pasa a `hecha`.
 - **Revisar:** cada PR se revisa por sí sola, de abajo hacia arriba.
 - **Fusionar:** de abajo hacia arriba, **con merge commit, nunca squash ni rebase**. Así se conserva la autoría que exige [Parte I §3] y las ramas superiores no necesitan reescribirse.
-- **Después de fusionar:** borra la rama. GitHub cambia la base de la PR siguiente automáticamente.
+- **Cómo fusionar:** siempre con `python scripts/flujo.py fusionar <numero>`. Fusiona, mueve a `main` las PR apiladas encima y luego borra la rama. **No uses el botón de GitHub con borrado de rama:** si se borra la rama antes de mover la base, GitHub cierra las PR apiladas encima.
 - **Si cambia una PR intermedia:** corrige en su rama y propaga con merge a las superiores, o desde la rama superior con `git rebase --update-refs <base>` y `git push --force-with-lease` si la pila es tuya. Nunca fuerces el push de una rama compartida.
 
 ## Comprobaciones automáticas
 
 `flujo.py aprobar` exige la verificación de IA vigente y comprueba cada fase (ver [AGENTS.md](AGENTS.md)). `flujo.py cierre` exige todas las fases aprobadas, sin cambios pendientes, y comprueba commits, título, tamaño y `pytest -q -m "not integration and not acceptance"`.
 
-Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/BACKLOG.md`.
+Superar el límite de tamaño no tiene excepción: se divide la PR. Quien revisa sigue siendo responsable de comprobar los criterios de `docs/backlog/`.
 
 ## Checks en GitHub
 
@@ -97,7 +97,7 @@ En local: `python -m scripts.conformidad repo`.
 Una vez, quien administre el repositorio:
 
 ```bash
-gh repo edit --enable-squash-merge=false --enable-rebase-merge=false --delete-branch-on-merge
+gh repo edit --enable-squash-merge=false --enable-rebase-merge=false
 ```
 
-La rama `estado` guarda `docs/STATUS.md` y la bitácora que publica el script. No se protege ni se borra, y no se fusiona en `main`.
+La rama `estado` guarda `docs/STATUS.md` y la bitácora que publica el script. No se borra, no admite push forzado y no se fusiona en `main`. Guía completa: [docs/GUIA.html](docs/GUIA.html).

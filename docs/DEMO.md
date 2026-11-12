@@ -21,11 +21,14 @@ sin necesitar el `.env` del equipo:
 
 ## Comandos
 
+La demo local va **en claro**: `.env.demo` y `docker-compose.demo.yml` fijan `TLS_ENABLED=false` (F-27). No la uses entre nodos; el despliegue de tres nodos exige TLS (`docs/DEPLOY_WORKERS.md`).
+
 ```bash
-docker compose -f deploy/docker-compose.demo.yml up -d --build   # iniciar
-docker compose -f deploy/docker-compose.demo.yml logs -f feeder  # ver casos enviados
-docker compose -f deploy/docker-compose.demo.yml down            # detener (conserva datos)
-docker compose -f deploy/docker-compose.demo.yml down -v         # detener y borrar todo
+python -m scripts.generar_credenciales                           # una vez: JWT_SECRET, WORKER_TOKEN y API_TOKEN en .env
+docker compose --env-file .env -f deploy/docker-compose.demo.yml up -d --build   # iniciar
+docker compose --env-file .env -f deploy/docker-compose.demo.yml logs -f feeder  # ver casos enviados
+docker compose --env-file .env -f deploy/docker-compose.demo.yml down            # detener (conserva datos)
+docker compose --env-file .env -f deploy/docker-compose.demo.yml down -v         # detener y borrar todo
 ```
 
 Ajustes (variables de entorno al ejecutar `up`):
@@ -33,7 +36,7 @@ Ajustes (variables de entorno al ejecutar `up`):
 - `DEMO_INTERVAL` (segundos entre casos, por defecto 8, con +-30 % de variacion).
 - `DEMO_MAX_CASES` (0 = ilimitado).
 
-Si tu dashboard corre en el host y usa dotenv: `cp .env.demo .env`.
+Si tu dashboard corre en el host y usa dotenv: `cp .env.demo .env` y, después, `python -m scripts.generar_credenciales` (el `cp` reemplaza el `.env` y borra las credenciales). El dashboard envía `API_TOKEN` como `Authorization: Bearer` en cada consulta.
 
 ## Estados de caso que aparecen en la demo
 
@@ -66,10 +69,18 @@ estados, formas de respuesta): `docs/WORKER_CONTRACT.md`.
 | `GET /cases` | Lista de casos (mas recientes primero). Filtro: `?status=processing` |
 | `GET /cases/{id}` | `{"case": {...}, "subtasks": [...]}` |
 | `GET /cases/{id}/report` | Reporte: `summary`, `totals`, `failure_breakdown`, promedios por operacion y por host, `priority`, `metadata`, `retries`, `subtasks_by_type`, `totals_by_type_and_operation` |
+| `GET /cases/{id}/consolidated-report` | Reporte consolidado de hallazgos: categorías, línea temporal e incidencias. Ejemplo: `curl http://localhost:8000/cases/<id>/consolidated-report`. 503 si Redis o el almacén de objetos (F-23) no están disponibles |
 | `GET /subtasks/{id}` | Una sub-tarea con `outputs`, `params` y `metadata` ya parseados |
 | `GET /workers` | Workers y su heartbeat, con el campo `alive` |
 | `GET /stats` | Largo de las 10 colas, casos por estado, workers vivos y sub-tareas activas |
 | `POST /cases/{id}/cancel` | Cancela un caso (409 si ya es terminal) |
+| `GET /alerts?limit=` | Alertas recientes del Stream `alerts`, mas nuevas primero (`limit` de 1 a 200, 50 por defecto; 503 si Redis no responde) |
+
+Alertas recientes (incidencias altas y cierre de caso):
+
+```bash
+curl "http://localhost:8000/alerts?limit=10"
+```
 
 Casos y sub-tareas (los valores de `GET /cases` y `GET /cases/{id}` vienen como strings de Redis;
 `metadata` es un JSON en string, y en `GET /subtasks/{id}` y en el reporte ya es un objeto):

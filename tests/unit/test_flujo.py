@@ -1,6 +1,12 @@
 import pytest
 
 from scripts.flujo import (
+    partes_cerradas,
+    hijas_de,
+    corresponde_a,
+    desbloqueadoras,
+    letras_de_equipo,
+    parsear_equipo,
     Feature,
     avanzar_spec,
     agregar_entrada,
@@ -338,3 +344,56 @@ def test_verificacion_sin_su_commit_no_esta_vigente():
 def test_aprobar_conserva_la_exigencia_para_la_fase_siguiente():
     texto = avanzar_spec(verificada(), "Ana", "2026-11-03")
     assert not verificacion_vigente(texto, "tests", ["docs(F-01): registrar verificacion tests"])
+
+
+EQUIPO_MD = """# Equipo
+
+| Usuario de GitHub | Letra | Nombre |
+|---|---|---|
+| AnaGit | A | Ana Uno |
+| por-confirmar | B | Bea Dos |
+"""
+
+
+def test_equipo_se_busca_sin_distinguir_mayusculas():
+    equipo = parsear_equipo(EQUIPO_MD)
+    assert equipo["anagit"].letra == "A"
+    assert equipo["anagit"].nombre == "Ana Uno"
+
+
+def test_usuario_por_confirmar_no_identifica_a_nadie():
+    assert "por-confirmar" not in parsear_equipo(EQUIPO_MD)
+    assert letras_de_equipo(EQUIPO_MD) == {"A", "B"}
+
+
+def test_corresponde_a_su_letra_y_a_las_compartidas():
+    assert corresponde_a(Feature("F-01", "K", (), ""), "K")
+    assert corresponde_a(Feature("F-02", "Todos", (), ""), "K")
+    assert corresponde_a(Feature("F-03", "Cada responsable", (), ""), "K")
+    assert not corresponde_a(Feature("F-04", "N", (), ""), "K")
+
+
+def test_desbloqueadoras_son_lo_empezable_ajeno_que_frena_lo_propio():
+    features = {
+        "F-01": Feature("F-01", "N", (), ""),
+        "F-02": Feature("F-02", "N", ("F-01",), ""),
+        "F-03": Feature("F-03", "V", ("F-02",), ""),
+        "F-04": Feature("F-04", "J", (), ""),
+    }
+    clases = clasificar(features, {}, {})
+    assert desbloqueadoras(features, clases, "V") == ["F-01"]
+
+
+def test_hijas_son_las_pr_abiertas_cuya_base_es_la_rama():
+    prs = [
+        {"number": 2, "baseRefName": "feat/F-01-1-a"},
+        {"number": 3, "baseRefName": "main"},
+        {"number": 4, "baseRefName": "feat/F-01-1-a"},
+    ]
+    assert hijas_de(prs, "feat/F-01-1-a") == [2, 4]
+
+
+def test_nueva_parte_no_reutiliza_numero_tras_fusionar_y_borrar_ramas():
+    spec = SPEC + "| revision | Ana | d |  |\n| devuelta de revision | Ana | d | x |\n| revision | Ana | d |  |\n"
+    assert partes_cerradas(spec) == 2
+    assert nombre_rama("F-20", "otra", {}, partes_cerradas(spec)) == "feat/F-20-3-otra"

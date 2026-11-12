@@ -1,0 +1,252 @@
+{
+  "plan": {
+    "cupo": 3,
+    "subtareas": 7
+  },
+  "memory_max": 268435456,
+  "huella_bytes": 67108864,
+  "margen_bytes": 33554432,
+  "sin_admision": true,
+  "intervalo_heartbeat": 1.0,
+  "pico_memory_current": 239824896,
+  "pico_en_curso": 7,
+  "oom_kill_total": 4,
+  "estados_finales": {
+    "sub-1": "failed",
+    "sub-4": "failed",
+    "sub-5": "failed",
+    "sub-6": "failed",
+    "sub-0": "completed",
+    "sub-2": "completed",
+    "sub-3": "completed"
+  },
+  "muestras": [
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.0,
+      "memory_current": 23453696,
+      "memory_max": 268435456,
+      "en_curso": 7,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.21,
+      "memory_current": 239824896,
+      "memory_max": 268435456,
+      "en_curso": 4,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.44,
+      "memory_current": 222937088,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.64,
+      "memory_current": 223281152,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.84,
+      "memory_current": 223178752,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.05,
+      "memory_current": 223281152,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.25,
+      "memory_current": 222699520,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.45,
+      "memory_current": 222879744,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.66,
+      "memory_current": 222916608,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.86,
+      "memory_current": 223109120,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.06,
+      "memory_current": 223088640,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.27,
+      "memory_current": 223129600,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.47,
+      "memory_current": 222928896,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.67,
+      "memory_current": 222445568,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.88,
+      "memory_current": 222814208,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.08,
+      "memory_current": 222789632,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.28,
+      "memory_current": 222748672,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.49,
+      "memory_current": 222810112,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.69,
+      "memory_current": 222883840,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.89,
+      "memory_current": 222842880,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.1,
+      "memory_current": 222470144,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 4.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.3,
+      "memory_current": 11517952,
+      "memory_max": 268435456,
+      "en_curso": 0,
+      "en_cola": 0,
+      "oom_killed": true,
+      "ultimo_heartbeat": 4.0
+    }
+  ],
+  "veredicto": {
+    "cumple": false,
+    "problemas": [
+      "hubo OOMKilled",
+      "se admitieron m\u00e1s sub-tareas que el cupo (3)"
+    ]
+  }
+}

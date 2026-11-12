@@ -1,20 +1,40 @@
-# Compose para la maquina A: redis + minio + reaper. El coordinador corre nativo y lee
-# REDIS_HOST/REDIS_PORT/REDIS_PASSWORD del mismo .env:
-#   python -m uvicorn src.coordinator.main:app --host 0.0.0.0 --port 8000 --env-file .env
+# Compose para el Nodo A: coordinador + redis + minio + reaper, sin workers.
+# NODE_IP es la IP de Tailscale del Nodo A: los puertos se publican solo en esa interfaz.
+# CERTS_DIR es la carpeta con los certificados (deploy/tls/generar_certs.sh), fuera del repo.
+#   docker compose up -d --build
 
 services:
+  redis-data-init:
+    image: redis:7-alpine
+    # El volumen nuevo queda de root o del usuario de la imagen; redis corre con CERTS_UID y necesita escribir en /data.
+    user: "0"
+    command: ["chown", "-R", "${CERTS_UID:?define CERTS_UID en .env (id -u)}:${CERTS_GID:?define CERTS_GID en .env (id -g)}", "/data"]
+    volumes:
+      - redis-data:/data
+    restart: "no"
+
   redis:
     image: redis:7-alpine
     container_name: redis-server
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?define REDIS_PASSWORD en .env}", "--appendonly", "yes"]
+    # La llave es 0600 del usuario que genero los certificados: el servidor corre con su UID (CERTS_UID/CERTS_GID de .env).
+    user: "${CERTS_UID:?define CERTS_UID en .env (id -u)}:${CERTS_GID:?define CERTS_GID en .env (id -g)}"
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?define REDIS_PASSWORD en .env}", "--appendonly", "yes",
+      "--port", "0", "--tls-port", "6380", "--tls-cert-file", "/certs/server.pem", "--tls-key-file", "/certs/server.key",
+      "--tls-ca-cert-file", "/certs/ca.pem", "--tls-auth-clients", "no", "--tls-protocols", "TLSv1.3"]
     ports:
-      - "6379:6379"
+      - "${NODE_IP:?define NODE_IP en .env}:6380:6380"
     environment:
       REDISCLI_AUTH: ${REDIS_PASSWORD:?define REDIS_PASSWORD en .env}
     volumes:
       - redis-data:/data
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/server.pem:/certs/server.pem:ro
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/server.key:/certs/server.key:ro
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/ca.pem:/certs/ca.pem:ro
+    depends_on:
+      redis-data-init:
+        condition: service_completed_successfully
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      test: ["CMD-SHELL", "redis-cli --tls --cacert /certs/ca.pem -h localhost -p 6380 ping | grep -q PONG"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -22,20 +42,60 @@ services:
 
   minio:
     image: ${MINIO_IMAGE:-cgr.dev/chainguard/minio:latest}
+    # La llave es 0600 del usuario que genero los certificados: el servidor corre con su UID (CERTS_UID/CERTS_GID de .env).
+    user: "${CERTS_UID:?define CERTS_UID en .env (id -u)}:${CERTS_GID:?define CERTS_GID en .env (id -g)}"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9001" --certs-dir /certs
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${NODE_IP:?define NODE_IP en .env}:9000:9000"
+      - "${NODE_IP:?define NODE_IP en .env}:9001:9001"
     volumes:
       - minio-data:/data
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/minio:/certs:ro
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD-SHELL", "MC_HOST_local=https://localhost:9000 mc --config-dir /tmp/.mc ready local --insecure"]
       interval: 5s
       timeout: 3s
       retries: 10
+    restart: unless-stopped
+
+  coordinator:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    # Lee server.key 0600: corre con el UID de quien genero los certificados, como redis y minio.
+    user: "${CERTS_UID:?define CERTS_UID en .env}:${CERTS_GID:?define CERTS_GID en .env}"
+    command: ["python", "-m", "uvicorn", "src.coordinator.main:app", "--host", "0.0.0.0", "--port", "8443",
+      "--ssl-certfile", "/certs/server.pem", "--ssl-keyfile", "/certs/server.key"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6380
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?define REDIS_PASSWORD en .env}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_SECURE: "true"
+      TLS_ENABLED: "true"
+      TLS_CA_FILE: /certs/ca.pem
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      JWT_SECRET: ${JWT_SECRET:?define JWT_SECRET en .env (python -m scripts.generar_credenciales)}
+    ports:
+      - "${NODE_IP:?define NODE_IP en .env}:8443:8443"
+    volumes:
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/server.pem:/certs/server.pem:ro
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/server.key:/certs/server.key:ro
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/ca.pem:/certs/ca.pem:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import ssl, urllib.request; urllib.request.urlopen('https://localhost:8443/openapi.json', timeout=2, context=ssl.create_default_context(cafile='/certs/ca.pem'))"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     restart: unless-stopped
 
   reaper:
@@ -46,13 +106,17 @@ services:
     env_file: .env
     environment:
       REDIS_HOST: redis
-      REDIS_PORT: 6379
-      COORDINATOR_URL: ${REAPER_COORDINATOR_URL:-http://host.docker.internal:8000}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      REDIS_PORT: 6380
+      COORDINATOR_URL: https://coordinator:8443
+      TLS_ENABLED: "true"
+      TLS_CA_FILE: /certs/ca.pem
+    volumes:
+      - ${CERTS_DIR:?define CERTS_DIR en .env}/ca.pem:/certs/ca.pem:ro
     depends_on:
       redis:
         condition: service_healthy
+      coordinator:
+        condition: service_started
     restart: unless-stopped
 
 volumes:

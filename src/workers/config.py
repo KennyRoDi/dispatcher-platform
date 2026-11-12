@@ -5,10 +5,13 @@ import socket
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping
+from typing import Iterable, Mapping
 
 import dotenv
 import redis
+
+from src.domain.admission import FootprintTable
+from src.infrastructure.tls import TlsSettings, redis_kwargs
 
 OPERATIONS = (
     "transcode_video",
@@ -117,6 +120,8 @@ class Settings:
     reaper_max_age: float = 2100.0
     max_attempts: int = 3
     hwaccel: str | None = None
+    node_ip: str | None = None
+    worker_token: str | None = field(default=None, repr=False)
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -164,6 +169,8 @@ class Settings:
             reaper_max_age=_float(env, "REAPER_MAX_AGE", cls.reaper_max_age),
             max_attempts=_int(env, "MAX_ATTEMPTS", cls.max_attempts),
             hwaccel=_parse_hwaccel(env.get("HWACCEL")),
+            node_ip=_optional_str(env, "NODE_IP"),
+            worker_token=_optional_str(env, "WORKER_TOKEN"),
         )
 
     def queue_keys(self) -> list[str]:
@@ -177,7 +184,26 @@ class Settings:
         return max(1, cpu_count // self.worker_concurrency)
 
 
-def make_redis(settings: Settings) -> redis.Redis:
+def _required_bytes(env: Mapping[str, str], name: str) -> int:
+    value = env.get(name, "").strip()
+    if not value.isascii() or not value.isdecimal():
+        raise ValueError(f"{name} es obligatoria y debe ser un entero en bytes")
+    return int(value)
+
+
+def load_admission_config(
+    env: Mapping[str, str], operations: Iterable[str]
+) -> tuple[FootprintTable, int]:
+    margin = _required_bytes(env, "ADMISSION_MARGIN_BYTES")
+    footprints = {
+        operation: _required_bytes(env, f"FOOTPRINT_{operation.upper()}_BYTES")
+        for operation in operations
+    }
+    return FootprintTable(footprints), margin
+
+
+def make_redis(settings: Settings, tls: TlsSettings | None = None) -> redis.Redis:
+    tls = tls if tls is not None else TlsSettings.from_env()
     return redis.Redis(
         host=settings.redis_host,
         port=settings.redis_port,
@@ -185,4 +211,5 @@ def make_redis(settings: Settings) -> redis.Redis:
         decode_responses=True,
         socket_keepalive=True,
         health_check_interval=30,
+        **redis_kwargs(tls),
     )

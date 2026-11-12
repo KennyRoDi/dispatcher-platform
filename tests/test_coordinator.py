@@ -4,6 +4,7 @@ import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 
+from src.coordinator import conexion
 import src.coordinator.main as main
 
 OPS = (
@@ -18,12 +19,12 @@ OPS = (
 @pytest.fixture
 def fake(monkeypatch):
     r = fakeredis.FakeRedis(decode_responses=True)
-    monkeypatch.setattr(main, "redis_client", r)
+    monkeypatch.setattr(conexion, "redis_client", r)
     return r
 
 
 @pytest.fixture
-def client(fake):
+def client(fake, sin_autorizacion):
     return TestClient(main.app)
 
 
@@ -119,7 +120,7 @@ def make_two(client):
 
 def test_barrier_completed(client, fake):
     cid, (s1, s2) = make_two(client)
-    assert report(client, cid, s1).json()["case_status"] == "queued"
+    assert report(client, cid, s1).json()["case_status"] == "processing"
     assert report(client, cid, s2).json()["case_status"] == "completed"
     assert fake.hget(f"case:{cid}", "finished_at")
 
@@ -240,7 +241,7 @@ def test_report_groups_by_type_and_operation(client, fake):
     report(client, cid, s2)
     report(client, cid, s3, "failed", error="x", error_type="FFmpegError")
     report(client, cid, s4)
-    assert case_status(fake, cid) == "queued"
+    assert case_status(fake, cid) == "processing"
 
     rep = client.get(f"/cases/{cid}/report").json()
     assert rep["priority"] == "high"
@@ -399,3 +400,25 @@ def test_hardware_empty_list_when_redis_down(client, fake, monkeypatch):
     _redis_down(fake, monkeypatch)
     r = client.get("/hardware")
     assert r.status_code == 200 and r.json() == []
+
+
+def test_cancel_deja_la_clave_y_publica_el_aviso_para_los_workers(client, fake):
+    cid = create(client).json()["case_id"]
+    canal = fake.pubsub()
+    canal.subscribe(f"cancel:{cid}")
+    canal.get_message(timeout=1)
+
+    client.post(f"/cases/{cid}/cancel")
+
+    assert fake.exists(f"cancel:{cid}") == 1
+    aviso = canal.get_message(timeout=1)
+    assert aviso["type"] == "message" and aviso["data"] == cid
+
+
+def test_cancel_rechazado_no_publica_aviso(client, fake):
+    cid = create(client).json()["case_id"]
+    client.post(f"/cases/{cid}/cancel")
+    fake.delete(f"cancel:{cid}")
+
+    assert client.post(f"/cases/{cid}/cancel").status_code == 409
+    assert fake.exists(f"cancel:{cid}") == 0

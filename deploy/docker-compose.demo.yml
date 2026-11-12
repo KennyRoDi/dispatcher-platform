@@ -1,5 +1,6 @@
 # Demo en vivo para desarrollar el dashboard sin .env: levanta todo el sistema local
 # (redis, minio, coordinator, reaper, 3 workers) y un "feeder" que envia casos aleatorios.
+# Antes, una vez: python -m scripts.generar_credenciales (crea JWT_SECRET, WORKER_TOKEN y API_TOKEN en .env).
 # Uso: docker compose -f deploy/docker-compose.demo.yml up -d --build
 
 include:
@@ -12,10 +13,12 @@ services:
       dockerfile: Dockerfile.worker
     command: ["python", "-m", "scripts.demo_feeder"]
     environment:
+      TLS_ENABLED: "false"
       COORDINATOR_URL: http://coordinator:8000
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      API_TOKEN: ${API_TOKEN:?define API_TOKEN en .env (python -m scripts.generar_credenciales)}
       DEMO_INTERVAL: ${DEMO_INTERVAL:-8}
       DEMO_MAX_CASES: ${DEMO_MAX_CASES:-0}
     depends_on:

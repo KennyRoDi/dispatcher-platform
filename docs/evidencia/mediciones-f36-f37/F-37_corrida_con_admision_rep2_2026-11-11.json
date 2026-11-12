@@ -1,0 +1,669 @@
+{
+  "plan": {
+    "cupo": 3,
+    "subtareas": 7
+  },
+  "memory_max": 268435456,
+  "huella_bytes": 67108864,
+  "margen_bytes": 33554432,
+  "sin_admision": false,
+  "intervalo_heartbeat": 1.0,
+  "pico_memory_current": 223793152,
+  "pico_en_curso": 3,
+  "oom_kill_total": 0,
+  "estados_finales": {
+    "sub-0": "completed",
+    "sub-1": "completed",
+    "sub-2": "completed",
+    "sub-3": "completed",
+    "sub-4": "completed",
+    "sub-5": "completed",
+    "sub-6": "completed"
+  },
+  "muestras": [
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.0,
+      "memory_current": 15593472,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.2,
+      "memory_current": 222531584,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.41,
+      "memory_current": 222568448,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.61,
+      "memory_current": 222650368,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 0.81,
+      "memory_current": 222986240,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": -0.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.02,
+      "memory_current": 223027200,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.22,
+      "memory_current": 223461376,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.42,
+      "memory_current": 223748096,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.63,
+      "memory_current": 223490048,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 1.83,
+      "memory_current": 223481856,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 1.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.03,
+      "memory_current": 223383552,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.24,
+      "memory_current": 223207424,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.44,
+      "memory_current": 222924800,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.64,
+      "memory_current": 222904320,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 2.85,
+      "memory_current": 223162368,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 2.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.05,
+      "memory_current": 223166464,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.25,
+      "memory_current": 223178752,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.46,
+      "memory_current": 223158272,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.66,
+      "memory_current": 223170560,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 3.86,
+      "memory_current": 223088640,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 3.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.07,
+      "memory_current": 223031296,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 4,
+      "oom_killed": false,
+      "ultimo_heartbeat": 4.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.27,
+      "memory_current": 15908864,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 4.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.48,
+      "memory_current": 223186944,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 4.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.68,
+      "memory_current": 223494144,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 4.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 4.88,
+      "memory_current": 223342592,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 4.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 5.09,
+      "memory_current": 223252480,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 5.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 5.29,
+      "memory_current": 223129600,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 5.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 5.49,
+      "memory_current": 223330304,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 5.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 5.7,
+      "memory_current": 223084544,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 5.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 5.9,
+      "memory_current": 223166464,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 5.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 6.1,
+      "memory_current": 223588352,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 6.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 6.31,
+      "memory_current": 223735808,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 6.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 6.51,
+      "memory_current": 223772672,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 6.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 6.71,
+      "memory_current": 223793152,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 6.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 6.92,
+      "memory_current": 223412224,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 6.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 7.12,
+      "memory_current": 223735808,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 7.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 7.32,
+      "memory_current": 223514624,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 7.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 7.53,
+      "memory_current": 222896128,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 7.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 7.73,
+      "memory_current": 223268864,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 7.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 7.93,
+      "memory_current": 223285248,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 7.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 8.13,
+      "memory_current": 223084544,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 8.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 8.34,
+      "memory_current": 222945280,
+      "memory_max": 268435456,
+      "en_curso": 3,
+      "en_cola": 1,
+      "oom_killed": false,
+      "ultimo_heartbeat": 8.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 8.54,
+      "memory_current": 12251136,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 8.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 8.74,
+      "memory_current": 81473536,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 8.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 8.95,
+      "memory_current": 81342464,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 8.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 9.15,
+      "memory_current": 81629184,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 9.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 9.35,
+      "memory_current": 81723392,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 9.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 9.56,
+      "memory_current": 81903616,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 9.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 9.76,
+      "memory_current": 81960960,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 9.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 9.96,
+      "memory_current": 81481728,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 9.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 10.16,
+      "memory_current": 82018304,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 10.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 10.37,
+      "memory_current": 81907712,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 10.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 10.57,
+      "memory_current": 81821696,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 10.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 10.77,
+      "memory_current": 82006016,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 10.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 10.98,
+      "memory_current": 81842176,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 10.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 11.18,
+      "memory_current": 81870848,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 11.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 11.38,
+      "memory_current": 82202624,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 11.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 11.59,
+      "memory_current": 82296832,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 11.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 11.79,
+      "memory_current": 82128896,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 11.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 11.99,
+      "memory_current": 82243584,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 11.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 12.2,
+      "memory_current": 82173952,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 12.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 12.4,
+      "memory_current": 82481152,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 12.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 12.6,
+      "memory_current": 12021760,
+      "memory_max": 268435456,
+      "en_curso": 1,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 12.0
+    },
+    {
+      "etiqueta": "ciclo",
+      "instante": 12.8,
+      "memory_current": 11857920,
+      "memory_max": 268435456,
+      "en_curso": 0,
+      "en_cola": 0,
+      "oom_killed": false,
+      "ultimo_heartbeat": 12.0
+    }
+  ],
+  "veredicto": {
+    "cumple": true,
+    "problemas": []
+  }
+}

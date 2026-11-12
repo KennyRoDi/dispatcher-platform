@@ -9,10 +9,11 @@ No leas documentos enteros si no hace falta.
 | Necesitas | Archivo |
 |---|---|
 | Estado de cada feature | `git fetch origin estado && git show origin/estado:docs/STATUS.md` |
-| Historia, responsable y dependencias | [docs/BACKLOG.md](docs/BACKLOG.md): busca `(F-XX)` |
+| Historia, responsable y dependencias | [docs/backlog/](docs/backlog/README.md): `git grep -n "(F-XX)" docs/backlog` |
 | Diseño aprobado de una feature | `docs/specs/F-XX/SPEC.md` |
 | Prueba roja y comandos de medición | [docs/IMPLEMENTACION.md](docs/IMPLEMENTACION.md) §4 y §5: busca `F-XX` |
 | Decisiones y capas | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) §4 y §8 |
+| Contratos entre módulos, dueños de archivos | [docs/CONTRATOS.md](docs/CONTRATOS.md) |
 | Requisito y supuestos | [docs/REQUERIMIENTOS.md](docs/REQUERIMIENTOS.md) |
 | Commits y PR | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
@@ -29,6 +30,10 @@ Este ciclo es igual para todos. `scripts/flujo.py` lo automatiza para que el for
 | Abrir la PR | `/cierre` | `$cierre` | `python scripts/flujo.py cierre --tipo feat --resumen "texto"` |
 
 Si tu herramienta no reconoce el comando, abre su archivo en `.agents/skills/` y síguelo.
+
+### Identidad
+
+Cada persona trabaja su módulo. Antes de empezar, el agente pregunta a la persona su usuario de GitHub y ejecuta una vez `python scripts/flujo.py soy <usuario>`; queda en ese clon. Así `empezables` muestra solo lo suyo y lo ajeno que la desbloquea; `--todas` muestra el resto. Tomar una feature ajena se permite como apoyo, con aviso. Es una declaración, no una autenticación. Equipo en [docs/EQUIPO.md](docs/EQUIPO.md).
 
 ### Seis fases, una por vez
 
@@ -99,6 +104,8 @@ El **responsable principal** es siempre una persona: aprueba cada fase y debe po
 
 **Las mediciones de SO no llevan TDD.** TDD prueba que la lógica decide bien, no cómo se comporta el sistema operativo. Lo medido va en `docs/modulo-MX-nombre.md`, con comandos exactos [Anexo 2].
 
+**Módulos independientes.** Cada módulo avanza de principio a fin sin esperar a otro: programa contra los puertos, prueba con `tests/dobles.py` y pasa los adaptadores por `tests/contratos.py`. Una feature de módulo no puede depender de otro responsable.
+
 **Capas.** Las dependencias apuntan hacia el dominio y `tests/unit/test_arquitectura.py` lo hace cumplir. El código heredado se mueve a `src/adapters` solo cuando se toca.
 
 | Capa | Ruta |
@@ -119,4 +126,4 @@ pip install -r requirements-dev.txt
 pytest -q -m "not integration and not acceptance"
 ```
 
-Requisitos del ciclo: Python 3.10 o superior, `git` y `gh` con sesión iniciada. Para agentes en paralelo, usa un worktree por agente: `git worktree add ../wt-F-XX origin/main`.
+Requisitos del ciclo: Python 3.13 o superior, `git` y `gh` con sesión iniciada. Para agentes en paralelo, usa un worktree por agente: `git worktree add ../wt-F-XX origin/main`.

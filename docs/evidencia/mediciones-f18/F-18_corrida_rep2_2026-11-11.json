@@ -1,0 +1,58 @@
+{
+ "uid": 10001,
+ "memory_max": 134217728,
+ "oom_kill_inicial": 0,
+ "memory_events_inicial": [
+  "low 0",
+  "high 0",
+  "max 0",
+  "oom 0",
+  "oom_kill 0",
+  "oom_group_kill 0",
+  ""
+ ],
+ "exceso_mib": 256,
+ "reserva_inicial_mib": 64,
+ "secuencia": [
+  {
+   "intento": "exceso_256MiB_oom_count_0",
+   "exit_code": -9,
+   "oom_kill_delta": 1,
+   "causa": "oom",
+   "decision": "requeue:reserva=100663296",
+   "supervisor_vivo": true
+  },
+  {
+   "intento": "exceso_256MiB_oom_count_1",
+   "exit_code": -9,
+   "oom_kill_delta": 1,
+   "causa": "oom",
+   "decision": "requeue:reserva=150994944",
+   "supervisor_vivo": true
+  },
+  {
+   "intento": "exceso_256MiB_oom_count_2",
+   "exit_code": -9,
+   "oom_kill_delta": 1,
+   "causa": "oom",
+   "decision": "giveup:oom",
+   "supervisor_vivo": true
+  }
+ ],
+ "control_sigkill_externo": {
+  "intento": "sigkill_externo_sin_oom",
+  "exit_code": -9,
+  "oom_kill_delta": 0,
+  "causa": "killed"
+ },
+ "oom_kill_final": 3,
+ "memory_events_final": [
+  "low 0",
+  "high 0",
+  "max 111",
+  "oom 3",
+  "oom_kill 3",
+  "oom_group_kill 0",
+  ""
+ ]
+}

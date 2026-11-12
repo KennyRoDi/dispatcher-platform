@@ -1,5 +1,5 @@
-# Imagen unica reutilizada por worker, reaper y coordinador (local compose).
-FROM python:3.14-slim
+# Imagen unica para worker, reaper y coordinador (Compose del Nodo A y compose local).
+FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -16,12 +16,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src ./src
 COPY scripts ./scripts
 
-RUN useradd --create-home --shell /usr/sbin/nologin appuser \
-    && mkdir -p /tmp/mm-worker \
-    && chown -R appuser:appuser /app /tmp/mm-worker
-USER appuser
+RUN useradd --uid 10001 --create-home --shell /usr/sbin/nologin appuser \
+    && mkdir -p /scratch \
+    && chown -R appuser:appuser /app /scratch
+USER 10001
 
-ENV WORK_DIR=/tmp/mm-worker
+ENV WORK_DIR=/scratch
 
 STOPSIGNAL SIGTERM
 

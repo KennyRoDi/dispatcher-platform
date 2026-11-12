@@ -8,8 +8,10 @@ from scripts.conformidad import (
     revisar_comandos,
     revisar_commits,
     revisar_ficha,
+    revisar_independencia,
     revisar_piezas,
     revisar_rama,
+    revisar_responsables,
     revisar_secretos,
     revisar_spec,
     revisar_status,
@@ -127,3 +129,24 @@ def test_cada_check_de_pr_tiene_su_entrada_en_el_workflow():
     workflow = (RAIZ / ".github/workflows/pr.yml").read_text(encoding="utf-8")
     for nombre in CHECKS_PR:
         assert f"- {nombre}\n" in workflow
+
+
+def test_responsable_sin_integrante_falla():
+    features = {"F-01": Feature("F-01", "Z", (), ""), "F-02": Feature("F-02", "Todos", (), "")}
+    motivos = revisar_responsables(features, {"K"})
+    assert len(motivos) == 1 and "F-01" in motivos[0]
+
+
+def test_backlog_con_ciclo_falla():
+    features = {"F-01": Feature("F-01", "K", ("F-02",), ""), "F-02": Feature("F-02", "K", ("F-01",), "")}
+    assert any("ciclo" in m for m in revisar_backlog(features))
+
+
+def test_una_feature_de_modulo_no_puede_depender_de_otro_responsable():
+    features = {"F-01": Feature("F-01", "N", (), ""), "F-02": Feature("F-02", "V", ("F-01",), "")}
+    assert any("F-02" in m for m in revisar_independencia(features))
+
+
+def test_las_features_de_integracion_si_pueden_depender_de_otros():
+    features = {"F-01": Feature("F-01", "N", (), ""), "F-33": Feature("F-33", "K", ("F-01",), "")}
+    assert not revisar_independencia(features)

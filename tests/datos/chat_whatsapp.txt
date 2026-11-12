@@ -1,0 +1,5 @@
+3/11/26, 08:15 - Ana Sintética: Hola, ¿ya revisaste el informe?
+3/11/26, 08:17 - Luis Sintético: Todavía no, lo veo en la tarde.
+3/11/26, 08:20 - Ana Sintética: <Multimedia omitido>
+3/11/26, 08:21 - Luis Sintético: Te aviso cuando termine.
+Esta línea continúa el mensaje anterior.

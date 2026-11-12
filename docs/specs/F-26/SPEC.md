@@ -1,0 +1,204 @@
+# SPEC F-26: Autenticación y roles
+
+**Fase:** cerrada
+**Base:** feat/F-26-2-autenticacion-y-roles
+**Verificación IA:** revision eb08072
+**Historia:** US-26 · **Requisitos:** RF-35, RNF-12 (accesos denegados por rol) · **Responsable:** K
+
+## Objetivo
+
+Hoy cualquiera que alcance el coordinador puede crear y cancelar casos y ver el estado del clúster. El enunciado exige «autenticación y control de acceso por roles (mínimo: analista, supervisor, administrador)» y como evidencia «accesos denegados por rol» [B.5 M4]. Esta feature hace que cada rol haga solo lo permitido: sin token se responde 401 y con un rol insuficiente 403 (RF-35). Los secretos nunca entran al repositorio, que es público [B.5 M4].
+
+## Alcance
+
+**Incluye:**
+- Matriz rol-acción pura en `src/domain/rbac.py`, única fuente de verdad.
+- Verificación de JWT firmado y dependencia FastAPI que responde 401 o 403.
+- Aplicación a los routers existentes desde `main.py`, sin editar las rutas de otros dueños.
+- Emisión de tokens de demo con un script que lee el secreto del entorno.
+- Prueba I con JWT real y guion de accesos denegados para la ficha M4.
+
+**No incluye:**
+- Endpoint de login, registro o base de usuarios: el enunciado no los pide; los tokens los emite el administrador con el script.
+- Renovación o revocación de tokens, MFA, OAuth, auditoría de accesos.
+- Autenticación del dashboard de Streamlit (de Melany) y de otros endpoints que aún no existen (`rutas_archivos.py`, F-14): cuando existan, su dueño los registra en la matriz.
+- TLS (F-27), cifrado en reposo (F-28) y cadena de custodia (F-29).
+- Roles dentro de Redis o MinIO.
+
+## Criterios de aceptación
+
+Copiados de `docs/backlog/m4-seguridad.md`:
+
+- **Dado** usuarios analista, supervisor y administrador
+- **Cuando** cada uno intenta cada acción, o no presenta token
+- **Entonces** se cumple la matriz de permisos, con 401 sin token y 403 sin permiso
+
+Concretado:
+1. Sin cabecera `Authorization: Bearer`, con token mal formado, firma inválida, algoritmo distinto o expirado: 401 con `WWW-Authenticate: Bearer`.
+2. Token válido con rol sin permiso para la acción: 403.
+3. Token válido con permiso: la respuesta es la de hoy, sin cambios.
+4. Un rol desconocido en el token se trata como sin permiso (403), no como error 500.
+5. Sin secreto configurado el coordinador no arranca la verificación y responde 401 a todo (falla cerrado), nunca acepta tokens.
+
+### Matriz de permisos (provisional, SUP-28)
+
+Solo acciones de rutas que existen hoy en `src/coordinator/`.
+
+| Acción | Ruta | analista | supervisor | administrador | servicio |
+|---|---|---|---|---|---|
+| `crear_caso` | `POST /cases` | sí | no | sí | no |
+| `consultar_caso` | `GET /cases`, `/cases/{id}`, `/cases/{id}/report`, `/cases/{id}/consolidated-report` (F-13), `/subtasks/{id}` | sí | sí | sí | no |
+| `cancelar_caso` | `POST /cases/{id}/cancel` | no | sí | sí | no |
+| `ver_monitoreo` | `GET /workers`, `/stats`, `/hardware`, `/alerts` (F-14) | no | sí | sí | no |
+| `reportar_subtarea` | `POST /subtasks/report` | no | no | no | sí |
+| (pública) | `GET /health` | sin token | sin token | sin token | sin token |
+
+`servicio` es el principal de los workers, que hoy llaman `POST /subtasks/report`; sin él, proteger esa ruta los rompería (AD-33).
+
+## Diseño
+
+**Contratos.** Implementa `rbac` y `seguridad.py` de Kenni, listados en `docs/CONTRATOS.md` («Quién toca qué»). Aplica la autenticación como indica «Autenticación sin tocar rutas ajenas»: `include_router(..., dependencies=[...])` en `main.py`. No usa contratos de otros responsables.
+
+**Capas y archivos** (`tests/unit/test_arquitectura.py` hace cumplir las dependencias):
+
+| Capa | Archivo | Contenido |
+|---|---|---|
+| Dominio | `src/domain/rbac.py` | `Role` y `Action` (`Enum`, no `str`), `PERMISOS` (`MappingProxyType` de `frozenset` de `Action` por `Role`) y `can(role, action) -> bool`, que falla cerrado (`False`) ante cualquier valor que no sea `Role`/`Action`. Sin FastAPI ni JWT. |
+| Aplicación | `src/application/ports.py` (17 líneas añadidas) | Puerto `TokenVerifier.verify(token) -> Identity`, con `Identity(subject, role)` y `InvalidToken`. |
+| Adaptador | `src/adapters/jwt_tokens.py` | `JwtTokenVerifier` con PyJWT; `issue_token(...)` usado solo por el script y las pruebas. |
+| Adaptador (HTTP) | `src/coordinator/seguridad.py` | `autorizar`: dependencia FastAPI que lee `Authorization`, llama al puerto, busca la acción de la ruta, aplica `can` y responde 401 o 403; contiene el mapa ruta-acción. |
+| Composición | `src/coordinator/main.py` | `include_router(..., dependencies=[Depends(autorizar)])` en cada router. |
+| Script | `scripts/emitir_token.py` | Emite un token para un rol y duración dados. |
+
+Como `rutas_casos.py` mezcla crear, cancelar y consultar en un mismo router, la acción se decide por ruta con un mapa `(método, patrón) -> Action` declarado en `seguridad.py`, junto a la matriz. Una sola dependencia, `Depends(autorizar)`, se aplica a los tres `include_router` de `main.py` y resuelve la acción con `request.scope["route"]`. Así no se edita ninguna ruta de Nahúm. Una prueba exige que toda ruta de `app.routes` esté en el mapa o marcada pública: una ruta nueva sin clasificar rompe la prueba.
+
+**JWT (AD-33, provisional).**
+- Algoritmo `HS256`, fijado en la verificación (`algorithms=["HS256"]`) para rechazar `none` y confusión de algoritmo.
+- Claims obligatorios: `sub`, `role`, `iat`, `exp`. Expiración por defecto 60 min; el script acepta otra duración. Tolerancia de reloj: 0 s (sin margen sin medir).
+- Un solo secreto simétrico porque el coordinador es el único que emite y verifica; asimétrico no aporta hoy.
+- Secreto: variable `JWT_SECRET_FILE` (ruta a un archivo fuera del repo, permisos `0400`, montado igual que la KEK de AD-16) o, para desarrollo, `JWT_SECRET`. Longitud mínima de 32 bytes; menos se rechaza. Nunca en el código, en `.env` versionado ni en el historial. Se añade `.env` y el patrón del archivo a `.gitignore` si faltan.
+- Tokens de demo: `JWT_SECRET_FILE=... python scripts/emitir_token.py --rol analista --sub demo --minutos 30` imprime el token en salida estándar. No guarda nada y el secreto de demo se genera con `openssl rand -hex 32` fuera del repo. Las pruebas generan un secreto aleatorio por ejecución; no hay ningún token ni secreto fijo en `tests/`.
+
+**Puertos y dobles.** El dominio no depende de nadie. Para la dependencia FastAPI, `tests/dobles.py` añade `FakeTokenVerifier` (diccionario token a identidad), de modo que las pruebas unitarias de `seguridad.py` no usan criptografía. `tests/contratos.py` añade una prueba de contrato `TokenVerifier` que corren el doble y `JwtTokenVerifier`. Redis se sustituye por `fakeredis`, como en `tests/test_coordinator.py`.
+
+**Reutilización.** Del I Proyecto no se reutiliza nada; la API de FastAPI y los routers son del propio repositorio. Terceros: PyJWT (MIT), citado en el código y en `docs/modulo-M4-seguridad.md` [Parte I §9].
+
+**Decisiones nuevas** (se registran en `docs/ARQUITECTURA.md` §8 en la parte 1):
+- **AD-33**, JWT HS256 con secreto fuera del repo, rol `servicio` para workers y mapa ruta-acción verificado por prueba. Alternativas: Basic auth (sin expiración ni roles firmados); API keys por rol en Redis (estado a operar, sin expiración); RS256 (dos llaves sin necesidad hoy); mTLS (lo cubre F-27 para nodos, no identifica rol de usuario). Medición pendiente: no aplica, no depende de datos.
+- **SUP-28**, la matriz exacta de permisos y la expiración de 60 min, porque el enunciado fija solo los tres roles.
+- **SUP-29**, `GET /health` pública, para sondas de despliegue; no expone datos de casos.
+
+Números comprobados libres en todas las ramas remotas: el mayor visto es SUP-27 y AD-32.
+
+## Pruebas
+
+| Tipo | Prueba | Demuestra |
+|---|---|---|
+| Unitaria | `test_matriz_rol_accion` parametrizada con todos los pares rol por acción contra la tabla esperada escrita aparte en la prueba | La matriz cumple lo acordado; ningún par queda sin cubrir (`Role` por `Action`) |
+| Unitaria | `test_rol_desconocido_no_tiene_permisos` | Rol inválido se deniega |
+| Unitaria | `test_sin_token_es_401`, `test_token_malformado_es_401`, `test_token_expirado_es_401`, `test_firma_invalida_es_401`, `test_algoritmo_none_es_401` | Cada fallo de autenticación da 401 con `WWW-Authenticate` |
+| Unitaria | `test_rol_insuficiente_es_403` con `FakeTokenVerifier` | La dependencia separa 401 de 403 |
+| Unitaria | `test_toda_ruta_esta_clasificada` | Una ruta nueva sin acción o sin marcar pública rompe la prueba |
+| Unitaria | `test_sin_secreto_falla_cerrado`, `test_secreto_corto_se_rechaza` | Sin llave nadie entra |
+| Integración | `test_api_con_jwt_real_por_rol` parametrizada (rol por ruta) con `TestClient`, `fakeredis` y tokens emitidos con un secreto aleatorio | Con JWT real la API da 200/201 donde la matriz permite y 403 donde no; 401 sin token |
+| Integración | `test_worker_reporta_con_token_servicio` | Los workers siguen pudiendo reportar |
+| Aceptación | `tests/acceptance/test_accesos_denegados.py` con el guion de `curl` por rol contra el coordinador levantado | Los códigos 401 y 403 de la demo, usados como evidencia de la ficha M4 |
+
+Pruebas existentes de `tests/test_coordinator.py` y similares pasan a usar un fixture que inyecta `FakeTokenVerifier` vía `dependency_overrides`, para no emitir tokens en cada una.
+
+## Mediciones
+
+No aplica. F-26 aporta a la ficha M4 el producto «accesos denegados por rol» (RNF-12): comandos `curl` y códigos por rol, que son resultados de ejecución, no mediciones de SO M1–M5. Se registran en `docs/modulo-M4-seguridad.md` con el comando exacto; sin ejecutarlos no se escribe ningún resultado.
+
+## Plan de pila
+
+Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
+
+| Parte | PR (título en Conventional Commits) | Contenido |
+|---|---|---|
+| 1 | `feat(F-26): matriz de permisos por rol en el dominio` | `src/domain/rbac.py` (`Role`, `Action`, `can`); registro de AD-33, SUP-28 y SUP-29 en `docs/ARQUITECTURA.md` y `docs/REQUERIMIENTOS.md`. Aprox. 60 líneas de código. |
+| 2 | `feat(F-26): verificación de JWT y dependencia 401/403` | Puerto `TokenVerifier`, `jwt_tokens.py`, `seguridad.py` con el mapa ruta-acción, doble y prueba de contrato, dependencia en `requirements.txt`. Aprox. 150 líneas estimadas; reales 224 sin pruebas. |
+| 3 | `feat(F-26): aplicar autenticación al coordinador y emitir tokens de demo` | Cableado en `main.py`, `scripts/emitir_token.py`, `.gitignore`, ajuste de fixtures existentes, pruebas I y A, borrador de la sección en `docs/modulo-M4-seguridad.md`. Aprox. 90 líneas estimadas; reales 141 en src y scripts. |
+
+## Riesgos y preguntas abiertas
+
+1. **Matriz (SUP-28).** ¿Es correcto que el supervisor no cree casos y que el analista no vea `/workers`, `/stats` ni `/hardware`? Es una interpretación: el enunciado no define permisos.
+2. **Rol `servicio` (AD-33).** El enunciado menciona tres roles; el cuarto es técnico para los workers. Alternativa: dejar `POST /subtasks/report` sin proteger hasta F-27 (mTLS), lo cual deja el endpoint abierto. Requiere coordinar con José Andrés, que debe configurar el token en los workers (variable de entorno); sin su cambio, los workers fallan con 401 al activar la parte 3. Decidir si se activa con una variable `AUTH_ENABLED` por defecto activa.
+3. **Dashboard de Streamlit** (Melany) llama a `GET /cases`, `/workers`, `/stats`: necesitará un token de rol supervisor; se avisa al dueño. No se toca `dashboard/`.
+4. **Mediciones previas.** F-26 añade una verificación de firma por petición; no se estima su costo. Si M1 a M3 ya tienen mediciones, evaluar si repetirlas (`docs/IMPLEMENTACION.md` §7).
+5. **Rutas futuras** (nuevas rutas de alertas) deben agregarse a la matriz y la prueba `test_toda_ruta_esta_clasificada` las detecta. F-22 clasificó `POST`/`PUT /uploads` como `CREAR_CASO` y `GET /uploads/{upload_id}` como `CONSULTAR_CASO`; solo analistas y administradores pueden subir, y la consulta permite los roles que ya tienen acceso a casos.
+6. **Expiración de 60 min y HS256** son provisionales (SUP-28, AD-33); no hay dato que las respalde.
+7. **PyJWT:** versión exacta se fija en la parte 2 tras comprobarla con `pip`; no se afirma aquí.
+
+## Notas para las partes 2 y 3
+
+Hallazgos de QA de la parte 1 (sin defectos en `rbac.py`; rutas no cubiertas por este SPEC):
+
+- **`/cases/` con barra final.** Existe como ruta aparte (`POST` y `GET`, `include_in_schema=False`) y debe estar en el mapa ruta-acción con la misma acción que `/cases`; si no, `test_toda_ruta_esta_clasificada` fallará.
+- **Rutas de documentación de FastAPI:** `/openapi.json`, `/docs`, `/docs/oauth2-redirect` y `/redoc`. Clasificarlas como públicas o deshabilitarlas; decisión pendiente de la persona.
+- **Scripts sin token:** `scripts/submit_case.py` y `scripts/run_load.py` no envían `Authorization`; se romperán al activar la autenticación (parte 3) y hay que darles el token.
+- **Dashboard:** llama a `/tasks/workers`, ruta que no existe (previo a F-26); no se resuelve aquí, se avisa a su dueña.
+
+Límites declarados de la parte 2 (QA y correcciones):
+
+- **JSON roto o muy grande sin token (resuelto en la parte 3).** Con cuerpo inválido, FastAPI respondía 422 y parseaba el cuerpo antes de autenticar. El middleware ASGI `AutenticacionPrevia` (`src/coordinator/seguridad.py`) comprueba `Authorization` antes de leer el cuerpo, de modo que ya no queda como `xfail`.
+- **Corregidos:** `exp` e `iat` no finitos o fuera de año 9999 se rechazan; `sub` vacío o de espacios se rechaza; `JWT_SECRET_FILE` se lee en binario con tope de 4096 bytes, exige archivo regular (`O_NONBLOCK`, `S_ISREG`) y un archivo no UTF-8 no filtra bytes al registro.
+- **Caché del verificador:** `obtener_verificador` guarda hasta 4 verificadores por clave `(JWT_SECRET_FILE, JWT_SECRET)`. Cambiar el contenido del archivo con la misma ruta no se relee hasta reiniciar el proceso. El error de configuración se registra una vez por clave mientras siga en la caché; una clave desalojada vuelve a registrarlo. `src/adapters/jwt_tokens.py` falta en «Quién toca qué» de `docs/CONTRATOS.md`: se agrega en la parte 3.
+- **Sin prueba:** varias cabeceras `Authorization` (gana la primera), `JWT_SECRET` sin medir entropía, BOM en el secreto, y los códigos 404/405/307/401 distinguen rutas existentes de inexistentes.
+
+## Aprobaciones
+
+Las registra `scripts/flujo.py`. No editar.
+
+| Fase | Aprobó | Fecha | Excepción o motivo |
+|---|---|---|---|
+| verificación IA de plan | Claude Code (orquestador Sonnet 5.5; subagente arquitecto general-purpose) | 2026-11-10 | SPEC F-26 sin campos pendientes (grep), solo toca el SPEC, commit empujado. AD-33, SUP-28 y SUP-29 sin uso en ninguna rama remota (grep). Preguntas abiertas en CLAUDE.md con decision provisional. Matriz es interpretacion del arquitecto: no verificada contra el enunciado por mi. (c37a765) |
+| plan | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests/unit/test_rbac.py (mas log del SPEC); pytest: error de coleccion ImportError rbac (rojo por falta del modulo). Matriz 20 pares rol x accion contra tabla propia de la prueba. API asumida: Role, Action enums, can(), PERMISOS MappingProxyType; fijada por las pruebas. (37d4a9a) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo src/domain/rbac.py (42 lineas); tests intactos. Ejecute test_rbac + test_arquitectura: verdes. Suite completa segun developer: 1799 passed. (998792c) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA sin defectos en rbac.py; sin commits nuevos (diff solo SPEC). Ejecute test_rbac + test_arquitectura: 81 passed. Hallazgos para partes 2 y 3 (ruta /cases/ con barra, /docs y /openapi.json, scripts sin token) a SPEC y pendientes. No reproduje los mutantes del QA. (a78b6b8) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff: ARQUITECTURA (AD-33), REQUERIMIENTOS (SUP-28/29 provisionales) y SPEC. conformidad 0 problemas (ejecutado por mi). Sin pytest (solo docs). Numeracion libre segun grep en docs de esta rama; AD-32 esta en la rama de F-04. (bd6e3a6) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: matriz celda por celda, capas, numeracion libre en todas las ramas, notas coherentes con rutas reales; ejecuto pytest 1799 passed y conformidad 0. Sin commits nuevos desde la documentacion (comprobado). (a146eec) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests (4 archivos nuevos, dobles y contratos, y 'jwt' añadido a TERCEROS_PROHIBIDOS en test_arquitectura); src, scripts y requirements intactos. pytest: errores de coleccion ModuleNotFoundError jwt_tokens (rojo por falta de modulos). PyJWT 2.15.1 instalado solo en el venv. Decision /docs publicas o deshabilitadas: pendiente, la prueba admite ambas. (2d114a5) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff: requirements (pyjwt==2.15.1), ports.py, jwt_tokens.py, seguridad.py; tests intactos (diff de tests vacio). Ejecute la suite completa tras el ultimo commit: 1941 passed, 7 skipped, 3 xfailed. Sin comentarios nuevos ni secretos fijos (grep). 198 lineas de codigo (<400). Desviaciones aceptadas: ClosedVerifier ante configuracion invalida; /docs publicas; sin cache del verificador. (f85b3d9) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobacion delegada: la persona autorizo trabajar sin aprobaciones por fase hasta su regreso |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | QA sin bypass de autenticacion ni escalada; 8 xfail estrictos nuevos en test_seguridad_qa.py; src intacto. Suite unitaria segun QA 1941 passed/11 xfailed. Devuelvo a implementacion los hallazgos 2-5 (NaN, sub vacio, secreto no UTF-8, cache/FIFO); 1 (JSON antes de auth) queda abierto. (9cb7813) |
+| devuelta de verificacion | Kenni Rodriguez | 2026-11-10 | QA parte 2: corregir NaN/inf en exp e iat, sub vacio, lectura del secreto no UTF-8 sin filtrar bytes al log, y cache del verificador con lectura acotada del archivo (FIFO, tamaño); el hallazgo 1 queda abierto |
+| verificación IA de implementacion | orquestador: git diff 03bc4b2, pytest 1947 passed 5 xfailed, conformidad 0 | 2026-11-10 | correcciones QA hallazgos 2 a 5 verificadas en codigo (03bc4b2) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | orquestador: QA previo (9cb7813) + correcciones 03bc4b2 verificadas, pytest 1947 passed 5 xfailed | 2026-11-10 | QA parte 2 completo; hallazgo 1 (parseo antes de auth) abierto como xfail y limite declarado; sin segundo QA para ahorrar cuota (6c47dd8) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de documentacion | orquestador (sin subagente documentador, verificación no independiente) | 2026-11-10 | SPEC con limites declarados y entrada de bitacora publicada (c6271f6) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de revision | orquestador + revisor (subagente APROBADO, 3 menores corregidos) | 2026-11-10 | orden de imports y precisiones del SPEC aplicadas (06103eb) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de tests | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Solo tests (diff sin src ni scripts). Ejecute: test_api_jwt+auth_habilitada+gitignore 55 failed/27 passed (los 27 verdes son rutas que ya cumplen, p.ej. publicas/422); test_emitir_token error de coleccion ModuleNotFoundError scripts.emitir_token; test_coordinator+contract+seguridad_qa 56 passed. Desviacion: fixture sin_autorizacion es no-op de autorizar, no FakeTokenVerifier. Sin cambio en workers (SERVICE_TOKEN fuera de alcance). (2110b77) |
+| tests | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de implementacion | Claude Code (orquestador Sonnet 5.5; subagente developer general-purpose) | 2026-11-10 | Diff sin cambios en tests. Ejecute suite completa tras f792c68: 2048 passed, 7 skipped, 3 xfailed. 144 lineas añadidas en src/scripts. Desviacion a revisar: middleware AutenticacionPrevia se salta la verificacion si app.dependency_overrides contiene autorizar (codigo de produccion conoce el mecanismo de pruebas); verify corre dos veces por peticion. (f792c68) |
+| implementacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de verificacion | Claude Code (orquestador Sonnet 5.5; subagente qa-tester general-purpose) | 2026-11-10 | Diff aeaf130 solo tests/unit/test_cableado_qa.py (src intacto). Ejecute el archivo: ver salida de pytest. QA sin bypass de autenticacion; 7 hallazgos bajos (OverflowError en --minutos, sub vacio, root_path, doble verify, sin aviso con AUTH_ENABLED=false, JWT_SECRET no UTF-8 filtra caracter, .gitignore parcial) como xfail strict, a declarar como limites. Salto por dependency_overrides no alcanzable por red (no reproduje yo el analisis). (aeaf130) |
+| verificacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+
+Límites declarados de la parte 3 (QA `aeaf130`, 14 `xfail` en `tests/unit/test_cableado_qa.py`):
+
+- `scripts/emitir_token.py --minutos` enorme da `OverflowError` con traza.
+- `--sub` vacío emite un token que el coordinador luego rechaza.
+- Con `root_path` (proxy con prefijo) `/health` deja de ser pública.
+- `verify` corre dos veces por petición (middleware y dependencia).
+- Sin aviso en el registro con `AUTH_ENABLED=false`.
+- `JWT_SECRET` con un byte inválido filtra un carácter al registro.
+- `.gitignore` solo cubre `jwt.secret`, `*.key` y `.env`; otros nombres de archivo de secreto no.
+- El middleware salta la verificación si `app.dependency_overrides` contiene `autorizar`. No es alcanzable por red, pero es un olor de diseño: producción conoce el mecanismo de pruebas.
+- `scripts/submit_case.py` y `scripts/run_load.py` no envían token.
+- Los workers necesitan un token con rol `servicio` (responsable: José).
+- El dashboard necesita un token de supervisor (responsable: Melany).
+| verificación IA de documentacion | Claude Code (orquestador Sonnet 5.5; subagente documentador general-purpose) | 2026-11-10 | Diff aeaf130..92deb88 solo docs (modulo-M4 borrador y SPEC). Salidas curl marcadas pendientes, sin datos inventados. Bitacora publicada en estado segun el subagente (no la verifique). Sin pytest: no cambio codigo. (92deb88) |
+| documentacion | Kenni Rodriguez | 2026-11-10 | aprobación delegada |
+| verificación IA de revision | Claude Code (orquestador Sonnet 5.5; subagente revisor general-purpose) | 2026-11-10 | Revisor APROBADO sin bloqueantes: cableado de 3 routers, middleware sin fugas, sin secretos, capas verdes, limites coinciden con 14 xfail; pytest segun revisor 2049 passed/17 xfailed. Menor corregido por mi (cifra real en SPEC). Quedan: salto por dependency_overrides declarado como olor de diseño. (eb08072) |
+| revision | Kenni Rodriguez | 2026-11-10 | aprobación delegada |

@@ -35,6 +35,16 @@ def test_node_name_defaults_to_hostname_and_reads_env(monkeypatch):
     assert Settings.from_env({"NODE_NAME": "kenni-laptop"}).node_name == "kenni-laptop"
 
 
+@pytest.mark.parametrize("raw", ["100.64.0.7", "100.64.0.7\r"])
+def test_node_ip_reads_env(raw):
+    assert Settings.from_env({"NODE_IP": raw}).node_ip == "100.64.0.7"
+
+
+@pytest.mark.parametrize("env", [{}, {"NODE_IP": ""}, {"NODE_IP": "\r"}])
+def test_node_ip_is_optional(env):
+    assert not Settings.from_env(env).node_ip
+
+
 def test_env_parsing_basic_types():
     env = {
         "REDIS_HOST": "10.0.0.1",
@@ -216,3 +226,16 @@ def test_from_env_strips_windows_line_endings():
     assert s.redis_password is None
     assert s.worker_queues == ("transcode_video", "extract_audio")
     assert s.worker_concurrency == 2
+
+
+def test_worker_token_se_lee_del_entorno_sin_espacios():
+    assert Settings.from_env({"WORKER_TOKEN": "  abc.def.ghi \r"}).worker_token == "abc.def.ghi"
+
+
+def test_worker_token_ausente_o_vacio_es_none():
+    assert Settings.from_env({}).worker_token is None
+    assert Settings.from_env({"WORKER_TOKEN": ""}).worker_token is None
+
+
+def test_worker_token_no_aparece_en_el_repr():
+    assert "secreto-del-token" not in repr(Settings.from_env({"WORKER_TOKEN": "secreto-del-token"}))

@@ -8,6 +8,7 @@ from typing import Callable
 import redis
 import requests
 
+from src.infrastructure.tls import TlsSettings, exigir_cifrado, requests_session
 from src.workers.config import Settings
 
 logger = logging.getLogger(__name__)
@@ -26,14 +27,19 @@ class Reporter:
         sleep: Callable[[float], None] = time.sleep,
         delays: tuple[float, ...] = (1, 2, 4, 8, 16),
         timeout: float = 10.0,
+        tls: TlsSettings | None = None,
     ):
+        tls = tls if tls is not None else TlsSettings.from_env()
+        exigir_cifrado(tls, coordinator_url=settings.coordinator_url)
         self.settings = settings
         self.redis = redis_client
-        self.session = session if session is not None else requests.Session()
+        self.session = session if session is not None else requests_session(tls)
         self.sleep = sleep
         self.delays = delays
         self.timeout = timeout
         self.url = f"{settings.coordinator_url}/subtasks/report"
+        if settings.worker_token:
+            self.session.headers["Authorization"] = f"Bearer {settings.worker_token}"
 
     def _post(self, payload: dict) -> tuple[bool, bool]:
         """Attempt one POST. Returns (delivered, retryable_failure)."""

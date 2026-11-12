@@ -1,0 +1,50 @@
+[
+  {
+    "config": "cpu-float32-h1",
+    "latencia_media_s": 2.3104929945999175,
+    "latencia_p95_s": 2.5049012290000974,
+    "throughput_x_realtime": 4.921893304406735,
+    "memoria_pico_mb": 487.5859375,
+    "repeticiones": 5
+  },
+  {
+    "config": "cpu-float32-h2",
+    "latencia_media_s": 1.611379073000353,
+    "latencia_p95_s": 1.6529005340016738,
+    "throughput_x_realtime": 7.057308978715717,
+    "memoria_pico_mb": 470.1953125,
+    "repeticiones": 5
+  },
+  {
+    "config": "cpu-float32-h4",
+    "latencia_media_s": 1.3205553068004519,
+    "latencia_p95_s": 1.3666876500010403,
+    "throughput_x_realtime": 8.611528757211238,
+    "memoria_pico_mb": 518.7890625,
+    "repeticiones": 5
+  },
+  {
+    "config": "cpu-int8-h1",
+    "latencia_media_s": 1.9537085468000441,
+    "latencia_p95_s": 2.232874506000371,
+    "throughput_x_realtime": 5.820724907318476,
+    "memoria_pico_mb": 316.51171875,
+    "repeticiones": 5
+  },
+  {
+    "config": "cpu-int8-h2",
+    "latencia_media_s": 1.0489762817996962,
+    "latencia_p95_s": 1.1872638689983432,
+    "throughput_x_realtime": 10.841045881885348,
+    "memoria_pico_mb": 343.20703125,
+    "repeticiones": 5
+  },
+  {
+    "config": "cpu-int8-h4",
+    "latencia_media_s": 0.8284257884002727,
+    "latencia_p95_s": 0.9465412460012885,
+    "throughput_x_realtime": 13.727240459232734,
+    "memoria_pico_mb": 345.1015625,
+    "repeticiones": 5
+  }
+]
