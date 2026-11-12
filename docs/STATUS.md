@@ -23,7 +23,7 @@
 | F-18 | hecha |
 | F-19 | hecha |
 | F-20 | en-pr |
-| F-21 | documentacion |
+| F-21 | revision |
 | F-22 | en-pr |
 | F-23 | verificacion |
 | F-24 | verificacion |
