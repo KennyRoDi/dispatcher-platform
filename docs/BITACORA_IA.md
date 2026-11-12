@@ -1440,3 +1440,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Campo | Contenido |
 |---|---|
 | Uso de IA | No se usó IA en F-20. |
+
+## 2026-11-11 · Nahúm Murillo · F-20 (`feat/F-20-1-prioridades-con-aging`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-20 |
+| Propósito | Diseñar SPEC, escribir pruebas TDD, implementar dominio de scheduling y adaptador Redis para F-20 |
+| Consulta resumida | Implementar prioridades con aging: Priority enum, SchedulingPolicy FIFO/AGING, SchedulerState, score = t_entrada - bono(prioridad) |
+| Resultado obtenido | SPEC completo, 20 pruebas unitarias e integración, src/domain/scheduling.py y src/adapters/redis_scheduler.py |
+| Validado / corregido / descartado | Responsable ejecutó y leyó cada fase; pruebas corridas localmente antes de cada aprobación |
+| Cómo se validó | Revisión manual del diseño (AD-04), lectura línea por línea del código generado y corrección de errores de lógica en el algoritmo de aging detectados al correr las pruebas |
