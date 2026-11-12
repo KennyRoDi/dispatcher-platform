@@ -60,6 +60,30 @@ class TestSchedulingPolicy:
         next_case = scheduler.next()
         assert next_case in ["caso1", "caso2"], "FIFO debe respetar entrada"
 
+    def test_fifo_ignora_prioridad(self):
+        """Con política FIFO elegida por configuración, un caso crítico reciente no adelanta a uno de baja que ya esperaba."""
+        from src.domain.scheduling import Priority, SchedulingPolicy, SchedulerState
+
+        policy = SchedulingPolicy.desde_configuracion("fifo")
+        scheduler = SchedulerState(policy=policy)
+
+        scheduler.enqueue(case_id="bajo_antiguo", priority=Priority.BAJA, entered_at=0.0)
+        scheduler.enqueue(case_id="critico_reciente", priority=Priority.CRITICA, entered_at=1.0)
+
+        assert scheduler.next() == "bajo_antiguo", "FIFO ignora la prioridad: sale primero quien entró primero"
+        assert scheduler.next() == "critico_reciente"
+
+    def test_politica_se_elige_por_configuracion(self):
+        """Una cadena de configuración selecciona la política sin tocar otro código."""
+        from src.domain.scheduling import SchedulingPolicy
+
+        assert SchedulingPolicy.desde_configuracion("fifo") == SchedulingPolicy.FIFO
+        assert SchedulingPolicy.desde_configuracion("aging") == SchedulingPolicy.AGING
+        assert SchedulingPolicy.desde_configuracion("FIFO") == SchedulingPolicy.FIFO, "no distingue mayúsculas"
+
+        with pytest.raises(ValueError):
+            SchedulingPolicy.desde_configuracion("round-robin")
+
     def test_aging_evita_inanicion(self):
         """Con aging, caso bajo se despacha aunque haya altos llegando continuamente."""
         from src.domain.scheduling import Priority, SchedulingPolicy, SchedulerState
