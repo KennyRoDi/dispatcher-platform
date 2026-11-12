@@ -64,6 +64,15 @@ class TestCasoMultifuenteAPI:
         assert reporte.status_code == 200
         assert reporte.json()["totals"]["total"] == 5
 
+    def test_case_id_con_salto_de_linea_rechaza(self, client):
+        """QA-2 de AD-46 (F-05): un case_id sin sanear no debe poder inyectar el log de routing."""
+        cuerpo = {
+            "case_id": "evil\nrouting case=FORJADO",
+            "sources": [{"sha256": "sha-texto", "name": "nota.txt"}],
+        }
+        respuesta = client.post("/cases", json=cuerpo)
+        assert respuesta.status_code == 422
+
     def test_fuente_sin_subir_responde_422_en_la_api(self, client):
         cuerpo = {
             "sources": [

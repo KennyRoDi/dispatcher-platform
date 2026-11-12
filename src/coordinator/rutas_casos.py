@@ -10,6 +10,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.adapters.redis_backpressure import transaccion_acotada
+from src.adapters.redis_case_catalog import CASE_ID_FORMAT
 from src.adapters.redis_type_queue import RedisTypeQueue
 from src.application.chunked_upload import ChunkedUpload
 from src.application.create_case import CreateMultiSourceCase, FuenteNoSubida
@@ -36,6 +37,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _validar_case_id(case_id: str) -> None:
+    """QA-2 de AD-46 (F-05): un case_id sin sanear puede inyectar al log de routing
+    (p. ej. saltos de línea) o colisionar con claves de Redis. Mismo formato que
+    ``RedisCaseCatalog`` ya exige al leer (F-01 lo aplica también al crear)."""
+    if not CASE_ID_FORMAT.fullmatch(case_id):
+        raise HTTPException(422, f"case_id inválido: debe cumplir {CASE_ID_FORMAT.pattern!r}")
+
+
 def _obtener_subidas_opcional() -> ChunkedUpload | None:
     """None si el almacén de objetos no está configurado, en vez de un 503.
 
@@ -55,6 +64,8 @@ def _create_multi_source_case(case_req: CaseRequest, subidas: ChunkedUpload | No
     priority = _PRIORIDAD_POR_TEXTO[case_req.priority]
     cola = RedisTypeQueue(conexion.redis_client, capacity=PROFUNDIDAD_POR_DEFECTO)
     caso_de_uso = CreateMultiSourceCase(conexion.redis_client, cola, SystemClock(), subidas)
+    if case_req.case_id:
+        _validar_case_id(case_req.case_id)
     case_id = case_req.case_id or str(uuid.uuid4())
     try:
         return caso_de_uso.execute(case_id, case_req.sources, priority, case_req.metadata)
@@ -90,6 +101,8 @@ def create_case(
 
     if not case_req.subtasks:
         raise HTTPException(status_code=422, detail="El caso debe tener al menos una sub-tarea.")
+    if case_req.case_id:
+        _validar_case_id(case_req.case_id)
 
     # --- resolve + validate all task types before touching Redis ---
     priority = case_req.priority
