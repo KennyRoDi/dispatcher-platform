@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 7149b5ba
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -77,3 +77,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | SPEC sin subagente. Comprobado en codigo: PUT ya lee async y receive va en run_in_threadpool (F-22); expected_size lee el manifiesto en el event loop. Aplica AD-13. Conformidad 0. (7149b5ba) |
