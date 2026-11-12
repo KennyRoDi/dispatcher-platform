@@ -1,6 +1,6 @@
 # SPEC F-35: Reinicio del coordinador
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 04c618c
 **Historia:** US-35 · **Requisitos:** RF-44 (B.6 «Reinicio del coordinador») · **Responsable:** N
@@ -129,3 +129,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-12 | Documentacion completa: docs/evidencia/F-35_reinicio_coordinador_2026-11-12.md con metodo, 3 repeticiones reales (0 perdidas/duplicadas, ~0.010s) y limites declarados honestamente (no es reinicio de proceso real, no comparable con los 45s historicos de I Proyecto); AD-21 en ARQUITECTURA.md actualizada: se quito 'Medicion pendiente', se aclaro que no hay reconciliacion propia porque no hay nada fuera de Redis que reconciliar (confirmado por git grep), y se enlazo la ficha; docs/modulo-M2-planificacion.md referencia la medicion; bitacora de la rama registrada con el hallazgo de TLS/autorizacion nuevos (ajeno a la logica de F-35). (9cf7bef) |
 | documentacion | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de revision | claude | 2026-11-12 | Revision contra el SPEC: diff (11 archivos, 522 inserciones) coincide exactamente con el alcance declarado - scenarios/coordinator_restart.py, 3 archivos de pruebas (U/I/A), ficha de evidencia, AD-21 y modulo-M2-planificacion.md actualizados. Ninguna de las exclusiones del SPEC se violo: no se toco src/coordinator/main.py, conexion.py ni ningun rutas_*.py; no se construyo reconciliacion nueva; no se midio el reinicio de Redis. Los 5 pasos del metodo de medicion se siguieron. Unica diferencia menor: la tabla de Pruebas del SPEC agrupa el caso de perdidas/duplicadas en un solo nombre de prueba, mientras el archivo real lo separa en 4 pruebas unitarias mas especificas (cumple, pierde, duplica, discrepancia de conteo) - mas cobertura que lo minimo descrito, no un incumplimiento. (04c618c) |
+| revision | Nahúm Murillo | 2026-11-12 |  |
