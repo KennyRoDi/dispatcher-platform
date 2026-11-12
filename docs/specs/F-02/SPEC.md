@@ -1,6 +1,6 @@
 # SPEC F-02: Validar y normalizar
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 91729a7
 **Historia:** US-02 · **Requisitos:** RF-02 (exportaciones de chat), RNF-06 (normalización) · **Responsable:** N
