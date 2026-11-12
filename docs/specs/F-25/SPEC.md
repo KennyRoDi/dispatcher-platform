@@ -1,6 +1,6 @@
 # SPEC F-25: Recepción no bloqueante
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-25-1-responder-durante-subidas-grandes
 **Verificación IA:** tests 6ccca7e6
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
@@ -91,3 +91,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 2 lineas de codigo en rutas_archivos.py y 3 archivos de prueba; cumple el SPEC parte 1 sin agregados; capas y commits correctos. (054552e8) |
 | revision | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Claude Code | 2026-11-11 | Pruebas del resumen de la medicion sin bloqueo (6ccca7e6) |
+| tests | Melany Vindas | 2026-11-11 | Pruebas de un script de medicion; verificadas en Linux por Claude |
