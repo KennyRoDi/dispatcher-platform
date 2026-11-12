@@ -37,6 +37,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable, Optional
 
+from src.domain.frame_sampling import Frame, FrameSampling
+
 logger = logging.getLogger(__name__)
 
 
@@ -288,6 +290,64 @@ def process(
         output_bytes=out_abs.stat().st_size,
         encoder=encoder,
     )
+
+
+FRAME_PATTERN = "frame_%04d.jpg"
+
+
+def extract_frames(
+    src: str,
+    out_dir: str,
+    sampling: FrameSampling,
+    supervisor=None,
+    timeout: Optional[float] = None,
+) -> list[Frame]:
+    """Extrae fotogramas JPEG de un video con la cadencia y el tope de `sampling`.
+
+    Se ejecuta por el supervisor de la sub-tarea cuando se entrega, para que cancelar el caso
+    mate el grupo de procesos de FFmpeg. Ante cualquier fallo no queda ningún fotograma en `out_dir`.
+    """
+    _require_ffmpeg()
+    src_path = Path(src)
+    name = src_path.name
+    if not src_path.is_file():
+        raise InputNotFoundError(f"{name}: el archivo de entrada no existe")
+    media_info = probe(str(src_path))
+    if not _has_video(media_info):
+        raise UnsupportedFormatError(f"{name}: el archivo no contiene stream de video")
+    duration = _media_duration(media_info)
+    marks = sampling.timestamps(duration)
+    out_path = Path(out_dir)
+    try:
+        out_path.mkdir(parents=True, exist_ok=True)
+        cmd = _frames_command(str(src_path), str(out_path / FRAME_PATTERN), sampling, len(marks))
+        _run(cmd, _timeout_for("extract_frames", duration, None, timeout), name, None, supervisor)
+        files = sorted(out_path.glob("frame_*.jpg"))
+    except BaseException:
+        _remove_frames(out_path)
+        raise
+    return [Frame(path, marks[index]) for index, path in enumerate(files[: len(marks)])]
+
+
+class FfmpegFrameExtractor:
+    def __init__(self, sampling: FrameSampling, supervisor=None, timeout: Optional[float] = None) -> None:
+        self._sampling = sampling
+        self._supervisor = supervisor
+        self._timeout = timeout
+
+    def extract(self, path: Path, out_dir: Path) -> list[Frame]:
+        return extract_frames(str(path), str(out_dir), self._sampling, self._supervisor, self._timeout)
+
+
+def _frames_command(src: str, pattern: str, sampling: FrameSampling, count: int) -> list[str]:
+    return [
+        *_FFMPEG_BASE, "-i", src, "-vf", f"fps={1 / sampling.every_s:.6f}:round=up", "-frames:v", str(count), "-q:v", "2", pattern
+    ]
+
+
+def _remove_frames(out_dir: Path) -> None:
+    for frame in out_dir.glob("frame_*.jpg"):
+        _remove_quietly(frame)
 
 
 def probe(src: str) -> dict:
