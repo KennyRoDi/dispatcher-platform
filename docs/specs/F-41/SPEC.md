@@ -28,7 +28,7 @@ Cambio documental, sin dependencias nuevas entre capas. Reutiliza `scripts/measu
 
 Archivos de entrega: `docs/modulo-M1-memoria.md`, `docs/modulo-M2-planificacion.md`, `docs/modulo-M3-es-almacenamiento.md`, `docs/modulo-M4-seguridad.md`, `docs/modulo-M5-computo.md` y `docs/specs/F-41/COMPROBACION.md`; aclaración mínima de AD-04 en `docs/ARQUITECTURA.md` para distinguir ventana de adelantamiento de tiempo de espera, sin cambiar el algoritmo ni introducir una decisión nueva. Salidas nuevas y registros reproducidos, si se obtienen realmente, en `docs/evidencia/F-41/`, sin llaves, tokens ni datos privados. La comprobación tendrá una fila por producto RNF, enlace al crudo, comando, entorno y veredicto con motivo. La bitácora se publica exclusivamente con `flujo.py bitacora` durante documentación.
 
-`docs/CONTRATOS.md` conserva todos los puertos y dueños: J, M1/M5; N, M2; M, M3; K, M4. Revisar transversalmente no transfiere autoría ni permite alterar sus componentes. No hay código del I Proyecto que implementar en esta feature. Se aplican AD-02 (nodos separados), AD-04 (planificación), AD-05 a AD-07 (memoria), AD-10 a AD-13 (E/S), AD-18 (routing) y las decisiones vigentes de seguridad, sin introducir otra decisión arquitectónica. Si surge una, se registra primero con alternativas, criterio y fuente en ARQUITECTURA §8; los supuestos se identifican como SUP, nunca se resuelven en silencio.
+`docs/CONTRATOS.md` conserva todos los puertos y dueños: J, M1/M5; N, M2; M, M3; K, M4. Revisar transversalmente no transfiere autoría ni permite alterar sus componentes. No hay código del I Proyecto que implementar en esta feature. Se aplican AD-02 (nodos separados), AD-04 (planificación), AD-05 a AD-07 (memoria), AD-10 a AD-13 (E/S), AD-18 y AD-32 (routing) y las decisiones vigentes de seguridad, sin introducir otra decisión arquitectónica. Si surge una, se registra primero con alternativas, criterio y fuente en ARQUITECTURA §8; los supuestos se identifican como SUP, nunca se resuelven en silencio.
 
 ### Revisión inicial y trabajo requerido
 
@@ -89,4 +89,3 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
-
