@@ -1,6 +1,6 @@
 # SPEC F-23: Almacenamiento por contenido
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-23-3-deduplicar-antes-de-transferir
 **Verificación IA:** revision 08e4f8e
 **Historia:** US-23 · **Requisitos:** RF-32, [B.5 M3] · **Responsable:** V
