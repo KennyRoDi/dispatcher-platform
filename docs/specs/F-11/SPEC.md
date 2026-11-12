@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-11-1-reintentos
 **Verificación IA:** tests 5ab9c77
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -167,3 +167,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Sonnet 5.5, subagente revisor | 2026-11-12 | Revisor independiente APROBADO sin hallazgos bloqueantes. Releí el diff completo contra el SPEC y la parte 1 del plan: 78 líneas de código, 13 archivos esperados, 48 passed y 4 xfailed ejecutados por mí antes y por el revisor, documentación coherente con lo implementado. Observaciones menores aceptadas: puntos suspensivos en la tabla de aprobaciones por la excepción de plan; suite completa de Windows sin re-ejecutar, la valida CI. (08b0802) |
 | revision | Kenni Rodriguez | 2026-11-12 |  |
 | verificación IA de tests | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: los 3 archivos nuevos fallan en colección por falta de redis_retry_scheduler, y en los 4 existentes fallan 9 pruebas nuevas mientras 121 previas siguen pasando. El diff fuera de tests/ solo toca el SPEC (fila de verificación). Cada prueba de la parte 2 del SPEC con su nombre exacto más extras razonables. No ejecuté la de aceptación, que no colecciona aún. (5ab9c77) |
+| tests | Kenni Rodriguez | 2026-11-12 |  |
