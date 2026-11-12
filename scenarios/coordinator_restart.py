@@ -58,6 +58,10 @@ def correr_con_app_real(redis_url="redis://localhost:6379/0"):
         redis_client = fakeredis.FakeStrictRedis(server=servidor, decode_responses=True)
         fuente = "fakeredis (no se pudo conectar a redis real)"
 
+    from src.coordinator.seguridad import autorizar
+
+    main.app.dependency_overrides[autorizar] = lambda: None
+
     conexion.redis_client = redis_client
     cliente1 = TestClient(main.app)
 
