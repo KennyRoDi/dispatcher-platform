@@ -1,6 +1,6 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-33-1-rafaga
 **Verificación IA:** revision 984e384
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
