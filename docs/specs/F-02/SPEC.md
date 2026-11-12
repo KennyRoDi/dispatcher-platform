@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 95dc0b2
+**Verificación IA:** tests 73e0aac
 **Historia:** US-02 · **Requisitos:** RF-02 (exportaciones de chat), RNF-06 (normalización) · **Responsable:** N
 
 ## Objetivo
@@ -98,3 +98,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-02 completado tras investigar el codigo: hallazgo clave es que ConversationParser (puerto) y TextAnalyzer (F-07) ya existen pero ningun adaptador real lo implementa (solo FakeConversationParser en pruebas). Formato reconstruido del propio generador sintetico de F-03 (chat_export_generator.py), que es la fuente de verdad del dataset. Nueva decision AD-48/SUP-44 sobre interpretar timestamps sin huso como UTC. Plan de 1 parte, ~160 lineas (95dc0b2) |
 | plan | Nahúm Murillo | 2026-11-11 |  |
+| verificación IA de tests | claude | 2026-11-11 | 10 pruebas en rojo (U x8, I x1, A x1): todas fallan por ModuleNotFoundError (faltan whatsapp_parser.py, telegram_parser.py y chat_export.py). Resto de la suite (58 passed en puertos/arquitectura/coordinator) intacto (73e0aac) |
