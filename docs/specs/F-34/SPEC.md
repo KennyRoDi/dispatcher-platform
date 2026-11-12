@@ -1,6 +1,6 @@
 # SPEC F-34: Caída de un worker
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 42a37c2
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
@@ -127,3 +127,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-12 | Documentacion completa: ficha docs/evidencia/F-34_caida_worker_2026-11-12.md con medicion real (6 repeticiones, JSON crudo incluido), referenciada en docs/modulo-M2-planificacion.md. No se toco docs/reutilizacion.md deliberadamente para no chocar con la sesion paralela trabajando F-39 sobre ese mismo archivo. Bitacora registrada declarando un error real de IA (mensaje confuso en evaluar) (778b2fd) |
 | documentacion | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), confirmados ajenos a F-34 |
 | verificación IA de revision | claude | 2026-11-12 | Diff F-34 vs SPEC: objetivo OK, alcance OK (todos los archivos del plan presentes), criterios OK (medido end-to-end, 6 repeticiones reales), diseno OK, pruebas OK, mediciones OK con ficha completa, plan de pila OK (1 parte, 139 lineas). APROBADO (42a37c2) |
+| revision | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), confirmados ajenos a F-34 |
