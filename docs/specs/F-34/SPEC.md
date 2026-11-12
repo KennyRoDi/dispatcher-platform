@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 5a234fc
+**Verificación IA:** documentacion 778b2fd
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
 
 ## Objetivo
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), confirmados ajenos a F-34; 3599 passed |
 | verificación IA de verificacion | claude | 2026-11-12 | QA: encontrado y corregido mensaje confuso cuando terminadas>creadas (exceso en vez de perdidas negativas). Medicion real ejecutada: 3 repeticiones con muestreo rapido (0.5s) dan 15.05s consistente, aislando el heartbeat_ttl puro; 3 repeticiones con el reaper_interval real de produccion (10s) dan 20.0s consistente (cuantizado por el intervalo de sondeo), refinando la estimacion informal de docs/DEMO.md (~25s) con un dato medido preciso. Sin perdidas ni duplicadas en ninguna corrida (5a234fc) |
 | verificacion | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), confirmados ajenos a F-34 |
+| verificación IA de documentacion | claude | 2026-11-12 | Documentacion completa: ficha docs/evidencia/F-34_caida_worker_2026-11-12.md con medicion real (6 repeticiones, JSON crudo incluido), referenciada en docs/modulo-M2-planificacion.md. No se toco docs/reutilizacion.md deliberadamente para no chocar con la sesion paralela trabajando F-39 sobre ese mismo archivo. Bitacora registrada declarando un error real de IA (mensaje confuso en evaluar) (778b2fd) |
