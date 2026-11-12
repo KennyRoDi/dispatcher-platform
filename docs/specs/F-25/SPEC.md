@@ -1,6 +1,6 @@
 # SPEC F-25: Recepción no bloqueante
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-25-1-responder-durante-subidas-grandes
 **Verificación IA:** revision 07436162
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
