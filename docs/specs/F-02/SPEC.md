@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 81906c0
+**Verificación IA:** documentacion 4c82e90
 **Historia:** US-02 · **Requisitos:** RF-02 (exportaciones de chat), RNF-06 (normalización) · **Responsable:** N
 
 ## Objetivo
@@ -104,3 +104,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
 | verificación IA de verificacion | claude | 2026-11-12 | QA: archivo vacio rechazado, body con dos puntos no confunde el parser, JSON Telegram no-dict (lista) rechazado, mensaje con text_entities (lista en vez de string) rechazado. Archivo inexistente lanza FileNotFoundError sin envolver (decision deliberada: no es un problema de formato, es una precondicion distinta). 10 passed en la suite de F-02 (81906c0) |
 | verificacion | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
+| verificación IA de documentacion | claude | 2026-11-12 | Documentacion completa: AD-48/SUP-44 agregadas (interpretacion UTC de timestamps sin huso), bitacora registrada en rama estado con uso real de IA declarado (4c82e90) |
