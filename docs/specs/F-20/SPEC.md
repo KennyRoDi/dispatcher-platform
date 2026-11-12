@@ -1,6 +1,6 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision a728ea1
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
@@ -128,3 +128,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-11 | Documentación: BITACORA_IA.md actualizada en rama estado. SPEC completo con plan de 3 PRs. No requiere cambios en ARQUITECTURA.md (usa Decision AD-04 existente) (45f670a) |
 | documentacion | Nahúm Murillo | 2026-11-11 | errores preexistentes |
 | verificación IA de revision | claude | 2026-11-11 | Diff vs SPEC: objetivo✓, alcance✓, criterios de aceptación✓, diseño✓, pruebas✓, mediciones✓, plan 1/3✓, riesgos✓. Todo implementado. Listo para mergear (a728ea1) |
+| revision | Nahúm Murillo | 2026-11-11 | errores preexistentes |
