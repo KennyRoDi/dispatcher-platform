@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan cc39ae48
+**Verificación IA:** tests 8300d141
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
 
 ## Objetivo
@@ -77,3 +77,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | SPEC sin subagente. Comprobado: el Monitor ya muestra CPU, RAM y GPU por worker con refresco; faltan memoria de cgroup y vista por nodo. Usa ResourceReader de F-16 sin cambios. Conformidad 0. (cc39ae48) |
 | plan | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente. 9 pruebas: heartbeat con cgroup, sin lector, lector que falla, GET /workers con cgroup, resumen por nodo (agrupacion, muertos, vacio, valores invalidos). Rojo: dashboard.nodos no existe y Heartbeat no acepta resource_reader. (8300d141) |
