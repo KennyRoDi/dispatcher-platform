@@ -1,6 +1,6 @@
 # SPEC F-15: Dashboard
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 8f5384ca
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
@@ -88,3 +88,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: SPEC con pruebas de QA y riesgo de nodos mixtos; sin ficha (F-15 no mide SO, evidencia es la demo); bitacora con 2 errores reales de la IA. (154082cc) |
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 86 lineas en heartbeat.py, worker_node.py, dashboard/nodos.py y monitor.py; cumple el SPEC parte 1; cambio aditivo en archivos de Kenni; capas y commits correctos. (8f5384ca) |
+| revision | Melany Vindas | 2026-11-11 |  |
