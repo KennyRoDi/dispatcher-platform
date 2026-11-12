@@ -1,6 +1,6 @@
 # SPEC F-21: Comparación de políticas
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 332147b
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
@@ -106,3 +106,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: SchedulingPolicy.desde_configuracion (9 lineas), scripts/measure/m2_sched.py (simulador con reloj virtual, 131 lineas), scripts/measure/m2_plot.py (graficos, 80 lineas). 15 passed, 1 skipped en tests de scheduling + integracion. Medicion real ejecutada con 3 semillas (42,43,44), datos en docs/evidencia/ y ficha docs/modulo-M2-planificacion.md (5f18c29) |
 | implementacion | Nahúm Murillo | 2026-11-11 | errores de colección preexistentes en tests de TLS/seguridad (entorno local), ajenos a F-21; pruebas de scheduling e integración verdes (15 passed, 1 skipped) |
 | verificación IA de verificacion | claude | 2026-11-11 | QA: politica invalida rechazada con mensaje claro (exit 2), high-rate/low en 0 o negativo rechazados, CSV inexistente en m2_plot rechazado, determinismo confirmado (misma semilla produce CSV identico byte a byte). Criterios de aceptacion cumplidos: misma carga + semilla fija -> espera/turnaround/throughput por nivel y politica (3 repeticiones, docs/evidencia/). Espera maxima de baja bajo aging (245.8ms) dentro de la cota teorica de AD-04 (400ms) (332147b) |
+| verificacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-21 |
