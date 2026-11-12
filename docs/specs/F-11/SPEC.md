@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** feat/F-11-1-reintentos
 **Verificación IA:** implementacion a6fa98d
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -169,3 +169,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: los 3 archivos nuevos fallan en colección por falta de redis_retry_scheduler, y en los 4 existentes fallan 9 pruebas nuevas mientras 121 previas siguen pasando. El diff fuera de tests/ solo toca el SPEC (fila de verificación). Cada prueba de la parte 2 del SPEC con su nombre exacto más extras razonables. No ejecuté la de aceptación, que no colecciona aún. (5ab9c77) |
 | tests | Kenni Rodriguez | 2026-11-12 |  |
 | verificación IA de implementacion | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: 182 passed y 4 xfailed en archivos de F-11, arquitectura, recovery, worker, config y reaper; 3 passed en integración y aceptación. Comprobé en un worktree de main que tests/test_contract.py falla igual (14 failed) sin estos cambios. Revisé el diff de tests: solo cambian 2 líneas en test_worker_node.py (MAX_ATTEMPTS=1 en dos pruebas de StorageError, justificado porque StorageError ahora es transitorio por lista aprobada). Evidencia docs/evidencia/F-11_reintentos_2026-11-12.md generada por la prueba. No verifiqué la suite completa de Windows. (a6fa98d) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | La suite completa en Windows tiene unos 120 fallos de entorno preexistentes (fakeredis sin Lua eval, generadores de 200 MiB); tests/test_contract.py falla igual en main; las pruebas de F-11 y los módulos tocados pasan. Autorizado por la persona |
