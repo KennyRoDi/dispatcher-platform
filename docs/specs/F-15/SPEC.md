@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests 8300d141
+**Verificación IA:** implementacion b12cb67a
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
 
 ## Objetivo
@@ -79,3 +79,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente. 9 pruebas: heartbeat con cgroup, sin lector, lector que falla, GET /workers con cgroup, resumen por nodo (agrupacion, muertos, vacio, valores invalidos). Rojo: dashboard.nodos no existe y Heartbeat no acepta resource_reader. (8300d141) |
 | tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-15. |
+| verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente. Heartbeat publica cgroup_memory_current y _max si hay lector; worker_node lo pasa; dashboard/nodos.py y seccion Por nodo en Monitor (MiB). 9/9, test_dashboard 22/22, vista renderizada sin excepciones, suite 3777 verde en Linux. 86 lineas. (b12cb67a) |
