@@ -102,8 +102,6 @@ def test_main_sin_limit_crea_la_salida_y_devuelve_1_si_no_cumple(tmp_path, monke
     assert (salida / "recursos_por_nodo.csv").exists()
 
 
-@pytest.mark.xfail(strict=True, raises=ValueError,
-                   reason="main deja escapar ValueError con traza si --limit < 20 o --concurrency < --limit")
 @pytest.mark.parametrize("argv", [["--limit", "5"], ["--limit", "40"]])
 def test_main_con_limit_invalido_da_error_claro_sin_traza(argv, tmp_path, monkeypatch):
     monkeypatch.setattr(burst, "_ejecutar_run_load", lambda args: pytest.fail("no debe ejecutar"))
@@ -114,8 +112,6 @@ def test_main_con_limit_invalido_da_error_claro_sin_traza(argv, tmp_path, monkey
     assert codigo not in (0, None)
 
 
-@pytest.mark.xfail(strict=True, reason="--out que es un archivo falla recien al terminar la corrida (run_load.py:402), "
-                                       "tras perder la tanda; no se valida antes de ejecutar")
 def test_main_con_out_invalido_falla_antes_de_ejecutar(tmp_path, monkeypatch):
     archivo = tmp_path / "es_archivo"
     archivo.write_text("x")
@@ -139,7 +135,6 @@ def test_evaluar_detecta_per_case_menor_que_cases():
     assert burst.evaluar(res)["cumple"] is False
 
 
-@pytest.mark.xfail(strict=True, reason="escribir_csv con filas vacias deja un archivo de 0 bytes sin encabezado")
 def test_csv_de_filas_vacias_conserva_el_encabezado(tmp_path):
     res = resultado()
     res["series"] = []

@@ -19,6 +19,13 @@ MINIMO_CASOS = 20
 MINIMO_NODOS = 3
 COLUMNAS_LATENCIA = {"caso": "name", "tipo": "kind", "prioridad": "priority", "estado": "status",
                      "subtareas": "subtasks", "duracion_s": "duration_s"}
+COLUMNAS_RECURSOS = ("instante", "host", "cpu_percent", "mem_percent", "subtareas_activas")
+
+
+class Filas(list):
+    def __init__(self, filas, columnas):
+        super().__init__(filas)
+        self.columnas = list(columnas)
 
 
 def ejecutar_rafaga(args, ejecutor):
@@ -58,20 +65,22 @@ def evaluar(resultado, minimo_casos=MINIMO_CASOS, minimo_nodos=MINIMO_NODOS):
 
 
 def filas_latencia(resultado):
-    return [{columna: caso[origen] for columna, origen in COLUMNAS_LATENCIA.items()}
-            for caso in resultado["metrics"]["per_case"]]
+    return Filas([{columna: caso[origen] for columna, origen in COLUMNAS_LATENCIA.items()}
+                  for caso in resultado["metrics"]["per_case"]], COLUMNAS_LATENCIA)
 
 
 def filas_recursos(resultado):
-    return [{"instante": muestra["t"], "host": worker["host"], "cpu_percent": worker["cpu_percent"],
-             "mem_percent": worker["mem_percent"], "subtareas_activas": worker["active_subtasks"]}
-            for muestra in resultado["series"] for worker in muestra["workers"].values()]
+    return Filas([{"instante": muestra["t"], "host": worker["host"], "cpu_percent": worker["cpu_percent"],
+                   "mem_percent": worker["mem_percent"], "subtareas_activas": worker["active_subtasks"]}
+                  for muestra in resultado["series"] for worker in muestra["workers"].values()],
+                 COLUMNAS_RECURSOS)
 
 
 def escribir_csv(filas, ruta):
     with Path(ruta).open("w", encoding="utf-8", newline="") as archivo:
-        if filas:
-            escritor = csv.DictWriter(archivo, fieldnames=list(filas[0]))
+        columnas = getattr(filas, "columnas", None) or (list(filas[0]) if filas else None)
+        if columnas:
+            escritor = csv.DictWriter(archivo, fieldnames=columnas)
             escritor.writeheader()
             escritor.writerows(filas)
 
@@ -95,7 +104,11 @@ def _argumentos(argv):
 
 def main(argv=None):
     args = _argumentos(argv)
-    resultado = ejecutar_rafaga(args, _ejecutar_run_load)
+    try:
+        args.out.mkdir(parents=True, exist_ok=True)
+        resultado = ejecutar_rafaga(args, _ejecutar_run_load)
+    except (ValueError, OSError) as error:
+        raise SystemExit(f"error: {error}") from error
     escribir_csv(filas_latencia(resultado), args.out / "latencia_por_caso.csv")
     escribir_csv(filas_recursos(resultado), args.out / "recursos_por_nodo.csv")
     veredicto = evaluar(resultado)
