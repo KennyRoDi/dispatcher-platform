@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 26c673c
+**Verificación IA:** verificacion 5a234fc
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
 
 ## Objetivo
@@ -122,3 +122,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de implementacion | claude | 2026-11-12 | Implementacion completa: scenarios/worker_crash.py (129 lineas) con evaluar/tiempo_deteccion/tiempo_reasignacion puras y correr_con_reaper_real que usa el heartbeat_ttl real (no acortado) para medir con el comportamiento verdadero por defecto. 10 passed, 1 skipped (aceptacion sin JSON real). 54 passed en regresion amplia. 129 lineas de codigo (26c673c) |
 | implementacion | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), confirmados ajenos a F-34; 3599 passed |
+| verificación IA de verificacion | claude | 2026-11-12 | QA: encontrado y corregido mensaje confuso cuando terminadas>creadas (exceso en vez de perdidas negativas). Medicion real ejecutada: 3 repeticiones con muestreo rapido (0.5s) dan 15.05s consistente, aislando el heartbeat_ttl puro; 3 repeticiones con el reaper_interval real de produccion (10s) dan 20.0s consistente (cuantizado por el intervalo de sondeo), refinando la estimacion informal de docs/DEMO.md (~25s) con un dato medido preciso. Sin perdidas ni duplicadas en ninguna corrida (5a234fc) |
