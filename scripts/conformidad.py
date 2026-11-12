@@ -52,7 +52,7 @@ PIEZAS_POR_FEATURE = {
     "F-41": ("docs/modulo-M1-memoria.md", "docs/modulo-M2-planificacion.md", "docs/modulo-M3-es-almacenamiento.md",
              "docs/modulo-M4-seguridad.md", "docs/modulo-M5-computo.md"),
 }
-FEATURES_DE_INTEGRACION = ("F-33", "F-34", "F-35", "F-36", "F-37", "F-41", "F-42")
+FEATURES_DE_INTEGRACION = ("F-33", "F-34", "F-35", "F-36", "F-37", "F-41", "F-42", "F-43")
 ESTADOS = ("pendiente", *FASES, EN_PR, "hecha")
 CAMPOS_ANEXO_3 = ("Herramienta", "Componente", "Propósito", "Consulta resumida", "Resultado obtenido",
                   "Validado / corregido / descartado", "Cómo se validó")

@@ -97,6 +97,7 @@ Tipo: **Reu**tilizar, **Mod**ificar, **Nue**vo. Este campo alimenta `docs/reutil
 | F-40 | Entrega | Matriz, historial y bitácora | RNF-17 a RNF-20 | K | H1 | B1 | Nue |
 | F-41 | Entrega | Cinco fichas de evidencia | RNF-09 a RNF-14 | Cada responsable | H3 | B4 | Nue |
 | F-42 | Entrega | Informe, README, demo y defensa | RNF-15, RNF-16, RNF-21 a RNF-23 | Todos, coordina K | H3 | B4 | Nue |
+| F-43 | Integración | Workers tipados de texto, imagen y audio conectados al pipeline | RF-04 a RF-08, RF-09 a RF-12 | K | H2 | B2 | Nue |
 
 ## 3. Cobertura de la rúbrica [B.9]
 

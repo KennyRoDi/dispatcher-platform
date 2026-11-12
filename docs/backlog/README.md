@@ -1,4 +1,4 @@
-**Resumen:** 42 historias de usuario, una por funcionalidad, divididas por área, con criterios, prioridad, pruebas y evidencia.
+**Resumen:** 43 historias de usuario, una por funcionalidad, divididas por área, con criterios, prioridad, pruebas y evidencia.
 
 # Backlog
 
@@ -11,13 +11,14 @@
 - [m4-seguridad](m4-seguridad.md)
 - [m5-computo](m5-computo.md)
 - [carga-fallos](carga-fallos.md)
+- [integracion-workers](integracion-workers.md)
 - [entrega](entrega.md)
 
 ## Dependencias
 
 Cada módulo se desarrolla de principio a fin sin esperar a otro. **Una feature de módulo solo puede depender de otra del mismo responsable;** el check `piezas y formato` lo exige. El contacto entre módulos ocurre por los contratos de [CONTRATOS.md](../CONTRATOS.md), con dobles y pruebas de conformidad.
 
-Solo F-33 a F-37, F-41 y F-42 dependen de varios módulos: son la integración final sobre los tres nodos.
+Solo F-33 a F-37, F-41, F-42 y F-43 dependen de varios módulos: son la integración final sobre los tres nodos.
 
 ## Prioridad
 
