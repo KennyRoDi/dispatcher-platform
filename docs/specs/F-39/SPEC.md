@@ -1,6 +1,6 @@
 # SPEC F-39: Reutilización y correcciones
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 42726a5
 **Historia:** US-39 · **Requisitos:** RNF-02, RNF-03, RNF-24 · **Responsable:** N
