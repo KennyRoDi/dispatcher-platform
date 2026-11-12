@@ -1,6 +1,6 @@
 # SPEC F-06: Cola confiable
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 943e82f
 **Historia:** US-06 · **Requisitos:** RF-04, RF-05 (confiabilidad de la cola de B.4 Cola y distribución), AD-03 · **Responsable:** N
@@ -106,3 +106,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: RedisTypeQueue con BLMOVE/LMOVE (67 lineas), Priority unificada (bonus_ms/next_priority movidos a priority.py canonica, scheduling.py reexporta). 6 tests nuevos verdes a la primera, 91 passed en suite ampliada (scheduling, decomposition, dispatch_case, arquitectura, redis_type_queue). 109 lineas de codigo, dentro del limite de 400 (3f2e4ae) |
 | implementacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-06 |
 | verificación IA de verificacion | claude | 2026-11-11 | QA: acknowledge de subtarea inexistente no revienta (no-op), reencolar_huerfanas en inflight vacio devuelve 0, capacidad exacta rechaza con QueueFull y libera tras take, dos workers no se contaminan entre si, reencolar con kinds mixtos (image/audio) va a sus colas correctas. Criterio de aceptacion verificado: BLMOVE atomico deja la subtarea en inflight tras take, sin ventana de perdida (943e82f) |
+| verificacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-06 |
