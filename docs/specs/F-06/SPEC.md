@@ -1,6 +1,6 @@
 # SPEC F-06: Cola confiable
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 3f2e4ae
 **Historia:** US-06 · **Requisitos:** RF-04, RF-05 (confiabilidad de la cola de B.4 Cola y distribución), AD-03 · **Responsable:** N
@@ -104,3 +104,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | claude | 2026-11-11 | 7 pruebas en rojo: contrato comprobar_work_queue, atomicidad BLMOVE (muerte tras take deja en inflight), timeout en cola vacia, acknowledge, reencolar_huerfanas completo e interrumpido a medias, y unificacion de Priority (scheduling.Priority vs priority.Priority). Todas fallan por ModuleNotFoundError o la duplicacion real detectada. Resto de la suite (32 passed) intacto (585cdd0) |
 | tests | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: RedisTypeQueue con BLMOVE/LMOVE (67 lineas), Priority unificada (bonus_ms/next_priority movidos a priority.py canonica, scheduling.py reexporta). 6 tests nuevos verdes a la primera, 91 passed en suite ampliada (scheduling, decomposition, dispatch_case, arquitectura, redis_type_queue). 109 lineas de codigo, dentro del limite de 400 (3f2e4ae) |
+| implementacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-06 |
