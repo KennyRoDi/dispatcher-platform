@@ -1,6 +1,6 @@
 # SPEC F-21: Comparación de políticas
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 72e13c2
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
@@ -110,3 +110,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-11 | Documentacion completa: ficha docs/modulo-M2-planificacion.md con 5 secciones (que se implemento, concepto SO, metodo, resultados, interpretacion), AD-04 actualizada con la medicion real, bitacora registrada en rama estado con uso real de IA declarado (59685a4) |
 | documentacion | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-21 |
 | verificación IA de revision | claude | 2026-11-11 | Diff F-21 vs SPEC: objetivo OK, alcance OK (cada archivo del plan presente: desde_configuracion, m2_sched.py, m2_plot.py, ficha M2), criterios de aceptacion OK (medido con 3 semillas), diseno OK, pruebas OK (3 nombres exactos), mediciones OK, plan de pila OK (1 parte, 221 lineas). APROBADO (72e13c2) |
+| revision | Nahúm Murillo | 2026-11-11 | errores de coleccion preexistentes en TLS/seguridad del entorno local, ajenos a F-21 |
