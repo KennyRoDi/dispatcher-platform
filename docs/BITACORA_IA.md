@@ -1440,3 +1440,15 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | SPEC completo, 20 pruebas unitarias e integración, src/domain/scheduling.py y src/adapters/redis_scheduler.py |
 | Validado / corregido / descartado | Responsable ejecutó y leyó cada fase; pruebas corridas localmente antes de cada aprobación |
 | Cómo se validó | Revisión manual del diseño (AD-04), lectura línea por línea del código generado y corrección de errores de lógica en el algoritmo de aging detectados al correr las pruebas |
+
+## 2026-11-11 · Nahúm Murillo · F-21 (`feat/F-21-1-comparacion-de-politicas`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-21 |
+| Propósito | Disenar SPEC, escribir pruebas TDD, implementar seleccion de politica por configuracion, simulador comparativo y ficha M2 para F-21 |
+| Consulta resumida | Comparar FIFO vs aging bajo la misma carga con semilla fija, midiendo espera/turnaround/throughput por nivel y politica |
+| Resultado obtenido | SchedulingPolicy.desde_configuracion, scripts/measure/m2_sched.py y m2_plot.py, docs/modulo-M2-planificacion.md con datos medidos reales (3 semillas), AD-04 actualizada |
+| Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; pruebas corridas localmente; medicion ejecutada y revisada antes de escribir la ficha |
+| Cómo se validó | pytest de tests/unit/test_scheduling.py y tests/integration/test_m2_sched.py (15 passed, 1 skipped); ejecucion manual de scripts/measure/m2_sched.py con 3 semillas y revision de los CSV resultantes antes de redactar la interpretacion |
