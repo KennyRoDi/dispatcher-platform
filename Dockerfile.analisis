@@ -1,0 +1,47 @@
+# Imagen de los workers de analisis tipados (F-43): una por tipo, con docker build --build-arg KIND=text|image|audio.
+# El worker FFmpeg, el reaper y el coordinador siguen usando Dockerfile.worker.
+FROM python:3.13-slim
+
+ARG KIND
+ARG TORCH_VERSION=2.15.0
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# torch solo CPU antes que el resto, como indican los requirements-*.txt; sin esto pip baja la rueda con CUDA.
+RUN pip install "torch==${TORCH_VERSION}" --index-url https://download.pytorch.org/whl/cpu
+
+COPY requirements.txt requirements-texto.txt requirements-imagen.txt requirements-audio.txt ./
+# requirements-audio.txt incluye requirements-texto.txt.
+RUN case "${KIND}" in \
+        text) requisitos=requirements-texto.txt ;; \
+        image) requisitos=requirements-imagen.txt ;; \
+        audio) requisitos=requirements-audio.txt ;; \
+        *) echo "KIND debe ser text, image o audio" >&2; exit 1 ;; \
+    esac \
+    && pip install -r requirements.txt -r "${requisitos}"
+
+COPY src ./src
+COPY scripts ./scripts
+COPY config ./config
+
+RUN useradd --uid 10001 --create-home --shell /usr/sbin/nologin appuser \
+    && mkdir -p /scratch /models \
+    && chown -R appuser:appuser /app /scratch /models
+USER 10001
+
+ENV WORK_DIR=/scratch \
+    CONFIG_DIR=/app/config \
+    HF_HOME=/models/huggingface \
+    XDG_CACHE_HOME=/models/cache
+
+STOPSIGNAL SIGTERM
+
+CMD ["python", "-m", "src.workers.typed_worker"]
