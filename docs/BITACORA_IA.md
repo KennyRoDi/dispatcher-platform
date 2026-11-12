@@ -1555,3 +1555,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; medicion real ejecutada (6 repeticiones), no simulada ni inventada |
 | Cómo se validó | pytest de tests/unit/test_worker_crash.py y tests/integration/test_worker_crash_reaper_real.py (11 passed); ejecucion real del escenario 6 veces, revision manual de los JSON antes de redactar la ficha |
 | Error de la IA | La IA (yo mismo) escribio un mensaje de error confuso en evaluar() cuando terminadas>creadas (mostraba 'faltan -2' en vez de explicar el exceso); detectado en QA manual deliberada y corregido con un mensaje distinto para ese caso, mas una prueba de regresion |
+
+## 2026-11-12 · José Andrés Loría Herrera · F-41 (`feat/F-41-1-fichas-de-evidencia`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Codex con subagentes arquitecto, developer y auditor |
+| Componente | F-41 |
+| Propósito | Revisar F-41 y consolidar fichas M1-M5 con trazabilidad veraz |
+| Consulta resumida | Trabaja autonomamente hasta terminar F-41; revisa todo y toma decisiones para el proyecto |
+| Resultado obtenido | SPEC y lista RNF09-14; cinco fichas corregidas; AD04 aclarada; recalculos documentales reproducibles; QA distingue correccion aprobada de aceptacion pendiente por evidencia distribuida y cinco reproducciones en otra maquina |
+| Validado / corregido / descartado | Revision independiente de diff completo, enlaces locales, cinco estructuras y calculos M1/M2/M3/M5; 28 tests conformidad pasan. Suite global interrumpida por esperas existentes en Reporter; no se declara verde. Unitarias separadas en curso |
+| Cómo se validó | Comparacion con ENUNCIADO Parte I5 B5 Anexo2; Python stdlib sobre JSON/CSV historicos; git diff --check; pytest. Se instalo lupa que faltaba en fakeredis[lua] ya declarado. No se ejecutaron mediciones remotas |
+| Error de la IA | El developer produjo temporalmente texto con codificacion incorrecta al editar sin UTF8 y copio una frase de cifrado en la seccion custodia. Validacion estructural y revision independiente detectaron ambos y se corrigieron antes de cerrar la implementacion; no se modificaron crudos historicos |
