@@ -18,12 +18,11 @@
 **Incluye:**
 - `src/coordinator/modelos.py`: `SourceRef(sha256: str, name: str)` y `CaseRequest.sources: list[SourceRef] | None = None` (opcional; si se envía, no se envía `subtasks` y viceversa).
 - `src/coordinator/rutas_casos.py::create_case`: si `sources` viene poblado, toma el camino nuevo:
-  1. Para cada fuente, verifica `object_store.exists(sha256)`; si falta alguna, `422` sin encolar nada.
+  1. Para cada fuente, verifica `subidas.already_stored(sha256)` (reutiliza la misma instancia de `ChunkedUpload` ya configurada para `rutas_archivos.py`, inyectada con `Depends(rutas_archivos.obtener_subidas)`; **no hace falta exponer un `ObjectStore` nuevo**); si falta alguna, `422` sin encolar nada.
   2. `classify_source(name)` (F-05) por extensión; una extensión no soportada responde `422` con el nombre, sin encolar nada (RF-02 parcial: formato).
   3. `DispatchCase(RedisTypeQueue(...), clock).execute(case_id, case_sources, priority)` (F-05/F-06): decompone, verifica capacidad y encola en `queue:text/image/audio` vía `BLMOVE`-ready `RedisTypeQueue`.
   4. Persiste `case:{id}` (status `queued`, totales, `created_at`, `priority`, `metadata`), `case:{id}:subtasks` y un `subtask:{id}` hash por sub-tarea devuelta (mismos campos que el camino heredado: `status=pending`, `case_id`, `source_sha256`, `file_path`=nombre de la fuente, `task_type`=`kind.value`, `priority`), para que `GET /cases/{id}`, `/report`, `list_cases` y `cancel_case` seguir funcionando sin cambios.
   5. Registra en `cases:registry` (igual que hoy).
-- `src/infrastructure/object_store.py` o donde corresponda: exponer la instancia de `ObjectStore` ya configurada (`crear_subidas`/MinIO) a `rutas_casos.py` (hoy solo la usa `rutas_archivos.py`).
 - `docs/ARQUITECTURA.md` §8: nueva decisión **AD-47**, coexistencia de los dos esquemas de persistencia hasta que exista un worker consumidor de `queue:text/image/audio` (F-3X futura).
 
 **No incluye:**
@@ -50,14 +49,14 @@ Copiado de `docs/backlog/recepcion-dataset.md` (US-01):
 - `classify_source`, `decompose`, `queue_for`, `CaseSource` (`src/domain/decomposition.py`, F-05)
 - `DispatchCase` (`src/application/dispatch_case.py`, F-05)
 - `RedisTypeQueue` (`src/adapters/redis_type_queue.py`, F-06)
-- `ObjectStore` (`src/application/ports.py`): `exists(sha256)` para validar que la fuente ya se subió
+- `ChunkedUpload.already_stored(sha256)` (`src/application/chunked_upload.py`, F-22/F-23, instancia ya configurada en `rutas_archivos.py`): valida que la fuente ya se subió, sin exponer un `ObjectStore` nuevo
 - `Role.ANALISTA` → `Action.CREAR_CASO` (`src/domain/rbac.py`, ya cableado en `seguridad.py`)
 
 **Archivos a crear/modificar** (todos de Nahúm, M2/coordinador):
 - `src/coordinator/modelos.py` (existente): agregar `SourceRef`, campo `sources` opcional en `CaseRequest`
 - `src/coordinator/rutas_casos.py` (existente): rama nueva en `create_case` para `sources`
 - `tests/unit/test_rutas_casos_multifuente.py` (nuevo): U del camino nuevo con dobles
-- `tests/integration/test_rutas_casos_multifuente_fakeredis.py` (nuevo): I con `fakeredis`/doble de `ObjectStore`
+- `tests/integration/test_rutas_casos_multifuente_fakeredis.py` (nuevo): I con `fakeredis`/doble de `ChunkedUpload`
 - `tests/acceptance/test_caso_heterogeneo_cliente_de_carga.py` (nuevo): A, caso con 4 fuentes
 
 **Decisión nueva propuesta (AD-47, se registra en `docs/ARQUITECTURA.md` §8 en la fase de documentación):**
@@ -70,10 +69,10 @@ Copiado de `docs/backlog/recepcion-dataset.md` (US-01):
 
 | Tipo | Prueba | Archivo | Demuestra |
 |---|---|---|---|
-| Unitaria | `test_crear_caso_con_varias_fuentes_las_registra` | `tests/unit/test_rutas_casos_multifuente.py` | Con dobles de `ObjectStore`/`WorkQueue`, un caso con 4 fuentes (texto, imagen, audio, video) persiste `case:{id}` en `queued`, 5 `subtask:{id}` (video expande a audio+imagen) y encola cada una en su cola |
-| Unitaria | `test_fuente_sin_objeto_subido_rechaza_sin_encolar_nada` | `tests/unit/test_rutas_casos_multifuente.py` | Si un `sha256` no existe en `ObjectStore`, responde 422 y no se encola ni persiste ninguna sub-tarea (todo o nada) |
+| Unitaria | `test_crear_caso_con_varias_fuentes_las_registra` | `tests/unit/test_rutas_casos_multifuente.py` | Con `fakeredis` y un doble de `ChunkedUpload`, un caso con 4 fuentes (texto, imagen, audio, video) persiste `case:{id}` en `queued`, 5 `subtask:{id}` (video expande a audio+imagen) y encola cada una en su cola |
+| Unitaria | `test_fuente_sin_objeto_subido_rechaza_sin_encolar_nada` | `tests/unit/test_rutas_casos_multifuente.py` | Si `already_stored(sha256)` es `False` para alguna fuente, responde 422 y no se encola ni persiste ninguna sub-tarea (todo o nada) |
 | Unitaria | `test_extension_no_soportada_rechaza_sin_encolar_nada` | `tests/unit/test_rutas_casos_multifuente.py` | Una fuente con extensión desconocida responde 422 (RF-02), nada queda encolado |
-| Integración | `test_caso_multifuente_con_fakeredis_queda_consultable` | `tests/integration/test_rutas_casos_multifuente_fakeredis.py` | Con `fakeredis` y un doble de `ObjectStore`, tras crear el caso, `GET /cases/{id}` y `/report` (código sin modificar) devuelven las 4 fuentes enlazadas y el estado `queued` |
+| Integración | `test_caso_multifuente_con_fakeredis_queda_consultable` | `tests/integration/test_rutas_casos_multifuente_fakeredis.py` | Con `fakeredis` y un doble de `ChunkedUpload`, tras crear el caso, `GET /cases/{id}` y `/report` (código sin modificar) devuelven las 4 fuentes enlazadas y el estado `queued` |
 | Aceptación | `test_caso_heterogeneo_cliente_de_carga` | `tests/acceptance/test_caso_heterogeneo_cliente_de_carga.py` | Un cliente sube 4 fuentes (texto, imagen, audio, video) por el flujo real de `POST /uploads` + `complete`, crea el caso y `GET /cases/{id}` muestra las 4 (5 con el video expandido) enlazadas a sus objetos |
 
 ## Mediciones
@@ -86,14 +85,13 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido | Líneas aprox |
 |---|---|---|---|
-| 1 | `feat(F-01): crear caso multifuente integrando F-05/F-06 con el esquema heredado` | `modelos.py`, `rutas_casos.py`, exposición de `ObjectStore` a `rutas_casos`, AD-47 | ~180 |
+| 1 | `feat(F-01): crear caso multifuente integrando F-05/F-06 con el esquema heredado` | `modelos.py`, `rutas_casos.py` (reutiliza `ChunkedUpload` ya configurado), AD-47 | ~150 |
 
 ## Riesgos y preguntas abiertas
 
 1. **No existe worker consumidor de `queue:text/image/audio`.** F-01 deja casos correctamente `queued` y encolados, pero nada los procesará hasta que exista ese worker (gap real, fuera de alcance, probablemente de integración F-33+). Se declara explícitamente para que no se confunda con un defecto de F-01.
 2. **Persistencia doble (cola tipada + hash heredado).** Es deliberada (AD-47) mientras conviven los dos caminos; si en el futuro se migra a un worker que solo lee de `queue:text/image/audio`, hay que decidir si el hash heredado se vuelve solo-lectura/caché o se elimina.
-3. **`ObjectStore` no está hoy inyectado en `rutas_casos.py`.** Se necesita exponerlo igual que `rutas_archivos.configurar(...)`; la persona debe confirmar si prefiere una función `configurar()` análoga o inyección por `Depends`.
-4. **RF-02 solo parcial.** F-01 rechaza por extensión (ya construido en F-05); la validación de contenido real (formato de exportación de chat, etc.) es F-02, no se duplica aquí.
+3. **RF-02 solo parcial.** F-01 rechaza por extensión (ya construido en F-05); la validación de contenido real (formato de exportación de chat, etc.) es F-02, no se duplica aquí.
 
 ## Aprobaciones
 
