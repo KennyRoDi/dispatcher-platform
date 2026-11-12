@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** tests 9a12eb8
+**Verificación IA:** tests a0ac95a
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
 
 ## Objetivo
@@ -102,3 +102,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-01 completado tras investigacion profunda del codigo: hallazgo clave es que GET /cases/{id}/report (RedisCaseCatalog) espera el esquema heredado, y que nadie consume aun queue:text/image/audio (F-07/08/09 solo entregaron Analyzer.analyze(), sin worker). Decision aprobada por el responsable: integrar ambos mundos (encolar con F-05/F-06, persistir con el esquema heredado para no romper el reporte existente). Nueva decision AD-47 propuesta. Plan de 1 parte, ~180 lineas (baf29c4) |
 | plan | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de tests | claude | 2026-11-11 | 5 pruebas en rojo (U x3, I x2, A x1): todas fallan por ModuleNotFoundError (falta src/application/create_case.py y SourceRef en modelos.py) o 422 porque CaseRequest no acepta sources todavia. Resto de la suite (77 passed en coordinador, decomposition, dispatch_case, redis_type_queue) intacto. Nota: test_fuente_sin_subir_responde_422_en_la_api pasa accidentalmente ahora (pydantic rechaza por subtasks requerido), pero seguira pasando por la razon correcta tras implementar (9a12eb8) |
+| verificación IA de tests | claude | 2026-11-11 | Implementacion completa: CreateMultiSourceCase (77 lineas) integra DispatchCase/RedisTypeQueue con persistencia heredada; SourceRef en modelos.py; rutas_casos.py con dependencia opcional _obtener_subidas_opcional (no rompe el camino heredado). 6 tests nuevos verdes a la primera tras un ajuste (el Depends inicial rompio 24 tests heredados por ser obligatorio; corregido a opcional). Regresion amplia: 287 passed, 2 fallos preexistentes confirmados no relacionados (classify_source identico a origin/main, TLS ambiental). 148 lineas de codigo (a0ac95a) |
