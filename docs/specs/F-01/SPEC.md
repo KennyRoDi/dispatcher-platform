@@ -1,6 +1,6 @@
 # SPEC F-01: Crear caso multifuente
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan baf29c4
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
@@ -102,3 +102,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-01 completado tras investigacion profunda del codigo: hallazgo clave es que GET /cases/{id}/report (RedisCaseCatalog) espera el esquema heredado, y que nadie consume aun queue:text/image/audio (F-07/08/09 solo entregaron Analyzer.analyze(), sin worker). Decision aprobada por el responsable: integrar ambos mundos (encolar con F-05/F-06, persistir con el esquema heredado para no romper el reporte existente). Nueva decision AD-47 propuesta. Plan de 1 parte, ~180 lineas (baf29c4) |
+| plan | Nahúm Murillo | 2026-11-11 |  |
