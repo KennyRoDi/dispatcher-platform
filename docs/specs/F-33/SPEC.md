@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion ff066ab
+**Verificación IA:** documentacion b184c70
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
 ## Objetivo
@@ -128,3 +128,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | verificación IA de verificacion | Claude Code (Sonnet 5.5), QA subagente + orquestador | 2026-11-12 | QA: criterios US-33 ok en lo verificable, 6 hallazgos (1,2,5 corregidos; 3,4,6 xfail estricto como limites); pytest 65 passed, 1 skipped, 3 xfailed reproducido por mí; medición B.6 en nodos: Medición pendiente, sin cifras; 29 líneas de diff de código (8002922) (ff066ab) |
 | verificacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5), subagente documentador; verificación del orquestador | 2026-11-12 | AD-50 en ARQUITECTURA.md y SUP-46 en REQUERIMIENTOS.md existen; AD-50/SUP-46 libres en ramas remotas (git grep); DEMO.md documenta opciones reales; sin ficha de evidencia ni cifras; bitácora publicada con errores reales de la IA (b184c70) (b184c70) |
