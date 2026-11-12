@@ -14,7 +14,7 @@ El enunciado pide una «ráfaga de carga»: envío concurrente de al menos 20 ca
 **Incluye:**
 
 - `scenarios/burst.py`: lee el JSON que ya produce `run_load` (`metrics`, `series`), evalúa el criterio y exporta CSV. Mismo patrón que `scenarios/cancel_heavy.py` y `scenarios/memory_saturation.py`: ejecutor inyectado, evaluación pura, `main()` con salida JSON.
-- Ejecución de la ráfaga: `ejecutar_rafaga(...)` llama a `run_load.run_load` con `--limit` ≥ 20 y `--concurrency` ≥ 20 (SUP-45) y devuelve el JSON. El ejecutor se inyecta en las pruebas.
+- Ejecución de la ráfaga: `ejecutar_rafaga(...)` llama a `run_load.run_load` con `--limit` ≥ 20 y `--concurrency` ≥ 20 (SUP-46) y devuelve el JSON. El ejecutor se inyecta en las pruebas.
 - Evaluación pura (`evaluar`): (1) casos enviados ≥ 20; (2) todos en estado final (`completed`, `failed`, `cancelled`) y sin `timed_out` ni `submit_error`; (3) al menos tres hosts worker distintos en `subtasks_per_host` o en las muestras de `series`; (4) throughput, latencia por caso (`duration_s`) y recursos por nodo (`peak_cpu_by_host`, `peak_active_by_host`) presentes.
 - Exportación CSV: `latencia_por_caso.csv` (caso, tipo, prioridad, estado, sub-tareas, duración) y `recursos_por_nodo.csv` (instante, host, CPU %, memoria %, sub-tareas activas), derivados de `per_case` y `series`.
 - Gráficos (latencia por caso y recursos por nodo en el tiempo) a partir de los CSV, en la parte 2.
@@ -61,11 +61,11 @@ Copiados de `docs/backlog/carga-fallos.md`, US-33:
 - `escribir_csv(filas, ruta)`.
 - `main()` con salida JSON y CSV.
 
-**Decisiones.** AD-49 (provisional; se registra en `docs/ARQUITECTURA.md` §8 en la Parte 1): la ráfaga se valida con un escenario que envuelve `run_load` y evalúa su JSON, no con un segundo cliente de carga. Alternativas: reescribir un cliente concurrente en `scenarios/` (duplica `run_load`); ampliar `run_load` con la evaluación (mezcla medición con criterio y toca un script ya probado). Supuestos nuevos en `docs/REQUERIMIENTOS.md`:
+**Decisiones.** AD-50 (provisional; se registra en `docs/ARQUITECTURA.md` §8 en la Parte 1): la ráfaga se valida con un escenario que envuelve `run_load` y evalúa su JSON, no con un segundo cliente de carga. Alternativas: reescribir un cliente concurrente en `scenarios/` (duplica `run_load`); ampliar `run_load` con la evaluación (mezcla medición con criterio y toca un script ya probado). Supuestos nuevos en `docs/REQUERIMIENTOS.md`:
 
-- **SUP-45 (provisional).** «Concurrente»: concurrencia de envío ≥ número de casos (mínimo 20), para que todos estén en vuelo a la vez. «Estado final»: `completed`, `failed` o `cancelled`; un caso `failed` cuenta como final pero se reporta aparte. «Tres nodos activos»: tres `host` distintos con sub-tareas procesadas (o visibles en `series`). El plazo de la corrida es el `--timeout` de `run_load`.
+- **SUP-46 (provisional).** «Concurrente»: concurrencia de envío ≥ número de casos (mínimo 20), para que todos estén en vuelo a la vez. «Estado final»: `completed`, `failed` o `cancelled`; un caso `failed` cuenta como final pero se reporta aparte. «Tres nodos activos»: tres `host` distintos con sub-tareas procesadas (o visibles en `series`). El plazo de la corrida es el `--timeout` de `run_load`.
 
-Numeración AD-49 y SUP-45: siguiente libre en `main`; confirmar al integrar si otra rama usó el número.
+Numeración AD-50 y SUP-46: AD-49 y SUP-45 los tomó la rama `feat/F-11-2-reintentos` (aún sin fusionar), por lo que esta feature usa los siguientes libres (verificado con `git grep` en `origin/*`, 2026-11-12).
 
 ## Pruebas
 
@@ -73,7 +73,7 @@ Numeración AD-49 y SUP-45: siguiente libre en `main`; confirmar al integrar si 
 |---|---|---|
 | Unitaria | `tests/unit/test_burst.py`: `evaluar` con JSON sintético (cumple; menos de 20 casos; caso sin estado final; `timed_out`; solo dos hosts; falta throughput o recursos) | Cada incumplimiento del criterio se detecta |
 | Unitaria | `filas_latencia`, `filas_recursos`, `escribir_csv` (columnas, una fila por caso y por muestra, casos sin duración) | El CSV refleja el JSON |
-| Unitaria | `ejecutar_rafaga` con ejecutor falso (rechaza menos de 20 casos, pasa concurrencia) | El escenario respeta SUP-45 sin red |
+| Unitaria | `ejecutar_rafaga` con ejecutor falso (rechaza menos de 20 casos, pasa concurrencia) | El escenario respeta SUP-46 sin red |
 | Integración | `tests/integration/test_burst_cliente_concurrente.py`: 20 casos concurrentes contra la app del coordinador en proceso con Redis (o fakeredis) y workers falsos, corto | El cliente concurrente lleva 20 casos a estado final |
 | Aceptación | `tests/acceptance/test_burst_aceptacion.py` sobre `BURST_JSON`; se omite sin él | La corrida real cumple las afirmaciones de US-33 |
 
@@ -95,15 +95,15 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-33): escenario de rafaga con evaluacion y csv` | `scenarios/burst.py` (ejecutor, evaluación, CSV y `main`, unas 150 líneas), unitarias, integración corta y aceptación sobre JSON. Registra AD-49 y SUP-45 |
+| 1 | `feat(F-33): escenario de rafaga con evaluacion y csv` | `scenarios/burst.py` (ejecutor, evaluación, CSV y `main`, unas 150 líneas), unitarias, integración corta y aceptación sobre JSON. Registra AD-50 y SUP-46 |
 | 2 | `docs(F-33): evidencia de rafaga en nodos` | Corrida (simulación local declarada o tres nodos reales si hay) con su JSON, CSV, gráficos y ficha. Sin código; lo no corrido queda «Medición pendiente» |
 
 ## Riesgos y preguntas abiertas
 
 Recomendación entre paréntesis; el orquestador las acepta por autonomía delegada.
 
-1. **Reutilizar `run_load` en lugar de un cliente nuevo.** (Sí, AD-49.)
-2. **Mínimo de 20 casos y concurrencia igual al número de casos.** (Aceptar SUP-45; el enunciado dice «al menos 20».)
+1. **Reutilizar `run_load` en lugar de un cliente nuevo.** (Sí, AD-50.)
+2. **Mínimo de 20 casos y concurrencia igual al número de casos.** (Aceptar SUP-46; el enunciado dice «al menos 20».)
 3. **Un caso `failed` cuenta como estado final.** (Sí, pero se reporta aparte; el criterio habla de estado final, no de éxito.)
 4. **Tres hosts distintos como prueba de tres nodos.** (Sí; la simulación local lo cumple con hosts declarados y no acredita B.2.)
 5. **Gráficos:** se generan a partir de los CSV con matplotlib si ya es dependencia; si no, solo CSV y tabla en la ficha. (Verificar dependencias antes de la parte 2.)

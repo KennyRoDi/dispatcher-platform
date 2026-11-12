@@ -182,3 +182,26 @@ for wid in sorted(r.smembers("workers:registry")):
 Consola en http://localhost:9001 (`minioadmin` / `minioadmin`): bucket `dataset` (entradas en
 `demo/`) y `results` (salidas por `caso/subtarea/`). Para bajar las salidas y el reporte de un caso:
 `python -m scripts.fetch_results <case_id> --out resultados` (con `.env` apuntando al demo).
+
+## Escenario de ráfaga (F-33, B.6)
+
+Envuelve `scripts/run_load.py`, evalúa su JSON y escribe `latencia_por_caso.csv` y `recursos_por_nodo.csv` en `--out`. Requiere el coordinador y tres workers activos (`GET /workers` con tres hosts). Salida: el veredicto en JSON; código 0 si cumple, 1 si no.
+
+```bash
+PYTHONPATH=. python -m scenarios.burst --dataset dataset --limit 20 --concurrency 20 --timeout 1800 --out docs/evidencia
+```
+
+| Opción | Defecto | Regla |
+|---|---|---|
+| `--dataset` | `dataset` | Directorio de casos |
+| `--limit` | 20 | Mínimo 20 (SUP-46); menos termina con `error:` |
+| `--concurrency` | 20 | Al menos igual a `--limit` |
+| `--timeout` | 1800 | Segundos; un caso sin estado final al vencer da `timed_out` |
+| `--out` | `docs/evidencia` | Se crea y valida antes de iniciar la corrida |
+
+Límites conocidos (xfail estricto en `tests/unit/test_burst_qa.py`):
+- `evaluar({})` lanza `KeyError` en vez de reportar problemas.
+- `evaluar` usa `metrics["cases"]`, no `len(per_case)`: 20 declarados con menos filas cumple.
+- Un caso `failed` cuenta como final y no se reporta aparte en el veredicto.
+
+La corrida real en tres nodos es **Medición pendiente** (parte 2).
