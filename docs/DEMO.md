@@ -204,4 +204,7 @@ Límites conocidos (xfail estricto en `tests/unit/test_burst_qa.py`):
 - `evaluar` usa `metrics["cases"]`, no `len(per_case)`: 20 declarados con menos filas cumple.
 - Un caso `failed` cuenta como final y no se reporta aparte en el veredicto.
 
-La corrida real en tres nodos es **Medición pendiente** (parte 2).
+- Un caso `partially_completed` también cuenta como final y el veredicto da `cumple: true` (ocurrió con 40 casos en la simulación local).
+- `scenarios.burst` no sube el dataset a MinIO (`--upload` no existe, `upload=False` fijo): debe estar ya cargado en el almacén. El muestreo de `GET /workers` es fijo, `poll=5.0` s (`scenarios/burst.py:101`), sin opción en la CLI.
+
+Evidencia: [`docs/evidencia/F-33_rafaga.md`](evidencia/F-33_rafaga.md), corrida en **simulación local** (tres contenedores en una máquina; no acredita B.2). La corrida en tres nodos reales sigue **Medición pendiente**.

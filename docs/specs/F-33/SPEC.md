@@ -1,8 +1,8 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** pr
-**Base:** main
-**Verificación IA:** revision b54da91
+**Fase:** cerrada
+**Base:** feat/F-33-1-rafaga
+**Verificación IA:** revision 984e384
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
 ## Objetivo
@@ -81,7 +81,7 @@ TDD aplica a la lógica de `scenarios/burst.py` (Parte 1). La corrida en nodos n
 
 ## Mediciones
 
-B.6 Ráfaga. **Medición pendiente:** corrida en tres nodos worker reales (F-38 parte 2 sin nodos reales) y la ficha `docs/evidencia/F-33_rafaga.md`. Sin cifras inventadas.
+B.6 Ráfaga. **Estado (2026-11-12):** corrida hecha en **simulación local** (tres contenedores worker en una sola máquina): 3 repeticiones de 20 casos y 1 opcional de 40, las cuatro con `cumple: true`. Ficha y datos crudos: `docs/evidencia/F-33_rafaga.md`. La prueba en tres nodos worker reales sigue **PENDIENTE** (F-38 con nodos reales); por decisión de la persona la simulación se acepta provisionalmente como criterio de cierre y no acredita B.2.
 
 1. Con los tres workers activos (`GET /workers` muestra tres hosts): `PYTHONPATH=. python -m scenarios.burst --dataset dataset --limit 20 --concurrency 20 --timeout 1800 --out docs/evidencia/F-33_<fecha>` (el defecto de `--out` es `docs/evidencia`, según `scenarios/burst.py`).
 2. Tres repeticiones; se reporta cada una, no solo la mejor. Opcional: 40 casos para ver saturación.
@@ -107,9 +107,9 @@ Recomendación entre paréntesis; el orquestador las acepta por autonomía deleg
 3. **Un caso `failed` cuenta como estado final.** (Sí; el veredicto no lo reporta aparte: límite declarado, aparece solo en `case_status_counts` del JSON de `run_load`, ver `docs/DEMO.md`. El criterio habla de estado final, no de éxito.)
 4. **Tres hosts distintos como prueba de tres nodos.** (Sí; la simulación local lo cumple con hosts declarados y no acredita B.2.)
 5. **Gráficos:** se generan a partir de los CSV con matplotlib si ya es dependencia; si no, solo CSV y tabla en la ficha. (Verificar dependencias antes de la parte 2.)
-6. **Corrida real:** depende de F-38 con nodos reales y del dataset de F-03; hasta entonces «Medición pendiente».
+6. **Corrida real:** depende de F-38 con nodos reales y del dataset de F-03. Hecha en simulación local (2026-11-12), aceptada provisionalmente por la persona como criterio de cierre; la corrida en nodos reales sigue «Medición pendiente».
 7. **Dependencias de F-24 (backpressure):** una ráfaga puede recibir 429 del coordinador; `submit_error` hace fallar la evaluación. (Dejarlo así y documentarlo; reintentos serían decisión de F-24.)
-8. **Costo de la ráfaga en una sola máquina:** puede saturar el equipo de desarrollo. (Usar `--limit 20` y poco tamaño en simulación local.)
+8. **Costo de la ráfaga en una sola máquina:** puede saturar el equipo de desarrollo. (Usar `--limit 20` y poco tamaño en simulación local.) Resultado: con 40 casos el CPU del host llegó a casi 99 %; con 20 no saturó. El veredicto da `cumple: true` aun con un caso `partially_completed` (límite declarado).
 
 ## Aprobaciones
 
@@ -131,4 +131,14 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude Code (Sonnet 5.5), subagente documentador; verificación del orquestador | 2026-11-12 | AD-50 en ARQUITECTURA.md y SUP-46 en REQUERIMIENTOS.md existen; AD-50/SUP-46 libres en ramas remotas (git grep); DEMO.md documenta opciones reales; sin ficha de evidencia ni cifras; bitácora publicada con errores reales de la IA (b184c70) (b184c70) |
 | documentacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | verificación IA de revision | Claude Code (Sonnet 5.5), subagente revisor; verificación del orquestador | 2026-11-12 | Revisor: APROBADO con menores; pytest burst+arquitectura 65 passed, 1 skipped, 3 xfailed; diff sin cambios en src/ ni run_load.py; menores 1-3 (estado final con partially_completed, cita FINISHED_STATUSES, --out) corregidos en SPEC y SUP-46 (b54da91); menores 4-5 aceptados; sin cambios de código tras la prueba (b54da91) |
+| revision | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
+| verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-12 | Parte 2 es solo evidencia (SPEC Plan de pila: sin código); las pruebas del escenario ya están en la parte 1 (PR 144); no hay pruebas nuevas que escribir; excepción de la fase tests (f161348) |
+| tests | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-12 | Parte 2 sin código por SPEC: git diff feat/F-33-1-rafaga no toca src/ ni scenarios/; la corrida y la evidencia van en verificación y documentación (7ef2f16) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
+| verificación IA de verificacion | Claude Code (Sonnet 5.5), subagente medidor; verificación del orquestador | 2026-11-12 | Releí los JSON crudos de rep1-3 y 40 casos: estados, subtasks_per_host, throughput y latencia máx. coinciden con el informe; recalculé throughput de rep3 (135/20,572*60=393,7); veredicto cumple true en las 4; .env intacto, sin secretos en docs/evidencia, git limpio. No verifiqué por mi cuenta la corrida Docker (SIMULACIÓN LOCAL, no acredita B.2); heartbeat mide el host entero (límite) (1db32ff) |
+| verificacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
+| verificación IA de documentacion | Claude Code (Sonnet 5.5), subagente documentador; verificación del orquestador | 2026-11-12 | Ficha y DEMO contrastadas: 503+Retry-After en rutas_casos.py:184 verificado; SPEC marca nodos reales PENDIENTE y simulación como criterio provisional; cifras sin alterar; bitácora publicada con errores reales de la IA (7403b38) |
+| documentacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
+| verificación IA de revision | Claude Code (Sonnet 5.5), subagente revisor; verificación del orquestador | 2026-11-12 | Revisor: APROBADO con menores; diff sin src/scenarios/tests; ficha con aviso SIMULACIÓN LOCAL y nodos reales PENDIENTE; cifras recalculadas desde crudos coinciden; sin secretos; menor (521,67 vs 521,68) aceptado por estar explicado (984e384) |
 | revision | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
