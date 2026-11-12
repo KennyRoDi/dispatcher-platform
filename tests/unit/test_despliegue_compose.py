@@ -199,3 +199,80 @@ def test_imagen_arranca_el_worker_por_defecto():
 def test_env_example_apunta_al_nodo_a_por_tailscale(variable, valor):
     ejemplo = (RAIZ / ".env.example").read_text(encoding="utf-8")
     assert re.search(rf"^{variable}={re.escape(valor)}$", ejemplo, re.MULTILINE), f"{variable} no usa el marcador"
+
+
+COMPOSE_ANALISIS = "deploy/docker-compose.analisis.yml"
+TIPOS_DE_ANALISIS = {"worker-texto": "text", "worker-imagen": "image", "worker-audio": "audio"}
+
+
+@pytest.fixture
+def analisis() -> dict:
+    return _servicios(COMPOSE_ANALISIS)
+
+
+def _destinos(servicio: dict) -> dict[str, str]:
+    destinos = {}
+    for volumen in servicio.get("volumes") or []:
+        partes = volumen.split(":")
+        destinos[partes[-2] if partes[-1] in {"ro", "rw"} else partes[-1]] = volumen
+    return destinos
+
+
+def test_compose_de_analisis_mantiene_el_endurecimiento_de_los_workers(analisis):
+    compose = yaml.safe_load((RAIZ / COMPOSE_ANALISIS).read_text(encoding="utf-8"))
+    assert set(analisis) == set(TIPOS_DE_ANALISIS)
+    for nombre, servicio in analisis.items():
+        assert servicio["user"] == "10001:10001", nombre
+        assert servicio["read_only"] is True, nombre
+        assert servicio["cap_drop"] == ["ALL"], nombre
+        assert servicio["security_opt"] == ["no-new-privileges:true"], nombre
+        assert "privileged" not in servicio and "cap_add" not in servicio, nombre
+        assert _entorno(servicio)["WORK_DIR"] == "/scratch", nombre
+        origen = _destinos(servicio)["/scratch"].split(":")[0]
+        assert origen in compose["volumes"], nombre
+        assert any(re.fullmatch(r"/tmp:size=\d+[mg],.*", t) for t in servicio["tmpfs"]), nombre
+        assert servicio["build"]["dockerfile"] == "Dockerfile.analisis", nombre
+
+
+def test_compose_de_analisis_exige_limites_y_huellas_sin_valor_por_defecto(analisis):
+    perfiles = []
+    for nombre, kind in TIPOS_DE_ANALISIS.items():
+        servicio, entorno = analisis[nombre], _entorno(analisis[nombre])
+        sufijo = kind.upper()
+        assert _es_obligatoria(servicio.get("mem_limit"), f"WORKER_MEM_LIMIT_{sufijo}"), nombre
+        assert servicio["memswap_limit"] == servicio["mem_limit"], nombre
+        assert _es_obligatoria(entorno.get("ADMISSION_MARGIN_BYTES"), "ADMISSION_MARGIN_BYTES"), nombre
+        assert _es_obligatoria(entorno.get(f"FOOTPRINT_{sufijo}_BYTES"), f"FOOTPRINT_{sufijo}_BYTES"), nombre
+        assert entorno["WORKER_KIND"] == kind and servicio["build"]["args"]["KIND"] == kind, nombre
+        assert _es_obligatoria(servicio.get("hostname"), "NODE_NAME"), nombre
+        assert _es_obligatoria(entorno.get("NODE_IP"), "NODE_IP"), nombre
+        assert entorno["KEK_FILE"] == "/run/secrets/kek" and "KEK" not in entorno, nombre
+        assert _destinos(servicio)["/run/secrets/kek"].endswith(":/run/secrets/kek:ro"), nombre
+        assert entorno["HF_HOME"].startswith("/models/") and "/models" in _destinos(servicio), nombre
+        assert "network_mode" not in servicio and "scale" not in servicio, nombre
+        assert "replicas" not in (servicio.get("deploy") or {}), nombre
+        perfiles += servicio["profiles"]
+    assert len(set(perfiles)) == len(TIPOS_DE_ANALISIS)
+
+
+def test_dockerfile_de_analisis_usa_uid_fijo_y_scratch():
+    from scripts.verificar_workers import incumplimientos_dockerfile
+
+    dockerfile = (RAIZ / "Dockerfile.analisis").read_text(encoding="utf-8")
+    assert incumplimientos_dockerfile(dockerfile) == []
+    assert re.search(r'^CMD\s+\[.*"src\.workers\.typed_worker"\]', dockerfile, re.MULTILINE)
+    assert re.search(r"^FROM\s+python:3\.13", dockerfile, re.MULTILINE)
+    for carpeta in ("src", "scripts", "config"):
+        assert re.search(rf"^COPY\s+{carpeta}\s", dockerfile, re.MULTILINE), carpeta
+
+
+def test_nodo_a_pasa_kek_bucket_y_staging_al_coordinador(nodo_a):
+    coordinador = _servicio(nodo_a, "coordinator")
+    entorno = _entorno(coordinador)
+    assert entorno.get("OBJECTS_BUCKET", "").startswith("${OBJECTS_BUCKET")
+    assert entorno.get("STAGING_DIR") == "/var/lib/dispatcher/staging"
+    assert entorno.get("KEK_FILE") == "/run/secrets/kek"
+    assert "KEK" not in entorno
+    volumenes = _destinos(coordinador)
+    assert volumenes["/run/secrets/kek"].endswith(":/run/secrets/kek:ro")
+    assert "/var/lib/dispatcher/staging" in volumenes

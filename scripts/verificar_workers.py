@@ -7,7 +7,12 @@ from pathlib import Path
 import yaml
 
 RAIZ = Path(__file__).resolve().parents[1]
-COMPOSES = ["deploy/docker-compose.worker.yml", "deploy/docker-compose.local.yml"]
+COMPOSES = [
+    "deploy/docker-compose.worker.yml",
+    "deploy/docker-compose.local.yml",
+    "deploy/docker-compose.analisis.yml",
+]
+DOCKERFILES = ["Dockerfile.worker", "Dockerfile.analisis"]
 UID_FIJO = "10001"
 DIRECTORIO_TRABAJO = "/scratch"
 _USUARIO_NUMERICO = re.compile(r"[1-9]\d*(:[1-9]\d*)?")
@@ -133,17 +138,21 @@ def incumplimientos_dockerfile(texto: str) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     analizador = argparse.ArgumentParser(description="Verifica que los workers no tengan privilegios.")
     analizador.add_argument("--compose", action="append", type=Path)
-    analizador.add_argument("--dockerfile", type=Path)
+    analizador.add_argument("--dockerfile", action="append", type=Path)
     args = analizador.parse_args(argv)
     composes = args.compose or [RAIZ / ruta for ruta in COMPOSES]
-    dockerfile = args.dockerfile or RAIZ / "Dockerfile.worker"
+    dockerfiles = args.dockerfile or [RAIZ / ruta for ruta in DOCKERFILES]
 
     problemas = []
     try:
         for ruta in composes:
             contenido = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
             problemas += [f"{ruta.name}: {p}" for p in incumplimientos_compose(contenido)]
-        problemas += incumplimientos_dockerfile(dockerfile.read_text(encoding="utf-8"))
+        for dockerfile in dockerfiles:
+            problemas += [
+                f"{dockerfile.name}: {p}"
+                for p in incumplimientos_dockerfile(dockerfile.read_text(encoding="utf-8"))
+            ]
     except (OSError, ValueError, yaml.YAMLError) as error:
         problemas.append(f"no se pudo leer: {error}")
     for problema in problemas:

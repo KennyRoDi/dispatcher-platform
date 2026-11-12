@@ -2,7 +2,6 @@
 
 import ipaddress
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -14,7 +13,19 @@ from src.domain.node_budget import validate_node_budget
 
 
 COMPOSE_FILES = ["deploy/docker-compose.worker.yml"]
+ANALYSIS_COMPOSE = "deploy/docker-compose.analisis.yml"
+GPU_COMPOSE = "deploy/docker-compose.worker-gpu.yml"
+ANALYSIS_KINDS = ("text", "image", "audio")
 GIB = 1024**3
+
+
+def compose_files_for(argv: list[str]) -> list[str]:
+    files = [] if "--solo-analisis" in argv else COMPOSE_FILES.copy()
+    if "--analisis" in argv or "--solo-analisis" in argv:
+        files.append(ANALYSIS_COMPOSE)
+    if "--gpu" in argv:
+        files.append(GPU_COMPOSE)
+    return files
 
 
 def _node_memory_bytes() -> int:
@@ -63,6 +74,16 @@ def _compose_config(compose_files: list[str]) -> dict:
     return json.loads(result.stdout)
 
 
+def _validate_analysis_footprints(name: str, environment: dict) -> None:
+    kind = environment.get("WORKER_KIND")
+    if kind is None:
+        return
+    if kind not in ANALYSIS_KINDS:
+        raise ValueError(f"Servicio {name} tiene un WORKER_KIND inválido")
+    for variable in ("ADMISSION_MARGIN_BYTES", f"FOOTPRINT_{kind.upper()}_BYTES"):
+        _memory_limit_bytes(environment.get(variable), name, variable)
+
+
 def validate_config(config: dict, node_memory: int) -> None:
     services = config.get("services")
     if not isinstance(services, dict) or not services:
@@ -88,6 +109,7 @@ def validate_config(config: dict, node_memory: int) -> None:
                         ipaddress.ip_address(value)
                     except ValueError as error:
                         raise ValueError("NODE_IP debe ser una dirección IPv4 o IPv6 válida") from error
+            _validate_analysis_footprints(name, environment)
         else:
             continue
         memory = _memory_limit_bytes(service.get("mem_limit"), name, "mem_limit")
@@ -105,11 +127,8 @@ def validate_config(config: dict, node_memory: int) -> None:
 
 
 def main() -> int:
-    compose_files = COMPOSE_FILES.copy()
-    if "--gpu" in os.sys.argv[1:]:
-        compose_files.append("deploy/docker-compose.worker-gpu.yml")
     try:
-        config = _compose_config(compose_files)
+        config = _compose_config(compose_files_for(sys.argv[1:]))
         memory = _node_memory_bytes()
         validate_config(config, memory)
     except (OSError, ValueError, subprocess.CalledProcessError, json.JSONDecodeError) as error:

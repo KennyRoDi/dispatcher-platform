@@ -1,0 +1,153 @@
+# Workers de analisis tipados (F-43): worker-texto, worker-imagen y worker-audio para los nodos B, C y D.
+# Cada servicio tiene su perfil: el .env del nodo fija COMPOSE_PROFILES=texto,imagen,audio (los tipos que le tocan).
+# Cada tipo debe correr en al menos dos nodos (ARQUITECTURA §6). El reparto se fija al medir (M1); ver docs/DEPLOY_WORKERS.md §10.
+# --env-file es necesario: el archivo esta en deploy/ y Compose no buscaria alli el .env de la raiz.
+#   docker compose --env-file .env -f deploy/docker-compose.analisis.yml up -d --build
+#
+# hostname fijo desde NODE_NAME y WORKER_ID propio por tipo: no se usa --scale (AD-23), porque las replicas compartirian
+# worker_id, heartbeat y lista inflight. Memoria, huellas y margen de admision son obligatorios y no tienen valor por
+# defecto: sin medir, el worker no arranca. No inventar valores.
+# La KEK (KEK_FILE del .env, ruta en ESTE nodo, fuera del repositorio, modo 0400 o 0600, propiedad del UID 10001) se monta de solo lectura.
+
+services:
+  worker-texto:
+    profiles: ["texto"]
+    build:
+      context: ..
+      dockerfile: Dockerfile.analisis
+      args:
+        KIND: text
+    hostname: ${NODE_NAME:?define NODE_NAME en .env}
+    env_file: ../.env
+    mem_limit: ${WORKER_MEM_LIMIT_TEXT:?define WORKER_MEM_LIMIT_TEXT en .env}
+    memswap_limit: ${WORKER_MEM_LIMIT_TEXT:?define WORKER_MEM_LIMIT_TEXT en .env}
+    environment:
+      WORKER_KIND: text
+      NODE_NAME: ${NODE_NAME:?define NODE_NAME en .env}
+      WORKER_ID: worker-${NODE_NAME}-text
+      WORK_DIR: /scratch
+      CONFIG_DIR: /app/config
+      NODE_IP: ${NODE_IP:?define NODE_IP en .env}
+      TLS_ENABLED: ${TLS_ENABLED:-true}
+      TLS_CA_FILE: /certs/ca.pem
+      OBJECTS_BUCKET: ${OBJECTS_BUCKET:-objetos}
+      KEK_FILE: /run/secrets/kek
+      ADMISSION_MARGIN_BYTES: ${ADMISSION_MARGIN_BYTES:?define ADMISSION_MARGIN_BYTES en .env (medir segun M1)}
+      FOOTPRINT_TEXT_BYTES: ${FOOTPRINT_TEXT_BYTES:?define FOOTPRINT_TEXT_BYTES en .env (medir segun M1)}
+      HF_HOME: /models/huggingface
+      XDG_CACHE_HOME: /models/cache
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${TLS_CA_FILE:-/dev/null}:/certs/ca.pem:ro
+      - ${KEK_FILE:?define KEK_FILE en .env (ruta de la KEK en este nodo)}:/run/secrets/kek:ro
+      - scratch-texto:/scratch
+      - modelos:/models
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    # Un analisis ya iniciado termina antes de salir (SIGTERM -> stop_event); el limite no esta medido.
+    stop_grace_period: 10m
+
+  worker-imagen:
+    profiles: ["imagen"]
+    build:
+      context: ..
+      dockerfile: Dockerfile.analisis
+      args:
+        KIND: image
+    hostname: ${NODE_NAME:?define NODE_NAME en .env}
+    env_file: ../.env
+    mem_limit: ${WORKER_MEM_LIMIT_IMAGE:?define WORKER_MEM_LIMIT_IMAGE en .env}
+    memswap_limit: ${WORKER_MEM_LIMIT_IMAGE:?define WORKER_MEM_LIMIT_IMAGE en .env}
+    environment:
+      WORKER_KIND: image
+      NODE_NAME: ${NODE_NAME:?define NODE_NAME en .env}
+      WORKER_ID: worker-${NODE_NAME}-image
+      WORK_DIR: /scratch
+      CONFIG_DIR: /app/config
+      NODE_IP: ${NODE_IP:?define NODE_IP en .env}
+      TLS_ENABLED: ${TLS_ENABLED:-true}
+      TLS_CA_FILE: /certs/ca.pem
+      OBJECTS_BUCKET: ${OBJECTS_BUCKET:-objetos}
+      KEK_FILE: /run/secrets/kek
+      ADMISSION_MARGIN_BYTES: ${ADMISSION_MARGIN_BYTES:?define ADMISSION_MARGIN_BYTES en .env (medir segun M1)}
+      FOOTPRINT_IMAGE_BYTES: ${FOOTPRINT_IMAGE_BYTES:?define FOOTPRINT_IMAGE_BYTES en .env (medir segun M1)}
+      HF_HOME: /models/huggingface
+      XDG_CACHE_HOME: /models/cache
+      YOLO_WEIGHTS_DIR: /models/yolo
+      FRAME_EVERY_S: ${FRAME_EVERY_S:-5}
+      FRAME_MAX: ${FRAME_MAX:-20}
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${TLS_CA_FILE:-/dev/null}:/certs/ca.pem:ro
+      - ${KEK_FILE:?define KEK_FILE en .env (ruta de la KEK en este nodo)}:/run/secrets/kek:ro
+      - scratch-imagen:/scratch
+      - modelos:/models
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    # Un analisis ya iniciado termina antes de salir (SIGTERM -> stop_event); el limite no esta medido.
+    stop_grace_period: 10m
+
+  worker-audio:
+    profiles: ["audio"]
+    build:
+      context: ..
+      dockerfile: Dockerfile.analisis
+      args:
+        KIND: audio
+    hostname: ${NODE_NAME:?define NODE_NAME en .env}
+    env_file: ../.env
+    mem_limit: ${WORKER_MEM_LIMIT_AUDIO:?define WORKER_MEM_LIMIT_AUDIO en .env}
+    memswap_limit: ${WORKER_MEM_LIMIT_AUDIO:?define WORKER_MEM_LIMIT_AUDIO en .env}
+    environment:
+      WORKER_KIND: audio
+      NODE_NAME: ${NODE_NAME:?define NODE_NAME en .env}
+      WORKER_ID: worker-${NODE_NAME}-audio
+      WORK_DIR: /scratch
+      CONFIG_DIR: /app/config
+      NODE_IP: ${NODE_IP:?define NODE_IP en .env}
+      TLS_ENABLED: ${TLS_ENABLED:-true}
+      TLS_CA_FILE: /certs/ca.pem
+      OBJECTS_BUCKET: ${OBJECTS_BUCKET:-objetos}
+      KEK_FILE: /run/secrets/kek
+      ADMISSION_MARGIN_BYTES: ${ADMISSION_MARGIN_BYTES:?define ADMISSION_MARGIN_BYTES en .env (medir segun M1)}
+      FOOTPRINT_AUDIO_BYTES: ${FOOTPRINT_AUDIO_BYTES:?define FOOTPRINT_AUDIO_BYTES en .env (medir segun M1)}
+      HF_HOME: /models/huggingface
+      XDG_CACHE_HOME: /models/cache
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${TLS_CA_FILE:-/dev/null}:/certs/ca.pem:ro
+      - ${KEK_FILE:?define KEK_FILE en .env (ruta de la KEK en este nodo)}:/run/secrets/kek:ro
+      - scratch-audio:/scratch
+      - modelos:/models
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    # Un analisis ya iniciado termina antes de salir (SIGTERM -> stop_event); el limite no esta medido.
+    stop_grace_period: 10m
+
+volumes:
+  scratch-texto:
+  scratch-imagen:
+  scratch-audio:
+  # Pesos de modelos (HuggingFace y YOLO): con read_only no hay donde descargarlos si no es este volumen.
+  modelos:
