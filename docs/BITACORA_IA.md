@@ -1363,3 +1363,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Corregido: QA devolvio por 503 falsos (H1) y se rediseno con Lua antes de aprobar |
 | Cómo se validó | Redis real: estres con productores y workers, paridad clave por clave con el pipeline, mutantes; suite 3778 verde en Linux |
 | Error de la IA | 1) La IA diseno la admision con WATCH/MULTI/EXEC y no previo que cualquier RPUSH o LPOP invalida el WATCH: daba 503 en 7-25 % de los casos con la cola casi vacia; se cambio a Lua. 2) No previo que un caso mas grande que el limite recibiria 503 para siempre. 3) La configuracion invalida daba 500 por peticion en vez de fallar al arrancar. |
+
+## 2026-11-11 · Melany Vindas · F-24 (`feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) |
+| Componente | F-24 |
+| Propósito | F-24 parte 2: primitiva para que el scheduler mueva solo con espacio en la cola |
+| Consulta resumida | Escribir pruebas, implementar mover_acotado con Lua y verificar con QA independiente |
+| Resultado obtenido | mover_acotado con script Lua atomico (KEYS[1]); sin limite encola directo |
+| Validado / corregido / descartado | Validado |
+| Cómo se validó | fakeredis[lua] y Redis real con 16 y 64 hilos concurrentes; mutantes detectados |
+| Error de la IA | En la parte 1 la IA paso las claves por ARGV en el script Lua, lo que no sirve en Redis Cluster; en esta parte se usaron KEYS correctamente. |
