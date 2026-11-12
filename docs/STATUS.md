@@ -4,7 +4,7 @@
 | Feature | Estado |
 |---|---|
 | F-01 | hecha |
-| F-02 | implementacion |
+| F-02 | verificacion |
 | F-03 | hecha |
 | F-04 | hecha |
 | F-05 | hecha |
