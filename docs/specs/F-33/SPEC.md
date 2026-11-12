@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** implementacion f142f42
+**Verificación IA:** implementacion 8002922
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
 ## Objetivo
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Code (Sonnet 5.5), subagente developer; verificación del orquestador | 2026-11-12 | pytest burst unit+integracion+aceptacion+arquitectura: 52 passed, 1 skipped (BURST_JSON); git diff de tests/ desde fase 2 vacío (sin debilitar); scenarios/burst.py 107 líneas, solo scenarios/, run_load.run_load y args compatibles (leído); sin cambios en src/ (f142f42) (f142f42) |
 | implementacion | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | devuelta de verificacion | Kenni Rodriguez | 2026-11-12 | QA: main con --limit<20 o concurrencia<limit da traza; --out invalido se detecta tras hasta 1800 s de corrida; escribir_csv([]) deja archivo vacio. Corregir hallazgos 1, 2 y 5 de test_burst_qa.py (quitar sus xfail); 3, 4 y 6 quedan como limites declarados |
+| verificación IA de implementacion | Claude Code (Sonnet 5.5), subagente developer; verificación del orquestador | 2026-11-12 | pytest burst unit+qa+integracion+aceptacion+arquitectura: 65 passed, 1 skipped, 3 xfailed (limites 3,4,6 declarados); diff de tests/ vs 5ad092d solo quita 3 xfail de hallazgos corregidos; cambios solo en scenarios/burst.py (8002922) (8002922) |
