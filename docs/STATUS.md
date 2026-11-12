@@ -13,7 +13,7 @@
 | F-08 | hecha |
 | F-09 | hecha |
 | F-10 | hecha |
-| F-11 | documentacion |
+| F-11 | revision |
 | F-12 | hecha |
 | F-13 | hecha |
 | F-14 | hecha |
@@ -43,5 +43,5 @@
 | F-38 | hecha |
 | F-39 | hecha |
 | F-40 | hecha |
-| F-41 | pendiente |
+| F-41 | plan |
 | F-42 | pendiente |
