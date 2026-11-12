@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
 **Verificación IA:** tests 544d8f08
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -119,3 +119,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) APROBADO: cumple el SPEC parte 1 sin faltantes ni agregados; Lua revisa todas las colas antes de escribir y respeta el borde; cambio en rutas_casos limitado a envolver los comandos existentes (paridad confirmada); capas, comentarios y commits correctos; ~214 lineas. Suite 3778 verde, integracion Redis real 4 pasan y 1 xfail documentado, conformidad 0. SPEC ajustado con sus sugerencias. (b7e0d357) |
 | revision | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 4 unitarias de mover_acotado con fakeredis[lua] (cola llena no mueve, con espacio encola al final, desactivado siempre encola, borde exacto) y 1 de integracion con Redis real (16 hilos, limite 40, nunca se supera). Rojo: la funcion no existe. (544d8f08) |
+| tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
