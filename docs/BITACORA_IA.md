@@ -1376,3 +1376,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado |
 | Cómo se validó | fakeredis[lua] y Redis real con 16 y 64 hilos concurrentes; mutantes detectados |
 | Error de la IA | En la parte 1 la IA paso las claves por ARGV en el script Lua, lo que no sirve en Redis Cluster; en esta parte se usaron KEYS correctamente. |
+
+## 2026-11-11 · Melany Vindas · F-25 (`feat/F-25-1-responder-durante-subidas-grandes`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude (Opus 5.5) |
+| Componente | F-25 |
+| Propósito | F-25: que la API responda durante subidas grandes |
+| Consulta resumida | Planificar, probar y cerrar el ultimo bloqueo del event loop en la recepcion por chunks |
+| Resultado obtenido | expected_size en el pool de hilos; pruebas de no bloqueo con cuerpo lento, manifiesto lento y uvicorn real |
+| Validado / corregido / descartado | Corregido: QA detecto que la integracion usaba el doble en memoria y agrego una con disco real |
+| Cómo se validó | Pruebas con eventos y uvicorn real, mutante detectado; suite verde en Linux |
+| Error de la IA | La prueba de integracion que escribio la IA usaba FakeChunkStaging, que no lee del disco, y seguia pasando aunque se quitara el arreglo; QA lo detecto. |
