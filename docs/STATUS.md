@@ -41,7 +41,7 @@
 | F-36 | hecha |
 | F-37 | hecha |
 | F-38 | hecha |
-| F-39 | en-pr |
+| F-39 | hecha |
 | F-40 | hecha |
 | F-41 | pendiente |
 | F-42 | pendiente |
