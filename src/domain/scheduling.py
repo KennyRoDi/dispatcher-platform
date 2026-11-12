@@ -39,6 +39,15 @@ class SchedulingPolicy(Enum):
     FIFO = "fifo"
     AGING = "aging"
 
+    @classmethod
+    def desde_configuracion(cls, valor: str) -> "SchedulingPolicy":
+        """Mapea un valor de configuración (ej. variable de entorno) a la política."""
+        try:
+            return cls(valor.lower())
+        except ValueError as exc:
+            opciones = ", ".join(p.value for p in cls)
+            raise ValueError(f"política de scheduling desconocida: {valor!r} (opciones: {opciones})") from exc
+
 
 @dataclass
 class CaseEntry:
