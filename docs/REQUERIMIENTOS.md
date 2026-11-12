@@ -152,6 +152,7 @@ El documento no define estos puntos. Son decisiones provisionales, no requisitos
 | SUP-42 | **Provisional:** el id de sub-tarea es `{case_id}:{sha256}:{kind}`. | Es determinista y trazable a caso, fuente y tipo (RF-04, RF-05); ver AD-46. |
 | SUP-43 | **Provisional:** la misma fuente repetida en un caso produce una sola sub-tarea. | Evita duplicar evidencia idéntica y permite reintentar sin duplicar; ver AD-46. |
 | SUP-44 | Un timestamp sin huso horario explícito en una exportación de WhatsApp o Telegram se interpreta como UTC. | No hay dato en el archivo que permita detectar el huso real; el dataset sintético de F-03 ya se genera en UTC. Exportaciones reales en otro huso deben convertirse antes de ingresar; ver AD-48. |
+| SUP-46 | **Provisional:** «concurrente» significa concurrencia de envío ≥ número de casos (mínimo 20), para que todos estén en vuelo a la vez. «Estado final» es `completed`, `failed` o `cancelled`; un caso `failed` cuenta como final. «Tres nodos activos» son tres `host` distintos con sub-tareas procesadas o visibles en `series`. El plazo de la corrida es el `--timeout` de `run_load`. | El enunciado pide «al menos 20 casos concurrentes» sin precisar el grado de concurrencia ni qué es un estado final; ver AD-50. |
 
 ## 4. Discrepancias detectadas al contrastar con el documento
 
