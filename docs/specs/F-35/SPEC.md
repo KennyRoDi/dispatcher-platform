@@ -1,6 +1,6 @@
 # SPEC F-35: Reinicio del coordinador
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 83b294a
 **Historia:** US-35 · **Requisitos:** RF-44 (B.6 «Reinicio del coordinador») · **Responsable:** N
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | claude | 2026-11-12 | SPEC F-35 completado tras verificar en el codigo que no existe ninguna funcion de reconciliacion para el coordinador (git grep reconcili sin resultados en src/) porque AD-21 ya decidio que es stateless; F-35 mide con datos reales lo que AD-21 dejo como 'Medicion pendiente'. Diseno: simular el reinicio construyendo una instancia nueva de crear_app() contra el mismo Redis, mismo patron que F-34/cancel_heavy.py. Plan de 1 parte, ~140 lineas (51ca420) |
 | plan | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de tests | claude | 2026-11-12 | 6 pruebas unitarias en rojo (falta scenarios/coordinator_restart.py). 1 prueba de integracion pasa de inmediato (dos clientes fakeredis sobre el mismo FakeServer, simulando reconexion real; valida crear_app/rutas heredadas sin codigo nuevo). 1 aceptacion omitida (sin COORDINATOR_RESTART_JSON). 44 passed en regresion (83b294a) |
+| tests | Nahúm Murillo | 2026-11-12 |  |
