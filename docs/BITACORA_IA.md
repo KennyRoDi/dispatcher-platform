@@ -1633,3 +1633,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Orquestador releyó los JSON crudos y recalculó el throughput de rep3; documentador contrastó con grep las referencias de código; .env intacto y sin secretos. NO se probó en tres nodos reales (B.2/Tailscale): sigue pendiente y la simulación se acepta provisionalmente por decisión de la persona. Aprobaciones delegadas; verificación no independiente de la sesión |
 | Cómo se validó | Simulación local autorizada por la persona; aprobaciones delegadas |
 | Error de la IA | El medidor adaptó la receta F-38 por TLS/JWT y renombró container_name; su ficha decía 429 donde el código da 503 y atribuía a DEMO.md una declaración inexistente de partially_completed (detectado por el documentador con grep y corregido) |
+
+## 2026-11-12 · Kenni Rodriguez · F-43 parte 1 (`feat/F-43-1-integracion-de-workers-tipados`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes developer |
+| Componente | F-43 parte 1 |
+| Propósito | Hacer que la plataforma entienda el formato tipado: prioridad normal/high, persistir antes de encolar, límite de cola, /stats con colas tipadas, reencolado en formato Subtask y reaper con el inflight tipado |
+| Consulta resumida | Pruebas en rojo, implementación mínima y corrección de dos pruebas existentes de /stats |
+| Resultado obtenido | 9 archivos de código con 113 líneas nuevas; 68 pruebas de la parte pasan; CI detectó que dos pruebas existentes de /stats asumían solo las colas de FFmpeg |
+| Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y comparando 23 archivos de regresión con un worktree de main (72 fallos idénticos de entorno); modo rápido sin subagentes de QA ni de revisión, por pedido de la persona |
+| Cómo se validó | pytest sobre los archivos de la parte, test_arquitectura y regresión; la suite completa la valida CI en Linux |
+| Error de la IA | El developer reportó la parte como lista y la PR falló en CI en dos pruebas existentes (test_stats en test_coordinator y test_contract) porque /stats ahora incluye las colas tipadas; se corrigieron. El reaper tipado usa recover_subtask y no reencolar_huerfanas, porque esa duplicaba el elemento en la cola |
