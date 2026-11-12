@@ -1,8 +1,8 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** revision
+**Fase:** en-pr
 **Base:** main
-**Verificación IA:** revision 055a16b
+**Verificación IA:** revision c26747b
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
