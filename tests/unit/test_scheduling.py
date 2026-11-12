@@ -9,6 +9,18 @@ from enum import Enum
 import pytest
 
 
+class TestPriorityUnificada:
+    """F-06: Priority no debe duplicarse entre scheduling.py y la canonica de priority.py."""
+
+    def test_priority_es_la_misma_clase_en_scheduling_y_en_subtask(self):
+        from src.domain.scheduling import Priority as PriorityDeScheduling
+        from src.domain.priority import Priority as PriorityCanonica
+
+        assert PriorityDeScheduling is PriorityCanonica, (
+            "scheduling.Priority debe reexportar la clase canonica de priority.py, no duplicarla"
+        )
+
+
 class TestPriorityEnum:
     """Priority debe ser un enum de 4 niveles con validación."""
 

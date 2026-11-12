@@ -22,9 +22,10 @@ F-06 entrega ese adaptador real (`RedisTypeQueue`) y resuelve la causa de pérdi
   - `take(queue, worker_id, timeout)`: **`BLMOVE queue inflight:{worker_id} LEFT RIGHT timeout`** — atómico, sin ventana de pérdida
   - `in_flight(worker_id)`: `LRANGE inflight:{worker_id}` deserializado a `Subtask`
   - `acknowledge(worker_id, subtask)`: `LREM inflight:{worker_id} 1 <json>` tras procesar
-  - `reencolar_huerfanas(worker_id)`: mueve, de una en una y atómicamente (`LMOVE`), cada sub-tarea de `inflight:{worker_id}` de vuelta a su cola original (derivada de `Subtask.kind` vía `queue_for`, reutilizando `src/domain/decomposition.py`); es el mecanismo de reencolado que el criterio de aceptación llama «el reaper». Quien decide que un worker murió es quien llama a este método (no es un daemon ni requiere un registro de workers vivos: eso es trabajo de F-34, que depende de F-06).
+  - `reencolar_huerfanas(worker_id, limite=None)`: mueve, de una en una y atómicamente (`LMOVE`), cada sub-tarea de `inflight:{worker_id}` de vuelta a su cola original (derivada de `Subtask.kind` vía `queue_for`, reutilizando `src/domain/decomposition.py`); devuelve cuántas movió. Es el mecanismo de reencolado que el criterio de aceptación llama «el reaper». Quien decide que un worker murió es quien llama a este método (no es un daemon ni requiere un registro de workers vivos: eso es trabajo de F-34, que depende de F-06). `limite` (opcional) acota cuántas mueve en una llamada, para poder demostrar que una interrupción a medias no pierde ni duplica nada: lo no movido sigue intacto en `inflight` y una llamada posterior retoma donde quedó.
 - Pruebas de conformidad del adaptador con `comprobar_work_queue` (ya existe en `tests/contratos.py:21-35`, sin modificar).
 - `docs/ARQUITECTURA.md` §8: refinar AD-03 declarando que, para el camino de F-05, el adaptador real usa `BLMOVE` a una *lista* `inflight:{worker_id}` (no un *set*, porque `BLMOVE` exige listas en ambos extremos).
+- **Corrección de bug encontrado al escribir las pruebas de F-06** (aprobado por la persona para incluir aquí, no en PR aparte): `src/domain/scheduling.py` define su propia clase `Priority(Enum)` (con `bonus_ms`/`next_priority`, agregada en F-20) en vez de reutilizar la clase `Priority` canónica y «Compartida» (`docs/CONTRATOS.md`) de `src/domain/priority.py`, que ya existía desde antes de F-20 y es la que usa `Subtask`. Son dos clases distintas con los mismos miembros: `scheduling.Priority.ALTA != priority.Priority.ALTA`. Se corrige moviendo `bonus_ms`/`next_priority` a la clase canónica y haciendo que `scheduling.py` la reimporte (`from src.domain.priority import Priority`), sin cambiar ninguna firma pública: todo el código que hace `from src.domain.scheduling import Priority` (p. ej. `src/application/ports.py:14`) sigue funcionando igual, porque sigue siendo el mismo objeto reexportado.
 
 **No incluye:**
 - Modificar `src/workers/worker_node.py`, `scripts/reaper.py` ni `src/workers/recovery.py` (camino heredado de F-07/F-08/F-09, en producción; ver nota de alcance arriba).
@@ -50,10 +51,12 @@ Copiado de `docs/backlog/cola-workers.md` (US-06):
 - `Subtask`, `ContentKind`, `QueueFull` (`src/domain/subtask.py`): serialización con `to_dict`/`from_dict`, ya probada en `test_subtarea_viaja_serializada_sin_perder_datos`
 - `queue_for` (`src/domain/decomposition.py`, F-05): deriva la cola original de un `ContentKind`, reutilizado por `reencolar_huerfanas`
 
-**Archivos a crear** (todos de Nahúm, M2/coordinador; `docs/CONTRATOS.md` ya lista `WorkQueue` como suyo):
+**Archivos a crear/modificar** (todos de Nahúm, M2/coordinador; `docs/CONTRATOS.md` ya lista `WorkQueue` como suyo):
 - `src/adapters/redis_type_queue.py` (nuevo): `RedisTypeQueue`
 - `tests/unit/test_redis_type_queue.py` (nuevo): conformidad con `comprobar_work_queue` sobre `fakeredis`, prueba de atomicidad `BLMOVE`
 - `tests/integration/test_redis_type_queue_reaper.py` (nuevo): `reencolar_huerfanas` con `fakeredis`
+- `src/domain/priority.py` (existente): agregar `bonus_ms()` y `next_priority()` (movidos desde `scheduling.py`)
+- `src/domain/scheduling.py` (existente): quitar la clase `Priority` duplicada, reimportar la canónica
 
 **Decisión aplicada (refina AD-03, no es una alternativa nueva):**
 - AD-03 ya decidió `BLMOVE` a `inflight:{worker}` como la forma de cerrar la ventana de pérdida; este SPEC fija el detalle que AD-03 no explicitaba: `inflight:{worker_id}` debe ser una **lista** (no un *set*, como usa el camino heredado) porque `BLMOVE` solo opera sobre listas. Se registra como adición a la fila AD-03 en la fase de documentación, citando que esto aplica al camino de F-05/F-06, no al heredado.
@@ -69,6 +72,7 @@ Copiado de `docs/backlog/cola-workers.md` (US-06):
 | Unitaria | `test_muerte_tras_blmove_deja_subtarea_en_inflight` | `tests/unit/test_redis_type_queue.py` | Tras `take()`, la sub-tarea está en `in_flight(worker_id)` aunque el worker no haga nada más (simula la muerte): no hay ventana en la que no esté en ninguna parte |
 | Unitaria | `test_take_en_cola_vacia_no_bloquea_mas_del_timeout` | `tests/unit/test_redis_type_queue.py` | `take` con cola vacía devuelve `None` tras el timeout, sin colgarse |
 | Integración | `test_reaper_reencola_huerfanas_a_su_cola_original` | `tests/integration/test_redis_type_queue_reaper.py` | Con varias sub-tareas de distinto `kind` en `inflight:{worker}`, `reencolar_huerfanas` las devuelve cada una a su cola (`queue_for`), vacía `inflight` y no duplica ni pierde ninguna |
+| Unitaria | `test_priority_es_la_misma_clase_en_scheduling_y_en_subtask` | `tests/unit/test_scheduling.py` | `scheduling.Priority is priority.Priority` (una sola clase, no dos compatibles por casualidad) |
 | Integración | `test_reaper_no_pierde_nada_si_se_interrumpe_a_medias` | `tests/integration/test_redis_type_queue_reaper.py` | Simulando una interrupción tras mover solo parte de las huérfanas, ninguna sub-tarea queda fuera de `inflight` o de su cola (nunca en ningún punto intermedio inexistente) |
 
 ## Mediciones
