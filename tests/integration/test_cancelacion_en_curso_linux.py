@@ -97,7 +97,7 @@ def test_process_real_con_ffmpeg_se_cancela_y_no_deja_hijos(tmp_path):
 
     def correr():
         try:
-            mp.process("transcode", str(entrada), str(tmp_path / "out"),
+            mp.process("transcode_video", str(entrada), str(tmp_path / "out"),
                        params={"width": 1920, "preset": "veryslow"}, supervisor=sup)
         except Exception:
             pass

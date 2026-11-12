@@ -121,6 +121,7 @@ class Settings:
     max_attempts: int = 3
     hwaccel: str | None = None
     node_ip: str | None = None
+    worker_token: str | None = field(default=None, repr=False)
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -169,6 +170,7 @@ class Settings:
             max_attempts=_int(env, "MAX_ATTEMPTS", cls.max_attempts),
             hwaccel=_parse_hwaccel(env.get("HWACCEL")),
             node_ip=_optional_str(env, "NODE_IP"),
+            worker_token=_optional_str(env, "WORKER_TOKEN"),
         )
 
     def queue_keys(self) -> list[str]:

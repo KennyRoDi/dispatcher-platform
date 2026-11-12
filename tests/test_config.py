@@ -226,3 +226,16 @@ def test_from_env_strips_windows_line_endings():
     assert s.redis_password is None
     assert s.worker_queues == ("transcode_video", "extract_audio")
     assert s.worker_concurrency == 2
+
+
+def test_worker_token_se_lee_del_entorno_sin_espacios():
+    assert Settings.from_env({"WORKER_TOKEN": "  abc.def.ghi \r"}).worker_token == "abc.def.ghi"
+
+
+def test_worker_token_ausente_o_vacio_es_none():
+    assert Settings.from_env({}).worker_token is None
+    assert Settings.from_env({"WORKER_TOKEN": ""}).worker_token is None
+
+
+def test_worker_token_no_aparece_en_el_repr():
+    assert "secreto-del-token" not in repr(Settings.from_env({"WORKER_TOKEN": "secreto-del-token"}))

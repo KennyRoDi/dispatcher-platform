@@ -24,10 +24,11 @@ sin necesitar el `.env` del equipo:
 La demo local va **en claro**: `.env.demo` y `docker-compose.demo.yml` fijan `TLS_ENABLED=false` (F-27). No la uses entre nodos; el despliegue de tres nodos exige TLS (`docs/DEPLOY_WORKERS.md`).
 
 ```bash
-docker compose -f deploy/docker-compose.demo.yml up -d --build   # iniciar
-docker compose -f deploy/docker-compose.demo.yml logs -f feeder  # ver casos enviados
-docker compose -f deploy/docker-compose.demo.yml down            # detener (conserva datos)
-docker compose -f deploy/docker-compose.demo.yml down -v         # detener y borrar todo
+python -m scripts.generar_credenciales                           # una vez: JWT_SECRET, WORKER_TOKEN y API_TOKEN en .env
+docker compose --env-file .env -f deploy/docker-compose.demo.yml up -d --build   # iniciar
+docker compose --env-file .env -f deploy/docker-compose.demo.yml logs -f feeder  # ver casos enviados
+docker compose --env-file .env -f deploy/docker-compose.demo.yml down            # detener (conserva datos)
+docker compose --env-file .env -f deploy/docker-compose.demo.yml down -v         # detener y borrar todo
 ```
 
 Ajustes (variables de entorno al ejecutar `up`):
@@ -35,7 +36,7 @@ Ajustes (variables de entorno al ejecutar `up`):
 - `DEMO_INTERVAL` (segundos entre casos, por defecto 8, con +-30 % de variacion).
 - `DEMO_MAX_CASES` (0 = ilimitado).
 
-Si tu dashboard corre en el host y usa dotenv: `cp .env.demo .env`.
+Si tu dashboard corre en el host y usa dotenv: `cp .env.demo .env` y, después, `python -m scripts.generar_credenciales` (el `cp` reemplaza el `.env` y borra las credenciales). El dashboard envía `API_TOKEN` como `Authorization: Bearer` en cada consulta.
 
 ## Estados de caso que aparecen en la demo
 
