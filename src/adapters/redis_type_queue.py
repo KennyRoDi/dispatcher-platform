@@ -6,9 +6,20 @@ en ninguna parte (ni en la cola, ni en inflight), a diferencia del camino
 heredado (BLPOP + SADD por separado).
 """
 import json
+import logging
 
 from src.domain.decomposition import queue_for
 from src.domain.subtask import QueueFull, Subtask
+
+logger = logging.getLogger(__name__)
+
+
+def destino_de_reencolado(operation: str | None, priority: str | None, payload: str | None, subtask_id: str) -> tuple[str, str]:
+    """Cola y elemento para reencolar: el JSON de Subtask si el hash lo trae, el id plano de FFmpeg si no."""
+    if payload:
+        return queue_for(Subtask.from_dict(json.loads(payload)).kind), payload
+    cola = f"queue:{operation}:high" if priority == "high" else f"queue:{operation}"
+    return cola, subtask_id
 
 
 class RedisTypeQueue:
@@ -17,7 +28,7 @@ class RedisTypeQueue:
         self.capacity = capacity
 
     def has_capacity(self, queue: str) -> bool:
-        return self.redis.llen(queue) < self.capacity
+        return self.capacity == 0 or self.redis.llen(queue) < self.capacity
 
     def enqueue(self, queue: str, subtask: Subtask) -> None:
         if not self.has_capacity(queue):
@@ -30,7 +41,14 @@ class RedisTypeQueue:
             raw = self.redis.lmove(queue, destino, "LEFT", "RIGHT")
         else:
             raw = self.redis.blmove(queue, destino, timeout=timeout, src="LEFT", dest="RIGHT")
-        return Subtask.from_dict(json.loads(raw)) if raw is not None else None
+        if raw is None:
+            return None
+        try:
+            return Subtask.from_dict(json.loads(raw))
+        except (ValueError, KeyError, TypeError):
+            logger.warning("elemento ilegible descartado de %s: %r", queue, raw)
+            self.redis.lrem(destino, 1, raw)
+            return None
 
     def in_flight(self, worker_id: str) -> list[Subtask]:
         raw_items = self.redis.lrange(self._inflight_key(worker_id), 0, -1)
