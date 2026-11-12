@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan f1711b4
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -103,3 +103,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | claude | 2026-11-11 | SPEC F-20 completado: objetivo, alcance, criterios de aceptación, diseño (AD-04), pruebas (U, I), mediciones y plan de pila con 3 PR hasta 400 líneas cada una (f1711b4) |
