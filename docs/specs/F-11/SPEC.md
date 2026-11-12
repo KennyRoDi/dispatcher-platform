@@ -1,6 +1,6 @@
 # SPEC F-11: Reintentos
 
-**Fase:** verificacion
+**Fase:** documentacion
 **Base:** main
 **Verificación IA:** verificacion 7f0c31b
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
@@ -147,3 +147,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de implementacion | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: test_retry, test_retry_subtask y test_arquitectura, 19 passed. git diff f9a8d62 -- tests vacío: pruebas sin debilitar. Leí retry.py (41 líneas) y retry_subtask.py (30): dominio puro, capas correctas, cita de fuente. Desviación declarada: decide_retry calcula la espera con next_delay(attempts+1) porque así lo exige la prueba; ajustar SPEC en documentación. No verifiqué la comparación de la suite completa (121 vs 144 fallos de entorno), que es del subagente. (8909d36) |
 | implementacion | Kenni Rodriguez | 2026-11-12 | En Windows la suite unitaria completa tiene 121 fallos de entorno preexistentes (fakeredis, generadores de 200 MiB; 144 en la base sin estos cambios) y el script se cae al leer su salida; las 19 pruebas de F-11 pasan y CI en Linux valida la suite completa. Autorizado por la persona |
 | verificación IA de verificacion | Claude Sonnet 5.5, subagente qa-tester | 2026-11-12 | QA independiente: criterios de la parte 1 cumplidos; 4 defectos menores (OverflowError con attempt muy grande, NaN aceptado en RetryPolicy, caso inexistente da AttributeError por case_state.py de F-10, estado cambia antes de schedule) documentados como xfail estricto. Reproduje yo el Overflow y el NaN; ejecuté 48 passed y 4 xfailed. Sin cambios en src/. Defectos de severidad baja aceptados y pendientes de registrar en documentación; no verifiqué la suite completa de Windows. (7f0c31b) |
+| verificacion | Kenni Rodriguez | 2026-11-12 | Misma razón que implementacion: la suite completa en Windows tiene fallos de entorno preexistentes y el script se cae al leer su salida; 48 passed y 4 xfailed en las pruebas de F-11. Autorizado por la persona |
