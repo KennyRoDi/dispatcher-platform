@@ -48,3 +48,43 @@ No se declara ninguna ejecución remota ni cumplimiento a partir del estado cerr
 ## Base de comparación
 
 `origin/main` avanzó con F-34 durante esta revisión. La comparación de PR usa tres puntos (`origin/main...HEAD`); comparar directamente las puntas puede mostrar como eliminaciones aparentes archivos F-34 posteriores a la base de F-41. El diff revisado de F-41 contiene únicamente los nueve documentos previstos.
+
+## Acceso a posibles nodos (2026-11-12)
+
+El orquestador comprobó el acceso con permisos elevados: `tailscale status` mostró `hp-nahum`, `krddebian-1` y `magdalena` conectados, y el ping de Tailscale a cada uno recibió pong mediante DERP. Esto actualiza el diagnóstico local inicial de Tailscale: no hay un bloqueo general de conectividad de la malla en esta comprobación. Los nombres son nodos potenciales; no se confirmó su correspondencia con los nodos A/B/C/D ni un despliegue del proyecto.
+
+Los intentos SSH no abrieron una sesión: `hp-nahum` y `magdalena` agotaron el tiempo de conexión al puerto 22; `krddebian-1` devolvió `banner exchange: Connection refused`. Comandos de conexión informados por el orquestador, sin IP ni credenciales:
+
+```powershell
+tailscale status
+tailscale ping hp-nahum
+tailscale ping krddebian-1
+tailscale ping magdalena
+ssh -o BatchMode=yes -o ConnectTimeout=4 hp-nahum
+ssh -o BatchMode=yes -o ConnectTimeout=4 krddebian-1
+ssh -o BatchMode=yes -o ConnectTimeout=4 magdalena
+```
+
+No hubo acceso remoto ni mediciones. Un pong DERP acredita respuesta de Tailscale, no disponibilidad de SSH, autenticación, servicios de la aplicación ni nodos worker distintos. No se registran IP, usuarios de acceso, llaves o tokens. El bloqueo actual es la ausencia de una sesión ejecutable en otra máquina y de las salidas experimentales pendientes, no la mera instalación del cliente de red.
+
+## Ejecución por responsables cuando haya acceso
+
+Estos son protocolos pendientes, no comandos ejecutados durante QA. Ejecutar desde la raíz del checkout en la máquina confirmada, con sus prerrequisitos. Resolver cualquier marcador antes de ejecutar y guardar el comando resuelto. Cada registro debe incluir responsable, UTC, commit, identidad no privada del entorno, versiones, entradas públicas/sintéticas y su procedencia, salida íntegra, código de retorno e interpretación. Conservar originales y añadir resultados en `docs/evidencia/F-41/`; no publicar secretos ni la captura de tráfico cruda.
+
+| Responsable | Comando o protocolo existente | Salida necesaria |
+|---|---|---|
+| José Andrés, M1 | [QA F-19 parte 3](../F-19/QA-parte-3.md): `python scripts/measure/comparar_carga.py --config config/audio.toml --hilos 1 --entrada tests/datos/audio/amenaza_01.ogg --procesos 1 2 --estrategias por_proceso workers_compartidos --repeticiones 5 --timeout 120 --cgroup /sys/fs/cgroup --salida docs/evidencia/F-41/m1` | Linux/cgroup v2 limitado y ejecución no root; JSON por variante con snapshots RSS/PSS/memory.current y cinco repeticiones. Completar además huellas de todos los modelos, ráfaga por worker y OOM desplegado con los protocolos de [M1](../../modulo-M1-memoria.md); esta comparación no los sustituye. |
+| Nahúm, M2 | [M2](../../modulo-M2-planificacion.md): `SCHED_POLICY=fifo python scripts/measure/m2_sched.py --high-rate 100 --low 5 --seed 42 --out m2_fifo_42.csv`, repetir con aging y semillas 43/44 | CSV de simulación con parámetros y entorno. No acredita niveles media/crítica, máximos individuales ni comportamiento desplegado; esos productos siguen requiriendo evidencia adecuada del responsable. |
+| Melany, M3 | [M3](../../modulo-M3-es-almacenamiento.md): `python scripts/measure/m3_chunks.py --file case_h1.mp4 --chunk 256K,1M,4M,16M --reps 5 --remote nodo-a` | Ejecutar desde otro nodo hacia el coordinador real; preparar archivo sintético de al menos 200 MiB y resolver `nodo-a` según despliegue. Guardar repeticiones, bytes, tiempo total/complete y unidad. Para reproducción representativa de deduplicación, seguir [F-23](../../evidencia/F-23_deduplicacion_2026-11-11.md), con dataset sintético y almacén aislado inicialmente vacío. |
+| Kenni, M4 | [M4](../../modulo-M4-seguridad.md): `python -m scripts.verificar_workers`; custodia según [F-29](../../evidencia/F-29_prueba_A_local_sintetica_2026-11-11.md) | Salidas efectivas por worker confirmado; custodia íntegra exit 0 y alterada exit 1, con llave efímera fuera del repo. Completar matriz de roles y captura TLS entre nodos con el protocolo siguiente; un handshake local no basta. |
+| José Andrés, M5 | [F-31](../../evidencia/F-31_m5_bench_2026-11-11.md): `python scripts/measure/m5_bench.py --compute cpu-float32,cpu-int8 --threads 1,2,4 --reps 5 --audio /bench --config /audio_en.toml --salida /bench/m5_bench.json` | Preparar WAV público y configuración del protocolo y resolver rutas locales; JSON, cinco repeticiones tras calentamiento, versión/modelo/entrada y comparación con host original. Justificar routing con datos compatibles. GPU solo si no aplica la alternativa CPU de B.5 M5. |
+
+Para TLS, Kenni debe aplicar el protocolo ya aprobado en M4 desde el nodo coordinador, sustituyendo interfaz y marcador sintético reales:
+
+```bash
+sudo tcpdump -i <if> -w m4.pcap 'port 8443 or 6380 or 9000'
+tshark -r m4.pcap -Y tls.handshake.type==1
+strings m4.pcap | grep -c <marcador_sintetico>
+```
+
+Registrar intento y análisis, handshakes y ausencia del marcador en claro; el archivo `m4.pcap` queda fuera del repositorio como exige la ficha. Ningún resultado previsto se considera obtenido. La reproducción de un comando por ficha no elimina los demás productos RNF pendientes.
