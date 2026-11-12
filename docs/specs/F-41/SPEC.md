@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 89fe63fc
+**Verificación IA:** verificacion ed090432
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
 
 ## Objetivo
@@ -95,3 +95,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | José Andrés Loría Herrera | 2026-11-12 | Autonomia autorizada expresamente por joselhcr en el chat: F41 documental exenta de TDD segun IMPLEMENTACION116; lista de aceptacion revisada, no aplica prueba roja de codigo. No se omiten criterios de evidencia ni reproduccion. |
 | verificación IA de implementacion | Codex | 2026-11-12 | Correccion documental revisada independientemente: diff completo solo docs, enlaces existentes, cinco revisar_ficha sin errores, diff --check limpio y codigo literal de recalculos reproducido. pytest tests/unit:3030 passed,82 skipped,37 xfailed; variables CA aisladas solo en proceso. Suite global interrumpida por esperas existentes Reporter; no verde global. QA documental aprobado, aceptacion total pendiente de nodos y cinco reproducciones. (89fe63fc) |
 | implementacion | José Andrés Loría Herrera | 2026-11-12 | Autonomia autorizada por joselhcr: implementacion solo documental sin codigo, revisada independientemente. Unitarias 3030 passed; suite global sin verde por esperas previas de Reporter documentadas en QA. Se omite requisito de codigo y suite global para avanzar a verificacion, NO se aprueba aceptacion RNF ni reproducciones pendientes. |
+| verificación IA de verificacion | Codex | 2026-11-12 | QA independiente reviso los cinco modulos y devolvio aceptacion total por mediciones y cinco reproducciones ausentes; documentacion y estado parcial veraces en QA y COMPROBACION. Usuario acepta expresamente subir y fusionar F41 con esta deuda. CI de PR142 verde salvo estado-feature. Verificacion de alcance y faltantes, no de cumplimiento completo. (ed090432) |
