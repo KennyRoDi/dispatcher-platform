@@ -1,6 +1,6 @@
 # SPEC F-43: Integración de workers tipados
 
-**Fase:** plan
+**Fase:** tests
 **Base:** main
 **Verificación IA:** plan becaaf37
 **Historia:** US-43 · **Requisitos:** RF-04 a RF-12, RF-13 y RF-14 (reporte con evidencias), RF-15, RF-16, RF-24 y RF-25 (admisión en el worker tipado); RNF-01, RNF-07, RNF-08, RNF-24, RNF-25; AD-03, AD-05, AD-06, AD-11, AD-26 a AD-28, AD-43, AD-46 a AD-49 (aplica); AD-51 a AD-54 (propone) · **Responsable:** K
@@ -307,3 +307,4 @@ Las registra `scripts/flujo.py`. No editar.
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
 | verificación IA de plan | Claude Sonnet 5.5, subagente arquitecto | 2026-11-12 | Subagente independiente. Verifiqué: sin caracteres de puntos suspensivos Unicode; diff solo toca docs/specs/F-43/SPEC.md; AD-50 y SUP-46 ya existen en main, por lo que AD-51 a AD-54 y SUP-47 a SUP-51 no colisionan; los nombres de prueba y archivos por parte cubren cada elemento del plan aprobado; la pila de 6 partes divide la parte 3 del plan para respetar 400 líneas. Decisiones del supervisor sobre las preguntas abiertas: se aceptan el límite de cancelación de analizadores en curso, que high no reordene la cola (F-20 es de otro responsable) y la clasificación de fallos; la parte 5 usará aprobar con excepcion; KEK, reparto por nodo y pesos de modelos quedan como pendientes de despliegue real. No verifiqué las afirmaciones de código una por una, solo las que fundamentan AD y SUP. (becaaf37) |
+| plan | Kenni Rodriguez | 2026-11-12 |  |
