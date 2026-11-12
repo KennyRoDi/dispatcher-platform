@@ -4,7 +4,7 @@
 | Feature | Estado |
 |---|---|
 | F-01 | hecha |
-| F-02 | documentacion |
+| F-02 | revision |
 | F-03 | hecha |
 | F-04 | hecha |
 | F-05 | hecha |
