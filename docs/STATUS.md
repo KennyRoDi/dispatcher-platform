@@ -3,7 +3,7 @@
 
 | Feature | Estado |
 |---|---|
-| F-01 | tests |
+| F-01 | implementacion |
 | F-02 | pendiente |
 | F-03 | hecha |
 | F-04 | hecha |
