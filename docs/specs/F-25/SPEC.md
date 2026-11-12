@@ -1,51 +1,75 @@
 # SPEC F-25: Recepción no bloqueante
 
 **Fase:** plan
-**Base:** feat/F-22-3-medicion-throughput
+**Base:** main
 **Verificación IA:** pendiente
-**Historia:** US-25 · **Requisitos:** … · **Responsable:** V
+**Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
 
 ## Objetivo
 
-… Qué cambia para quién y por qué, citando el enunciado.
+El enunciado pide para M3 «E/S asíncrona o no bloqueante en la recepción» [B.5 M3] y RF-34 exige que, durante una subida grande, otra petición de la API responda sin esperar a que termine. F-22 ya lee cada chunk con `async for` y procesa `receive` en el pool de hilos (AD-13). Queda un punto bloqueante: `PUT /uploads/{id}/chunks/{index}` llama a `expected_size`, que lee el manifiesto del disco dentro del event loop; con un disco lento o un volumen de red, cada chunk frena a toda la API. F-25 lo saca del event loop y demuestra con pruebas y medición que la API responde durante subidas grandes.
 
 ## Alcance
 
-**Incluye:** …
+**Incluye:** mover `expected_size` al pool de hilos; prueba unitaria de no bloqueo; prueba de integración con uvicorn real y una subida lenta en paralelo con peticiones ligeras; script de medición de latencia durante la subida y su sección en la ficha M3.
 
-**No incluye:** …
+**No incluye:** cambiar el pool de hilos de AnyIO (40 hilos por defecto); E/S asíncrona del disco (`aiofiles`), que AD-13 descarta a favor del hilo acotado; cambios en el cliente.
 
 ## Criterios de aceptación
 
-… Copiados de `docs/backlog/`, en Dado/Cuando/Entonces.
+De `docs/backlog/m3-es-almacenamiento.md` (US-25):
+
+- **Dado** una subida lenta en curso
+- **Cuando** llega otra petición
+- **Entonces** responde sin esperar a que termine la subida
+
+Criterios adicionales derivados de los requisitos:
+
+- RF-34: mientras un `PUT` espera bytes de un cliente lento o lee un manifiesto en un disco lento, otra petición a la API se atiende antes de que ese `PUT` termine.
+- RF-34: con uvicorn real, durante la subida de un chunk de 16 MiB enviado lentamente, todas las peticiones ligeras en paralelo responden y la subida termina con 204.
 
 ## Diseño
 
-… Contratos de `docs/CONTRATOS.md` que implementa y que usa. Capas y archivos que se tocan, decisiones `AD-XX` que aplica y código del I Proyecto que reutiliza. Una decisión nueva se propone aquí y se registra en `docs/ARQUITECTURA.md` §8.
+**Contratos.** Sin cambios en puertos ni contratos.
+
+| Capa | Archivo | Cambio | Dueño |
+|---|---|---|---|
+| Coordinador | `src/coordinator/rutas_archivos.py` | `recibir` obtiene `expected_size` con `run_in_threadpool`, igual que `receive` | Melany |
+| Medición | `scripts/measure/m3_no_bloqueo.py` (nuevo), `docs/modulo-M3-es-almacenamiento.md` | Subida lenta de N MiB y, en paralelo, `GET /health` cada 100 ms; registra latencias | Melany |
+
+**Decisiones.** Aplica AD-13 sin cambiarla. Sin supuestos nuevos.
+
+**Código del I Proyecto que reutiliza.** El servidor uvicorn y `/health` de `rutas_monitoreo.py`.
 
 ## Pruebas
 
 | Tipo | Prueba | Demuestra |
 |---|---|---|
-| Unitaria | … | … |
-| Integración | … | … |
-| Aceptación | … | … |
+| Unitaria | `test_subida_lenta_no_bloquea_otra_peticion`: un `PUT` cuyo cuerpo llega en partes controladas por eventos; otra ruta responde mientras el cuerpo sigue abierto | Recepción `async` del cuerpo |
+| Unitaria | `test_manifiesto_lento_no_bloquea_otra_peticion`: `load_manifest` del staging se bloquea hasta que otra petición se atiende; con la lectura en el event loop, la otra petición no llega a atenderse | Lectura del manifiesto fuera del event loop |
+| Integración | uvicorn real: chunk de 16 MiB enviado en partes lentas y 20 peticiones ligeras en paralelo; todas responden antes de que termine la subida | Criterio de US-25 con servidor real |
 
 ## Mediciones
 
-… Solo M1–M5 y B.6: comando exacto, repeticiones y ficha de destino. Si no aplica, escribe «No aplica».
+M3, recepción no bloqueante (RF-34):
+
+```bash
+python scripts/measure/m3_no_bloqueo.py --url <coordinador> --mib 256 --kbps 8192 --out m3_no_bloqueo.csv
+```
+
+Registra la latencia de `GET /health` antes, durante y después de la subida. Tres repeticiones. Ficha de destino: `docs/modulo-M3-es-almacenamiento.md`, sección de recepción no bloqueante, con la distribución de latencias. Basta un coordinador; no requiere tres nodos.
 
 ## Plan de pila
 
-Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni documentos.
-
 | Parte | PR (título en Conventional Commits) | Contenido |
 |---|---|---|
-| 1 | `feat(F-25): …` | … |
+| 1 | `feat(F-25): responder durante subidas grandes` | `expected_size` en el pool de hilos y las tres pruebas. Estimado: ~5 líneas de código |
+| 2 | `docs(F-25): medir latencia durante subidas grandes` | Script de medición y sección de la ficha M3 con datos medidos |
 
 ## Riesgos y preguntas abiertas
 
-… Lo que la persona que aprueba debe decidir.
+1. **Pool de hilos compartido.** `receive`, `complete` y los handlers síncronos (como `/health`) comparten el limitador de AnyIO de 40 hilos. Muchas subidas en paralelo podrían ocuparlo. La medición lo observa; si hace falta, un limitador propio para `complete` iría en otra parte.
+2. **Medición.** La puede correr cualquier integrante con un coordinador; los números se miden, nunca se estiman.
 
 ## Aprobaciones
 
