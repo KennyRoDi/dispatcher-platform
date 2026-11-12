@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
+
 import fakeredis
 import pytest
 
+from src.adapters.redis_type_queue import RedisTypeQueue
+from src.domain.priority import Priority
+from src.domain.subtask import ContentKind, Subtask
 from src.workers.config import Settings
 from src.workers.recovery import recover_subtask
 
@@ -263,3 +269,32 @@ def test_recovery_usa_la_misma_decision_de_limite(redis_client, monkeypatch):
     assert recover_subtask(redis_client, settings, FakeReporter(), "sid-giveup", "worker_lost") == "failed"
     assert recover_subtask(redis_client, settings, FakeReporter(), "sid-retry", "worker_lost") == "requeued"
     assert consultas == [(0, politica), (99, politica)]
+
+
+def test_recovery_reencola_en_formato_subtask_en_la_cola_tipada(redis_client):
+    subtarea = Subtask(
+        "case-1:sha-1:text", "case-1", ContentKind.TEXT, "sha-1", Priority.ALTA,
+        datetime(2026, 11, 12, tzinfo=timezone.utc),
+    )
+    payload = json.dumps(subtarea.to_dict())
+    redis_client.hset(f"subtask:{subtarea.id}", mapping={
+        "subtask_id": subtarea.id,
+        "case_id": "case-1",
+        "operation": "text",
+        "task_type": "text",
+        "status": "assigned",
+        "worker_id": "tipado-a",
+        "attempts": 1,
+        "priority": "high",
+        "payload": payload,
+    })
+    redis_client.hset("case:case-1", "status", "processing")
+
+    result = recover_subtask(redis_client, make_settings(), FakeReporter(), subtarea.id, "worker_lost")
+
+    assert result == "requeued"
+    assert redis_client.lrange("queue:text", 0, -1) == [payload]
+    assert redis_client.llen("queue:text:high") == 0
+    assert redis_client.hget(f"subtask:{subtarea.id}", "status") == "pending"
+    assert redis_client.hget("case:case-1", "status") == "retrying"
+    assert RedisTypeQueue(redis_client, capacity=10).take("queue:text", "tipado-b", timeout=0) == subtarea

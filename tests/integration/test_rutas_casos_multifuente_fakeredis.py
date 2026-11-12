@@ -8,6 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.coordinator import conexion, rutas_casos
+from src.domain.backpressure import PROFUNDIDAD_POR_DEFECTO
 import src.coordinator.main as main
 
 
@@ -82,6 +83,49 @@ class TestCasoMultifuenteAPI:
         }
         respuesta = client.post("/cases", json=cuerpo)
         assert respuesta.status_code == 422
+
+
+@pytest.mark.integration
+class TestColaTipadaPlataforma:
+    @staticmethod
+    def _caso_de_texto():
+        return {"sources": [{"sha256": "sha-texto", "name": "nota.txt"}]}
+
+    def test_cola_tipada_respeta_queue_max_depth_y_responde_retry_after(self, client, fake, monkeypatch):
+        monkeypatch.setenv("QUEUE_MAX_DEPTH", "1")
+        monkeypatch.setenv("QUEUE_RETRY_AFTER", "7")
+
+        assert client.post("/cases", json=self._caso_de_texto()).status_code == 201
+        rechazado = client.post("/cases", json=self._caso_de_texto())
+
+        assert rechazado.status_code == 503
+        assert rechazado.headers["Retry-After"] == "7"
+        assert fake.llen("queue:text") == 1
+        assert len(fake.smembers("cases:registry")) == 1
+
+    def test_cola_tipada_con_limite_cero_no_rechaza(self, client, fake, monkeypatch):
+        monkeypatch.setenv("QUEUE_MAX_DEPTH", "0")
+        fake.rpush("queue:text", *["pendiente"] * PROFUNDIDAD_POR_DEFECTO)
+
+        respuesta = client.post("/cases", json=self._caso_de_texto())
+
+        assert respuesta.status_code == 201
+        assert fake.llen("queue:text") == PROFUNDIDAD_POR_DEFECTO + 1
+
+    def test_stats_incluye_las_colas_tipadas(self, client):
+        cuerpo = {
+            "sources": [
+                {"sha256": "sha-texto", "name": "nota.txt"},
+                {"sha256": "sha-video", "name": "clip.mp4"},
+            ],
+        }
+        assert client.post("/cases", json=cuerpo).status_code == 201
+
+        colas = client.get("/stats").json()["queues"]
+
+        assert colas["queue:text"] == 1
+        assert colas["queue:image"] == 1
+        assert colas["queue:audio"] == 1
 
 
 if __name__ == "__main__":

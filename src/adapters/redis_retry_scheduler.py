@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from src.adapters.redis_type_queue import destino_de_reencolado
 from src.application.ports import Clock
 
 logger = logging.getLogger(__name__)
@@ -34,8 +35,8 @@ class RedisRetryScheduler:
         def txn(pipe):
             if pipe.zscore(SCHEDULED_KEY, subtask_id) is None:
                 return False
-            operation, priority, status, case_id = pipe.hmget(
-                subtask_key, "operation", "priority", "status", "case_id"
+            operation, priority, status, case_id, payload = pipe.hmget(
+                subtask_key, "operation", "priority", "status", "case_id", "payload"
             )
             case_status = pipe.hget(f"case:{case_id}", "status") if case_id else None
             pipe.multi()
@@ -43,8 +44,8 @@ class RedisRetryScheduler:
             # Si el reaper ya la reencoló o el caso terminó, encolarla otra vez la duplicaría o la resucitaría.
             if status not in (None, "pending") or case_status == "cancelled":
                 return False
-            if operation:
-                pipe.lpush(f"queue:{operation}:high" if priority == "high" else f"queue:{operation}", subtask_id)
+            if operation or payload:
+                pipe.lpush(*destino_de_reencolado(operation, priority, payload, subtask_id))
             else:
                 logger.error("subtarea %s sin operation, no se puede reencolar tras la espera", subtask_id)
             return True

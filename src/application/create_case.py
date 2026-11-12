@@ -35,16 +35,25 @@ class CreateMultiSourceCase:
         nombre_por_sha256 = {s.sha256: s.name for s in sources}
         case_sources = [CaseSource(s.sha256, s.name, classify_source(s.name)) for s in sources]
 
-        routed = self._dispatch.execute(case_id, case_sources, priority)
-
         created_at = self._clock.now().isoformat()
-        subtask_ids = [subtask.id for _queue, subtask in routed]
-        self._persistir(case_id, routed, priority, created_at, metadata or {}, nombre_por_sha256)
+        persistidas: list = []
 
+        def persistir(routed: list) -> None:
+            persistidas.extend(routed)
+            self._persistir(case_id, routed, priority, created_at, metadata or {}, nombre_por_sha256)
+
+        try:
+            routed = self._dispatch.execute(case_id, case_sources, priority, before_enqueue=persistir)
+        except Exception:
+            if persistidas:
+                self._deshacer(case_id, persistidas)
+            raise
+
+        subtask_ids = [subtask.id for _queue, subtask in routed]
         return {
             "case_id": case_id,
             "status": "queued",
-            "priority": priority.name.lower(),
+            "priority": priority.to_contract(),
             "total_subtasks": len(subtask_ids),
             "subtask_ids": subtask_ids,
             "created_at": created_at,
@@ -58,7 +67,7 @@ class CreateMultiSourceCase:
             "total_subtasks": total,
             "pending_subtasks": total,
             "created_at": created_at,
-            "priority": priority.name.lower(),
+            "priority": priority.to_contract(),
             "metadata": json.dumps(metadata),
             "retries": "0",
         })
@@ -74,6 +83,17 @@ class CreateMultiSourceCase:
                 "source_sha256": subtask.source_sha256,
                 "params": "{}",
                 "metadata": "{}",
-                "priority": priority.name.lower(),
+                "priority": priority.to_contract(),
+                "payload": json.dumps(subtask.to_dict()),
             })
             self._redis.rpush(f"case:{case_id}:subtasks", subtask.id)
+
+    def _deshacer(self, case_id: str, routed: list) -> None:
+        """Borra lo persistido y lo ya encolado para que un fallo a mitad no deje huerfanos."""
+        pipe = self._redis.pipeline()
+        for queue, subtask in routed:
+            pipe.lrem(queue, 1, json.dumps(subtask.to_dict()))
+            pipe.delete(f"subtask:{subtask.id}")
+        pipe.delete(f"case:{case_id}", f"case:{case_id}:subtasks")
+        pipe.srem("cases:registry", case_id)
+        pipe.execute()

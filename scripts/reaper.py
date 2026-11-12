@@ -8,6 +8,7 @@ import time
 from datetime import datetime, timezone
 
 from src.adapters.redis_retry_scheduler import RedisRetryScheduler
+from src.adapters.redis_type_queue import RedisTypeQueue
 from src.infrastructure.clock import SystemClock
 from src.workers.recovery import ACTIVE_STATES, recover_subtask
 
@@ -62,6 +63,7 @@ class Reaper:
                     self._recover(sid, "worker_lost", counts)
                 except Exception:
                     logger.exception("error recuperando subtarea %s del worker muerto %s", sid, wid)
+            self._recover_typed_inflight(wid, counts)
             try:
                 self.redis.delete(inflight_key)
                 self.redis.srem("workers:registry", wid)
@@ -75,6 +77,21 @@ class Reaper:
                 self._process_inflight_sid(sid, inflight_key, counts)
             except Exception:
                 logger.exception("error procesando subtarea %s del worker %s", sid, wid)
+
+    def _recover_typed_inflight(self, wid: str, counts: dict) -> None:
+        # Recuperar antes de confirmar: si el reaper muere en medio, el elemento sigue en inflight y se reintenta.
+        queue = RedisTypeQueue(self.redis, capacity=0)
+        try:
+            pending = queue.in_flight(wid)
+        except Exception:
+            logger.exception("no se pudo leer inflight:%s", wid)
+            return
+        for subtask in pending:
+            try:
+                if self._recover(subtask.id, "worker_lost", counts) != "skipped":
+                    queue.acknowledge(wid, subtask)
+            except Exception:
+                logger.exception("error recuperando subtarea %s del worker muerto %s", subtask.id, wid)
 
     def _process_inflight_sid(self, sid: str, inflight_key: str, counts: dict) -> None:
         data = self.redis.hgetall(f"subtask:{sid}")
@@ -98,10 +115,11 @@ class Reaper:
             self._recover(sid, "max_age", counts)
             self.redis.srem(inflight_key, sid)
 
-    def _recover(self, sid: str, reason: str, counts: dict) -> None:
+    def _recover(self, sid: str, reason: str, counts: dict) -> str:
         result = recover_subtask(self.redis, self.settings, self.reporter, sid, reason)
         if result in ("requeued", "failed", "cleaned"):
             counts[result] += 1
+        return result
 
     def run_forever(self, stop_event: threading.Event) -> None:
         logger.info(

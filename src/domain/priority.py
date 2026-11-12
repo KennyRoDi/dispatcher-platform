@@ -15,6 +15,19 @@ class Priority(IntEnum):
     CRITICA = 3
 
     @classmethod
+    def from_contract(cls, text: str) -> "Priority":
+        try:
+            return _PRIORIDAD_POR_PALABRA[text]
+        except KeyError:
+            raise ValueError(f"prioridad de contrato desconocida: {text!r}") from None
+
+    def to_contract(self) -> str:
+        for palabra, prioridad in _PRIORIDAD_POR_PALABRA.items():
+            if prioridad is self:
+                return palabra
+        raise ValueError(f"la prioridad {self.name} no tiene palabra de contrato")
+
+    @classmethod
     def from_name(cls, name: str) -> "Priority":
         try:
             return cls[name.upper()]
@@ -30,3 +43,6 @@ class Priority(IntEnum):
         if self is Priority.CRITICA:
             return Priority.CRITICA
         return Priority(self.value + 1)
+
+
+_PRIORIDAD_POR_PALABRA = {"normal": Priority.MEDIA, "high": Priority.ALTA}

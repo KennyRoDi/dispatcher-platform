@@ -1,4 +1,5 @@
-from datetime import timedelta
+import json
+from datetime import datetime, timedelta, timezone
 
 import fakeredis
 import pytest
@@ -63,3 +64,29 @@ def test_promote_due_no_duplica_en_la_cola(redis_falso, reloj):
     assert planificador.promote_due(reloj.now()) == ["s1"]
     assert planificador.promote_due(reloj.now()) == []
     assert redis_falso.lrange("queue:transcode_video", 0, -1) == ["s1"]
+
+
+def test_promocion_del_reintento_encola_el_json_de_subtask_en_la_cola_tipada(redis_falso, reloj):
+    from src.adapters.redis_type_queue import RedisTypeQueue
+    from src.domain.priority import Priority
+    from src.domain.subtask import ContentKind, Subtask
+
+    planificador = RedisRetryScheduler(redis_falso, reloj)
+    subtarea = Subtask(
+        "c1:sha-1:image", "c1", ContentKind.IMAGE, "sha-1", Priority.ALTA,
+        datetime(2026, 11, 12, tzinfo=timezone.utc),
+    )
+    payload = json.dumps(subtarea.to_dict())
+    sembrar(redis_falso, subtarea.id, "image", priority="high")
+    redis_falso.hset(f"subtask:{subtarea.id}", mapping={"task_type": "image", "payload": payload})
+    sembrar(redis_falso, "s-ffmpeg", "transcode_video")
+    planificador.schedule(subtarea.id, 3)
+    planificador.schedule("s-ffmpeg", 3)
+
+    reloj.advance(timedelta(seconds=3))
+    assert sorted(planificador.promote_due(reloj.now())) == sorted([subtarea.id, "s-ffmpeg"])
+
+    assert redis_falso.lrange("queue:image", 0, -1) == [payload]
+    assert redis_falso.llen("queue:image:high") == 0
+    assert redis_falso.lrange("queue:transcode_video", 0, -1) == ["s-ffmpeg"]
+    assert RedisTypeQueue(redis_falso, capacity=10).take("queue:image", "w1", timeout=0) == subtarea
