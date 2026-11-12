@@ -27,7 +27,7 @@
 | F-22 | en-pr |
 | F-23 | hecha |
 | F-24 | hecha |
-| F-25 | en-pr |
+| F-25 | hecha |
 | F-26 | hecha |
 | F-27 | hecha |
 | F-28 | hecha |
