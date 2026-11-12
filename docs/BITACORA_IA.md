@@ -1529,3 +1529,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | QA independiente contrastó 15 filas con git diff, 29 hashes y PR; aprobaciones de fases delegadas por la persona (modo autónomo); trabajo en apoyo de F-39, responsable N |
 | Cómo se validó | Se corrigieron dos omisiones del documento halladas por QA |
 | Error de la IA | El subagente omitió la fila 'Heartbeat y reaper' y listó incompleto los lugares con minioadmin (faltaban .env.demo, deploy/*.yml y src/workers/config.py); detectado por QA contra git grep y corregido. El test de aceptación no cruza estado con git diff (límite declarado) |
+
+## 2026-11-12 · Kenni Rodriguez · F-11 parte 1 (`feat/F-11-1-reintentos`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes arquitecto, developer, QA tester y documentador |
+| Componente | F-11 parte 1 |
+| Propósito | Diseñar, probar con TDD, implementar, verificar y documentar la política de reintento con backoff exponencial y jitter, sin Redis ni worker (parte 2) |
+| Consulta resumida | SPEC de F-11 desde RF-11 y el código existente; pruebas en rojo; dominio retry.py, RetrySubtask y puerto RetryScheduler; pruebas de ruptura de QA; AD-48, SUP-44 y contrato |
+| Resultado obtenido | retry.py, retry_subtask.py y puerto RetryScheduler con doble y contrato; 48 pruebas pasan y 4 xfail estrictos documentan defectos menores; AD-48, SUP-44 y fila en CONTRATOS |
+| Validado / corregido / descartado | Validado por verificación de cada fase y aprobación de la persona; el SPEC se corrigió a next_delay(attempts+1); 4 defectos menores aceptados como riesgos; base 1 s y tope 30 s sin medir |
+| Cómo se validó | El orquestador ejecutó test_retry, test_retry_subtask, las pruebas QA y test_arquitectura; diff de pruebas vacío entre fases; reproducción del OverflowError y del NaN; en Windows la suite completa tiene fallos de entorno preexistentes y CI en Linux valida el resto |
+| Error de la IA | El resumen de verificación del plan incluyó el carácter de puntos suspensivos y el script rechazó la aprobación (resuelto con excepción autorizada); QA halló 4 defectos menores: OverflowError con attempt mayor a 1000 y base float, RetryPolicy acepta NaN, caso inexistente da AttributeError por case_state.py de F-10 y el estado cambia a retrying antes de schedule; la implementación mostró que decide_retry calcula la espera con next_delay(attempts+1) y el SPEC se corrigió |
