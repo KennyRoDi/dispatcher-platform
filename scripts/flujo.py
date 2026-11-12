@@ -21,6 +21,7 @@ import dataclasses
 import datetime
 import importlib.util
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -513,8 +514,9 @@ def _correr_pytest(*argumentos):
     if not importlib.util.find_spec("pytest"):
         _fallar("pytest no está instalado: pip install -r requirements-dev.txt")
     resultado = subprocess.run([sys.executable, "-m", "pytest", "-q", *argumentos], cwd=RAIZ,
-                               capture_output=True, text=True, encoding="utf-8")
-    return resultado.returncode, "\n".join(resultado.stdout.splitlines()[-15:])
+                               capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               env={**os.environ, "PYTHONUTF8": "1"})
+    return resultado.returncode, "\n".join((resultado.stdout or "").splitlines()[-15:])
 
 
 def _exigir_pruebas_en_verde():
