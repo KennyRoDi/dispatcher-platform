@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan 3683020
+**Verificación IA:** tests d19fb1d
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -101,3 +101,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-21 completado: objetivo, alcance, criterios de aceptación, diseño (reutiliza AD-04 de F-20, sin nueva decisión), pruebas (U, I), mediciones (SCHED_POLICY, scripts/measure/m2_sched.py y m2_plot.py) y plan de pila de 1 parte (3683020) |
 | plan | Nahúm Murillo | 2026-11-11 |  |
+| verificación IA de tests | claude | 2026-11-11 | 3 pruebas en rojo: test_fifo_ignora_prioridad y test_politica_se_elige_por_configuracion (AttributeError: falta SchedulingPolicy.desde_configuracion), test_medicion_corta_produce_csv_por_politica (falta scripts/measure/m2_sched.py). Sin código de implementacion. Resto de la suite de scheduling sigue verde (12 passed, 1 skipped) (d19fb1d) |
