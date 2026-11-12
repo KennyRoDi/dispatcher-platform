@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 3683020
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -99,3 +99,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | claude | 2026-11-11 | SPEC F-21 completado: objetivo, alcance, criterios de aceptación, diseño (reutiliza AD-04 de F-20, sin nueva decisión), pruebas (U, I), mediciones (SCHED_POLICY, scripts/measure/m2_sched.py y m2_plot.py) y plan de pila de 1 parte (3683020) |
