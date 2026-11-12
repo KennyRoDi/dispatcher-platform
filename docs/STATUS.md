@@ -27,7 +27,7 @@
 | F-22 | en-pr |
 | F-23 | verificacion |
 | F-24 | en-pr |
-| F-25 | documentacion |
+| F-25 | revision |
 | F-26 | hecha |
 | F-27 | hecha |
 | F-28 | hecha |
