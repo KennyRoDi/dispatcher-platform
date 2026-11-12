@@ -48,7 +48,7 @@ Cada registro real en `docs/evidencia/F-41/` incluirá: módulo, ejecutor, fecha
 
 ## Cierre de aceptación
 
-Pendiente: corregir las fichas en implementación documental, revisar enlaces y cálculos, incorporar únicamente ejecuciones reales y repetir los cinco comandos en otra máquina. Registrar resultados finales por fila y distinguir bloqueos externos. No cerrar F-41 como satisfecha mientras falten productos RNF o reproducción. Las excepciones documentales del flujo omiten rojo/código, no estos criterios.
+Correcciones documentales y recálculos ejecutados según la sección siguiente. Pendiente: completar los productos RNF parciales, incorporar únicamente ejecuciones reales y repetir los cinco comandos en otra máquina. Registrar resultados finales por fila y distinguir bloqueos externos. No cerrar F-41 como satisfecha mientras falten productos RNF o reproducción. Las excepciones documentales del flujo omiten rojo/código, no estos criterios.
 
 ## Resultado de implementación documental (2026-11-12)
 

@@ -9,7 +9,7 @@ Comando exacto PowerShell desde la raíz (el ejecutable usado es el instalado lo
 import csv, json, statistics
 from collections import defaultdict
 from pathlib import Path
-runs=json.loads(Path("docs/evidencia/F-19/comparacion/run-20261111T050340678173Z.json").read_text())["runs"]
+runs=json.loads(Path("docs/evidencia/F-19/comparacion/run-20261111T050340678173Z.json").read_text(encoding="utf-8"))["runs"]
 groups=defaultdict(list)
 for run in runs:
     snap=next(s for s in run["snapshots"] if s["stage"]=="inferred")
@@ -17,15 +17,15 @@ for run in runs:
 for key,values in sorted(groups.items()):
     print("M1",key,"n=",len(values),"PSS media B=",statistics.mean(values))
 groups=defaultdict(list)
-for row in csv.DictReader(Path("docs/evidencia/F-21_comparacion_politicas_2026-11-11.csv").open()):
+for row in csv.DictReader(Path("docs/evidencia/F-21_comparacion_politicas_2026-11-11.csv").open(encoding="utf-8", newline="")):
     groups[(row["politica"],row["nivel"])].append(row)
 for key,rows in sorted(groups.items()):
     print("M2",key,[(field,round(statistics.mean(float(r[field]) for r in rows),4)) for field in ("espera_ms","turnaround_ms","throughput_cps")])
-row=next(csv.DictReader(Path("docs/evidencia/m3_dedup_2026-11-11.csv").open()))
+row=next(csv.DictReader(Path("docs/evidencia/m3_dedup_2026-11-11.csv").open(encoding="utf-8", newline="")))
 logical,stored,saved=(int(row[k]) for k in ("logical_bytes","stored_bytes","bytes_saved"))
 assert logical-stored==saved
 print("M3 ahorro B=",saved,"tasa %=",saved/logical*100)
-rows=json.loads(Path("docs/evidencia/F-31_m5_bench_2026-11-11.json").read_text())
+rows=json.loads(Path("docs/evidencia/F-31_m5_bench_2026-11-11.json").read_text(encoding="utf-8"))
 for r in rows:
     print("M5",r["config"],*[round(r[k],3) for k in ("latencia_media_s","latencia_p95_s","throughput_x_realtime")],round(r["memoria_pico_mb"]),"MiB",r["repeticiones"])
 from scripts.conformidad import revisar_ficha
