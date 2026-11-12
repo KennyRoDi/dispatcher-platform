@@ -1659,3 +1659,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
 | Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
 | Error de la IA | El agente no corrió la suite completa porque dos pruebas de integración de reporte se colgaron en Windows; las fábricas importan minio y urllib3 que solo estaban en requirements.txt |
+
+## 2026-11-12 · Kenni Rodriguez · F-43 parte 3 (`feat/F-43-3-worker-tipado`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes developer |
+| Componente | F-43 parte 3 |
+| Propósito | Worker tipado de texto, imagen y audio |
+| Consulta resumida | Implementación directa de la parte según docs/specs/F-43/SPEC.md |
+| Resultado obtenido | TypedWorker, AnalyzeSubtask y configuración WORKER_KIND con huellas por tipo; reutiliza Worker y comparte el reclamo con el camino heredado |
+| Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
+| Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
+| Error de la IA | El agente no volvió a correr test_worker_node, test_recovery ni test_reaper tras su último cambio de configuración; las pruebas de extremo a extremo de la parte 5 lo cubrieron |
