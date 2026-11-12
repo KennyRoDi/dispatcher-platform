@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests 83b294a
+**Verificación IA:** implementacion 88bd2c6
 **Historia:** US-35 · **Requisitos:** RF-44 (B.6 «Reinicio del coordinador») · **Responsable:** N
 
 ## Objetivo
@@ -122,3 +122,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de tests | claude | 2026-11-12 | 6 pruebas unitarias en rojo (falta scenarios/coordinator_restart.py). 1 prueba de integracion pasa de inmediato (dos clientes fakeredis sobre el mismo FakeServer, simulando reconexion real; valida crear_app/rutas heredadas sin codigo nuevo). 1 aceptacion omitida (sin COORDINATOR_RESTART_JSON). 44 passed en regresion (83b294a) |
 | tests | Nahúm Murillo | 2026-11-12 |  |
+| verificación IA de implementacion | claude | 2026-11-12 | Implementacion completa: scenarios/coordinator_restart.py (116 lineas) con evaluar/tiempo_de_arranque puras y correr_con_app_real que crea una conexion Redis nueva (simula reinicio) y compara estado antes/despues. 7 passed, 1 skipped a la primera (sin ajustes). 49 passed en regresion amplia. 116 lineas de codigo (88bd2c6) |
