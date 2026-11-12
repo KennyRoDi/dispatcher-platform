@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests a0ac95a
+**Verificación IA:** implementacion 7005101
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
 
 ## Objetivo
@@ -104,3 +104,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | claude | 2026-11-11 | 5 pruebas en rojo (U x3, I x2, A x1): todas fallan por ModuleNotFoundError (falta src/application/create_case.py y SourceRef en modelos.py) o 422 porque CaseRequest no acepta sources todavia. Resto de la suite (77 passed en coordinador, decomposition, dispatch_case, redis_type_queue) intacto. Nota: test_fuente_sin_subir_responde_422_en_la_api pasa accidentalmente ahora (pydantic rechaza por subtasks requerido), pero seguira pasando por la razon correcta tras implementar (9a12eb8) |
 | verificación IA de tests | claude | 2026-11-11 | Implementacion completa: CreateMultiSourceCase (77 lineas) integra DispatchCase/RedisTypeQueue con persistencia heredada; SourceRef en modelos.py; rutas_casos.py con dependencia opcional _obtener_subidas_opcional (no rompe el camino heredado). 6 tests nuevos verdes a la primera tras un ajuste (el Depends inicial rompio 24 tests heredados por ser obligatorio; corregido a opcional). Regresion amplia: 287 passed, 2 fallos preexistentes confirmados no relacionados (classify_source identico a origin/main, TLS ambiental). 148 lineas de codigo (a0ac95a) |
 | tests | Nahúm Murillo | 2026-11-11 | error de proceso del orquestador: se implemento el codigo sin ejecutar aprobar tras tu si de la fase tests; las pruebas ya estan en verde (no en rojo) por eso, no porque la fase no aplique |
+| verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: CreateMultiSourceCase (77 lineas) integra DispatchCase/RedisTypeQueue con persistencia heredada; SourceRef en modelos.py; rutas_casos.py con dependencia opcional _obtener_subidas_opcional (no rompe el camino heredado, bug encontrado y corregido durante la implementacion: el Depends inicial era obligatorio y rompio 24 tests heredados). 6 tests nuevos verdes, 287 passed en regresion amplia (2 fallos preexistentes confirmados no relacionados: classify_source identico a origin/main, TLS ambiental). 148 lineas de codigo (7005101) |
