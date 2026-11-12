@@ -37,7 +37,7 @@ Como evaluador, quiero fichas con datos medidos para calificar cada módulo.
 - **Demuestra:** comprobación. **Evidencia:** `docs/modulo-M1-memoria.md`, `docs/modulo-M2-planificacion.md`, `docs/modulo-M3-es-almacenamiento.md`, `docs/modulo-M4-seguridad.md`, `docs/modulo-M5-computo.md`.
 
 ### US-42 · Informe, README, demo y defensa (F-42) · P1 · H3
-- **Responsable:** Todos · **Depende de:** F-33, F-34, F-35, F-36, F-37, F-41
+- **Responsable:** Todos · **Depende de:** F-33, F-34, F-35, F-36, F-37, F-41, F-43
 Como evaluador, quiero el informe y una demo real para verificar el sistema y la comprensión de cada integrante.
 - **Dado** el sistema en los tres nodos
 - **Cuando** se presenta
