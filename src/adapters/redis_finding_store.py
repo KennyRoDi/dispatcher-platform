@@ -2,6 +2,8 @@ import json
 import logging
 from collections.abc import Sequence
 
+from redis.exceptions import WatchError
+
 from src.domain.finding import EvidenceRef, Finding, Severity
 
 logger = logging.getLogger(__name__)
@@ -17,6 +19,23 @@ class RedisFindingStore:
         pipe = self._client.pipeline()
         pipe.rpush(_key(case_id), *(_encode(f) for f in findings))
         pipe.execute()
+
+    def add_once(self, case_id: str, subtask_id: str, findings: Sequence[Finding]) -> bool:
+        control = f"{_key(case_id)}:subtasks"
+        with self._client.pipeline() as pipe:
+            while True:
+                try:
+                    pipe.watch(control)
+                    if pipe.sismember(control, subtask_id):
+                        return False
+                    pipe.multi()
+                    pipe.sadd(control, subtask_id)
+                    if findings:
+                        pipe.rpush(_key(case_id), *(_encode(f) for f in findings))
+                    pipe.execute()
+                    return True
+                except WatchError:
+                    continue
 
     def list_with_omitted(self, case_id: str) -> tuple[list[Finding], int]:
         decoded = [_decode(raw) for raw in self._client.lrange(_key(case_id), 0, -1)]

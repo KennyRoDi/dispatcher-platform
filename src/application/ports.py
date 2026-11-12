@@ -83,6 +83,11 @@ class FindingStore(Protocol):
 
 
 @runtime_checkable
+class SubtaskFindingStore(FindingStore, Protocol):
+    def add_once(self, case_id: str, subtask_id: str, findings: Sequence[Finding]) -> bool: ...
+
+
+@runtime_checkable
 class OmissionAwareFindingStore(FindingStore, Protocol):
     def list_with_omitted(self, case_id: str) -> tuple[list[Finding], int]: ...
 

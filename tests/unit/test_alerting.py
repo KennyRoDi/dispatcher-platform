@@ -181,3 +181,15 @@ def test_cierre_con_publicador_sin_envolver_tampoco_propaga(caplog):
 
     assert roto.llamadas == 1
     assert caplog.records
+
+
+def test_alertas_no_se_repiten_ante_un_add_once_ignorado():
+    interno, publicador = FakeFindingStore(), FakeAlertPublisher()
+    almacen = AlertingFindingStore(interno, publicador)
+    hallazgos = [_hallazgo(Severity.ALTA, "p1")]
+
+    assert almacen.add_once("c1", "s1", hallazgos) is True
+    assert almacen.add_once("c1", "s1", hallazgos) is False
+
+    assert len(publicador.alertas) == 1
+    assert interno.list("c1") == hallazgos

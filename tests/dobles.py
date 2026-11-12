@@ -107,9 +107,17 @@ class FakeWorkQueue:
 class FakeFindingStore:
     def __init__(self):
         self.hallazgos = defaultdict(list)
+        self.subtareas = set()
 
     def add(self, case_id, findings):
         self.hallazgos[case_id].extend(findings)
+
+    def add_once(self, case_id, subtask_id, findings):
+        if (case_id, subtask_id) in self.subtareas:
+            return False
+        self.subtareas.add((case_id, subtask_id))
+        self.hallazgos[case_id].extend(findings)
+        return True
 
     def list(self, case_id):
         return list(self.hallazgos[case_id])

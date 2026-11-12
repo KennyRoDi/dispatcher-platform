@@ -81,6 +81,19 @@ def comprobar_finding_store(almacen):
     assert almacen.list("c2") == []
 
 
+def comprobar_finding_store_idempotente(almacen):
+    primero = Finding("amenaza", Severity.ALTA, 0.9, EvidenceRef("abc", "linea 3"))
+    segundo = Finding("ofensivo", Severity.MEDIA, 0.7, EvidenceRef("abc", "linea 5"))
+    assert almacen.add_once("c1", "s1", [primero]) is True
+    assert almacen.add_once("c1", "s1", [primero]) is False
+    assert almacen.add_once("c1", "s2", [segundo]) is True
+    assert almacen.add_once("c2", "s1", [segundo]) is True
+    assert almacen.add_once("c1", "s3", []) is True
+    assert almacen.add_once("c1", "s3", [primero]) is False
+    assert almacen.list("c1") == [primero, segundo]
+    assert almacen.list("c2") == [segundo]
+
+
 def comprobar_analyzer(analizador, path):
     hallazgos = analizador.analyze(path)
     assert isinstance(hallazgos, list)
