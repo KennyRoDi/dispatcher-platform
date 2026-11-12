@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan cc39ae48
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
 
 ## Objetivo
@@ -75,3 +75,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | SPEC sin subagente. Comprobado: el Monitor ya muestra CPU, RAM y GPU por worker con refresco; faltan memoria de cgroup y vista por nodo. Usa ResourceReader de F-16 sin cambios. Conformidad 0. (cc39ae48) |
