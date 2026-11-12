@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
 **Verificación IA:** revision 2e15cb8c
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
