@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
-**Verificación IA:** tests 0b31bb9d
+**Verificación IA:** implementacion c5169357
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -130,3 +130,4 @@ Las registra `scripts/flujo.py`. No editar.
 | revision | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Claude Code | 2026-11-11 | Pruebas del resumen de la medicion de backpressure (0b31bb9d) |
 | tests | Melany Vindas | 2026-11-11 | Pruebas de un script de medicion; verificadas en Linux por Claude |
+| verificación IA de implementacion | Claude Code | 2026-11-11 | Script de medicion de backpressure, pruebas en verde (c5169357) |
