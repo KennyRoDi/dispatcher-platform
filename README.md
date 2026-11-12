@@ -101,52 +101,34 @@ pytest -q -m "not integration and not acceptance"
 
 ### Demo local
 
-Levanta Redis, MinIO, coordinador, reaper, tres workers y un `feeder` que envía casos aleatorios, todo en una máquina, sin `.env` y sin Tailscale. Puertos libres: `8000`, `9000`, `9001` y `127.0.0.1:6379`. Lo que lee el dashboard y los estados de caso están en [docs/DEMO.md](docs/DEMO.md).
+Levanta Redis, MinIO, coordinador, reaper, tres workers y un `feeder` que envía casos aleatorios, todo en una máquina y sin Tailscale. Puertos libres: `8000`, `9000`, `9001` y `127.0.0.1:6379`. Lo que lee el dashboard y los estados de caso están en [docs/DEMO.md](docs/DEMO.md).
 
-**Defecto conocido en `main` (medido el 2026-11-11, sin corregir):** los workers exigen `ADMISSION_MARGIN_BYTES` y `FOOTPRINT_<OP>_BYTES` (F-17, `src/workers/config.py`), y ni `deploy/docker-compose.local.yml` ni `.env.example` los definen. Con el comando de DEMO.md tal cual, los tres workers reinician en bucle con `ValueError: ADMISSION_MARGIN_BYTES es obligatoria y debe ser un entero en bytes`, aunque `/health` del coordinador responde y `/stats` encola casos. Además, sin `mem_limit` el lector de cgroups falla con `ValueError: /sys/fs/cgroup/memory.max debe contener un entero en bytes` y el worker no toma tareas. Hace falta una PR de código; esta guía no la hace.
-
-**Solución provisional, solo para la demo local.** Crea en la raíz un archivo `demo-admision.yml` (sin versionar) con valores **de demostración, no medidos**. Las huellas reales las fija la ficha M1 (§4.1, pendiente de medir):
-
-```yaml
-services:
-  worker:
-    mem_limit: 2g
-    memswap_limit: 2g
-    environment:
-      ADMISSION_MARGIN_BYTES: 268435456
-      FOOTPRINT_TRANSCODE_VIDEO_BYTES: 268435456
-      FOOTPRINT_EXTRACT_AUDIO_BYTES: 268435456
-      FOOTPRINT_GENERATE_THUMBNAIL_BYTES: 268435456
-      FOOTPRINT_CONVERT_AUDIO_BYTES: 268435456
-      FOOTPRINT_EXTRACT_METADATA_BYTES: 268435456
-```
-
-**Probado en Linux (Debian 13, 2026-11-11)**, con el archivo anterior: ocho contenedores arriba, tres workers con `alive: true` en `GET /workers`, casos en `completed` y el feeder enviando casos. Sin el archivo, los workers no arrancan, como se describió.
+El coordinador rechaza con 401 toda petición sin token (F-26), así que antes de la primera vez se generan las credenciales. El comando escribe `JWT_SECRET`, `WORKER_TOKEN` y `API_TOKEN` en `.env` (ignorado por git) y no imprime ningún valor:
 
 ```bash
-docker compose -f deploy/docker-compose.demo.yml -f demo-admision.yml up -d --build
-docker compose -f deploy/docker-compose.demo.yml logs -f feeder
-curl -s http://localhost:8000/stats
-curl -s http://localhost:8000/workers
-docker compose -f deploy/docker-compose.demo.yml down -v
+python -m scripts.generar_credenciales
+docker compose --env-file .env -f deploy/docker-compose.demo.yml up -d --build
+docker compose --env-file .env -f deploy/docker-compose.demo.yml logs -f feeder
+docker compose --env-file .env -f deploy/docker-compose.demo.yml down -v
 ```
 
-Con la demo en marcha y el venv activo, en otra terminal, estos comandos también se probaron en Linux. `cp .env.demo .env` reemplaza el `.env` que tengas:
+Los tokens duran 30 días (`--dias N` lo cambia). Con la demo en marcha, `GET /stats` y `GET /workers` piden el token de administrador. En PowerShell:
+
+```powershell
+$token = (Get-Content .env | Where-Object { $_ -like 'API_TOKEN=*' }).Split('=', 2)[1]
+curl.exe -s -H "Authorization: Bearer $token" http://localhost:8000/workers
+```
+
+`deploy/docker-compose.local.yml` fija `mem_limit` y las huellas de admisión (`ADMISSION_MARGIN_BYTES`, `FOOTPRINT_<OP>_BYTES`) con **valores de demostración, no medidos**: 2 GiB por worker y 256 MiB por huella. Las huellas reales las fija la ficha M1 §4.1; para sustituirlas, define esas variables en `.env`.
+
+Para enviar un caso a mano, con el venv activo y el `.env` de la demo (`cp .env.demo .env` reemplaza el `.env` y borra las credenciales: vuelve a ejecutar `generar_credenciales` después):
 
 ```bash
-cp .env.demo .env
 python -m scripts.check_connectivity
 python -m scripts.submit_case --dir <carpeta con videos o audios> --mode auto --timeout 100
 ```
 
-`check_connectivity` salió con `[OK]` en redis, coordinator, minio, ffmpeg y work_dir. `submit_case` subió un video de 2 s, terminó en `completed` y salió con 0. Al terminar, `down -v` dejó 0 contenedores y 0 volúmenes. `docker compose ... down` sin `-v` conserva los datos.
-
-**Sin probar en Windows: traducción de los comandos de Linux; verificar.** Los comandos `docker compose` y `python` son los mismos en PowerShell; cambian la activación del venv y la copia del `.env`:
-
-```powershell
-Copy-Item .env.demo .env
-curl.exe -s http://localhost:8000/stats
-```
+`submit_case` lee `API_TOKEN` del entorno. `docker compose ... down` sin `-v` conserva los datos.
 
 ### Nodo A y workers
 

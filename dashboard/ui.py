@@ -1,6 +1,7 @@
 """Utilidades compartidas del dashboard: estilos, cliente HTTP, tiempo y componentes."""
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 
 import altair as alt
@@ -53,7 +54,9 @@ def api_get(base: str, path: str, params: dict | None = None, timeout: float = 5
     """GET JSON. Devuelve (data, error); data es None si hubo error."""
     url = f"{base}{path}"
     try:
-        r = requests.get(url, params=params, timeout=timeout)
+        token = os.environ.get("API_TOKEN", "").strip()
+        cabeceras = {"Authorization": f"Bearer {token}"} if token else None
+        r = requests.get(url, params=params, headers=cabeceras, timeout=timeout)
     except requests.exceptions.ConnectionError:
         return None, f"El servidor no responde en {base} (conexión rechazada)."
     except requests.exceptions.Timeout:
@@ -62,6 +65,8 @@ def api_get(base: str, path: str, params: dict | None = None, timeout: float = 5
         return None, f"Error consultando {url}: {e}"
     if r.status_code != 200:
         hint = " - reinícialo con la versión actual" if r.status_code in (404, 405) else ""
+        if r.status_code in (401, 403):
+            hint = " - define API_TOKEN con un token de rol supervisor o administrador"
         return None, f"El servidor respondio HTTP {r.status_code} en {path}{hint}."
     try:
         return r.json(), None

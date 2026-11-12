@@ -122,7 +122,7 @@ def test_el_caso_ya_es_terminal_cuando_se_publica_la_alerta(client, fake, public
 
 def test_la_alerta_no_se_publica_mientras_quedan_subtareas(client, fake, publicador):
     case_id, (s1, s2) = crear_caso(client, 2)
-    assert reportar(client, case_id, s1).json()["case_status"] == "queued"
+    assert reportar(client, case_id, s1).json()["case_status"] == "processing"
     assert publicador.alertas == []
     assert reportar(client, case_id, s2).json()["case_status"] == "completed"
     assert len(publicador.alertas) == 1

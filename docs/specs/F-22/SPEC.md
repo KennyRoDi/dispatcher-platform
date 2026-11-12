@@ -1,8 +1,8 @@
 # SPEC F-22: Chunks verificados
 
 **Fase:** pr
-**Base:** feat/F-22-1-chunks-verificados
-**Verificación IA:** revision a7c8e59
+**Base:** feat/F-22-3-medicion-throughput
+**Verificación IA:** revision a70f68a
 **Historia:** US-22 · **Requisitos:** RF-31, RF-22, RNF-11 (parte de throughput), QA-04; AD-10, SUP-13, SUP-17; [B.5 M3] · **Responsable:** V
 
 ## Objetivo
@@ -218,3 +218,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) devolvio dos veces y aprobo los arreglos 1, 2 y 5: receive en run_in_threadpool (no bloquea el event loop, B.5 M3 intacto), KeyError del ObjectStore ya no se disfraza de 404, separador eliminado. Su segunda revision hallo una carrera previa en received() (is_dir y luego iterdir) que daba 500 en 4/25; arreglada por el orquestador con prueba determinista, 0/25 fallos (verificacion no independiente de ese punto). Anotado: discard borra sin renombrar si rename falla con OSError. Diff 226 lineas en src y scripts. Suite 1144 verde. (a7c8e59) |
 | revision | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Codex | 2026-11-11 | F-22 parte 3, fase tests: pruebas de parseo de tamaños binarios y rechazo de tamaños inválidos/duplicados; import falla en rojo esperado porque el runner aún no existe. Sin código de producción; verificación no independiente. (0c25562) |
+| tests | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó el avance autónomo; suite de pruebas nueva falla por la función/runner aún ausente como se espera en TDD. |
+| verificación IA de implementacion | Codex | 2026-11-11 | Runner M3 añadido: exige archivo >=200 MiB, cinco repeticiones predeterminadas por tamaño, mide transferencia completa y completion, guarda CSV y media/desviación, elimina el objeto entre repeticiones para evitar dedup. Sintaxis y conformidad 0; pruebas nuevas 6 passed. Medición real pendiente por falta de archivo/nodos; QA no independiente. (d2cd1e4) |
+| implementacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó continuar sin aprobación humana; pruebas 6/6 y conformidad 0; la medición de sistema no se ejecuta porque no están disponibles el archivo de 200 MiB y los nodos reales, no se estima evidencia. |
+| verificación IA de verificacion | Codex | 2026-11-11 | QA del runner M3 F-22: pruebas del parser y suite de chunks/rutas/cliente en verde; conformidad 0. No se corren mediciones: falta archivo sintético >=200 MiB, coordinador accesible y clúster real de nodos; F-38 local es simulación y no sirve como evidencia. Verificación no independiente. (ef54219) |
+| verificacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo. Evidencia de rendimiento debe ser medida y no hay dataset de medios ni nodos reales; se registra la limitación sin valores estimados. |
+| verificación IA de documentacion | Codex | 2026-11-11 | Documentación M3 describe el runner, fórmula y bloqueo real; no inventa resultados. Bitácora intentada por el comando oficial. (6ae487b) |
+| documentacion | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó avance autónomo; documentación revisada y las mediciones faltantes se declaran pendientes por falta de entorno real. |
+| verificación IA de revision | Codex | 2026-11-11 | Revisión F-22 parte 3: runner compatible con comando del SPEC, valida tamaños y archivo >=200 MiB, mide las fases solicitadas y elimina el objeto por repetición; código 132 líneas, CSV crudo y media/desviación. No reporta datos sin nodos reales; unitarias verdes. Revisión no independiente. (a70f68a) |
+| revision | José Andrés Loría Herrera | 2026-11-11 | José Andrés autorizó autonomía. La herramienta cumple el SPEC; la evidencia de throughput queda pendiente, sin mediciones falsas, hasta disponibilidad de dataset y nodos reales. |

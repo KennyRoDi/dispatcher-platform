@@ -224,3 +224,30 @@ class FakeChunkStaging:
     def discard(self, upload_id):
         self.manifiestos.pop(upload_id, None)
         self.chunks.pop(upload_id, None)
+
+
+class FakeCaseStateStore:
+    def __init__(self):
+        self._reportes = defaultdict(dict)
+        self._estados = {}
+        self._historial = defaultdict(list)
+
+    def mark_reported(self, case_id, subtask_id, outcome):
+        if subtask_id in self._reportes[case_id]:
+            return False
+        self._reportes[case_id][subtask_id] = outcome
+        return True
+
+    def counts(self, case_id):
+        resultados = list(self._reportes[case_id].values())
+        return resultados.count("completed"), resultados.count("failed")
+
+    def state(self, case_id):
+        return self._estados.get(case_id)
+
+    def set_state(self, case_id, nuevo, at):
+        self._estados[case_id] = nuevo
+        self._historial[case_id].append((nuevo, at))
+
+    def history(self, case_id):
+        return list(self._historial[case_id])

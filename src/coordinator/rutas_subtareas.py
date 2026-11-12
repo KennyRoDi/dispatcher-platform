@@ -8,13 +8,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.application.alerting import notify_case_closed
 from src.application.ports import AlertPublisher
 from src.coordinator import conexion
-from src.coordinator.apoyo import (
-    final_case_status,
-    json_dict,
-    json_list,
-    now_iso,
-    str_or_empty,
-)
+from src.adapters.redis_case_state import RedisCaseState
+from src.application.report_subtask import ReportSubtask
+from src.domain.case_state import CaseState
+from src.coordinator.apoyo import json_dict, json_list, now_iso, str_or_empty
+from src.infrastructure.clock import SystemClock
 from src.coordinator.modelos import SubtaskReport
 from src.coordinator.rutas_alertas import obtener_publicador_alertas
 
@@ -45,32 +43,11 @@ def report_subtask(
     case_id = report.case_id
     subtask_key = f"subtask:{subtask_id}"
     case_key = f"case:{case_id}"
-    done_set_key = f"case:{case_id}:done"
+    redis = conexion.redis_client
 
-    # --- guard: subtask must exist ---
-    if not conexion.redis_client.exists(subtask_key):
+    if not redis.exists(subtask_key):
         raise HTTPException(status_code=404, detail=f"Sub-tarea '{subtask_id}' no encontrada.")
-
-    # --- [FIX 1] atomic idempotency via SADD ---
-    added = conexion.redis_client.sadd(done_set_key, subtask_id)
-    if added == 0:
-        # Already processed — return current case status without touching counters
-        current_case_status = conexion.redis_client.hget(case_key, "status") or "unknown"
-        logger.info(
-            "Reporte duplicado ignorado (SADD=0): subtask=%s case=%s",
-            subtask_id, case_id,
-        )
-        return {
-            "message": "Reporte ignorado por idempotencia",
-            "subtask_id": subtask_id,
-            "case_id": case_id,
-            "case_status": current_case_status,
-        }
-
-    # --- validate reported status ---
     if report.status not in ("completed", "failed"):
-        # Undo the sadd so the report can be retried with a correct status
-        conexion.redis_client.srem(done_set_key, subtask_id)
         raise HTTPException(
             status_code=422,
             detail=(
@@ -79,8 +56,16 @@ def report_subtask(
             ),
         )
 
-    # --- update subtask hash with ALL worker metrics (None → "") ---
-    subtask_updates: dict[str, str] = {
+    if redis.sismember(f"case:{case_id}:done", subtask_id):
+        logger.info("Reporte duplicado ignorado: subtask=%s case=%s", subtask_id, case_id)
+        return {
+            "message": "Reporte ignorado por idempotencia",
+            "subtask_id": subtask_id,
+            "case_id": case_id,
+            "case_status": redis.hget(case_key, "status") or "unknown",
+        }
+
+    redis.hset(subtask_key, mapping={
         "status": report.status,
         "worker_id": str_or_empty(report.worker_id),
         "host": str_or_empty(report.host),
@@ -90,30 +75,24 @@ def report_subtask(
         "media_duration_s": str_or_empty(report.media_duration_s),
         "output_bytes": str_or_empty(report.output_bytes) if report.output_bytes is not None else "0",
         "attempts": str_or_empty(report.attempts),
-        "outputs": json.dumps(report.outputs or []),   # list → JSON string
+        "outputs": json.dumps(report.outputs or []),
         "error": str_or_empty(report.error),
         "error_type": str_or_empty(report.error_type),
         "encoder": str_or_empty(report.encoder),
-    }
-    conexion.redis_client.hset(subtask_key, mapping=subtask_updates)
+    })
+    remaining = redis.hincrby(case_key, "pending_subtasks", -1)
+    expected = int(redis.hget(case_key, "total_subtasks") or 1)
 
-    # --- decrement pending counter ---
-    remaining = conexion.redis_client.hincrby(case_key, "pending_subtasks", -1)
-    case_status = conexion.redis_client.hget(case_key, "status")
-
-    # --- Barrier / Join (un caso cancelado nunca cambia de estado) ---
-    if remaining <= 0 and case_status != "cancelled":
-        final_status = final_case_status(case_id)
-        conexion.redis_client.hset(case_key, mapping={
-            "status": final_status,
-            "finished_at": now_iso(),
-        })
-        case_status = final_status
-        logger.info(
-            "Caso %s finalizado → %s (pending=%d)", case_id, final_status, remaining
-        )
+    almacen, reloj = RedisCaseState(redis), SystemClock()
+    final = ReportSubtask(almacen, reloj).execute(case_id, subtask_id, report.status, expected)
+    if final is None and almacen.state(case_id) in (CaseState.QUEUED, CaseState.RETRYING):
+        almacen.set_state(case_id, CaseState.PROCESSING, reloj.now())
+    case_status = redis.hget(case_key, "status")
+    if final is not None:
+        redis.hset(case_key, "finished_at", now_iso())
+        logger.info("Caso %s finalizado -> %s", case_id, final.value)
         try:
-            notify_case_closed(publicador, case_id, final_status)
+            notify_case_closed(publicador, case_id, final.value)
         except Exception:
             logger.exception("Alerta de cierre del caso %r no publicada", case_id)
 
@@ -125,8 +104,6 @@ def report_subtask(
         "case_status": case_status,
         "pending_subtasks": remaining,
     }
-
-
 
 
 @router.get("/subtasks/{subtask_id}", response_model=dict, tags=["Dashboard"])
