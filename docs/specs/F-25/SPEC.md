@@ -26,7 +26,7 @@ De `docs/backlog/m3-es-almacenamiento.md` (US-25):
 Criterios adicionales derivados de los requisitos:
 
 - RF-34: mientras un `PUT` espera bytes de un cliente lento o lee un manifiesto en un disco lento, otra petición a la API se atiende antes de que ese `PUT` termine.
-- RF-34: con uvicorn real, durante la subida de un chunk de 16 MiB enviado lentamente, todas las peticiones ligeras en paralelo responden y la subida termina con 204.
+- RF-34: con uvicorn real, durante la subida de un chunk de 16 MiB enviado lentamente, 20 peticiones ligeras seguidas responden antes de que termine y la subida termina con 204.
 
 ## Diseño
 
@@ -47,7 +47,8 @@ Criterios adicionales derivados de los requisitos:
 |---|---|---|
 | Unitaria | `test_subida_lenta_no_bloquea_otra_peticion`: un `PUT` cuyo cuerpo llega en partes controladas por eventos; otra ruta responde mientras el cuerpo sigue abierto | Recepción `async` del cuerpo |
 | Unitaria | `test_manifiesto_lento_no_bloquea_otra_peticion`: `load_manifest` del staging se bloquea hasta que otra petición se atiende; con la lectura en el event loop, la otra petición no llega a atenderse | Lectura del manifiesto fuera del event loop |
-| Integración | uvicorn real: chunk de 16 MiB enviado en partes lentas y 20 peticiones ligeras en paralelo; todas responden antes de que termine la subida | Criterio de US-25 con servidor real |
+| Integración | uvicorn real: chunk de 16 MiB enviado en partes lentas y 20 peticiones ligeras seguidas durante la subida; todas responden antes de que termine | Criterio de US-25 con servidor real |
+| Integración | `test_recepcion_no_bloqueante_disco.py` (QA): `DiskChunkStaging` real con `load_manifest` demorado 1 s; los `GET` responden en menos de 0,5 s y el chunk queda en disco | El cambio de F-25 con disco real; falla si `expected_size` vuelve al event loop |
 
 ## Mediciones
 
