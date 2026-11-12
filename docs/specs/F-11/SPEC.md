@@ -77,7 +77,7 @@ Interpretación (SUP-44, provisional): N es el **número total de intentos** de 
 
 **`next_delay(attempt, base, cap, jitter)`**: `attempt` desde 1; espera exponencial `min(cap, base · 2^(attempt − 1))` multiplicada por `0.5 + 0.5 · jitter()` («jitter igual», acota la espera entre la mitad y el total de la exponencial). Nunca supera `cap`; con `jitter()` fijo es monótona creciente hasta el tope; sin `random` ni reloj dentro del dominio. Rechaza con `ValueError` `attempt < 1`, `base <= 0`, `cap < base` o un `jitter()` fuera de `[0, 1)`.
 
-**`decide_retry(attempts, policy, jitter)`**: `attempts` es el número de intentos ya realizados. Si `attempts < policy.max_attempts` devuelve `Retry(delay=next_delay(attempts, ...))`; si no, `GiveUp`. Es la única comparación del límite en todo el código, usada por el worker y por `recovery.py`.
+**`decide_retry(attempts, policy, jitter)`**: `attempts` es el número de intentos ya realizados. Si `attempts < policy.max_attempts` devuelve `Retry(delay=next_delay(attempts + 1, ...))`; si no, `GiveUp`. Con `attempts + 1`, el primer reintento (tras el intento 1) espera entre `base` y `2 · base`, no entre `base/2` y `base`; hay N − 1 esperas entre los N intentos (implementado y probado así en la parte 1). Es la única comparación del límite en todo el código, usada por el worker y por `recovery.py`.
 
 **Decisión nueva propuesta, AD-48 (provisional), a registrar en `docs/ARQUITECTURA.md` §8 en la fase de documentación:**
 - *Decisión:* reintento con backoff exponencial y jitter acotado, decidido por una función pura de dominio y ejecutado con una **espera programada fuera del worker** (ZSET `retry:scheduled` más promoción por el reaper), con N como total de intentos.
@@ -126,13 +126,27 @@ Cada PR hace una sola cosa y tiene hasta 400 líneas sin contar pruebas ni docum
 ## Riesgos y preguntas abiertas
 
 1. **Dueño de `recovery.py`, `worker_node.py` y `config.py`.** `docs/CONTRATOS.md` asigna `src/workers/` a José Andrés, no a Nahúm; solo `src/domain/retry.py` es de Nahúm. La parte 2 modifica archivos de José y F-18 ya tocó `worker_node.py` (OOM). ¿Se avisa a José y se pide su revisión en la PR de la parte 2, o prefiere que él aplique ese cambio? Esta feature se toma como apoyo a Nahúm.
+   **Decisión de la persona:** se avisa a José Andrés y se pide su revisión en la PR de la parte 2.
 2. **Quién promueve las sub-tareas vencidas.** Se propone que el reaper existente llame a `promote_due` en su ciclo, lo que añade una dependencia de que el reaper corra y retrasa cada reintento hasta un ciclo (`REAPER_INTERVAL`) más allá de la espera. Alternativa: dormir en el worker (más simple, ocupa el slot y se pierde si muere). ¿Se acepta la resolución gruesa del reaper o se prefiere el sueño en el worker en la parte 2?
+   **Decisión de la persona:** lo hace el reaper (`promote_due` en su ciclo).
 3. **Qué fallos son transitorios.** Propuesta: reintentar `TimeoutError`, `MemoryError`, `BlockingIOError`, `InterruptedError`, `PermissionError`, `StorageError` y el `ProcessingError` de FFmpeg con código de salida distinto de entrada inválida; no reintentar `ValueError` (entrada ilegible, permanente). Hoy `handle_subtask` trata todo igual. ¿Se aprueba esa lista, o se reintenta cualquier excepción hasta N, a riesgo de repetir fallos permanentes?
+   **Decisión de la persona:** se aprueba la lista propuesta de fallos transitorios.
 4. **Valores por defecto de `base` y `tope`.** No hay un dato medido que los fundamente. Se proponen provisionales `RETRY_BASE_S=1` y `RETRY_CAP_S=30` (el mismo orden que `MAX_BACKOFF` del worker) y se marca «Medición pendiente» en AD-48. ¿Se aceptan?
+   **Decisión de la persona:** se aprueban `RETRY_BASE_S=1` y `RETRY_CAP_S=30` (sin medir, «Medición pendiente» en AD-48).
 5. **Semántica de N (SUP-44).** Se toma como total de intentos, igual que `recovery.py`; «N reintentos» daría un intento más. ¿Se acepta?
+   **Decisión de la persona:** N es el total de intentos (SUP-44, registrado en `docs/REQUERIMIENTOS.md`).
 6. **Camino nuevo vs camino actual.** Hoy el worker real usa `queue:{operacion}`, `attempts` en el hash `subtask:{id}` y estado en el hash `case:{id}`, mientras que `RetrySubtask` opera sobre `CaseStateStore` (F-10) para el camino de F-05/F-06 aún sin conectar a `POST /cases`. Se implementan ambos con la misma decisión de dominio, pero el camino actual escribe el estado `retrying` por el hash, como ya hace `_requeue`. ¿Se acepta ese doble cableado hasta que F-01 conecte el camino nuevo?
 7. **Entrega al menos una vez.** Un reintento vuelve a ejecutar el análisis; la idempotencia por id de sub-tarea (AD-21, citada en AD-03) debe evitar hallazgos duplicados. F-13 aún no persiste `Finding` desde los workers, así que no se prueba aquí; queda declarado como límite.
 8. **Ramas relacionadas.** Se revisó `git branch -r`: no hay ramas de F-11 de Nahúm distintas de la actual; `feat/F-10-3-estados-y-cierre` es la base (estados) y `feat/F-18-*` toca el reencolado por OOM. SUP-44 y AD-48 se numeran contra `main` (último AD-47, último SUP-43); si otra rama los usa antes, se renumeran en la parte 2.
+
+## Riesgos conocidos de la parte 1 (QA)
+
+Defectos menores hallados por QA, documentados como `xfail` estricto en `tests/unit/test_retry_qa.py` y `tests/unit/test_retry_subtask_qa.py`. Ninguno bloquea la parte 1.
+
+9. `next_delay` lanza `OverflowError` con `attempt` de unos 1000 en adelante si `base` es `float` (`2 ** (attempt − 1)` desborda al multiplicar). Con N pequeño no ocurre; queda por acotar el exponente.
+10. `RetryPolicy` acepta `NaN` en `base` o `cap`, porque las comparaciones con `NaN` son falsas y la validación no lo rechaza.
+11. Un caso inexistente da `AttributeError` y no un error de dominio: viene de `case_state.py` (F-10, línea ~33), no de F-11.
+12. `RetrySubtask` pasa el caso a `retrying` **antes** de `schedule`. Si `schedule` falla, el caso queda en `retrying` sin sub-tarea programada. Es relevante para la atomicidad del adaptador Redis de la parte 2: estado y ZSET deben escribirse en una sola transacción o el orden debe invertirse con compensación.
 
 ## Aprobaciones
 
