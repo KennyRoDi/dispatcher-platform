@@ -119,6 +119,8 @@ class Settings:
     reaper_interval: float = 10.0
     reaper_max_age: float = 2100.0
     max_attempts: int = 3
+    retry_base_s: float = 1
+    retry_cap_s: float = 30
     hwaccel: str | None = None
     node_ip: str | None = None
     worker_token: str | None = field(default=None, repr=False)
@@ -139,6 +141,11 @@ class Settings:
         worker_concurrency = _int(env, "WORKER_CONCURRENCY", cls.worker_concurrency)
         if worker_concurrency < 1:
             raise ValueError(f"WORKER_CONCURRENCY must be >= 1: {worker_concurrency}")
+
+        retry_base_s = _float(env, "RETRY_BASE_S", cls.retry_base_s)
+        retry_cap_s = _float(env, "RETRY_CAP_S", cls.retry_cap_s)
+        if retry_base_s <= 0 or retry_cap_s < retry_base_s:
+            raise ValueError(f"RETRY_BASE_S debe ser > 0 y <= RETRY_CAP_S: {retry_base_s}, {retry_cap_s}")
 
         raw_work_dir = _optional_str(env, "WORK_DIR")
         work_dir = Path(raw_work_dir) if raw_work_dir is not None else cls.work_dir
@@ -168,6 +175,8 @@ class Settings:
             reaper_interval=_float(env, "REAPER_INTERVAL", cls.reaper_interval),
             reaper_max_age=_float(env, "REAPER_MAX_AGE", cls.reaper_max_age),
             max_attempts=_int(env, "MAX_ATTEMPTS", cls.max_attempts),
+            retry_base_s=retry_base_s,
+            retry_cap_s=retry_cap_s,
             hwaccel=_parse_hwaccel(env.get("HWACCEL")),
             node_ip=_optional_str(env, "NODE_IP"),
             worker_token=_optional_str(env, "WORKER_TOKEN"),
