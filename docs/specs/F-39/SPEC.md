@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan ce6e2d7
+**Verificación IA:** tests 842ab69
 **Historia:** US-39 · **Requisitos:** RNF-02, RNF-03, RNF-24 · **Responsable:** N
 
 ## Objetivo
@@ -112,3 +112,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | claude | 2026-11-12 | SPEC sin campos pendientes (grep 0); bc6bab6 existe; minioadmin confirmado en docker-compose.yml:48-49 y .env.example:23-24; plan de 1 parte, 0 lineas de src (ce6e2d7) |
 | plan | Kenni Rodriguez | 2026-11-12 |  |
+| verificación IA de tests | claude | 2026-11-12 | Solo tests/unit/test_reutilizacion_doc.py (842ab69); pytest: 20 failed 2 passed, fallas por documento sin reescribir, sin errores de import (842ab69) |
