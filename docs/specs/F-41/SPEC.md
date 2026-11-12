@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests a649c769
+**Verificación IA:** implementacion 89fe63fc
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
 
 ## Objetivo
@@ -93,3 +93,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | José Andrés Loría Herrera | 2026-11-12 |  |
 | verificación IA de tests | Codex | 2026-11-12 | Revision independiente de COMPROBACION: cubre productos RNF09-14 y cinco reproducciones; estados parciales no se declaran cumplidos; diff solo documental y diff --check limpio. pytest tests/unit/test_conformidad.py: 28 passed. F41 no lleva TDD segun IMPLEMENTACION116; sin codigo ni pruebas rojas artificiales. (a649c769) |
 | tests | José Andrés Loría Herrera | 2026-11-12 | Autonomia autorizada expresamente por joselhcr en el chat: F41 documental exenta de TDD segun IMPLEMENTACION116; lista de aceptacion revisada, no aplica prueba roja de codigo. No se omiten criterios de evidencia ni reproduccion. |
+| verificación IA de implementacion | Codex | 2026-11-12 | Correccion documental revisada independientemente: diff completo solo docs, enlaces existentes, cinco revisar_ficha sin errores, diff --check limpio y codigo literal de recalculos reproducido. pytest tests/unit:3030 passed,82 skipped,37 xfailed; variables CA aisladas solo en proceso. Suite global interrumpida por esperas existentes Reporter; no verde global. QA documental aprobado, aceptacion total pendiente de nodos y cinco reproducciones. (89fe63fc) |
