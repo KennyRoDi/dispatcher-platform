@@ -1646,3 +1646,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y comparando 23 archivos de regresión con un worktree de main (72 fallos idénticos de entorno); modo rápido sin subagentes de QA ni de revisión, por pedido de la persona |
 | Cómo se validó | pytest sobre los archivos de la parte, test_arquitectura y regresión; la suite completa la valida CI en Linux |
 | Error de la IA | El developer reportó la parte como lista y la PR falló en CI en dos pruebas existentes (test_stats en test_coordinator y test_contract) porque /stats ahora incluye las colas tipadas; se corrigieron. El reaper tipado usa recover_subtask y no reencolar_huerfanas, porque esa duplicaba el elemento en la cola |
+
+## 2026-11-12 · Kenni Rodriguez · F-43 parte 2 (`feat/F-43-2-fabricas-y-contrato`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes developer |
+| Componente | F-43 parte 2 |
+| Propósito | Fábricas de almacén y analizadores, hallazgos idempotentes, clasificación de fallos y reporte consolidado real |
+| Consulta resumida | Implementación directa de la parte según docs/specs/F-43/SPEC.md |
+| Resultado obtenido | crear_almacen_lectura, crear_analizador, ParserPorExtension, add_once, es_transitorio, obtener_almacen real y contrato del worker tipado; 187 pruebas pasan |
+| Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
+| Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
+| Error de la IA | El agente no corrió la suite completa porque dos pruebas de integración de reporte se colgaron en Windows; las fábricas importan minio y urllib3 que solo estaban en requirements.txt |
