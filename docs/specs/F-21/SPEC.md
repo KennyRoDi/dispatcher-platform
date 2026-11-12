@@ -1,6 +1,6 @@
 # SPEC F-21: Comparación de políticas
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 5f18c29
 **Historia:** US-21 · **Requisitos:** RF-30, RNF-10 · **Responsable:** N
@@ -104,3 +104,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | claude | 2026-11-11 | 3 pruebas en rojo: test_fifo_ignora_prioridad y test_politica_se_elige_por_configuracion (AttributeError: falta SchedulingPolicy.desde_configuracion), test_medicion_corta_produce_csv_por_politica (falta scripts/measure/m2_sched.py). Sin código de implementacion. Resto de la suite de scheduling sigue verde (12 passed, 1 skipped) (d19fb1d) |
 | tests | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: SchedulingPolicy.desde_configuracion (9 lineas), scripts/measure/m2_sched.py (simulador con reloj virtual, 131 lineas), scripts/measure/m2_plot.py (graficos, 80 lineas). 15 passed, 1 skipped en tests de scheduling + integracion. Medicion real ejecutada con 3 semillas (42,43,44), datos en docs/evidencia/ y ficha docs/modulo-M2-planificacion.md (5f18c29) |
+| implementacion | Nahúm Murillo | 2026-11-11 | errores de colección preexistentes en tests de TLS/seguridad (entorno local), ajenos a F-21; pruebas de scheduling e integración verdes (15 passed, 1 skipped) |
