@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 3fec3cde
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
 
 ## Objetivo
@@ -89,3 +89,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | Codex | 2026-11-12 | Revision independiente del arquitecto en una ronda: diff completo contra origin/main solo SPEC; criterios US-41 y RNF-09 a RNF-14 cotejados con enunciado y backlog; sin marcadores; git diff --check limpio; cinco fichas pasan revisar_ficha. Verificados flags CLI m5. Brechas y errores M1/M2/M5 registrados; sin ejecutar mediciones ni acreditar reproduccion en otra maquina. (3fec3cde) |
