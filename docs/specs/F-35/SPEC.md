@@ -2,7 +2,7 @@
 
 **Fase:** verificacion
 **Base:** main
-**Verificación IA:** implementacion 88bd2c6
+**Verificación IA:** verificacion 34460e9
 **Historia:** US-35 · **Requisitos:** RF-44 (B.6 «Reinicio del coordinador») · **Responsable:** N
 
 ## Objetivo
@@ -124,3 +124,4 @@ Las registra `scripts/flujo.py`. No editar.
 | tests | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de implementacion | claude | 2026-11-12 | Implementacion completa: scenarios/coordinator_restart.py (116 lineas) con evaluar/tiempo_de_arranque puras y correr_con_app_real que crea una conexion Redis nueva (simula reinicio) y compara estado antes/despues. 7 passed, 1 skipped a la primera (sin ajustes). 49 passed en regresion amplia. 116 lineas de codigo (88bd2c6) |
 | implementacion | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), identicos a los de F-34, confirmados ajenos a F-35; 3628 passed |
+| verificación IA de verificacion | claude | 2026-11-12 | QA de edge cases en evaluar()/tiempo_de_arranque() de scenarios/coordinator_restart.py: vacios, progreso normal de estado (no se marca problema), discrepancia de conteo (se marca), arranque instantaneo (0.0s, no falla); sin bugs. Se detecto que main (fusionado por otra sesion) ahora exige TLS_ENABLED y autorizacion JWT por defecto; se ajusto el script de medicion para desactivar TLS (TLS_ENABLED=false, igual que conftest.py) y sortear la autorizacion (dependency_overrides[autorizar], igual que el fixture sin_autorizacion de las pruebas) ya que F-35 no mide esos aspectos. 3 corridas reales con fakeredis.FakeServer (redis real no disponible): 0 perdidas, 0 duplicadas, mismos subtask_id antes/despues en las 3; tiempo_arranque_s ~0.01s (crear una conexion/TestClient nuevos, no un reinicio real de proceso, limite ya declarado en el SPEC). Prueba de aceptacion pasa contra la corrida 1. (34460e9) |
