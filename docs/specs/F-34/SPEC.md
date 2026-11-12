@@ -1,6 +1,6 @@
 # SPEC F-34: Caída de un worker
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 26c673c
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
@@ -121,3 +121,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | claude | 2026-11-12 | 8 pruebas unitarias en rojo (falta scenarios/worker_crash.py). 2 pruebas de integracion pasan de inmediato porque validan el Reaper heredado ya existente (no codigo nuevo), confirmando que mi configuracion de prueba es correcta contra el mecanismo real. 1 prueba de aceptacion omitida (sin WORKER_CRASH_JSON). Resto de la suite (49 passed) intacto (4dc2e35) |
 | tests | Nahúm Murillo | 2026-11-12 |  |
 | verificación IA de implementacion | claude | 2026-11-12 | Implementacion completa: scenarios/worker_crash.py (129 lineas) con evaluar/tiempo_deteccion/tiempo_reasignacion puras y correr_con_reaper_real que usa el heartbeat_ttl real (no acortado) para medir con el comportamiento verdadero por defecto. 10 passed, 1 skipped (aceptacion sin JSON real). 54 passed en regresion amplia. 129 lineas de codigo (26c673c) |
+| implementacion | Nahúm Murillo | 2026-11-12 | 3 fallos preexistentes en TLS/cableado del entorno local (encoding), confirmados ajenos a F-34; 3599 passed |
