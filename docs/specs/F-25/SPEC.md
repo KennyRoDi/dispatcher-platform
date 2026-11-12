@@ -1,6 +1,6 @@
 # SPEC F-25: Recepción no bloqueante
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests e69130db
 **Historia:** US-25 · **Requisitos:** RF-34, [B.5 M3] · **Responsable:** V
@@ -80,3 +80,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | Claude (Opus 5.5) | 2026-11-11 | SPEC sin subagente. Comprobado en codigo: PUT ya lee async y receive va en run_in_threadpool (F-22); expected_size lee el manifiesto en el event loop. Aplica AD-13. Conformidad 0. (7149b5ba) |
 | plan | Melany Vindas | 2026-11-11 |  |
 | verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente. 2 unitarias (cuerpo lento, manifiesto lento) y 1 de integracion con uvicorn real (16 MiB lentos, 20 peticiones en paralelo). Rojo: el manifiesto lento bloquea la API 5 s; las otras dos pasan porque F-22 ya lee async. (e69130db) |
+| tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-25. |
