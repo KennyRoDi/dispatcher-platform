@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** main
-**Verificación IA:** documentacion 31a0e058
+**Verificación IA:** revision 4c3c6e38
 **Historia:** US-41 · **Requisitos:** RNF-09 a RNF-14 · **Responsable:** Cada responsable
 
 ## Objetivo
@@ -99,3 +99,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | José Andrés Loría Herrera | 2026-11-12 | Jose autoriza fusionar F41 tal como esta; QA devuelve cumplimiento total. Se acepta como entrega documental parcial con M1-M5 y cinco reproducciones pendientes detalladas en QA y COMPROBACION, sin atribuirles mediciones. Excepcion limitada a gate de fase, no cambia verdad de evidencia. |
 | verificación IA de documentacion | Codex | 2026-11-12 | Documentacion M1-M5, AD04, QA, COMPROBACION y recalculos revisados; bitacora F41 publicada en estado; git diff --check limpio; enlaces locales existentes; 3030 unitarias en verde. Pendientes medidos explicitamente, usuario acepta entrega parcial. (31a0e058) |
 | documentacion | José Andrés Loría Herrera | 2026-11-12 |  |
+| verificación IA de revision | Codex | 2026-11-12 | Revision independiente QA en docs/specs/F-41/QA.md comparo diff completo origin/main...HEAD con SPEC; correcciones documentales aprobadas, aceptacion RNF parcial devuelta. Usuario autorizo cierre y merge con faltantes explicitos; sin llaves ni datos privados, diff --check limpio y 3030 unitarias verdes. (4c3c6e38) |
