@@ -17,6 +17,7 @@ from pathlib import Path
 
 import pytest
 
+from src.domain.frame_sampling import FrameSampling
 from src.workers import multimedia_processor as mp
 
 HAS_FFMPEG = shutil.which("ffmpeg") is not None and shutil.which("ffprobe") is not None
@@ -670,3 +671,107 @@ def test_busqueda_wsl_solo_en_linux(monkeypatch):
     monkeypatch.setattr(mp.shutil, "which", lambda n: None)
     monkeypatch.setattr(mp.glob, "glob", glob_prohibido)
     assert mp._nvidia_smi_candidates() == []
+
+
+# ---------- Fotogramas (F-43) ----------
+class SupervisorFalso:
+    def __init__(self, fotogramas=0, retornos=(0,)):
+        self.fotogramas, self.retornos = fotogramas, list(retornos)
+        self.argv, self.cancelados = None, []
+
+    def start(self, argv, scratch):
+        self.argv = list(argv)
+        salida = Path(argv[-1])
+        for indice in range(1, self.fotogramas + 1):
+            (salida.parent / (salida.name % indice)).write_bytes(b"jpg")
+        return 77
+
+    def poll(self, pid):
+        return self.retornos.pop(0) if self.retornos else 0
+
+    def cancel(self, pid):
+        self.cancelados.append(pid)
+
+
+@pytest.fixture
+def ffmpeg_simulado(monkeypatch, tmp_path):
+    video = tmp_path / "fuente.mp4"
+    video.write_bytes(b"v")
+    info = {"format": {"duration": "12"}, "streams": [{"codec_type": "video"}]}
+    monkeypatch.setattr(mp, "_require_ffmpeg", lambda: None)
+    monkeypatch.setattr(mp, "probe", lambda src: info)
+    return video
+
+
+def test_comando_de_fotogramas_usa_cadencia_tope_y_salida_en_scratch(tmp_path):
+    muestreo = FrameSampling(every_s=4, max_frames=3)
+
+    cmd = mp._frames_command("v.mp4", str(tmp_path / mp.FRAME_PATTERN), muestreo, 3)
+
+    assert cmd[cmd.index("-vf") + 1] == "fps=0.250000:round=up"
+    assert cmd[cmd.index("-frames:v") + 1] == "3"
+    assert cmd[-1] == str(tmp_path / "frame_%04d.jpg")
+    assert cmd[cmd.index("-i") + 1] == "v.mp4"
+
+
+def test_extraer_fotogramas_usa_el_supervisor_de_la_subtarea_para_poder_cancelar(ffmpeg_simulado, tmp_path):
+    supervisor = SupervisorFalso(fotogramas=3)
+    salida = tmp_path / "sub"
+
+    frames = mp.extract_frames(str(ffmpeg_simulado), str(salida), FrameSampling(every_s=5, max_frames=20), supervisor)
+
+    assert supervisor.argv[0] == "ffmpeg" and supervisor.argv[-1] == str(salida / mp.FRAME_PATTERN)
+    assert [(f.path.name, f.t_s) for f in frames] == [("frame_0001.jpg", 0), ("frame_0002.jpg", 5), ("frame_0003.jpg", 10)]
+
+
+def test_extraer_fotogramas_con_timeout_cancela_el_supervisor_y_no_deja_fotogramas(ffmpeg_simulado, tmp_path):
+    supervisor = SupervisorFalso(fotogramas=2, retornos=(None, -15))
+    salida = tmp_path / "sub"
+
+    with pytest.raises(mp.ProcessingTimeoutError):
+        mp.extract_frames(str(ffmpeg_simulado), str(salida), FrameSampling(), supervisor, timeout=0)
+
+    assert supervisor.cancelados == [77]
+    assert list(salida.glob("frame_*.jpg")) == []
+
+
+def test_extraer_fotogramas_que_falla_lanza_error_de_procesamiento_sin_dejar_fotogramas(ffmpeg_simulado, tmp_path):
+    supervisor = SupervisorFalso(fotogramas=1, retornos=(1,))
+    salida = tmp_path / "sub"
+
+    with pytest.raises(mp.CorruptInputError):
+        mp.extract_frames(str(ffmpeg_simulado), str(salida), FrameSampling(), supervisor)
+
+    assert list(salida.glob("frame_*.jpg")) == []
+
+
+def test_extraer_fotogramas_sin_stream_de_video_es_error_de_formato(monkeypatch, tmp_path):
+    video = tmp_path / "audio.mp4"
+    video.write_bytes(b"v")
+    monkeypatch.setattr(mp, "_require_ffmpeg", lambda: None)
+    monkeypatch.setattr(mp, "probe", lambda src: {"format": {}, "streams": [{"codec_type": "audio"}]})
+
+    with pytest.raises(mp.UnsupportedFormatError):
+        mp.extract_frames(str(video), str(tmp_path / "sub"), FrameSampling())
+
+
+def test_extraer_fotogramas_de_un_archivo_inexistente(tmp_path, monkeypatch):
+    monkeypatch.setattr(mp, "_require_ffmpeg", lambda: None)
+
+    with pytest.raises(mp.InputNotFoundError):
+        mp.extract_frames(str(tmp_path / "no.mp4"), str(tmp_path / "sub"), FrameSampling())
+
+
+def test_el_extractor_ffmpeg_entrega_el_supervisor_y_el_muestreo(ffmpeg_simulado, tmp_path):
+    supervisor = SupervisorFalso(fotogramas=2)
+
+    frames = mp.FfmpegFrameExtractor(FrameSampling(every_s=2, max_frames=2), supervisor).extract(
+        ffmpeg_simulado, tmp_path / "sub"
+    )
+
+    assert [f.t_s for f in frames] == [0, 2]
+    assert "fps=0.500000:round=up" in supervisor.argv
+
+
+def test_fotogramas_no_cambia_las_operaciones_soportadas():
+    assert "extract_frames" not in mp.SUPPORTED_OPERATIONS

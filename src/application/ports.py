@@ -9,6 +9,7 @@ from src.domain.case_state import CaseState
 from src.domain.chat_message import ChatMessage
 from src.domain.consolidated_report import CaseInfo
 from src.domain.finding import Finding
+from src.domain.frame_sampling import Frame
 from src.domain.rbac import Role
 from src.domain.resources import ResourceUsage
 from src.domain.scheduling import Priority
@@ -43,6 +44,11 @@ class RetryScheduler(Protocol):
 @runtime_checkable
 class Analyzer(Protocol):
     def analyze(self, path: Path) -> list[Finding]: ...
+
+
+@runtime_checkable
+class FrameExtractor(Protocol):
+    def extract(self, path: Path, out_dir: Path) -> list[Frame]: ...
 
 
 @runtime_checkable

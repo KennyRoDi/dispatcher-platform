@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-from src.domain.evidence_position import BoxLocator, Locator, MessageLocator, SegmentLocator, UnknownLocator
+from src.domain.evidence_position import BoxLocator, FrameLocator, Locator, MessageLocator, SegmentLocator, UnknownLocator
 from src.domain.finding import Finding, Severity
 
 # Mismo conjunto que TERMINAL_CASE_STATUSES de src/coordinator/apoyo.py; se repite para no depender del coordinador.
@@ -168,6 +168,8 @@ def _clave_de_posicion(locador: Locator) -> tuple[Any, ...]:
         return (locador.index,)
     if isinstance(locador, BoxLocator):
         return (locador.x1, locador.y1, locador.x2, locador.y2)
+    if isinstance(locador, FrameLocator):
+        return (locador.t_s, locador.box.x1, locador.box.y1, locador.box.x2, locador.box.y2)
     return ()
 
 
