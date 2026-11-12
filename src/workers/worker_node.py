@@ -97,7 +97,7 @@ class Worker:
         if self.heartbeat_enabled:
             self.heartbeat = Heartbeat(
                 self.settings, self.redis, self.stats, self.stop_event,
-                ffmpeg_info=self.ffmpeg_info, processor=self.processor,
+                ffmpeg_info=self.ffmpeg_info, processor=self.processor, resource_reader=self.resource_reader,
             )
             self.heartbeat.start()
 
