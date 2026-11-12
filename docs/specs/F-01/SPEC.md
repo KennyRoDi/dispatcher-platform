@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** verificacion a5b285e
+**Verificación IA:** implementacion 7137d09
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
 
 ## Objetivo
@@ -109,3 +109,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | claude | 2026-11-11 | QA: encontrado y corregido bug real - CreateMultiSourceCase.execute([]) creaba un caso con 0 sub-tareas en silencio, ahora rechaza con ValueError. Verificado: sha256 duplicado con mismo kind dedupe correctamente (ultimo nombre gana, aceptable para contenido identico por sha256), un solo source funciona (no solo heterogeneos), sources+subtasks juntos no crashea (sources prioriza, documentado). 84 passed en regresion final (a5b285e) |
 | verificacion | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 |
 | devuelta de documentacion | Nahúm Murillo | 2026-11-11 | QA-2 de AD-46 (F-05) asigna explicitamente a F-01 validar el formato de case_id para evitar inyeccion en el log de routing; no se habia implementado |
+| verificación IA de implementacion | claude | 2026-11-11 | Agregada validacion de case_id (QA-2 de AD-46, asignada explicitamente a F-01): reutiliza CASE_ID_FORMAT de RedisCaseCatalog, aplicada en ambos caminos (nuevo y heredado) cuando el cliente suministra case_id manualmente. Prueba nueva confirma rechazo de salto de linea en el log de routing. 43 passed en regresion de rutas_casos/coordinator. 157 lineas de codigo total (7137d09) |
