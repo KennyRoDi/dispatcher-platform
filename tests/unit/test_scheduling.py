@@ -9,6 +9,18 @@ from enum import Enum
 import pytest
 
 
+class TestPriorityUnificada:
+    """F-06: Priority no debe duplicarse entre scheduling.py y la canonica de priority.py."""
+
+    def test_priority_es_la_misma_clase_en_scheduling_y_en_subtask(self):
+        from src.domain.scheduling import Priority as PriorityDeScheduling
+        from src.domain.priority import Priority as PriorityCanonica
+
+        assert PriorityDeScheduling is PriorityCanonica, (
+            "scheduling.Priority debe reexportar la clase canonica de priority.py, no duplicarla"
+        )
+
+
 class TestPriorityEnum:
     """Priority debe ser un enum de 4 niveles con validación."""
 
@@ -17,11 +29,12 @@ class TestPriorityEnum:
         # Importar una vez que exista
         from src.domain.scheduling import Priority
 
-        # Valores válidos
-        assert Priority.BAJA
-        assert Priority.MEDIA
-        assert Priority.ALTA
-        assert Priority.CRITICA
+        # Valores válidos: existen como miembros del enum (Priority es IntEnum,
+        # asi que BAJA=0 es falsy; se confirma la pertenencia, no la verdad booleana)
+        assert Priority.BAJA in Priority
+        assert Priority.MEDIA in Priority
+        assert Priority.ALTA in Priority
+        assert Priority.CRITICA in Priority
 
         # Valores no válidos lanzan ValueError o AttributeError
         with pytest.raises((ValueError, AttributeError, KeyError)):

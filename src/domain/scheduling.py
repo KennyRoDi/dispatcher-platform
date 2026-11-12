@@ -7,30 +7,9 @@ from dataclasses import dataclass, field
 from typing import Optional, Dict
 import time
 
+from src.domain.priority import Priority
 
-class Priority(Enum):
-    """Cuatro niveles de prioridad para casos."""
-
-    BAJA = 0
-    MEDIA = 1
-    ALTA = 2
-    CRITICA = 3
-
-    def bonus_ms(self) -> float:
-        """Bono de espera en ms: tiempo antes de que la prioridad sube un nivel."""
-        bonos = {
-            Priority.BAJA: 0.0,
-            Priority.MEDIA: 100.0,
-            Priority.ALTA: 200.0,
-            Priority.CRITICA: 400.0,
-        }
-        return bonos[self]
-
-    def next_priority(self) -> "Priority":
-        """Prioridad siguiente (máximo: CRITICA)."""
-        if self == Priority.CRITICA:
-            return Priority.CRITICA
-        return Priority(self.value + 1)
+__all__ = ["Priority", "SchedulingPolicy", "CaseEntry", "SchedulerState"]
 
 
 class SchedulingPolicy(Enum):
