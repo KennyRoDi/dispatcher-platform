@@ -75,3 +75,20 @@ def transaccion_acotada(cliente: redis.Redis, demanda: Mapping[str, int], limite
     llena = cliente.eval(_ESCRIBIR_SI_CABE, 0, *argumentos)
     if llena:
         raise QueueFull(llena)
+
+
+_MOVER_SI_CABE = """
+if redis.call('LLEN', KEYS[1]) >= tonumber(ARGV[1]) then
+  return 0
+end
+redis.call('RPUSH', KEYS[1], ARGV[2])
+return 1
+"""
+
+
+def mover_acotado(cliente: redis.Redis, cola: str, payload: str, limite: QueueLimit) -> bool:
+    """Encola `payload` solo si `cola` está por debajo del límite (AD-12); el scheduler no mueve si no cabe."""
+    if limite.desactivado:
+        cliente.rpush(cola, payload)
+        return True
+    return bool(cliente.eval(_MOVER_SI_CABE, 1, cola, limite.max_depth, payload))

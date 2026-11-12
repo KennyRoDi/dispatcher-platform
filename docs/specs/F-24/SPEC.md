@@ -1,8 +1,8 @@
 # SPEC F-24: Backpressure
 
 **Fase:** pr
-**Base:** main
-**Verificación IA:** revision b7e0d357
+**Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
+**Verificación IA:** revision 70b97e4e
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -117,4 +117,14 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: SPEC actualizado al diseno con Lua (alcance, diseno, pruebas, decisiones) y riesgos H4 y H5 de QA. Sin ficha: la medicion es la parte 3. Bitacora con 3 errores reales de la IA. (067568fe) |
 | documentacion | Melany Vindas | 2026-11-11 |  |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revisor independiente (subagente) APROBADO: cumple el SPEC parte 1 sin faltantes ni agregados; Lua revisa todas las colas antes de escribir y respeta el borde; cambio en rutas_casos limitado a envolver los comandos existentes (paridad confirmada); capas, comentarios y commits correctos; ~214 lineas. Suite 3778 verde, integracion Redis real 4 pasan y 1 xfail documentado, conformidad 0. SPEC ajustado con sus sugerencias. (b7e0d357) |
+| revision | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. 4 unitarias de mover_acotado con fakeredis[lua] (cola llena no mueve, con espacio encola al final, desactivado siempre encola, borde exacto) y 1 de integracion con Redis real (16 hilos, limite 40, nunca se supera). Rojo: la funcion no existe. (544d8f08) |
+| tests | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de implementacion | Claude (Opus 5.5) | 2026-11-11 | Sin subagente, no independiente. mover_acotado: script Lua con KEYS[1] (LLEN y RPUSH atomicos), sin limite RPUSH directo. Unitarias 4/4, integracion Redis real 3/3 corridas (falla sin el arreglo), suite 3782 verde en Linux, conformidad 0. 17 lineas. (b03d0303) |
+| implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) APROBADO con Redis real: cola llena no mueve; 64 hilos con limite 1 encola 1 y con limite 100 encola 100; desactivado encola 640/640; payload unicode de 280 KB integro; 2/2 mutantes detectados. Sin defectos. (d80e460e) |
+| verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: el SPEC ya describe mover_acotado; sin ficha (medicion en la parte 3); bitacora publicada. (f12f4c9c) |
+| documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 17 lineas en redis_backpressure.py y 2 archivos de prueba; cumple el SPEC parte 2 sin agregados; usa KEYS; capas correctas; commits de 58 y 62 caracteres en Conventional Commits. (70b97e4e) |
 | revision | Melany Vindas | 2026-11-11 |  |
