@@ -22,7 +22,7 @@
 | F-17 | hecha |
 | F-18 | hecha |
 | F-19 | hecha |
-| F-20 | pendiente |
+| F-20 | plan |
 | F-21 | pendiente |
 | F-22 | en-pr |
 | F-23 | verificacion |
