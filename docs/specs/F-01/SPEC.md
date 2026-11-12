@@ -1,6 +1,6 @@
 # SPEC F-01: Crear caso multifuente
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** main
 **Verificación IA:** documentacion db97ec5
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N
@@ -114,3 +114,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | claude | 2026-11-11 | QA final: limites del regex CASE_ID_FORMAT confirmados (vacio, 129 chars, espacios y slash rechazados; 128 chars y uuid aceptados). Criterio de aceptacion verificado end-to-end: caso con 4 fuentes heterogeneas queda queued con 5 sub-tareas enlazadas (video expande), consultable por GET /cases/{id} sin modificar ese endpoint. 8 passed en la suite de F-01 (f154e25) |
 | verificacion | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 |
 | verificación IA de documentacion | claude | 2026-11-11 | Documentacion completa: AD-47 agregada (coexistencia de esquemas), QA-2 de AD-46 marcada resuelta, bitacora registrada en rama estado declarando 2 errores propios de IA (Depends obligatorio, caso vacio silencioso) y 1 limite heredado resuelto (db97ec5) |
+| documentacion | Nahúm Murillo | 2026-11-11 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-01 |
