@@ -41,6 +41,8 @@ TRANSIENT_FAILURES = (
 class Worker:
     """Consumes subtasks from Redis queues, runs them through the processor and reports results."""
 
+    _registra_en_set_heredado = True
+
     def __init__(
         self,
         settings: Settings,
@@ -285,7 +287,8 @@ class Worker:
                 },
             )
             pipe.hincrby(subtask_key, "attempts", 1)
-            pipe.sadd(self._inflight_key, subtask_id)
+            if self._registra_en_set_heredado:
+                pipe.sadd(self._inflight_key, subtask_id)
             if case_status in ("queued", "retrying"):
                 case_update = {"status": "processing"}
                 if not case_started:
