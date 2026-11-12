@@ -35,7 +35,7 @@
 | F-30 | hecha |
 | F-31 | hecha |
 | F-32 | hecha |
-| F-33 | revision |
+| F-33 | en-pr |
 | F-34 | hecha |
 | F-35 | en-pr |
 | F-36 | hecha |
