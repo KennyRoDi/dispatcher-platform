@@ -1,6 +1,6 @@
 # SPEC F-06: Cola confiable
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** main
 **Verificación IA:** tests 585cdd0
 **Historia:** US-06 · **Requisitos:** RF-04, RF-05 (confiabilidad de la cola de B.4 Cola y distribución), AD-03 · **Responsable:** N
@@ -102,3 +102,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-06 completado tras investigar el codigo real: hallazgo clave es que F-05 dejo el adaptador real de WorkQueue pendiente para F-06 (declarado en su propio SPEC y en CONTRATOS.md), y que el camino heredado (worker_node.py) es un sistema de colas DISTINTO que no se toca (mayor riesgo, en produccion via F-07/08/09 ya hecha). Diseno: RedisTypeQueue con BLMOVE atomico a inflight (lista), reencolar_huerfanas reutilizando queue_for de F-05. Plan de 1 parte, ~150 lineas (8538cea) |
 | plan | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de tests | claude | 2026-11-11 | 7 pruebas en rojo: contrato comprobar_work_queue, atomicidad BLMOVE (muerte tras take deja en inflight), timeout en cola vacia, acknowledge, reencolar_huerfanas completo e interrumpido a medias, y unificacion de Priority (scheduling.Priority vs priority.Priority). Todas fallan por ModuleNotFoundError o la duplicacion real detectada. Resto de la suite (32 passed) intacto (585cdd0) |
+| tests | Nahúm Murillo | 2026-11-11 |  |
