@@ -46,7 +46,9 @@ def iniciar(cuerpo: InicioSubida, subidas: ChunkedUpload = Depends(obtener_subid
 async def recibir(upload_id: str, index: int, request: Request,
                   x_chunk_sha256: str = Header(...), subidas: ChunkedUpload = Depends(obtener_subidas)) -> Response:
     try:
-        datos = await _leer_chunk(request, subidas.expected_size(upload_id, index))
+        # Leer el manifiesto toca el disco: fuera del event loop, para no frenar a otras peticiones (RF-34).
+        esperado = await run_in_threadpool(subidas.expected_size, upload_id, index)
+        datos = await _leer_chunk(request, esperado)
         await run_in_threadpool(subidas.receive, upload_id, index, datos, x_chunk_sha256)
     except UploadNotFound:
         raise _no_existe(upload_id) from None
