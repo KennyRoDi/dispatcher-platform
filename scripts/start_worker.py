@@ -7,13 +7,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.preflight import COMPOSE_FILES, ROOT, _compose_config, _node_memory_bytes, validate_config
+from scripts.preflight import ROOT, _compose_config, _node_memory_bytes, compose_files_for, validate_config
 
 
 def main() -> int:
-    compose_files = COMPOSE_FILES.copy()
-    if "--gpu" in sys.argv[1:]:
-        compose_files.append("deploy/docker-compose.worker-gpu.yml")
+    compose_files = compose_files_for(sys.argv[1:])
     try:
         validate_config(_compose_config(compose_files), _node_memory_bytes())
     except (OSError, ValueError, subprocess.CalledProcessError) as error:

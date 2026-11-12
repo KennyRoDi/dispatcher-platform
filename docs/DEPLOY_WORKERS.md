@@ -593,3 +593,106 @@ Con una carga en curso, observa la recuperación con `GET /stats`, `GET /workers
 | Coordinador caído | `docker compose stop coordinator` unos 30 a 60 s, luego `docker compose start coordinator` | Los workers siguen. Sus reportes se reintentan (1, 2, 4, 8, 16 s) y quedan en `reports:pending`; al volver se entregan, cada 15 s, sin perder ni duplicar |
 | Redis se reinicia | `docker compose restart redis` | Recarga su AOF; los workers reconectan con espera exponencial, de 1 a 30 s |
 | Sub-tarea agota `MAX_ATTEMPTS` | Matar repetidamente a los workers que la toman | El reaper reporta `failed` con `error_type=WorkerLostError` |
+
+## 10. Workers de análisis tipados (F-43)
+
+> **Estado:** ninguno de estos pasos se ha ejecutado en nodos reales. Los valores de memoria y de huellas están sin medir y marcados «Medición pendiente»; no se inventan.
+
+Los workers de análisis consumen `queue:text`, `queue:image` y `queue:audio`. Se levantan con `deploy/docker-compose.analisis.yml` y la imagen `Dockerfile.analisis` (Python 3.13, `requirements-texto|imagen|audio.txt`, `torch` solo CPU, FFmpeg). `Dockerfile.worker` queda para el worker FFmpeg, el reaper y el coordinador. Los tres servicios (`worker-texto`, `worker-imagen`, `worker-audio`) conservan el endurecimiento de F-30: usuario `10001:10001`, `read_only`, `cap_drop: ALL`, `no-new-privileges`, `scratch` y `tmpfs`, `mem_limit` igual a `memswap_limit`, `hostname` desde `NODE_NAME` y sin `--scale`. Cada servicio tiene su propio `WORKER_ID` (`worker-<NODE_NAME>-<tipo>`), porque comparten `hostname` en el mismo nodo.
+
+### 10.1 Variables nuevas
+
+Van en el `.env` de cada nodo worker (`.env.example` las trae comentadas):
+
+| Variable | Valor | ¿Igual en los nodos? |
+|---|---|---|
+| `COMPOSE_PROFILES` | Tipos que corre ese nodo: `texto`, `imagen` y `audio`, separados por coma | No |
+| `WORKER_KIND` | Lo fija el Compose por servicio (`text`, `image`, `audio`); no se define en `.env` | Fijo |
+| `OBJECTS_BUCKET` | Bucket de los objetos cifrados; el mismo que usa el coordinador (por defecto `objetos`) | Sí, e igual al del Nodo A |
+| `KEK_FILE` | Ruta de la KEK **en esa máquina** (§10.3). El Compose la monta de solo lectura en `/run/secrets/kek` y pasa esa ruta al contenedor | La ruta puede variar; el contenido, no |
+| `WORKER_MEM_LIMIT_TEXT`, `_IMAGE`, `_AUDIO` | Límite de memoria por tipo. **Sin valor por defecto. Medición pendiente (M1)** | Según la medición |
+| `ADMISSION_MARGIN_BYTES` | Margen de admisión. **Obligatorio, sin valor por defecto. Medición pendiente (M1 §4.1)** | Según la medición |
+| `FOOTPRINT_TEXT_BYTES`, `FOOTPRINT_IMAGE_BYTES`, `FOOTPRINT_AUDIO_BYTES` | Huella por tipo. **Obligatorias, sin valor por defecto. Medición pendiente (M1 §4.1)** | Sí: es propiedad del tipo, no del nodo |
+| `FRAME_EVERY_S`, `FRAME_MAX` | Muestreo de video (SUP-48). Si faltan, el Compose usa 5 y 20. **Provisionales, sin medir** | Sí |
+| `CONFIG_DIR`, `HF_HOME`, `XDG_CACHE_HOME`, `YOLO_WEIGHTS_DIR` | Los fija el Compose: `/app/config`, `/models/huggingface`, `/models/cache`, `/models/yolo` | Fijos |
+
+Compose interpola todo el archivo aunque un perfil esté inactivo, así que cada nodo debe definir las tres variables `WORKER_MEM_LIMIT_*` y las tres `FOOTPRINT_*_BYTES`, también las de los tipos que no corre. El límite de un tipo inactivo no consume memoria: solo cuenta si su perfil está activo. Si falta alguna, `docker compose` se niega con el nombre de la variable y no arranca ningún contenedor.
+
+### 10.2 Reparto por nodo
+
+Cada tipo debe correr en al menos dos nodos para reasignar sub-tareas tras una caída (ARQUITECTURA §6). Tres procesos con `torch` y los modelos de HuggingFace, YOLO y Whisper pueden no caber juntos en un nodo, y las huellas no están medidas, así que el reparto es **provisional (Medición pendiente)**:
+
+| Nodo | `COMPOSE_PROFILES` | Corre |
+|---|---|---|
+| B | `texto,imagen` | `worker-texto`, `worker-imagen` |
+| C | `imagen,audio` | `worker-imagen`, `worker-audio` |
+| D | `audio,texto` | `worker-audio`, `worker-texto` |
+
+Cada tipo queda en dos nodos. Si M1 muestra que dos tipos no caben en un nodo, se reasigna cambiando solo `COMPOSE_PROFILES`, siempre que cada tipo siga en dos nodos. El Nodo A no corre workers.
+
+Comprobación del presupuesto y arranque, desde PowerShell en cada nodo (`--analisis` suma el worker FFmpeg; `--solo-analisis` corre únicamente los tipados):
+
+```powershell
+python scripts/preflight.py --solo-analisis
+python scripts/start_worker.py --solo-analisis
+docker compose --env-file .env -f deploy/docker-compose.analisis.yml ps
+```
+
+Sin `--env-file .env`, Compose no lee el `.env` de la raíz. El preflight valida `NODE_NAME`, `NODE_IP`, los límites y la suma contra la RAM del nodo, y que `ADMISSION_MARGIN_BYTES` y la huella de cada tipo activo sean enteros positivos.
+
+**Pesos de modelos.** Con `read_only`, los pesos de HuggingFace y de YOLO viven en el volumen `modelos` (`/models`). No están en el repositorio: la primera carga descarga de internet, o se precargan según la decisión pendiente del SPEC (pregunta 8). El volumen conserva los pesos entre reinicios. Los pesos de YOLO deben tener el `sha256` fijado en `config/imagen.toml`.
+
+### 10.3 Distribución de la KEK a los tres nodos
+
+La KEK es un secreto de 32 bytes que envuelve las llaves de los objetos (AD-16, SUP-30). Los tres nodos worker y el Nodo A usan **el mismo valor**, porque leen los mismos objetos. **Nunca se guarda en el repositorio** (es público; B.5 M4), ni en `.env`, ni en un volumen de Docker, ni en el historial de comandos. `.gitignore` excluye `*.kek` y `kek*` solo como red de seguridad.
+
+`FileKeyProvider` exige un archivo regular con modo exactamente `0400` o `0600`; con otro modo, el worker falla cerrado con `KeyUnavailable`. El contenedor corre como UID 10001, así que en los workers el archivo debe pertenecer a ese UID para que `0400` sea legible.
+
+**1. Generarla una vez, en el Nodo A, fuera del repositorio:**
+
+```bash
+install -d -m 700 "$HOME/.ms-kek"
+umask 077
+openssl rand -out "$HOME/.ms-kek/kek" 32
+chmod 0400 "$HOME/.ms-kek/kek"
+stat -c '%a %s' "$HOME/.ms-kek/kek"        # debe dar: 400 32
+```
+
+En el Nodo A, `KEK_FILE=$HOME/.ms-kek/kek` (ruta absoluta) en su `.env`. El coordinador corre con `CERTS_UID`, que es quien generó el archivo, así que lo lee.
+
+**2. Copiarla a cada nodo por un canal privado** (por ejemplo `scp` sobre Tailscale o el gestor de secretos del equipo; nunca por chat, correo ni `git`). Se borra cualquier copia intermedia.
+
+**3. Instalarla en cada nodo worker.** Docker Desktop sobre WSL2 puede mostrar un bind mount desde NTFS con modo `0777` en el contenedor, y el worker rechazaría la llave. Por eso la KEK vive en el sistema de archivos de la distro WSL2 y se monta desde ahí. En la terminal de la distro:
+
+```bash
+install -d -m 700 "$HOME/.ms-kek"
+# copiar aquí el archivo recibido como $HOME/.ms-kek/kek
+sudo chown 10001:10001 "$HOME/.ms-kek/kek"
+sudo chmod 0400 "$HOME/.ms-kek/kek"
+stat -c '%a %u %s' "$HOME/.ms-kek/kek"     # debe dar: 400 10001 32
+```
+
+`KEK_FILE` en el `.env` del nodo es la ruta de ese archivo tal como la ve el motor de Docker. **No verificado:** si el Compose se lanza desde PowerShell, la ruta de la distro (`\\wsl$\<distro>\...`) puede no montarse con el modo `0400`; en ese caso se lanza `docker compose` desde la terminal de la distro, con una copia del repositorio dentro de ella y `KEK_FILE=/home/<usuario>/.ms-kek/kek`. **Debe probarse en un nodo real antes de darlo por procedimiento.**
+
+**4. Comprobar lo que ve el contenedor**, sin arrancar el worker:
+
+```bash
+docker compose --env-file .env -f deploy/docker-compose.analisis.yml run --rm --no-deps worker-texto stat -c '%a %u %s' /run/secrets/kek
+```
+
+Esperado: `400 10001 32`. Cualquier otro modo o un error de permiso se corrige antes de arrancar. Comprueba también que el repositorio no la contiene: `git status --short` no debe listar la llave.
+
+**Pérdida, filtración y rotación.** Sin la KEK no se descifra ningún objeto. Si se filtra, hay que regenerarla y recifrar los objetos; la rotación queda fuera de alcance (SUP-30). La variable `KEK` en base64 queda solo para desarrollo.
+
+### 10.4 Nodo A
+
+`docker-compose.yml` pasa ahora `OBJECTS_BUCKET`, `STAGING_DIR` y `KEK_FILE` al coordinador, que sin ellos no puede comprobar las fuentes de `POST /cases` ni cifrar subidas. Define `KEK_FILE` en el `.env` del Nodo A (ruta del archivo del §10.3): Compose lo exige y lo monta `:ro`. `staging-init` deja el volumen `coordinator-staging` a nombre de `CERTS_UID`. Reconstruye con `docker compose up -d --build`.
+
+### 10.5 Verificación en el repositorio
+
+```bash
+python -m scripts.verificar_workers
+pytest -q tests/unit/test_despliegue_compose.py tests/unit/test_f16_preflight.py
+```
+
+`verificar_workers` revisa los tres Compose de workers y los dos Dockerfile. Sin comprobar aún: construir la imagen con `torch` en un nodo, que los workers tipados arranquen contra el Nodo A y que `GET /workers` los muestre; eso es la corrida real de F-43.

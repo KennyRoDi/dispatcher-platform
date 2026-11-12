@@ -1,10 +1,32 @@
+import re
 import subprocess
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+import yaml
 
 import scripts.start_worker as start_worker
-from scripts.preflight import _node_memory_bytes, validate_config
+from scripts.preflight import _node_memory_bytes, compose_files_for, validate_config
+
+COMPOSE_ANALISIS = Path(__file__).resolve().parents[2] / "deploy/docker-compose.analisis.yml"
+VALORES = {
+    "NODE_NAME": "node-b",
+    "NODE_IP": "100.64.0.2",
+    "ADMISSION_MARGIN_BYTES": "268435456",
+    "WORKER_MEM_LIMIT_TEXT": "2147483648",
+    "WORKER_MEM_LIMIT_IMAGE": "2147483648",
+    "WORKER_MEM_LIMIT_AUDIO": "2147483648",
+    "FOOTPRINT_TEXT_BYTES": "1073741824",
+    "FOOTPRINT_IMAGE_BYTES": "1073741824",
+    "FOOTPRINT_AUDIO_BYTES": "1073741824",
+}
+
+
+def _compose_de_analisis(valores: dict[str, str]) -> dict:
+    texto = COMPOSE_ANALISIS.read_text(encoding="utf-8")
+    resuelto = re.sub(r"\$\{(\w+)[^}]*\}", lambda m: valores.get(m[1], ""), texto)
+    return yaml.safe_load(resuelto)
 
 
 def _config(memory=4 * 1024**3, swap=4 * 1024**3):
@@ -122,3 +144,30 @@ def test_memoria_del_daemon_propaga_error_de_docker(monkeypatch):
 
     with pytest.raises(subprocess.CalledProcessError):
         _node_memory_bytes()
+
+
+def test_preflight_acepta_los_servicios_de_analisis():
+    config = _compose_de_analisis(VALORES)
+
+    assert set(config["services"]) == {"worker-texto", "worker-imagen", "worker-audio"}
+    validate_config(config, node_memory=16 * 1024**3)
+
+
+@pytest.mark.parametrize("variable", ["ADMISSION_MARGIN_BYTES", "FOOTPRINT_TEXT_BYTES"])
+def test_preflight_rechaza_un_servicio_de_analisis_sin_huella_medida(variable):
+    config = _compose_de_analisis({**VALORES, variable: ""})
+
+    with pytest.raises(ValueError, match=variable):
+        validate_config(config, node_memory=16 * 1024**3)
+
+
+def test_preflight_suma_los_limites_de_los_servicios_de_analisis():
+    with pytest.raises(ValueError, match="excede"):
+        validate_config(_compose_de_analisis(VALORES), node_memory=6 * 1024**3)
+
+
+def test_compose_files_for_agrega_o_reemplaza_con_el_compose_de_analisis():
+    assert compose_files_for([]) == ["deploy/docker-compose.worker.yml"]
+    assert compose_files_for(["--analisis"]) == [
+        "deploy/docker-compose.worker.yml", "deploy/docker-compose.analisis.yml"]
+    assert compose_files_for(["--solo-analisis"]) == ["deploy/docker-compose.analisis.yml"]
