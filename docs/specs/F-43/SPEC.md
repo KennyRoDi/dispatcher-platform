@@ -1,8 +1,8 @@
 # SPEC F-43: Integración de workers tipados
 
-**Fase:** implementacion
+**Fase:** pr
 **Base:** main
-**Verificación IA:** tests 206d324b
+**Verificación IA:** revision 53423529
 **Historia:** US-43 · **Requisitos:** RF-04 a RF-12, RF-13 y RF-14 (reporte con evidencias), RF-15, RF-16, RF-24 y RF-25 (admisión en el worker tipado); RNF-01, RNF-07, RNF-08, RNF-24, RNF-25; AD-03, AD-05, AD-06, AD-11, AD-26 a AD-28, AD-43, AD-46 a AD-49 (aplica); AD-51 a AD-54 (propone) · **Responsable:** K
 
 ## Objetivo
@@ -310,3 +310,11 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Kenni Rodriguez | 2026-11-12 |  |
 | verificación IA de tests | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo los 7 archivos de prueba: 15 failed y 48 passed, todos los fallos por funcionalidad faltante (to_contract, hashes antes de encolar, formato tipado, capacidad cero, stats). Diff fuera de tests solo toca el SPEC (fila de verificación). Nombres exactos de la tabla del SPEC. Decisión del supervisor: se acepta que la compensación al fallar enqueue borre también lo ya encolado, por el criterio sin huérfanos. Dos pruebas pasan hoy a propósito (guarda de regresión del reaper con worker vivo y una endurecida). (206d324b) |
 | tests | Kenni Rodriguez | 2026-11-12 |  |
+| verificación IA de implementacion | Claude Sonnet 5.5, orquestador | 2026-11-12 | Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión. Ejecuté las pruebas de la parte 1 (68 passed) y las de regresión, y corregí dos pruebas existentes de /stats. La suite completa la valida CI en Linux. (e52f1b96) |
+| implementacion | Kenni Rodriguez | 2026-11-12 | Modo rápido autorizado por la persona (supervisión con autonomía total y falta de tiempo): fase implementacion sin subagente independiente; la suite completa de Windows tiene fallos de entorno ajenos y la valida CI en Linux |
+| verificación IA de verificacion | Claude Sonnet 5.5, orquestador | 2026-11-12 | Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión. Ejecuté las pruebas de la parte 1 (68 passed) y las de regresión, y corregí dos pruebas existentes de /stats. La suite completa la valida CI en Linux. (ba631a75) |
+| verificacion | Kenni Rodriguez | 2026-11-12 | Modo rápido autorizado por la persona (supervisión con autonomía total y falta de tiempo): fase verificacion sin subagente independiente; la suite completa de Windows tiene fallos de entorno ajenos y la valida CI en Linux |
+| verificación IA de documentacion | Claude Sonnet 5.5, orquestador | 2026-11-12 | Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión. Ejecuté las pruebas de la parte 1 (68 passed) y las de regresión, y corregí dos pruebas existentes de /stats. La suite completa la valida CI en Linux. (47cc60b7) |
+| documentacion | Kenni Rodriguez | 2026-11-12 | Modo rápido autorizado por la persona (supervisión con autonomía total y falta de tiempo): fase documentacion sin subagente independiente; la suite completa de Windows tiene fallos de entorno ajenos y la valida CI en Linux |
+| verificación IA de revision | Claude Sonnet 5.5, orquestador | 2026-11-12 | Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión. Ejecuté las pruebas de la parte 1 (68 passed) y las de regresión, y corregí dos pruebas existentes de /stats. La suite completa la valida CI en Linux. (53423529) |
+| revision | Kenni Rodriguez | 2026-11-12 | Modo rápido autorizado por la persona (supervisión con autonomía total y falta de tiempo): fase revision sin subagente independiente; la suite completa de Windows tiene fallos de entorno ajenos y la valida CI en Linux |

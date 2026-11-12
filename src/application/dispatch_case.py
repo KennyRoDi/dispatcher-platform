@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Callable
 
 from src.application.ports import Clock, WorkQueue
 from src.domain.decomposition import CaseSource, decompose, queue_for
@@ -14,13 +15,18 @@ class DispatchCase:
         self._clock = clock
 
     def execute(
-        self, case_id: str, sources: list[CaseSource], priority: Priority
+        self,
+        case_id: str,
+        sources: list[CaseSource],
+        priority: Priority,
+        before_enqueue: Callable[[list[tuple[str, Subtask]]], None] = lambda routed: None,
     ) -> list[tuple[str, Subtask]]:
         routed = [
             (queue_for(subtask.kind), subtask)
             for subtask in decompose(case_id, sources, priority, self._clock.now())
         ]
         self._require_capacity({queue for queue, _ in routed})
+        before_enqueue(routed)
         for queue, subtask in routed:
             self._queue.enqueue(queue, subtask)
             logger.info(

@@ -14,6 +14,7 @@ from src.coordinator.apoyo import (
 )
 from src.coordinator.conexion import redis_unavailable
 from src.coordinator.router import VALID_TASK_TYPES, queue_key
+from src.domain.decomposition import QUEUE_BY_KIND
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -58,6 +59,8 @@ def get_stats() -> dict:
         for op in sorted(VALID_TASK_TYPES):
             for key in (queue_key(op), queue_key(op, "high")):
                 queues[key] = conexion.redis_client.llen(key)
+        for key in QUEUE_BY_KIND.values():
+            queues[key] = conexion.redis_client.llen(key)
 
         cases_by_status: dict[str, int] = defaultdict(int)
         for cid in conexion.redis_client.smembers("cases:registry"):
