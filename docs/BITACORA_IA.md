@@ -1060,3 +1060,7 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
 | Cómo se validó | Revision del diff contra el SPEC |
 | Error de la IA | el QA halló que el log del cierre usaba %s con un case_id controlado por el cliente (inyección de líneas) y tres defectos previos de rutas_subtareas.py amplificados por la alerta |
+
+## 2026-11-11 · Nahúm Murillo · F-20 (feat/F-20-1-prioridades-con-aging)
+
+Entrada temporal en PR. Se actualizará con `flujo.py bitacora` al fusionar.
