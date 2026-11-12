@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import json
 import threading
 import time
+from datetime import datetime, timezone
 
 import fakeredis
 import pytest
 
 from scripts.reaper import ACTIVE_STATES, TERMINAL_STATES, Reaper
+from src.adapters.redis_type_queue import RedisTypeQueue
+from src.domain.priority import Priority
+from src.domain.subtask import ContentKind, Subtask
 from src.workers.config import Settings
 
 
@@ -386,3 +391,53 @@ def test_reaper_promueve_los_reintentos_vencidos_en_cada_ciclo():
     reaper.run_once()
     reaper.run_once()
     assert planificador.instantes == [datetime.fromtimestamp(1000.0, timezone.utc)] * 2
+
+
+def dejar_en_inflight_tipado(redis_client, worker_id: str, alive: bool) -> Subtask:
+    subtarea = Subtask(
+        "case-t:sha-1:audio", "case-t", ContentKind.AUDIO, "sha-1", Priority.MEDIA,
+        datetime(2026, 11, 12, tzinfo=timezone.utc),
+    )
+    cola = RedisTypeQueue(redis_client, capacity=10)
+    cola.enqueue("queue:audio", subtarea)
+    assert cola.take("queue:audio", worker_id, timeout=0) == subtarea
+    redis_client.hset(f"subtask:{subtarea.id}", mapping={
+        "subtask_id": subtarea.id,
+        "case_id": "case-t",
+        "operation": "audio",
+        "task_type": "audio",
+        "status": "assigned",
+        "worker_id": worker_id,
+        "attempts": 1,
+        "priority": "normal",
+        "payload": json.dumps(subtarea.to_dict()),
+    })
+    redis_client.hset("case:case-t", "status", "processing")
+    redis_client.sadd("workers:registry", worker_id)
+    if alive:
+        redis_client.hset(f"worker:{worker_id}", mapping={"worker_id": worker_id, "status": "alive"})
+    return subtarea
+
+
+def test_reaper_devuelve_a_la_cola_el_inflight_tipado_de_un_worker_muerto(redis_client):
+    subtarea = dejar_en_inflight_tipado(redis_client, "tipado-a", alive=False)
+
+    counts = Reaper(make_settings(), redis_client, FakeReporter(), clock=lambda: 1000.0).run_once()
+
+    assert counts["requeued"] == 1
+    assert redis_client.llen("inflight:tipado-a") == 0
+    assert RedisTypeQueue(redis_client, capacity=10).take("queue:audio", "tipado-b", timeout=0) == subtarea
+    assert redis_client.hget(f"subtask:{subtarea.id}", "status") == "pending"
+    assert redis_client.hget("case:case-t", "status") == "retrying"
+
+
+def test_reaper_no_toca_el_inflight_tipado_de_un_worker_vivo(redis_client):
+    subtarea = dejar_en_inflight_tipado(redis_client, "tipado-a", alive=True)
+
+    counts = Reaper(make_settings(), redis_client, FakeReporter(), clock=lambda: 1000.0).run_once()
+
+    assert counts == {"requeued": 0, "failed": 0, "workers_removed": 0, "cleaned": 0}
+    assert RedisTypeQueue(redis_client, capacity=10).in_flight("tipado-a") == [subtarea]
+    assert redis_client.llen("queue:audio") == 0
+    assert redis_client.hget(f"subtask:{subtarea.id}", "status") == "assigned"
+    assert redis_client.hget("case:case-t", "status") == "processing"

@@ -2,6 +2,7 @@
 
 TDD: pruebas en rojo, sin implementacion aun.
 """
+import logging
 import time
 from datetime import datetime, timezone
 
@@ -70,6 +71,43 @@ class TestRedisTypeQueueAtomicidad:
         cola.acknowledge("w1", tomada)
 
         assert cola.in_flight("w1") == []
+
+
+class TestRedisTypeQueueTolerante:
+    @pytest.mark.parametrize("ilegible", ["id-plano", "{}", "123"])
+    def test_take_descarta_un_elemento_ilegible_sin_dejarlo_en_inflight(self, ilegible, caplog):
+        from src.adapters.redis_type_queue import RedisTypeQueue
+
+        redis = cliente_redis()
+        cola = RedisTypeQueue(redis, capacity=10)
+        valida = subtarea("s2")
+        redis.rpush("queue:text", ilegible)
+
+        with caplog.at_level(logging.WARNING):
+            assert cola.take("queue:text", "w1", timeout=0) is None
+
+        assert caplog.records, "el descarte debe quedar registrado"
+        assert redis.llen("queue:text") == 0
+        assert redis.llen("inflight:w1") == 0
+
+        redis.rpush("queue:text", ilegible)
+        cola.enqueue("queue:text", valida)
+        tomada = cola.take("queue:text", "w1", timeout=0)
+        assert tomada in (None, valida)
+        assert ilegible not in redis.lrange("inflight:w1", 0, -1)
+        assert cola.in_flight("w1") in ([], [valida])
+
+    def test_capacidad_cero_no_tiene_limite(self):
+        from src.adapters.redis_type_queue import RedisTypeQueue
+
+        redis = cliente_redis()
+        cola = RedisTypeQueue(redis, capacity=0)
+
+        for numero in range(3):
+            cola.enqueue("queue:text", subtarea(f"s{numero}"))
+
+        assert cola.has_capacity("queue:text")
+        assert redis.llen("queue:text") == 3
 
 
 if __name__ == "__main__":
