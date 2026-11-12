@@ -1,0 +1,13 @@
+instante,host,cpu_percent,mem_percent,subtareas_activas
+0.0,worker-sim-1,1.5,50.0,0.0
+0.0,worker-sim-2,1.5,50.0,0.0
+0.0,worker-sim-3,1.3,50.0,0.0
+5.115,worker-sim-1,38.0,52.1,2.0
+5.115,worker-sim-2,41.0,52.2,1.0
+5.115,worker-sim-3,45.1,52.2,1.0
+10.224,worker-sim-1,76.6,52.6,2.0
+10.224,worker-sim-2,76.4,53.2,2.0
+10.224,worker-sim-3,75.8,52.8,2.0
+15.329,worker-sim-1,51.8,51.6,0.0
+15.329,worker-sim-2,48.9,51.6,0.0
+15.329,worker-sim-3,45.5,51.6,0.0
