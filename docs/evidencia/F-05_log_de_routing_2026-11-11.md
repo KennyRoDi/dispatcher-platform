@@ -21,7 +21,7 @@ La ruta local del `rootdir` se sustituyó por `<raíz del repositorio>`; el rest
 ```text
 ============================= test session starts =============================
 platform win32 -- Python 3.13.17, pytest-9.1.1, pluggy-1.7.0
-rootdir: C:\Users\ka240\Desktop\SO
+rootdir: <raíz del repositorio>
 configfile: pytest.ini
 plugins: anyio-4.16.0
 collected 1 item
