@@ -22,7 +22,17 @@
 - Revisión de tablas locales RBAC y salidas de custodia: 409 de cancelación corresponde a conflicto tras autorización, no denegación por rol; custodia íntegra exit 0, manipulaciones exit 1 y errores de llave exit 2.
 - Lectura de `scripts/measure/m5_bench.py`: RSS se divide por 1024² y se consulta tras cada repetición. La ficha distingue MiB y máximo entre muestras de un pico continuo.
 
-No se ejecutaron mediciones de nodos ni una segunda suite desde este rol. El orquestador informó 28 pruebas de conformidad aprobadas. La suite global no tiene resultado verde registrado en esta revisión: tuvo impedimentos de permisos temporales y dependencia `lupa`, y luego esperas reales del reporter; el resultado de las unitarias separadas lo registrará el orquestador al concluir. No se extrapola progreso parcial a aprobación de la suite.
+No se ejecutaron mediciones de nodos ni una segunda suite desde este rol. El orquestador informó 28 pruebas de conformidad aprobadas y reprodujo el código exacto de `recalculos.md` con salida idéntica; las cinco fichas devolvieron `[]` en `revisar_ficha` y el diff pasó `git diff --check`.
+
+**Unitarias ejecutadas por el orquestador:** 3030 passed, 82 skipped, 5 deselected, 37 xfailed y 5 warnings, en 131.56 s, exit 0. Comando PowerShell:
+
+```powershell
+Remove-Item Env:REQUESTS_CA_BUNDLE -ErrorAction SilentlyContinue
+Remove-Item Env:CURL_CA_BUNDLE -ErrorAction SilentlyContinue
+& C:\Users\Usuario\AppData\Local\Python\pythoncore-3.14-64\python.exe -m pytest -q tests/unit -m 'not integration and not acceptance' --maxfail=1 -o faulthandler_timeout=30
+```
+
+La eliminación de variables se limitó al proceso de prueba; no cambió el entorno del sistema. Un intento previo falló en `test_tls_cableado.py:294` porque `REQUESTS_CA_BUNDLE` heredada apuntaba a una CA de PostgreSQL en vez del valor esperado. También hubo impedimentos iniciales de permisos temporales y falta de `lupa`, dependencia requerida que se instaló. La suite global no tiene resultado verde: se interrumpió tras observar esperas reales del reporter. El éxito de las unitarias no acredita toda la suite ni las pruebas distribuidas pendientes.
 
 ## Bloqueos de aceptación
 
