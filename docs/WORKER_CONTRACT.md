@@ -372,6 +372,67 @@ El modelo `SubtaskReport` del coordinador no declara `result_path`; el campo se 
 5. Una respuesta 4xx no se reintenta (error de formato); se descarta y se registra en el log.
 6. **Idempotencia**: el coordinador hace `SADD case:{id}:done <subtask_id>`; solo el primer reporte de cada sub-tarea modifica el estado, así que los reenvíos (por respuesta HTTP perdida o vaciado de `reports:pending`) no cuentan dos veces ni cierran el caso antes de tiempo.
 
+## Worker tipado (`text`, `image`, `audio`) — F-43
+
+Camino paralelo al de FFmpeg para las sub-tareas de análisis que crea `POST /cases` con `sources` (AD-46, AD-47). Un proceso por tipo (`WORKER_KIND`), con concurrencia 1 y los modelos cargados una vez al arrancar (AD-51). El camino de FFmpeg descrito arriba no cambia. **Provisional:** lo marcado «Medición pendiente» se fija sin medir.
+
+### Mensaje y colas
+
+El coordinador encola en `queue:text`, `queue:image` o `queue:audio` (`queue_for(kind)`) el JSON de `Subtask.to_dict()`:
+
+```json
+{"id": "<caso>:<sha256>:<kind>", "case_id": "<caso>", "kind": "text", "source_sha256": "<64 hex>",
+ "priority": "media", "enqueued_at": "2026-11-12T10:00:00+00:00", "attempts": 0, "node_class": null}
+```
+
+`priority` en el mensaje conserva el nombre del enum (`baja|media|alta|critica`); en los hashes y en la API la prioridad es `normal|high` (`Priority.to_contract`, AD-53). La prioridad no reordena estas colas (FIFO por tipo). El worker toma con `BLMOVE` hacia `inflight:{worker_id}` (`RedisTypeQueue.take`) y confirma con `acknowledge` solo después de reportar o de dejar el reintento programado. Un elemento ilegible se descarta y se registra.
+
+### Hash `subtask:{id}` del camino tipado
+
+Además de los campos de la tabla anterior (`status`, `attempts`, `worker_id`, `assigned_at`, `started_at`, `error`, `error_type`), el coordinador guarda `payload` (el JSON de arriba, para reencolar sin reconstruirlo), `kind` y `source_sha256`. El hash es la fuente de verdad: el worker lo relee al reclamar.
+
+| Escribe el coordinador | Escribe el worker |
+|---|---|
+| Hashes `case:{id}` y `subtask:{id}` antes de encolar; `payload`; `pending_subtasks`; cierre del barrier al recibir el reporte; estado final del caso | `status` (`assigned`, `pending` al reintentar), `attempts` (+1 al reclamar), `worker_id`; paso del caso a `processing` (`started_at` solo la primera vez) o `retrying`; hallazgos en `case:{id}:findings`; el reporte |
+
+### Flujo de una sub-tarea
+
+1. **Admisión** (AD-06): sin memoria libre para la huella del tipo (`FOOTPRINT_<TIPO>_BYTES`) no se llama a `take`; la sub-tarea queda en la cola.
+2. **Reclamo** (`WATCH/MULTI` sobre `subtask:{id}` y `case:{id}`): hash inexistente, sub-tarea terminal o caso `cancelled` se confirman sin procesar. Si el intento que se reclama supera N (`MAX_ATTEMPTS`, SUP-51) se reporta `failed` con `WorkerLostError` sin procesar. Si no: `status=assigned`, `attempts+1`, `worker_id`.
+3. **Análisis:** `ObjectStore.open(source_sha256)` a un archivo temporal `fuente<extensión>` en `WORK_DIR/<id con ':' sustituido>`; se calcula el SHA-256 al copiar y debe coincidir (si no, fallo permanente). `Analyzer.analyze(path)` devuelve los hallazgos. El directorio se borra siempre.
+4. **Hallazgos:** `SubtaskFindingStore.add_once(case_id, subtask_id, findings)` (AD-54): una sub-tarea escribe una sola vez; una segunda escritura devuelve `False`, no agrega nada y no repite la alerta de incidencia alta (`AlertingFindingStore`).
+5. **Reporte:** `POST /subtasks/report` con `status` `completed` o `failed`, `outputs=[]`, `error_type` y `attempts`; es idempotente (`SADD case:{id}:done`). Se reporta **antes** de confirmar: si el worker muere en medio, la sub-tarea vuelve a la cola y el reporte repetido se ignora (entrega al menos una vez, AD-03).
+
+### Fallos y reintento
+
+`src/workers/fallos.py::es_transitorio` separa los fallos (SUP-50). Un fallo transitorio programa la espera con `RetrySubtask` y `RedisRetryScheduler` (F-11), deja el hash `pending` y el caso `retrying`, y confirma el elemento; el reaper promueve las vencidas a `queue:{kind}` con su `payload`. Un fallo permanente se reporta `failed` de inmediato. Lo no clasificado es permanente. Fuentes `.csv` u otra extensión sin parser: fallo permanente `ExtensionSinParser` (SUP-47).
+
+### Cancelación
+
+Si `case:{id}` está `cancelled` antes del reclamo, la sub-tarea se marca `cancelled` y se confirma sin procesar. Con el análisis en curso, los analizadores corren dentro del proceso del worker y no se interrumpen: terminan y, si el caso ya está cancelado, sus hallazgos se descartan. Solo el subproceso FFmpeg de extracción de fotogramas (video, parte 4) se cancela por grupo de procesos.
+
+### Recuperación
+
+Al arrancar, el worker reencola lo que quedó en su propio `inflight:{worker_id}` (mismo `worker_id` tras reiniciar). El reaper reencola el `inflight:{worker_id}` de los workers tipados sin heartbeat, en formato `Subtask`, y promueve los reintentos vencidos.
+
+### Fábricas compartidas
+
+| Fábrica | Qué arma | Variables |
+|---|---|---|
+| `src.infrastructure.object_store.crear_almacen_lectura(env)` | `EncryptedObjectStore(MinioObjectStore, EnvelopeCipher(FileKeyProvider))`; la usan el worker (descarga) y el coordinador (reporte consolidado) | `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_SECURE`, `OBJECTS_BUCKET`, `KEK_FILE` (o `KEK` solo en desarrollo), `TLS_*` |
+| `src.infrastructure.analizadores.crear_analizador(kind, env)` | `TextAnalyzer` (con `ParserPorExtension`: `.txt` WhatsApp, `.json` Telegram), `ImageAnalyzer` o `AudioAnalyzer`, con los modelos cargados una sola vez | `CONFIG_DIR` (por defecto `config/` del repositorio), `YOLO_WEIGHTS_DIR` (pesos fijados en `config/imagen.toml`) |
+
+`GET /cases/{id}/consolidated-report` usa `crear_almacen_lectura`; sin esas variables, o con el almacén caído, responde 503 sin detallar la configuración.
+
+### Variables del worker tipado
+
+| Variable | Significado |
+|---|---|
+| `WORKER_KIND` | `text`, `image` o `audio`; con ella `WORKER_CONCURRENCY` debe ser 1 |
+| `FOOTPRINT_TEXT_BYTES`, `FOOTPRINT_IMAGE_BYTES`, `FOOTPRINT_AUDIO_BYTES` | Huella de memoria por tipo, sin valor por defecto. **Medición pendiente** (M1) |
+| `ADMISSION_MARGIN_BYTES`, `MAX_ATTEMPTS`, `RETRY_BASE_S`, `RETRY_CAP_S`, `WORK_DIR` | Los mismos que en el worker de FFmpeg |
+| `CONFIG_DIR`, `YOLO_WEIGHTS_DIR`, `OBJECTS_BUCKET`, `KEK_FILE` | Las de la tabla de fábricas |
+
 ## Algoritmo del Reaper
 
 El reaper (`scripts/reaper.py`) corre en la máquina A cada `REAPER_INTERVAL` segundos (10 por defecto). En cada ciclo también llama `reporter.flush_pending()`. La lógica de recuperación de una sub-tarea está en `src/workers/recovery.py` y la comparte el worker.
