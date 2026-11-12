@@ -57,3 +57,9 @@ Se corrigieron las cinco fichas y AD-04: M1 consolida el método F-19 ya ejecuta
 [Recálculos ejecutados y comando exacto](../../evidencia/F-41/recalculos.md): M1 medias PSS, M2 agregados, M3 deduplicación y M5 transcripción de agregados coinciden con el redondeo documentado. Los cinco comprobadores estructurales devuelven lista vacía. Esto corrige documentación, no cambia a cumplidos los productos experimentales parciales o pendientes de arriba. M2/M5 ya incorporan referencias; SUP-16 sigue abierto.
 
 Impedimento temporal comprobado por el orquestador en este host: Docker CLI instalado pero daemon Linux inaccesible (pipe dockerDesktopLinuxEngine inexistente), y Tailscale CLI instalado pero servicio tailscaled sin conexión. No describe el estado de máquinas remotas ni acredita una ejecución distribuida. Las cinco reproducciones en otra máquina siguen pendientes.
+
+## Decisión de entrega documental (2026-11-12)
+
+La persona responsable decidió subir las fichas en su estado actual y cerrar el trabajo documental aceptando los pendientes. Los estados parciales y pendientes de esta lista se mantienen: no se declaran RNF completos ni reproducciones realizadas. No se logró cerrar formalmente F-41.
+
+Deuda: completar huellas/ráfaga/validación desplegada M1; niveles e inanición M2; throughput distribuido por tamaños M3; TLS y controles desplegados M4; routing y condición de alternativa CPU M5; y las cinco reproducciones US-41 en otra máquina. Esta decisión no modifica los datos existentes ni sustituye la evidencia faltante.

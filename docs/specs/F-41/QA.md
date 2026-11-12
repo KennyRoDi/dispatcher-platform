@@ -88,3 +88,9 @@ strings m4.pcap | grep -c <marcador_sintetico>
 ```
 
 Registrar intento y análisis, handshakes y ausencia del marcador en claro; el archivo `m4.pcap` queda fuera del repositorio como exige la ficha. Ningún resultado previsto se considera obtenido. La reproducción de un comando por ficha no elimina los demás productos RNF pendientes.
+
+## Decisión de entrega documental (2026-11-12)
+
+La persona responsable decidió subir las fichas tal como están y cerrar este trabajo documental aceptando la evidencia pendiente. Se entrega el estado parcial descrito en este informe; la decisión no acredita RNF completos, ejecuciones remotas ni las cinco reproducciones US-41. No se logró cerrar formalmente F-41.
+
+Deuda conservada: M1, huellas de todos los modelos, ráfaga por worker y validación desplegada; M2, niveles y evidencia de inanición; M3, throughput entre nodos con al menos tres tamaños; M4, captura TLS y controles desplegados; M5, routing justificado y condición de alternativa CPU; todos los módulos, reproducción de un comando por ficha en otra máquina. Los datos y resultados anteriores permanecen sin cambios.
