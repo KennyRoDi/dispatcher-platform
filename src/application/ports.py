@@ -11,6 +11,7 @@ from src.domain.consolidated_report import CaseInfo
 from src.domain.finding import Finding
 from src.domain.rbac import Role
 from src.domain.resources import ResourceUsage
+from src.domain.scheduling import Priority
 from src.domain.subtask import Subtask
 
 
@@ -133,6 +134,19 @@ class Identity:
 @runtime_checkable
 class TokenVerifier(Protocol):
     def verify(self, token: str) -> Identity: ...
+
+
+@runtime_checkable
+class SchedulingPolicy(Protocol):
+    """Política de planificación de casos: FIFO o Aging."""
+
+    def next(self) -> str | None:
+        """Dequecar el siguiente caso según la política."""
+        ...
+
+    def enqueue(self, case_id: str, priority: Priority, entered_at: float) -> None:
+        """Enquecar un caso con prioridad."""
+        ...
 
 
 class KeyUnavailable(Exception):
