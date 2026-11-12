@@ -1428,3 +1428,9 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Corregido: QA detecto que ninguna prueba cubria el paso del lector al heartbeat |
 | Cómo se validó | Pruebas unitarias, Monitor renderizado con AppTest, mutantes; suite verde en Linux |
 | Error de la IA | 1) La IA escribio una prueba que esperaba gpu 'none' para un worker sin ese campo; se corrigio a None. 2) No cubrio con pruebas que Worker.start pasara el lector al Heartbeat; QA lo detecto con un mutante. |
+
+## 2026-11-11 · Nahúm Murillo · F-20 (`feat/F-20-1-prioridades-con-aging`)
+
+| Campo | Contenido |
+|---|---|
+| Uso de IA | No se usó IA en F-20. |
