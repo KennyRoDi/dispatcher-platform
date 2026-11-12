@@ -2,7 +2,7 @@
 
 **Fase:** documentacion
 **Base:** main
-**Verificación IA:** verificacion 9592d3a9
+**Verificación IA:** documentacion 154082cc
 **Historia:** US-15 · **Requisitos:** RF-17, [B.4 Dashboard] · **Responsable:** V
 
 ## Objetivo
@@ -85,3 +85,4 @@ Las registra `scripts/flujo.py`. No editar.
 | implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-15. |
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) APROBADO: 89/89; Monitor renderizado en 6 escenarios sin excepciones (sin cgroup, hosts nulos, 150 nodos, todos muertos); cableado real del lector confirmado; mutante que quitaba el lector sobrevivia y ahora lo detecta una prueba nueva. (9592d3a9) |
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-15. |
+| verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: SPEC con pruebas de QA y riesgo de nodos mixtos; sin ficha (F-15 no mide SO, evidencia es la demo); bitacora con 2 errores reales de la IA. (154082cc) |
