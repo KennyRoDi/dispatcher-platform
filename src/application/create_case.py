@@ -26,6 +26,8 @@ class CreateMultiSourceCase:
         self._subidas = subidas
 
     def execute(self, case_id: str, sources: list, priority: Priority, metadata: dict | None = None) -> dict:
+        if not sources:
+            raise ValueError("el caso debe tener al menos una fuente")
         faltante = next((s for s in sources if not self._subidas.already_stored(s.sha256)), None)
         if faltante is not None:
             raise FuenteNoSubida(faltante.sha256)

@@ -109,6 +109,20 @@ class TestCrearCasoMultifuente:
         assert redis.exists("case:caso3") == 0
         assert redis.llen("queue:text") == 0
 
+    def test_sin_fuentes_rechaza_en_vez_de_crear_caso_vacio(self):
+        """Hallazgo de QA: execute([]) no debe crear un caso con 0 sub-tareas en silencio."""
+        from src.adapters.redis_type_queue import RedisTypeQueue
+        from src.application.create_case import CreateMultiSourceCase
+
+        redis = fakeredis.FakeStrictRedis(decode_responses=True)
+        cola = RedisTypeQueue(redis, capacity=100)
+        caso_de_uso = CreateMultiSourceCase(redis, cola, _RelojFijo(), _SubidasFalsas(set()))
+
+        with pytest.raises(ValueError):
+            caso_de_uso.execute("caso4", [], Priority.ALTA)
+
+        assert redis.exists("case:caso4") == 0
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
