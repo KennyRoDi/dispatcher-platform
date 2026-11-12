@@ -2,7 +2,7 @@
 
 **Fase:** revision
 **Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
-**Verificación IA:** documentacion f12f4c9c
+**Verificación IA:** revision 70b97e4e
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -126,3 +126,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: el SPEC ya describe mover_acotado; sin ficha (medicion en la parte 3); bitacora publicada. (f12f4c9c) |
 | documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 17 lineas en redis_backpressure.py y 2 archivos de prueba; cumple el SPEC parte 2 sin agregados; usa KEYS; capas correctas; commits de 58 y 62 caracteres en Conventional Commits. (70b97e4e) |
