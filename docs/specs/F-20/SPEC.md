@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** main
-**Verificación IA:** plan f1711b4
+**Verificación IA:** tests 9717ad2
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -105,3 +105,4 @@ Las registra `scripts/flujo.py`. No editar.
 |---|---|---|---|
 | verificación IA de plan | claude | 2026-11-11 | SPEC F-20 completado: objetivo, alcance, criterios de aceptación, diseño (AD-04), pruebas (U, I), mediciones y plan de pila con 3 PR hasta 400 líneas cada una (f1711b4) |
 | plan | Nahúm Murillo | 2026-11-11 |  |
+| verificación IA de tests | claude | 2026-11-11 | Tests en rojo completados: 10 pruebas unitarias + 6 de integración con Redis. Todas fallan hasta implementar Priority, SchedulingPolicy, SchedulerState. TDD: pruebas puras sin red, reloj simulado con mock, no usan sleep ni reloj real. Commit 9717ad2. (9717ad2) |
