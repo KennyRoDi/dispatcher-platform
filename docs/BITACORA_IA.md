@@ -1607,3 +1607,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Pruebas unitarias, de integración y arquitectura en verde ejecutadas por el orquestador; numeración verificada con git grep en ramas remotas; corrida real en tres nodos NO ejecutada (Medición pendiente). Aprobaciones delegadas por la persona (autonomía total); la verificación del orquestador no es independiente de la sesión |
 | Cómo se validó | Revisión del diff contra el SPEC por el orquestador; aprobaciones delegadas |
 | Error de la IA | El arquitecto dejó Base obsoleta (feat/F-20) y declaró AD-49/SUP-45 libres cuando feat/F-11-2-reintentos ya los usaba (se pasó a AD-50/SUP-46); QA halló en el código del developer: --limit menor a 20 con traza, --out sin validar antes de 1800 s de corrida y CSV vacío sin encabezado (corregidos) |
+
+## 2026-11-12 · Nahúm Murillo · F-35 (`feat/F-35-1-reinicio-del-coordinador`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5) |
+| Componente | F-35 |
+| Propósito | Disenar SPEC, investigar si existe mecanismo de reconciliacion del coordinador, escribir pruebas TDD e implementar la medicion real de reinicio del coordinador para F-35 |
+| Consulta resumida | Demostrar con datos medidos que, tras un reinicio del coordinador, las sub-tareas en curso no se pierden ni duplican (AD-21), reemplazando la cifra historica sin medir de I Proyecto (45s sin perdida, sin logs) |
+| Resultado obtenido | scenarios/coordinator_restart.py mide contra el coordinador real (crear_app, sin modificar); confirmado por git grep que no existe codigo de reconciliacion en src/ (el coordinador es sin estado por diseno, no hay nada que reconciliar); 3 repeticiones reales, 0 perdidas/duplicadas, ~0.010s para reconectar y responder |
+| Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; medicion real ejecutada (3 repeticiones), no simulada ni inventada |
+| Cómo se validó | pytest de tests/unit/test_coordinator_restart.py y tests/integration/test_coordinator_restart_real.py (7 passed); ejecucion real del escenario 3 veces, revision manual de los JSON antes de redactar la ficha |
+| Error de la IA | Sin error de logica propio de F-35 (QA de edge cases en evaluar()/tiempo_de_arranque() no encontro bugs). Se detecto que main.py (fusionado por otra sesion durante el desarrollo de F-35) ahora exige TLS_ENABLED y autorizacion JWT por defecto; el escenario de medicion fallaba por esto, ajeno a la logica medida. Se ajusto el script para desactivar TLS y sortear la autorizacion, igual que ya hacen tests/conftest.py y el fixture sin_autorizacion de las pruebas, porque F-35 no mide esos aspectos |
