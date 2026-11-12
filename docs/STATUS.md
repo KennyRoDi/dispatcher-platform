@@ -17,7 +17,7 @@
 | F-12 | hecha |
 | F-13 | hecha |
 | F-14 | hecha |
-| F-15 | implementacion |
+| F-15 | verificacion |
 | F-16 | hecha |
 | F-17 | hecha |
 | F-18 | hecha |
