@@ -1,8 +1,8 @@
 # SPEC F-24: Backpressure
 
-**Fase:** pr
-**Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
-**Verificación IA:** revision 70b97e4e
+**Fase:** cerrada
+**Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
+**Verificación IA:** revision 2e15cb8c
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -128,3 +128,13 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 17 lineas en redis_backpressure.py y 2 archivos de prueba; cumple el SPEC parte 2 sin agregados; usa KEYS; capas correctas; commits de 58 y 62 caracteres en Conventional Commits. (70b97e4e) |
 | revision | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude Code | 2026-11-11 | Pruebas del resumen de la medicion de backpressure (0b31bb9d) |
+| tests | Melany Vindas | 2026-11-11 | Pruebas de un script de medicion; verificadas en Linux por Claude |
+| verificación IA de implementacion | Claude Code | 2026-11-11 | Script de medicion de backpressure, pruebas en verde (c5169357) |
+| implementacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de verificacion | Claude Code | 2026-11-11 | Medicion real: con limite 200 la cola no supera 200; sin limite llega a ~55 mil (ba8da238) |
+| verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de documentacion | Claude Code | 2026-11-11 | Ficha M3 con seccion F-24 y bitacora registrada (af0138e2) |
+| documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
+| verificación IA de revision | Claude Code | 2026-11-11 | Diff revisado contra el SPEC de F-24 (2e15cb8c) |
+| revision | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
