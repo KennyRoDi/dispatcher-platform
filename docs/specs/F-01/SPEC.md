@@ -1,6 +1,6 @@
 # SPEC F-01: Crear caso multifuente
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision bc7ae3a
 **Historia:** US-01 · **Requisitos:** RF-01, RF-02 (parcial: rechazo por extensión), RF-03 · **Responsable:** N

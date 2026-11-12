@@ -1,6 +1,6 @@
 # SPEC F-05: Descomponer y enrutar
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 70730a9
 **Historia:** US-05 · **Requisitos:** RF-04, RF-05 · **Responsable:** N
