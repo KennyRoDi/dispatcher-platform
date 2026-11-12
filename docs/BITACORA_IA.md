@@ -1685,3 +1685,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
 | Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
 | Error de la IA | El agente tocó consolidated_report.py fuera de la lista del SPEC y AnalyzeVideo no recibe el muestreo como indicaba el encargo; el supervisor por sub-tarea quedó para el cableado de la parte 5 |
+
+## 2026-11-12 · Kenni Rodriguez · F-43 parte 5 (`feat/F-43-5-pruebas-extremo-a-extremo`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Claude Sonnet 5.5), con subagentes developer |
+| Componente | F-43 parte 5 |
+| Propósito | Cableado del video y pruebas de extremo a extremo del pipeline tipado |
+| Consulta resumida | Implementación directa de la parte según docs/specs/F-43/SPEC.md |
+| Resultado obtenido | video_por_subtarea, 22 pruebas de extremo a extremo y evidencia docs/evidencia/F-43_caso_completo; no se hallaron defectos en las partes 1 a 4 |
+| Validado / corregido / descartado | Validado por el orquestador ejecutando las pruebas de la parte y test_arquitectura; Modo rápido a pedido de la persona: sin subagentes de QA ni de revisión; la verificación fue del orquestador con las pruebas de la parte y la suite completa la valida CI en Linux |
+| Cómo se validó | pytest sobre los archivos de la parte; sin suite completa de Windows (fallos de entorno ajenos) |
+| Error de la IA | El source_ref de los hallazgos de Telegram queda fuente.json y no el nombre original, y la prueba de tres nodos es una simulación con fakeredis |
