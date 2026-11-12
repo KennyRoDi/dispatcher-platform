@@ -1,7 +1,7 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** pr
-**Base:** main
+**Fase:** tests
+**Base:** feat/F-33-1-rafaga
 **Verificación IA:** revision b54da91
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
 
