@@ -1,6 +1,6 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** revision
+**Fase:** pr
 **Base:** main
 **Verificación IA:** revision 42dbc50
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
@@ -120,3 +120,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de documentacion | claude | 2026-11-11 | F-20 fase documentacion: BITACORA_IA.md debera actualizarse post-merge en rama estado (dec0052) |
 | documentacion | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de revision | claude | 2026-11-11 | Diff F-20 vs SPEC: objetivo ✓, alcance ✓, criterios ✓, diseño ✓, tests ✓, mediciones ✓, plan 1/3 ✓, riesgos ✓. Listo para mergear (42dbc50) |
+| revision | Nahúm Murillo | 2026-11-11 |  |
