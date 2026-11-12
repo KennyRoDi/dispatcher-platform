@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan d92b599
 **Historia:** US-34 · **Requisitos:** RF-43 (B.6 «Caída de un worker») · **Responsable:** N
 
 ## Objetivo
@@ -116,3 +116,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | claude | 2026-11-12 | SPEC F-34 completado tras investigar el mecanismo real de heartbeat/reaper (heartbeat_ttl=15s, reaper_interval=10s, verificado en heartbeat.py y reaper.py). Diseno: medir deteccion+reasignacion deteniendo los latidos (simula docker kill sin necesitar Docker/3 nodos), reutilizando el Reaper real sin modificarlo. Mismo patron que F-36/cancel_heavy.py (funciones puras + prueba de aceptacion que lee JSON de corrida real). Plan de 1 parte, ~140 lineas (d92b599) |
