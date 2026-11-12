@@ -25,6 +25,7 @@ class TestEvaluar:
             (5, 4, 0, 0, "completed", "perdid"),
             (5, 5, 0, 1, "completed", "duplicad"),
             (5, 5, 0, 0, "failed", "completed"),
+            (3, 5, 0, 0, "completed", "más terminadas que creadas"),
         ],
     )
     def test_senala_cada_incumplimiento(self, creadas, terminadas, perdidas, duplicadas, estado, fragmento):

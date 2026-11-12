@@ -16,10 +16,15 @@ from pathlib import Path
 def evaluar(creadas, terminadas, perdidas, duplicadas, estado_caso, estado_esperado="completed"):
     problemas = []
     faltantes = creadas - terminadas - perdidas
-    if faltantes != 0:
+    if faltantes > 0:
         problemas.append(
             f"sub-tareas perdidas: {creadas} creadas, {terminadas} terminadas, "
             f"{perdidas} reportadas perdidas (faltan {faltantes})"
+        )
+    elif faltantes < 0:
+        problemas.append(
+            f"se contaron más terminadas que creadas: {creadas} creadas, {terminadas} terminadas, "
+            f"{perdidas} reportadas perdidas (exceso de {-faltantes}, revisar conteo o duplicados)"
         )
     if duplicadas:
         problemas.append(f"sub-tareas duplicadas: {duplicadas}")
@@ -63,6 +68,7 @@ def correr_con_reaper_real(redis_client, operation="transcode_video", intervalo_
 
     redis_client.hset(f"subtask:{sid}", mapping={
         "status": "assigned", "operation": operation, "attempts": "1", "worker_id": worker_id,
+        "assigned_ts": time.time(),
     })
     redis_client.sadd(f"worker:{worker_id}:inflight", sid)
     redis_client.sadd("workers:registry", worker_id)
@@ -106,6 +112,9 @@ def correr_con_reaper_real(redis_client, operation="transcode_video", intervalo_
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Mide deteccion y reasignacion ante caida de worker (F-34).")
     parser.add_argument("--redis-url", default="redis://localhost:6379/0")
+    parser.add_argument("--intervalo-muestreo", type=float, default=0.5,
+                        help="segundos entre sondeos; usar el reaper_interval real (10) para medir "
+                             "la latencia de produccion, o un valor chico para aislar el heartbeat_ttl")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
 
@@ -117,8 +126,9 @@ def main(argv=None) -> int:
         redis_client = fakeredis.FakeStrictRedis(decode_responses=True)
         fuente = "fakeredis (no se pudo conectar a redis real)"
 
-    resultado = correr_con_reaper_real(redis_client)
+    resultado = correr_con_reaper_real(redis_client, intervalo_muestreo=args.intervalo_muestreo)
     resultado["fuente_redis"] = fuente
+    resultado["intervalo_muestreo_s"] = args.intervalo_muestreo
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(resultado, ensure_ascii=False, indent=2), encoding="utf-8")
     print(args.out)
