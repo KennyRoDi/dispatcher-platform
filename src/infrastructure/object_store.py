@@ -19,7 +19,8 @@ def crear_subidas(env: Mapping[str, str] | None = None) -> ChunkedUpload:
     staging_dir = env.get("STAGING_DIR", "/var/lib/dispatcher/staging").strip()
     if not staging_dir:
         raise ValueError("faltan variables requeridas de MinIO, OBJECTS_BUCKET o STAGING_DIR")
-    return ChunkedUpload(DiskChunkStaging(staging_dir), crear_almacen_lectura(env))
+    objetos = crear_almacen_lectura(env)
+    return ChunkedUpload(DiskChunkStaging(staging_dir), objetos)
 
 
 def crear_almacen_lectura(env: Mapping[str, str] | None = None) -> EncryptedObjectStore:
