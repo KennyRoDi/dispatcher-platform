@@ -22,7 +22,7 @@
 | F-17 | hecha |
 | F-18 | hecha |
 | F-19 | hecha |
-| F-20 | en-pr |
+| F-20 | hecha |
 | F-21 | hecha |
 | F-22 | hecha |
 | F-23 | hecha |
