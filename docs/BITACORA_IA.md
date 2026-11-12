@@ -1433,18 +1433,6 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 
 | Campo | Contenido |
 |---|---|
-| Uso de IA | No se usó IA en F-20. |
-
-## 2026-11-11 · Nahúm Murillo · F-20 (`feat/F-20-1-prioridades-con-aging`)
-
-| Campo | Contenido |
-|---|---|
-| Uso de IA | No se usó IA en F-20. |
-
-## 2026-11-11 · Nahúm Murillo · F-20 (`feat/F-20-1-prioridades-con-aging`)
-
-| Campo | Contenido |
-|---|---|
 | Herramienta | Claude Code (Sonnet 5) |
 | Componente | F-20 |
 | Propósito | Diseñar SPEC, escribir pruebas TDD, implementar dominio de scheduling y adaptador Redis para F-20 |
