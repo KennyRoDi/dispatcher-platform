@@ -16,13 +16,20 @@ from src.infrastructure.tls import TlsSettings, exigir_cifrado, minio_http_clien
 
 def crear_subidas(env: Mapping[str, str] | None = None) -> ChunkedUpload:
     env = os.environ if env is None else env
+    staging_dir = env.get("STAGING_DIR", "/var/lib/dispatcher/staging").strip()
+    if not staging_dir:
+        raise ValueError("faltan variables requeridas de MinIO, OBJECTS_BUCKET o STAGING_DIR")
+    return ChunkedUpload(DiskChunkStaging(staging_dir), crear_almacen_lectura(env))
+
+
+def crear_almacen_lectura(env: Mapping[str, str] | None = None) -> EncryptedObjectStore:
+    env = os.environ if env is None else env
     endpoint = env.get("MINIO_ENDPOINT", "").strip()
     access_key = env.get("MINIO_ACCESS_KEY", "").strip()
     secret_key = env.get("MINIO_SECRET_KEY", "")
     bucket = env.get("OBJECTS_BUCKET", "objetos").strip()
-    staging_dir = env.get("STAGING_DIR", "/var/lib/dispatcher/staging").strip()
-    if not all((endpoint, access_key, secret_key, bucket, staging_dir)):
-        raise ValueError("faltan variables requeridas de MinIO, OBJECTS_BUCKET o STAGING_DIR")
+    if not all((endpoint, access_key, secret_key, bucket)):
+        raise ValueError("faltan variables requeridas de MinIO o OBJECTS_BUCKET")
     secure = env.get("MINIO_SECURE", "true").strip().lower() not in {"0", "false", "no", "off"}
     tls = TlsSettings.from_env(env)
     exigir_cifrado(tls, minio_secure=secure)
@@ -30,8 +37,7 @@ def crear_subidas(env: Mapping[str, str] | None = None) -> ChunkedUpload:
                           secure=secure, http_client=minio_http_client(tls))
     if not cliente.bucket_exists(bucket):
         cliente.make_bucket(bucket)
-    objetos = EncryptedObjectStore(
+    return EncryptedObjectStore(
         MinioObjectStore(cliente, bucket),
         EnvelopeCipher(FileKeyProvider.from_env(env)),
     )
-    return ChunkedUpload(DiskChunkStaging(staging_dir), objetos)

@@ -134,3 +134,37 @@ def test_adaptadores_por_defecto_leen_de_conexion_redis_client(monkeypatch, dobl
     assert [h["categoria"] for h in datos["hallazgos"]] == ["amenaza", "transcripcion"]
     assert {i["tipo"] for i in datos["incidencias"]} == {"severidad_alta"}
     assert inexistente.status_code == 404
+
+
+def test_reporte_consolidado_usa_el_almacen_de_lectura(monkeypatch, dobles):
+    hallazgos, catalogo, almacen = dobles
+    monkeypatch.setattr(rutas_reporte, "_almacen", None)
+    monkeypatch.setattr(rutas_reporte, "crear_almacen_lectura", lambda: almacen)
+    main.app.dependency_overrides[rutas_reporte.obtener_hallazgos] = lambda: hallazgos
+    main.app.dependency_overrides[rutas_reporte.obtener_catalogo] = lambda: catalogo
+    main.app.dependency_overrides[rutas_reporte.obtener_reloj] = lambda: FakeClock(AHORA)
+    try:
+        respuesta = TestClient(main.app).get(RUTA)
+    finally:
+        main.app.dependency_overrides.clear()
+    assert respuesta.status_code == 200
+    assert rutas_reporte._almacen is almacen
+
+
+def test_reporte_consolidado_responde_503_sin_configuracion_del_almacen(monkeypatch, dobles):
+    hallazgos, catalogo, _ = dobles
+    monkeypatch.setattr(rutas_reporte, "_almacen", None)
+    for variable in ("MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY"):
+        monkeypatch.setenv(variable, "")
+    monkeypatch.setenv("MINIO_SECRET_KEY", "clave-que-no-debe-filtrarse")
+    main.app.dependency_overrides[rutas_reporte.obtener_hallazgos] = lambda: hallazgos
+    main.app.dependency_overrides[rutas_reporte.obtener_catalogo] = lambda: catalogo
+    main.app.dependency_overrides[rutas_reporte.obtener_reloj] = lambda: FakeClock(AHORA)
+    try:
+        respuesta = TestClient(main.app).get(RUTA)
+    finally:
+        main.app.dependency_overrides.clear()
+    assert respuesta.status_code == 503
+    assert "no configurado" in respuesta.json()["detail"]
+    assert "clave-que-no-debe-filtrarse" not in respuesta.text
+    assert rutas_reporte._almacen is None
