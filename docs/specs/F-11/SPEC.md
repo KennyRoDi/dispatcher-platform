@@ -2,7 +2,7 @@
 
 **Fase:** implementacion
 **Base:** main
-**Verificación IA:** tests f9a8d62
+**Verificación IA:** implementacion 8909d36
 **Historia:** US-11 · **Requisitos:** RF-11 ([B.4] Reintentos y cancelación); AD-03, AD-43 (aplica); AD-48 (propone) · **Responsable:** N
 
 ## Objetivo
@@ -144,3 +144,4 @@ Las registra `scripts/flujo.py`. No editar.
 | plan | Kenni Rodriguez | 2026-11-12 | El único … del SPEC está en el texto de la fila de verificación IA (mi resumen decía 'campos … restantes'), no en un campo sin completar; autorizado por la persona |
 | verificación IA de tests | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: test_retry.py 10 failed y test_retry_subtask.py error de colección, ambos por ImportError de lo no implementado; test_arquitectura 5 passed. Diff vs main solo toca tests/ y el SPEC, sin código en src/. Cada prueba de la parte 1 del SPEC con su nombre exacto. No verifiqué: los 119 fallos de la suite completa (el subagente los atribuye a entorno Windows/fakeredis tras comparar solo 2 archivos). (f9a8d62) |
 | tests | Kenni Rodriguez | 2026-11-12 |  |
+| verificación IA de implementacion | Claude Sonnet 5.5, subagente developer | 2026-11-12 | Subagente independiente. Ejecuté yo: test_retry, test_retry_subtask y test_arquitectura, 19 passed. git diff f9a8d62 -- tests vacío: pruebas sin debilitar. Leí retry.py (41 líneas) y retry_subtask.py (30): dominio puro, capas correctas, cita de fuente. Desviación declarada: decide_retry calcula la espera con next_delay(attempts+1) porque así lo exige la prueba; ajustar SPEC en documentación. No verifiqué la comparación de la suite completa (121 vs 144 fallos de entorno), que es del subagente. (8909d36) |
