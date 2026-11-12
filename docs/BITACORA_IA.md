@@ -1060,3 +1060,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Validado / corregido / descartado | Aprobaciones delegadas por la persona; verificacion del orquestador, no independiente de la persona |
 | Cómo se validó | Revision del diff contra el SPEC |
 | Error de la IA | el QA halló que el log del cierre usaba %s con un case_id controlado por el cliente (inyección de líneas) y tres defectos previos de rutas_subtareas.py amplificados por la alerta |
+
+## 2026-11-11 · Nahúm Murillo · F-20 (`feat/F-20-1-prioridades-con-aging`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code con Claude Haiku 4.5 |
+| Componente | M2: Planificación con prioridades y aging |
+| Propósito | Implementar scheduling sin inanición: casos bajos no esperan indefinidamente bajo carga alta |
+| Consulta resumida | Plan (SPEC), 16 tests en rojo (TDD), dominio puro (Priority, SchedulingPolicy, SchedulerState), adaptador Redis (RedisScheduler) |
+| Resultado obtenido | `src/domain/scheduling.py` (Priority enum, CaseEntry, SchedulerState), `src/adapters/redis_scheduler.py` (persistencia ZSET), `tests/unit/test_scheduling.py` (16 tests), `tests/integration/test_scheduler_redis.py` (fakeredis) |
+| Validado / corregido / descartado | Aceptado. Algoritmo derivado de AD-04 (ZSET score = t_entrada - bono(prioridad)). Medición de bonos pendiente (F-21) |
+| Cómo se validó | Structura conforme a `docs/CONTRATOS.md`: dominio puro sin redis, adaptador testeable con fakeredis, no usan sleep ni reloj real (mock.patch), TDD: tests en rojo hasta implementación |
+| Error de la IA | Ninguno detectado. Los bonos son placeholders (100 ms); F-21 los reemplaza por valores medidos. Backoff provisional: lineal por nivel |

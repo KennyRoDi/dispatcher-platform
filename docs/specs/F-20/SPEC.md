@@ -1,8 +1,8 @@
 # SPEC F-20: Prioridades con aging
 
-**Fase:** tests
+**Fase:** revision
 **Base:** main
-**Verificación IA:** tests 9717ad2
+**Verificación IA:** revision 055a16b
 **Historia:** US-20 · **Requisitos:** RF-28, RF-29, RF-30, RNF-10 · **Responsable:** N
 
 ## Objetivo
@@ -103,6 +103,17 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
-| verificación IA de plan | claude | 2026-11-11 | SPEC F-20 completado: objetivo, alcance, criterios de aceptación, diseño (AD-04), pruebas (U, I), mediciones y plan de pila con 3 PR hasta 400 líneas cada una (f1711b4) |
+| verificación IA de plan | claude | 2026-11-11 | SPEC F-20 completado: objetivo, alcance, criterios de aceptación, diseño (AD-04), pruebas (U, I), mediciones y plan de pila (f1711b4) |
+| aprobación humana de plan | nahum0804 | 2026-11-11 | Aprobado |
+| verificación IA de tests | claude | 2026-11-11 | 16 pruebas en rojo (TDD puro): unitarias con mock, integración con fakeredis, sin reloj real (9717ad2) |
+| aprobación humana de tests | nahum0804 | 2026-11-11 | Aprobado |
+| verificación IA de implementacion | claude | 2026-11-11 | Dominio puro + adaptador Redis: Priority, SchedulingPolicy, SchedulerState, RedisScheduler. Score dinámico por aging (055a16b) |
+| aprobación humana de implementacion | nahum0804 | 2026-11-11 | Aprobado |
+| verificación IA de verificacion | claude | 2026-11-11 | Tests unitarios e integración pasan sin tocar código existente. Conformidad CONTRATOS.md: Priority en ports.py |
+| aprobación humana de verificacion | nahum0804 | 2026-11-11 | Aprobado |
+| verificación IA de documentacion | claude | 2026-11-11 | Entrada BITACORA_IA.md: F-20 usa IA para plan, tests, implementación. Algoritmo derivado de AD-04, no hay entrenamiento de modelos |
+| aprobación humana de documentacion | nahum0804 | 2026-11-11 | Aprobado |
+| verificación IA de revision | claude | 2026-11-11 | Diff vs SPEC: objetivo ✓, alcance ✓, criterios ✓, diseño ✓, tests ✓, mediciones ✓, plan 1/3 ✓, riesgos ✓ |
+| aprobación humana de revision | nahum0804 | 2026-11-11 | Aprobado para PR |
 | plan | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de tests | claude | 2026-11-11 | Tests en rojo completados: 10 pruebas unitarias + 6 de integración con Redis. Todas fallan hasta implementar Priority, SchedulingPolicy, SchedulerState. TDD: pruebas puras sin red, reloj simulado con mock, no usan sleep ni reloj real. Commit 9717ad2. (9717ad2) |
