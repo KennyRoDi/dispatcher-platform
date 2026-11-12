@@ -1,6 +1,6 @@
 # SPEC F-35: Reinicio del coordinador
 
-**Fase:** pr
+**Fase:** cerrada
 **Base:** main
 **Verificación IA:** revision 04c618c
 **Historia:** US-35 · **Requisitos:** RF-44 (B.6 «Reinicio del coordinador») · **Responsable:** N
