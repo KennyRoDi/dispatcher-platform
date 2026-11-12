@@ -1,6 +1,6 @@
 # SPEC F-24: Backpressure
 
-**Fase:** documentacion
+**Fase:** revision
 **Base:** feat/F-24-1-frenar-productores-con-colas-acotadas
 **Verificación IA:** documentacion f12f4c9c
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
@@ -125,3 +125,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de verificacion | Claude (Opus 5.5) | 2026-11-11 | QA independiente (subagente) APROBADO con Redis real: cola llena no mueve; 64 hilos con limite 1 encola 1 y con limite 100 encola 100; desactivado encola 640/640; payload unicode de 280 KB integro; 2/2 mutantes detectados. Sin defectos. (d80e460e) |
 | verificacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de documentacion | Claude (Opus 5.5) | 2026-11-11 | Documentacion: el SPEC ya describe mover_acotado; sin ficha (medicion en la parte 3); bitacora publicada. (f12f4c9c) |
+| documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
