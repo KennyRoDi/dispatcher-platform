@@ -15,7 +15,7 @@ El enunciado pide una «ráfaga de carga»: envío concurrente de al menos 20 ca
 
 - `scenarios/burst.py`: lee el JSON que ya produce `run_load` (`metrics`, `series`), evalúa el criterio y exporta CSV. Mismo patrón que `scenarios/cancel_heavy.py` y `scenarios/memory_saturation.py`: ejecutor inyectado, evaluación pura, `main()` con salida JSON.
 - Ejecución de la ráfaga: `ejecutar_rafaga(...)` llama a `run_load.run_load` con `--limit` ≥ 20 y `--concurrency` ≥ 20 (SUP-46) y devuelve el JSON. El ejecutor se inyecta en las pruebas.
-- Evaluación pura (`evaluar`): (1) casos enviados ≥ 20; (2) todos en estado final (`completed`, `failed`, `cancelled`) y sin `timed_out` ni `submit_error`; (3) al menos tres hosts worker distintos en `subtasks_per_host` o en las muestras de `series`; (4) throughput, latencia por caso (`duration_s`) y recursos por nodo (`peak_cpu_by_host`, `peak_active_by_host`) presentes.
+- Evaluación pura (`evaluar`): (1) casos enviados ≥ 20; (2) todos en estado final (`FINISHED_STATUSES` de `scripts/submit_case.py`: `completed`, `partially_completed`, `failed`, `cancelled`) y sin `timed_out` ni `submit_error`; (3) al menos tres hosts worker distintos en `subtasks_per_host` o en las muestras de `series`; (4) throughput, latencia por caso (`duration_s`) y recursos por nodo (`peak_cpu_by_host`, `peak_active_by_host`) presentes.
 - Exportación CSV: `latencia_por_caso.csv` (caso, tipo, prioridad, estado, sub-tareas, duración) y `recursos_por_nodo.csv` (instante, host, CPU %, memoria %, sub-tareas activas), derivados de `per_case` y `series`.
 - Gráficos (latencia por caso y recursos por nodo en el tiempo) a partir de los CSV, en la parte 2.
 - Ficha `docs/evidencia/F-33_rafaga.md` con comando, repeticiones y resultados.
@@ -49,7 +49,7 @@ Copiados de `docs/backlog/carga-fallos.md`, US-33:
 | Pieza | Uso |
 |---|---|
 | `scripts/run_load.py` (`run_load`, `submit_all`, `monitor`, `sample_workers`, `compute_metrics`) | Envío concurrente, muestreo de recursos por nodo y métricas (throughput en `throughput_subtasks_per_min`, latencia en `per_case[].duration_s`, `peak_cpu_by_host`, `peak_active_by_host`). El escenario no los duplica. |
-| `FINISHED_STATUSES` de `run_load` | Definición de «estado final». |
+| `FINISHED_STATUSES` de `scripts.submit_case` (`run_load` la importa) | Definición de «estado final». |
 | `scenarios/cancel_heavy.py`, `scenarios/memory_saturation.py` | Patrón de ejecutor inyectado y aceptación sobre JSON. |
 | Dataset de F-03 | Casos sintéticos para la ráfaga. |
 
@@ -63,7 +63,7 @@ Copiados de `docs/backlog/carga-fallos.md`, US-33:
 
 **Decisiones.** AD-50 (provisional; se registra en `docs/ARQUITECTURA.md` §8 en la Parte 1): la ráfaga se valida con un escenario que envuelve `run_load` y evalúa su JSON, no con un segundo cliente de carga. Alternativas: reescribir un cliente concurrente en `scenarios/` (duplica `run_load`); ampliar `run_load` con la evaluación (mezcla medición con criterio y toca un script ya probado). Supuestos nuevos en `docs/REQUERIMIENTOS.md`:
 
-- **SUP-46 (provisional).** «Concurrente»: concurrencia de envío ≥ número de casos (mínimo 20), para que todos estén en vuelo a la vez. «Estado final»: `completed`, `failed` o `cancelled`; un caso `failed` cuenta como final pero se reporta aparte. «Tres nodos activos»: tres `host` distintos con sub-tareas procesadas (o visibles en `series`). El plazo de la corrida es el `--timeout` de `run_load`.
+- **SUP-46 (provisional).** «Concurrente»: concurrencia de envío ≥ número de casos (mínimo 20), para que todos estén en vuelo a la vez. «Estado final»: `FINISHED_STATUSES` de `scripts/submit_case.py` (`completed`, `partially_completed`, `failed`, `cancelled`); un caso `failed` cuenta como final. Límite declarado: el veredicto no lo reporta aparte; solo queda en `case_status_counts` del JSON de `run_load` (ver `docs/DEMO.md`). «Tres nodos activos»: tres `host` distintos con sub-tareas procesadas (o visibles en `series`). El plazo de la corrida es el `--timeout` de `run_load`.
 
 Numeración AD-50 y SUP-46: AD-49 y SUP-45 los tomó la rama `feat/F-11-2-reintentos` (aún sin fusionar), por lo que esta feature usa los siguientes libres (verificado con `git grep` en `origin/*`, 2026-11-12).
 
@@ -83,7 +83,7 @@ TDD aplica a la lógica de `scenarios/burst.py` (Parte 1). La corrida en nodos n
 
 B.6 Ráfaga. **Medición pendiente:** corrida en tres nodos worker reales (F-38 parte 2 sin nodos reales) y la ficha `docs/evidencia/F-33_rafaga.md`. Sin cifras inventadas.
 
-1. Con los tres workers activos (`GET /workers` muestra tres hosts): `PYTHONPATH=. python -m scenarios.burst --dataset dataset --limit 20 --concurrency 20 --timeout 1800 --out docs/evidencia/F-33_<fecha>`.
+1. Con los tres workers activos (`GET /workers` muestra tres hosts): `PYTHONPATH=. python -m scenarios.burst --dataset dataset --limit 20 --concurrency 20 --timeout 1800 --out docs/evidencia/F-33_<fecha>` (el defecto de `--out` es `docs/evidencia`, según `scenarios/burst.py`).
 2. Tres repeticiones; se reporta cada una, no solo la mejor. Opcional: 40 casos para ver saturación.
 3. Corrida de prueba en la simulación local de F-38 parte 2, declarada «simulación local, no acredita B.2».
 4. CSV y gráficos de latencia por caso y de recursos por nodo, generados con los CSV.
@@ -104,7 +104,7 @@ Recomendación entre paréntesis; el orquestador las acepta por autonomía deleg
 
 1. **Reutilizar `run_load` en lugar de un cliente nuevo.** (Sí, AD-50.)
 2. **Mínimo de 20 casos y concurrencia igual al número de casos.** (Aceptar SUP-46; el enunciado dice «al menos 20».)
-3. **Un caso `failed` cuenta como estado final.** (Sí, pero se reporta aparte; el criterio habla de estado final, no de éxito.)
+3. **Un caso `failed` cuenta como estado final.** (Sí; el veredicto no lo reporta aparte: límite declarado, aparece solo en `case_status_counts` del JSON de `run_load`, ver `docs/DEMO.md`. El criterio habla de estado final, no de éxito.)
 4. **Tres hosts distintos como prueba de tres nodos.** (Sí; la simulación local lo cumple con hosts declarados y no acredita B.2.)
 5. **Gráficos:** se generan a partir de los CSV con matplotlib si ya es dependencia; si no, solo CSV y tabla en la ficha. (Verificar dependencias antes de la parte 2.)
 6. **Corrida real:** depende de F-38 con nodos reales y del dataset de F-03; hasta entonces «Medición pendiente».
