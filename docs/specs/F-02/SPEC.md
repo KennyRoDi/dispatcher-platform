@@ -1,6 +1,6 @@
 # SPEC F-02: Validar y normalizar
 
-**Fase:** implementacion
+**Fase:** verificacion
 **Base:** main
 **Verificación IA:** implementacion 53d802e
 **Historia:** US-02 · **Requisitos:** RF-02 (exportaciones de chat), RNF-06 (normalización) · **Responsable:** N
@@ -101,3 +101,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de tests | claude | 2026-11-11 | 10 pruebas en rojo (U x8, I x1, A x1): todas fallan por ModuleNotFoundError (faltan whatsapp_parser.py, telegram_parser.py y chat_export.py). Resto de la suite (58 passed en puertos/arquitectura/coordinator) intacto (73e0aac) |
 | tests | Nahúm Murillo | 2026-11-11 |  |
 | verificación IA de implementacion | claude | 2026-11-11 | Implementacion completa: FormatoDeChatInvalido (7 lineas), WhatsAppParser (39 lineas, regex de cabecera + continuacion multilinea), TelegramParser (51 lineas, valida JSON/messages/campos). 10 tests nuevos verdes a la primera, 58 passed en regresion (puertos, arquitectura, coordinator). 97 lineas de codigo total (53d802e) |
+| implementacion | Nahúm Murillo | 2026-11-12 | errores de coleccion/fallos preexistentes en TLS/decomposition_qa del entorno local, confirmados ajenos a F-02 |
