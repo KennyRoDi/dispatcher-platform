@@ -2,7 +2,7 @@
 
 **Fase:** plan
 **Base:** main
-**Verificación IA:** pendiente
+**Verificación IA:** plan 51ca420
 **Historia:** US-35 · **Requisitos:** RF-44 (B.6 «Reinicio del coordinador») · **Responsable:** N
 
 ## Objetivo
@@ -118,3 +118,4 @@ Las registra `scripts/flujo.py`. No editar.
 
 | Fase | Aprobó | Fecha | Excepción o motivo |
 |---|---|---|---|
+| verificación IA de plan | claude | 2026-11-12 | SPEC F-35 completado tras verificar en el codigo que no existe ninguna funcion de reconciliacion para el coordinador (git grep reconcili sin resultados en src/) porque AD-21 ya decidio que es stateless; F-35 mide con datos reales lo que AD-21 dejo como 'Medicion pendiente'. Diseno: simular el reinicio construyendo una instancia nueva de crear_app() contra el mismo Redis, mismo patron que F-34/cancel_heavy.py. Plan de 1 parte, ~140 lineas (51ca420) |
