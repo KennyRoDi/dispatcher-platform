@@ -1516,3 +1516,16 @@ Registro del uso de IA, con el formato del Anexo 3 [Parte I §4]. Lo escribe `py
 | Resultado obtenido | WhatsAppParser y TelegramParser implementan ConversationParser; formato reconstruido del generador sintetico de F-03; AD-48/SUP-44 documentan la interpretacion UTC |
 | Validado / corregido / descartado | Responsable ejecuto y leyo cada fase; formato verificado contra el generador sintetico real |
 | Cómo se validó | pytest de los parsers y de integracion/aceptacion (10 passed); QA manual con archivo vacio, JSON malformado, text_entities de Telegram |
+
+## 2026-11-12 · Kenni Rodriguez · F-39 (`feat/F-39-1-reutilizacion-y-correcciones`)
+
+| Campo | Contenido |
+|---|---|
+| Herramienta | Claude Code (Sonnet 5.5) |
+| Componente | F-39 |
+| Propósito | Documento de reutilización y correcciones (SPEC, pruebas y redacción de docs/reutilizacion.md) |
+| Consulta resumida | Clasificar cada componente del I Proyecto contra git diff bc6bab6 y enlazar cada deficiencia a su corrección |
+| Resultado obtenido | docs/reutilizacion.md en cinco secciones y test_reutilizacion_doc.py (22 pruebas) |
+| Validado / corregido / descartado | QA independiente contrastó 15 filas con git diff, 29 hashes y PR; aprobaciones de fases delegadas por la persona (modo autónomo); trabajo en apoyo de F-39, responsable N |
+| Cómo se validó | Se corrigieron dos omisiones del documento halladas por QA |
+| Error de la IA | El subagente omitió la fila 'Heartbeat y reaper' y listó incompleto los lugares con minioadmin (faltaban .env.demo, deploy/*.yml y src/workers/config.py); detectado por QA contra git grep y corregido. El test de aceptación no cruza estado con git diff (límite declarado) |
