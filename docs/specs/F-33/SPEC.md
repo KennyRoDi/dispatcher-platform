@@ -1,6 +1,6 @@
 # SPEC F-33: Ráfaga
 
-**Fase:** tests
+**Fase:** implementacion
 **Base:** feat/F-33-1-rafaga
 **Verificación IA:** tests f161348
 **Historia:** US-33 · **Requisitos:** RF-42, RNF-01, RNF-09, RNF-15; QA-10; [B.6 Ráfaga de carga] · **Responsable:** K
@@ -133,3 +133,4 @@ Las registra `scripts/flujo.py`. No editar.
 | verificación IA de revision | Claude Code (Sonnet 5.5), subagente revisor; verificación del orquestador | 2026-11-12 | Revisor: APROBADO con menores; pytest burst+arquitectura 65 passed, 1 skipped, 3 xfailed; diff sin cambios en src/ ni run_load.py; menores 1-3 (estado final con partially_completed, cita FINISHED_STATUSES, --out) corregidos en SPEC y SUP-46 (b54da91); menores 4-5 aceptados; sin cambios de código tras la prueba (b54da91) |
 | revision | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33) |
 | verificación IA de tests | Claude Code (Sonnet 5.5), sin subagente: verificación no independiente | 2026-11-12 | Parte 2 es solo evidencia (SPEC Plan de pila: sin código); las pruebas del escenario ya están en la parte 1 (PR 144); no hay pruebas nuevas que escribir; excepción de la fase tests (f161348) |
+| tests | Kenni Rodriguez | 2026-11-12 | aprobación delegada por la persona (autonomía total en /trabajar F-33); parte 2 sin código ni pruebas nuevas: solo evidencia de corrida en simulación local |
