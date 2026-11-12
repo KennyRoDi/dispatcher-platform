@@ -2,7 +2,7 @@
 
 **Fase:** tests
 **Base:** feat/F-24-2-mover-al-scheduler-solo-con-espacio-en-la-cola
-**Verificación IA:** revision 70b97e4e
+**Verificación IA:** tests 0b31bb9d
 **Historia:** US-24 · **Requisitos:** RF-33, [B.5 M3], QA-05 · **Responsable:** V
 
 ## Objetivo
@@ -128,3 +128,4 @@ Las registra `scripts/flujo.py`. No editar.
 | documentacion | Melany Vindas | 2026-11-11 | Suite verificada en Linux por Claude; en Windows falla test_generar_certs, ajena a F-24. |
 | verificación IA de revision | Claude (Opus 5.5) | 2026-11-11 | Revision no independiente: 17 lineas en redis_backpressure.py y 2 archivos de prueba; cumple el SPEC parte 2 sin agregados; usa KEYS; capas correctas; commits de 58 y 62 caracteres en Conventional Commits. (70b97e4e) |
 | revision | Melany Vindas | 2026-11-11 |  |
+| verificación IA de tests | Claude Code | 2026-11-11 | Pruebas del resumen de la medicion de backpressure (0b31bb9d) |
