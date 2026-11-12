@@ -50,24 +50,38 @@ class CaseEntry:
     current_priority: Priority = field(default_factory=lambda: Priority.BAJA)
 
     def score(self, now: float) -> float:
-        """Puntaje para ZSET: t_entrada - bono(prioridad).
+        """Puntaje para ZSET: t_entrada - bono(prioridad_efectiva).
 
-        Menor score sale primero (rojo en Redis ZRANGE).
-        El bono aumenta con la espera, así que la prioridad efectiva sube.
+        Menor score sale primero (en Redis ZRANGE ASC).
+        El bono crece: BAJA=0, MEDIA=100, ALTA=200, CRITICA=400.
+        Ejemplo: caso BAJA entra en t=0, score = 0 - 0 = 0
+                caso CRITICA entra en t=200, score = 200 - 400 = -200
+        Orden: -200 (critica) < 0 (baja) → critica sale primero.
         """
-        elapsed = now - self.entered_at
         effective_priority = self._effective_priority_at(now)
         bonus = effective_priority.bonus_ms()
         return self.entered_at - bonus
 
     def _effective_priority_at(self, now: float) -> Priority:
-        """Prioridad efectiva según espera (aging)."""
+        """Prioridad efectiva según espera (aging).
+
+        Si caso BAJA espera más de 100ms (su bono = 0 + siguiente bono = 100),
+        sube a MEDIA. Si espera más de 100+200=300, sube a ALTA. Etc.
+        """
         elapsed = now - self.entered_at
         prio = self.priority
 
-        while prio != Priority.CRITICA and elapsed > prio.bonus_ms():
-            elapsed -= prio.bonus_ms()
-            prio = prio.next_priority()
+        # Calcular cuántos escalones de bono se cumplieron
+        while prio != Priority.CRITICA:
+            next_prio = prio.next_priority()
+            next_bonus = next_prio.bonus_ms()
+            current_bonus = prio.bonus_ms()
+
+            # Si la espera supera el bono del siguiente nivel, sube
+            if elapsed > next_bonus:
+                prio = next_prio
+            else:
+                break
 
         return prio
 

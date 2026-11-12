@@ -95,24 +95,18 @@ class TestSchedulingPolicy:
         with patch("time.time", return_value=0.0):
             scheduler.enqueue(case_id="caso", priority=Priority.BAJA, entered_at=0.0)
 
-        # Puntaje en t=0: 0 - bono(BAJA) = 0 - 0 = 0
-        # Puntaje en t=50: 50 - bono(BAJA) = 50 - 0 = 50 (esperó 50, bono no aplica)
-        # Puntaje en t=101: 101 - bono(MEDIA) = 101 - 100 = 1 (subió a MEDIA, bono = 100)
+        # Bonos: BAJA=0, MEDIA=100, ALTA=200, CRITICA=400
+        # Caso BAJA entra en t=0
+        # A t=50: elapsed=50, bono MEDIA=100, 50 < 100 → sigue siendo BAJA
+        # A t=101: elapsed=101, bono MEDIA=100, 101 > 100 → sube a MEDIA
 
-        # El scheduler debe devolver una prioridad dinámica según la espera
         with patch("time.time", return_value=50.0):
             priority_at_50 = scheduler.effective_priority("caso")
-            assert priority_at_50 == Priority.BAJA, "A 50 ms aún es BAJA (bono = 100)"
+            assert priority_at_50 == Priority.BAJA, "A 50 ms aún es BAJA (bono MEDIA = 100)"
 
         with patch("time.time", return_value=101.0):
             priority_at_101 = scheduler.effective_priority("caso")
-            assert priority_at_101 in [Priority.BAJA, Priority.MEDIA], \
-                "A 101 ms debe subir a MEDIA"
-            if priority_at_101 == Priority.MEDIA:
-                # El backoff es lineal
-                pass
-            else:
-                pytest.skip("Backoff aún no calibrado")
+            assert priority_at_101 == Priority.MEDIA, "A 101 ms sube a MEDIA (101 > 100)"
 
 
 class TestSchedulingOrder:
@@ -129,15 +123,16 @@ class TestSchedulingOrder:
             scheduler.enqueue(case_id="baja", priority=Priority.BAJA, entered_at=0.0)
             scheduler.enqueue(case_id="alta", priority=Priority.ALTA, entered_at=10.0)
 
-        # Puntajes (bono=0 para simplificar):
+        # Bonos: BAJA=0, ALTA=200
+        # Puntajes:
         # baja: 0 - 0 = 0
-        # alta: 10 - bono(ALTA=200) = 10 - 200 = -190
+        # alta: 10 - 200 = -190
         # Menor sale primero: -190 < 0, así que alta sale primero
         next_case = scheduler.next()
-        assert next_case == "alta", "ZSET: prioridad alta sale primero (puntaje menor)"
+        assert next_case == "alta", "ZSET: puntaje menor (-190) sale primero"
 
         next_case = scheduler.next()
-        assert next_case == "baja", "ZSET: luego prioridad baja"
+        assert next_case == "baja", "ZSET: luego puntaje mayor (0)"
 
         assert scheduler.next() is None, "Cola vacía"
 
@@ -156,8 +151,13 @@ class TestSchedulingOrder:
             with patch("time.time", return_value=t):
                 scheduler.enqueue(case_id=case, priority=prio, entered_at=t)
 
-        # El orden debe ser por puntaje: t - bono(prio)
-        # Esperamos que crítica salga primero (mayor bono, puntaje más bajo)
+        # Bonos: BAJA=0, MEDIA=100, ALTA=200, CRITICA=400
+        # Puntajes: t - bono(prio)
+        # baja: 0 - 0 = 0
+        # media: 50 - 100 = -50
+        # alta: 100 - 200 = -100
+        # critica: 200 - 400 = -200
+        # Orden por puntaje: -200 < -100 < -50 < 0
         order = []
         while True:
             case = scheduler.next()
@@ -166,8 +166,10 @@ class TestSchedulingOrder:
             order.append(case)
 
         assert len(order) == 4, "Todas las 4 casos deben estar"
-        # La crítica (t=200, bono alto) debe tener puntaje bajo y salir primero
-        assert order[0] == "critica", "Crítica tiene puntaje más bajo (bono alto)"
+        assert order[0] == "critica", "Crítica tiene puntaje más bajo (-200)"
+        assert order[1] == "alta", "Alta tiene puntaje -100"
+        assert order[2] == "media", "Media tiene puntaje -50"
+        assert order[3] == "baja", "Baja tiene puntaje más alto (0)"
 
 
 class TestSchedulerIdempotencia:

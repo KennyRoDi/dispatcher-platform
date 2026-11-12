@@ -78,24 +78,25 @@ class TestRedisIntegration:
 
     def test_zset_ordenado_por_puntaje(self, redis_client):
         """ZSET de Redis mantiene orden por puntaje (t_entrada - bono)."""
-        # Simular ZSET: score = t_entrada - bono(prioridad)
-        # bono(BAJA)=0, bono(MEDIA)=100, bono(ALTA)=200, bono(CRITICA)=400
+        # Bonos: BAJA=0, MEDIA=100, ALTA=200, CRITICA=400
+        # Scores = t_entrada - bono(prioridad)
 
-        # Casos entrados en orden: baja t=0, media t=50, alta t=100, crítica t=200
+        # Casos entrados:
         cases = [
-            ("baja", 0 - 0, 0),       # score, entered_at
-            ("media", 50 - 100, 50),
-            ("alta", 100 - 200, 100),
-            ("critica", 200 - 400, 200),
+            ("baja", 0 - 0, 0),          # score=0, entered_at=0
+            ("media", 50 - 100, 50),     # score=-50, entered_at=50
+            ("alta", 100 - 200, 100),    # score=-100, entered_at=100
+            ("critica", 200 - 400, 200), # score=-200, entered_at=200
         ]
 
         for case_id, score, entered_at in cases:
             redis_client.zadd("pending:text", {case_id: score})
 
-        # Sacar en orden por score (ZRANGE score ASC)
+        # Sacar en orden por score ASC (menor sale primero)
+        # Orden esperado por score: -200 < -100 < -50 < 0
         order = redis_client.zrange("pending:text", 0, -1)
-        assert order == ["critica", "media", "alta", "baja"], \
-            "ZSET devuelve en orden ascendente de score (crítica tiene score más bajo)"
+        assert order == ["critica", "alta", "media", "baja"], \
+            f"ZSET devuelve en orden ascendente de score. Scores: critica=-200, alta=-100, media=-50, baja=0. Obtuvimos: {order}"
 
     def test_blmove_desde_cola_con_prioridad(self, redis_client):
         """BLMOVE atómico mantiene el orden de prioridad."""
